@@ -149,9 +149,131 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('data/web-data/taofen_images/韬奋像/001_韬奋像照片1.jpg') center/cover;
-            filter: brightness(0.4) sepia(0.3) contrast(1.1);
+            background: 
+                linear-gradient(45deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)),
+                linear-gradient(rgba(244, 228, 188, 0.1), rgba(244, 228, 188, 0.05));
             animation: heroZoom 20s ease-in-out infinite;
+        }
+
+        /* Photo Collage Elements */
+        .photo-collage {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .collage-photo {
+            position: absolute;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            filter: sepia(0.3) brightness(0.8) contrast(1.1);
+            border: 3px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .collage-photo:hover {
+            transform: scale(1.05) rotate(2deg);
+            filter: sepia(0.1) brightness(1) contrast(1.2);
+            border-color: rgba(212, 175, 55, 0.6);
+        }
+
+        /* 主要肖像 - 中心位置 */
+        .collage-main {
+            width: 250px;
+            height: 300px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-2deg);
+            z-index: 5;
+            background: url('data/web-data/taofen_images/韬奋像/001_韬奋像照片1.jpg') center/cover;
+        }
+
+        /* 青年时期照片 - 左上角 */
+        .collage-young {
+            width: 180px;
+            height: 220px;
+            top: 15%;
+            left: 10%;
+            transform: rotate(-8deg);
+            z-index: 3;
+            background: url('data/web-data/taofen_images/韬奋像/070_韬奋像_70.jpg') center/cover;
+        }
+
+        /* 中年时期照片 - 右上角 */
+        .collage-middle {
+            width: 160px;
+            height: 200px;
+            top: 20%;
+            right: 15%;
+            transform: rotate(5deg);
+            z-index: 3;
+            background: url('data/web-data/taofen_images/韬奋像/071_韬奋像_71.jpg') center/cover;
+        }
+
+        /* 家庭照片 - 左下角 */
+        .collage-family {
+            width: 200px;
+            height: 150px;
+            bottom: 20%;
+            left: 8%;
+            transform: rotate(3deg);
+            z-index: 2;
+            background: url('data/web-data/taofen_images/韬奋与家人/058_韬奋与家人_58.jpg') center/cover;
+        }
+
+        /* 朋友合影 - 右下角 */
+        .collage-friends {
+            width: 180px;
+            height: 140px;
+            bottom: 15%;
+            right: 12%;
+            transform: rotate(-4deg);
+            z-index: 2;
+            background: url('data/web-data/taofen_images/韬奋与朋友/030_韬奋与朋友_30.jpg') center/cover;
+        }
+
+        /* 小照片装饰 */
+        .collage-small1 {
+            width: 120px;
+            height: 100px;
+            top: 35%;
+            left: 20%;
+            transform: rotate(12deg);
+            z-index: 1;
+            background: url('data/web-data/taofen_images/韬奋与朋友/086_韬奋与朋友_86.jpg') center/cover;
+        }
+
+        .collage-small2 {
+            width: 100px;
+            height: 120px;
+            top: 60%;
+            right: 25%;
+            transform: rotate(-10deg);
+            z-index: 1;
+            background: url('data/web-data/taofen_images/韬奋像/072_韬奋像_72.jpg') center/cover;
+        }
+
+        /* 历史文档背景纹理 */
+        .hero-texture {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(244, 228, 188, 0.05) 2px,
+                    rgba(244, 228, 188, 0.05) 4px
+                ),
+                radial-gradient(circle at 20% 30%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(212, 175, 55, 0.08) 0%, transparent 50%);
+            z-index: 1;
         }
 
         .hero-portrait-overlay {
@@ -161,11 +283,12 @@
             width: 100%;
             height: 100%;
             background: radial-gradient(
-                ellipse at 30% 40%, 
+                ellipse at center, 
                 transparent 0%, 
-                rgba(0, 0, 0, 0.3) 40%, 
-                rgba(0, 0, 0, 0.8) 80%
+                rgba(0, 0, 0, 0.3) 60%, 
+                rgba(0, 0, 0, 0.7) 100%
             );
+            z-index: 6;
         }
 
         @keyframes heroZoom {
@@ -623,200 +746,7 @@
             color: #d4af37;
         }
 
-        /* Photo Gallery Styles */
-        .photo-gallery {
-            padding: 120px 0;
-            background: linear-gradient(180deg, #000 0%, #0a0a0a 50%, #000 100%);
-            position: relative;
-        }
 
-        .photo-gallery::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, #d4af37, transparent);
-        }
-
-        .category-nav {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 60px;
-            flex-wrap: wrap;
-        }
-
-        .category-btn {
-            background: transparent;
-            border: 2px solid rgba(212, 175, 55, 0.3);
-            color: rgba(255, 255, 255, 0.7);
-            padding: 12px 30px;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'ZCOOL XiaoWei', serif;
-            font-size: 1rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .category-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.1), transparent);
-            transition: left 0.6s ease;
-        }
-
-        .category-btn:hover::before,
-        .category-btn.active::before {
-            left: 100%;
-        }
-
-        .category-btn:hover,
-        .category-btn.active {
-            border-color: #d4af37;
-            color: #d4af37;
-            background: rgba(212, 175, 55, 0.1);
-        }
-
-        .photo-grid {
-            display: none;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 40px;
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s ease;
-        }
-
-        .photo-grid.active {
-            display: grid;
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .photo-item {
-            position: relative;
-            border-radius: 15px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: all 0.4s ease;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-        }
-
-        .photo-item.featured {
-            grid-column: span 2;
-            grid-row: span 2;
-        }
-
-        .photo-item:hover {
-            transform: translateY(-10px) scale(1.02);
-            border-color: #d4af37;
-            box-shadow: 0 20px 40px rgba(212, 175, 55, 0.2);
-        }
-
-        .photo-item img {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-            transition: all 0.4s ease;
-            filter: sepia(0.2) brightness(0.9);
-        }
-
-        .photo-item.featured img {
-            height: 520px;
-        }
-
-        .photo-item:hover img {
-            transform: scale(1.1);
-            filter: sepia(0.3) brightness(1.1);
-        }
-
-        .photo-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
-            padding: 30px 20px 20px;
-            transform: translateY(100%);
-            transition: all 0.4s ease;
-        }
-
-        .photo-item:hover .photo-overlay {
-            transform: translateY(0);
-        }
-
-        .photo-info h4 {
-            font-family: 'ZCOOL XiaoWei', serif;
-            color: #d4af37;
-            font-size: 1.2rem;
-            margin-bottom: 8px;
-        }
-
-        .photo-info p {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-
-        /* Lightbox Modal */
-        .lightbox {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 10000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(10px);
-        }
-
-        .lightbox.active {
-            display: flex;
-        }
-
-        .lightbox-content {
-            max-width: 90%;
-            max-height: 90%;
-            position: relative;
-        }
-
-        .lightbox-img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            border-radius: 10px;
-        }
-
-        .lightbox-close {
-            position: absolute;
-            top: -50px;
-            right: 0;
-            background: none;
-            border: none;
-            color: #d4af37;
-            font-size: 2rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .lightbox-close:hover {
-            color: #fff;
-            transform: scale(1.2);
-        }
 
         /* Mobile Responsive */
         @media (max-width: 768px) {
@@ -865,26 +795,52 @@
                 align-items: center;
             }
 
-            .photo-grid {
-                grid-template-columns: 1fr;
+            /* Mobile collage adjustments */
+            .collage-main {
+                width: 180px;
+                height: 220px;
             }
 
-            .photo-item.featured {
-                grid-column: span 1;
-                grid-row: span 1;
+            .collage-young {
+                width: 120px;
+                height: 150px;
+                top: 20%;
+                left: 5%;
             }
 
-            .photo-item.featured img {
-                height: 250px;
+            .collage-middle {
+                width: 100px;
+                height: 130px;
+                top: 25%;
+                right: 8%;
             }
 
-            .category-nav {
-                gap: 5px;
+            .collage-family {
+                width: 140px;
+                height: 100px;
+                bottom: 25%;
+                left: 5%;
             }
 
-            .category-btn {
-                padding: 8px 15px;
-                font-size: 0.9rem;
+            .collage-friends {
+                width: 120px;
+                height: 90px;
+                bottom: 20%;
+                right: 8%;
+            }
+
+            .collage-small1 {
+                width: 80px;
+                height: 70px;
+                top: 40%;
+                left: 15%;
+            }
+
+            .collage-small2 {
+                width: 70px;
+                height: 80px;
+                top: 65%;
+                right: 20%;
             }
         }
     </style>
@@ -906,10 +862,10 @@
             <div class="nav-content">
                 <div class="nav-logo">邹韬奋 · 数字纪念</div>
                 <ul class="nav-menu">
-                    <li><a href="#gallery">时光相册</a></li>
                     <li><a href="#timeline">时间之旅</a></li>
                     <li><a href="#philosophy">思想之光</a></li>
                     <li><a href="#context">历史回响</a></li>
+                    <li><a href="#cta">探索之旅</a></li>
                 </ul>
             </div>
         </div>
@@ -918,6 +874,19 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-bg"></div>
+        <div class="hero-texture"></div>
+        
+        <!-- Photo Collage -->
+        <div class="photo-collage">
+            <div class="collage-photo collage-main"></div>
+            <div class="collage-photo collage-young"></div>
+            <div class="collage-photo collage-middle"></div>
+            <div class="collage-photo collage-family"></div>
+            <div class="collage-photo collage-friends"></div>
+            <div class="collage-photo collage-small1"></div>
+            <div class="collage-photo collage-small2"></div>
+        </div>
+        
         <div class="hero-portrait-overlay"></div>
         <div class="hero-overlay"></div>
         <div class="hero-particles" id="heroParticles"></div>
@@ -936,166 +905,7 @@
         </div>
     </section>
 
-    <!-- Photo Gallery Section -->
-    <section class="photo-gallery" id="gallery">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">时光相册</h2>
-                <p class="section-subtitle">透过珍贵照片，走进韬奋先生的人生足迹</p>
-            </div>
-            
-            <div class="gallery-categories">
-                <div class="category-nav">
-                    <button class="category-btn active" data-category="portrait">个人写真</button>
-                    <button class="category-btn" data-category="friends">社交时光</button>
-                    <button class="category-btn" data-category="family">温馨家庭</button>
-                    <button class="category-btn" data-category="prison">铁窗岁月</button>
-                </div>
-                
-                <!-- Portrait Gallery -->
-                <div class="photo-grid active" id="portrait-grid">
-                    <div class="photo-item" data-src="data/web-data/taofen_images/韬奋像/070_韬奋像_70.jpg">
-                        <img src="data/web-data/taofen_images/韬奋像/070_韬奋像_70.jpg" alt="韬奋青年时期">
-                        <div class="photo-overlay">
-                            <div class="photo-info">
-                                <h4>青年韬奋</h4>
-                                <p>意气风发的青年时期</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="photo-item featured" data-src="data/web-data/taofen_images/韬奋像/001_韬奋像照片1.jpg">
-                        <img src="data/web-data/taofen_images/韬奋像/001_韬奋像照片1.jpg" alt="韬奋经典肖像">
-                        <div class="photo-overlay">
-                            <div class="photo-info">
-                                <h4>经典肖像</h4>
-                                <p>最具代表性的韬奋形象</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="photo-item" data-src="data/web-data/taofen_images/韬奋像/071_韬奋像_71.jpg">
-                        <img src="data/web-data/taofen_images/韬奋像/071_韬奋像_71.jpg" alt="韬奋中年时期">
-                        <div class="photo-overlay">
-                            <div class="photo-info">
-                                <h4>中年韬奋</h4>
-                                <p>事业巅峰的成熟风采</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="photo-item" data-src="data/web-data/taofen_images/韬奋像/072_韬奋像_72.jpg">
-                        <img src="data/web-data/taofen_images/韬奋像/072_韬奋像_72.jpg" alt="韬奋晚年">
-                        <div class="photo-overlay">
-                            <div class="photo-info">
-                                <h4>晚年韬奋</h4>
-                                <p>历经沧桑的智者风范</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Friends Gallery -->
-                <div class="photo-grid" id="friends-grid">
-                    <div class="photo-item" data-src="data/web-data/taofen_images/韬奋与朋友/030_韬奋与朋友_30.jpg">
-                        <img src="data/web-data/taofen_images/韬奋与朋友/030_韬奋与朋友_30.jpg" alt="韬奋与同事合影">
-                        <div class="photo-overlay">
-                            <div class="photo-info">
-                                <h4>同窗好友</h4>
-                                <p>与志同道合的朋友们</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="photo-item" data-src="data/web-data/taofen_images/韬奋与朋友/024_韬奋与朋友_24.jpg">
-                        <img src="data/web-data/taofen_images/韬奋与朋友/024_韬奋与朋友_24.jpg" alt="韬奋与文化界人士">
-                        <div class="photo-overlay">
-                            <div class="photo-info">
-                                <h4>文化沙龙</h4>
-                                <p>与文化界人士的聚会</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="photo-item" data-src="data/web-data/taofen_images/韬奋与朋友/086_韬奋与朋友_86.jpg">
-                        <img src="data/web-data/taofen_images/韬奋与朋友/086_韬奋与朋友_86.jpg" alt="韬奋工作场景">
-                        <div class="photo-overlay">
-                            <div class="photo-info">
-                                <h4>工作时光</h4>
-                                <p>与同事们的工作瞬间</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Family Gallery -->
-                <div class="photo-grid" id="family-grid">
-                    <div class="photo-item" data-src="data/web-data/taofen_images/韬奋与家人/058_韬奋与家人_58.jpg">
-                        <img src="data/web-data/taofen_images/韬奋与家人/058_韬奋与家人_58.jpg" alt="韬奋全家福">
-                        <div class="photo-overlay">
-                            <div class="photo-info">
-                                <h4>全家福</h4>
-                                <p>温馨的家庭时光</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="photo-item" data-src="data/web-data/taofen_images/韬奋与家人/059_韬奋与家人_59.jpg">
-                        <img src="data/web-data/taofen_images/韬奋与家人/059_韬奋与家人_59.jpg" alt="韬奋与妻子">
-                        <div class="photo-overlay">
-                            <div class="photo-info">
-                                <h4>伉俪情深</h4>
-                                <p>与妻子的恩爱合影</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="photo-item" data-src="data/web-data/taofen_images/韬奋与家人/061_韬奋与家人_61.jpg">
-                        <img src="data/web-data/taofen_images/韬奋与家人/061_韬奋与家人_61.jpg" alt="韬奋与子女">
-                        <div class="photo-overlay">
-                            <div class="photo-info">
-                                <h4>父爱如山</h4>
-                                <p>与子女们的亲情时刻</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Prison Gallery -->
-                <div class="photo-grid" id="prison-grid">
-                    <div class="photo-item" data-src="data/web-data/taofen_images/韬奋在狱中/018_韬奋在狱中_18.jpg">
-                        <img src="data/web-data/taofen_images/韬奋在狱中/018_韬奋在狱中_18.jpg" alt="韬奋狱中照片">
-                        <div class="photo-overlay">
-                            <div class="photo-info">
-                                <h4>铁窗岁月</h4>
-                                <p>坚贞不屈的铁骨精神</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="photo-item" data-src="data/web-data/taofen_images/韬奋在狱中/016_韬奋在狱中_16.jpg">
-                        <img src="data/web-data/taofen_images/韬奋在狱中/016_韬奋在狱中_16.jpg" alt="七君子事件">
-                        <div class="photo-overlay">
-                            <div class="photo-info">
-                                <h4>七君子事件</h4>
-                                <p>历史性的关键时刻</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="photo-item" data-src="data/web-data/taofen_images/韬奋在狱中/100_韬奋在狱中_100.jpg">
-                        <img src="data/web-data/taofen_images/韬奋在狱中/100_韬奋在狱中_100.jpg" alt="狱中记录">
-                        <div class="photo-overlay">
-                            <div class="photo-info">
-                                <h4>狱中记录</h4>
-                                <p>不屈意志的见证</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+
 
     <!-- Journey Section -->
     <section class="journey" id="timeline">
@@ -1184,7 +994,7 @@
     </section>
 
     <!-- CTA Section -->
-    <section class="cta">
+    <section class="cta" id="cta">
         <div class="container">
             <div class="cta-content">
                 <h2>开始探索之旅</h2>
@@ -1202,23 +1012,17 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-links">
-                    <a href="#gallery">时光相册</a>
                     <a href="#timeline">时间之旅</a>
                     <a href="#philosophy">思想之光</a>
                     <a href="#context">历史回响</a>
+                    <a href="#cta">探索之旅</a>
                 </div>
                 <p>&copy; 2024 邹韬奋数字纪念馆. 用现代科技传承历史记忆.</p>
             </div>
         </div>
     </footer>
 
-    <!-- Lightbox Modal -->
-    <div class="lightbox" id="lightbox">
-        <div class="lightbox-content">
-            <button class="lightbox-close" id="lightboxClose">&times;</button>
-            <img class="lightbox-img" id="lightboxImg" src="" alt="">
-        </div>
-    </div>
+
 
     <script>
         // Hide loading screen
@@ -1301,95 +1105,7 @@
             }
         });
 
-        // Photo Gallery functionality
-        const categoryBtns = document.querySelectorAll('.category-btn');
-        const photoGrids = document.querySelectorAll('.photo-grid');
-        const photoItems = document.querySelectorAll('.photo-item');
-        const lightbox = document.getElementById('lightbox');
-        const lightboxImg = document.getElementById('lightboxImg');
-        const lightboxClose = document.getElementById('lightboxClose');
 
-        // Category switching
-        categoryBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const category = this.getAttribute('data-category');
-                
-                // Update active button
-                categoryBtns.forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                
-                // Show corresponding grid
-                photoGrids.forEach(grid => {
-                    grid.classList.remove('active');
-                    if (grid.id === category + '-grid') {
-                        setTimeout(() => {
-                            grid.classList.add('active');
-                        }, 300);
-                    }
-                });
-            });
-        });
-
-        // Photo lightbox functionality
-        photoItems.forEach(item => {
-            item.addEventListener('click', function() {
-                const imageSrc = this.getAttribute('data-src');
-                const imageAlt = this.querySelector('img').getAttribute('alt');
-                
-                lightboxImg.src = imageSrc;
-                lightboxImg.alt = imageAlt;
-                lightbox.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            });
-        });
-
-        // Close lightbox
-        lightboxClose.addEventListener('click', closeLightbox);
-        lightbox.addEventListener('click', function(e) {
-            if (e.target === lightbox) {
-                closeLightbox();
-            }
-        });
-
-        // ESC key to close lightbox
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeLightbox();
-            }
-        });
-
-        function closeLightbox() {
-            lightbox.classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
-
-        // Photo grid animation on scroll
-        const photoGridObserver = new IntersectionObserver(function(entries) {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, {
-            threshold: 0.1,
-            rootMargin: '0px 0px -100px 0px'
-        });
-
-        photoGrids.forEach(grid => {
-            photoGridObserver.observe(grid);
-        });
-
-        // Add subtle hover effects to category buttons
-        categoryBtns.forEach(btn => {
-            btn.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-2px)';
-            });
-            
-            btn.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0)';
-            });
-        });
     </script>
 </body>
 </html>
