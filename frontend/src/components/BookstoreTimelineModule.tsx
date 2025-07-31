@@ -1,329 +1,278 @@
-import { Timeline } from 'vis-timeline/esnext';
-import { DataSet } from 'vis-data/esnext';
-import 'vis-timeline/styles/vis-timeline-graph2d.css';
-import { useEffect, useRef } from 'react';
-import '../styles/vis-timeline-custom.css';
+import React, { useRef, useEffect } from 'react';
+import * as d3 from 'd3';
 
-interface BookstoreEvent {
+// D3 远读山峦数据结构
+interface MountainDataPoint {
   id: number;
   year: number;
   month: number;
-  date: string;
   title: string;
-  description: string;
-  location: string;
-  type: 'establishment' | 'expansion' | 'publication' | 'milestone' | 'closure';
-  image: string;
-  details: string[];
-  impact: string;
+  type: 'book' | 'magazine' | 'newspaper' | 'pamphlet';
+  category: string;
 }
 
-// 本地图片数据源 - 使用public目录中的100张图片
-const localBookImages = [
-  'book_23416_-4998639186942255748.jpg', 'book_23417_-3852244789965758496.jpg', 'book_23418_4462283b97413ab9.jpg',
-  'book_23419_-5632022676287629273.jpg', 'book_23420_-1855791942358398657.jpg', 'book_23421_-2042169621397586150.jpg',
-  'book_23422_-7115342089587619670.jpg', 'book_23423_-8373031078909513017.jpg', 'book_23424_-2604910119916886782.jpg',
-  'book_23425_-1785525125771768182.jpg', 'book_23426_-159901723489253475.jpg', 'book_23427_-3844244803203524888.jpg',
-  'book_23428_-3837940625291627111.jpg', 'book_23429_-1477639427932003088.jpg', 'book_23430_-5562129265642608756.jpg',
-  'book_23431_-7892229097442701058.jpg', 'book_23432_-2581749817470159686.jpg', 'book_23433_-3470636951303014949.jpg',
-  'book_23434_-4623327514967615735.jpg', 'book_23435_-2087955644272572478.jpg', 'book_23436_-7714621659299364889.jpg',
-  'book_23437_-3360823350712026630.jpg', 'book_23438_-2232596915751383319.jpg', 'book_23439_-1368073078858966529.jpg',
-  'book_23440_-3658158069634473578.jpg', 'book_23441_-3916099362726884917.jpg', 'book_23442_-1255433671954459195.jpg',
-  'book_23443_-4910439981153704181.jpg', 'book_23444_-2195130034922510191.jpg', 'book_23445_-2400332830789112399.jpg',
-  'book_23446_-2224633863020081482.jpg', 'book_23447_-1075169616984349866.jpg', 'book_23448_-614297641780091019.jpg',
-  'book_23450_-206594605777767237.jpg', 'book_23451_-1203391813805897094.jpg', 'book_23452_-3392186564342118941.jpg',
-  'book_23453_-8880444755985866078.jpg', 'book_23454_2218799157042891040.jpg', 'book_23455_-1762059586010719922.jpg',
-  'book_23456_1ce7a45c9c64e7f4.jpg', 'book_23457_-1262639379820779836.jpg', 'book_23458_-7405423048627670781.jpg',
-  'book_23459_-1023150637824470312.jpg', 'book_23460_-4390334948177620911.jpg', 'book_23461_-3933660030092891077.jpg',
-  'book_23462_-5613829804670559247.jpg', 'book_23463_-2427818215605441259.jpg', 'book_23464_-2873368441043783992.jpg',
-  'book_23465_-4562298341534676269.jpg', 'book_23466_-5843245027255920579.jpg', 'book_23467_-2617235280630217202.jpg',
-  'book_23468_-2671334620773387670.jpg', 'book_23469_-2187776683781714513.jpg', 'book_23470_-602075659643498126.jpg',
-  'book_23471_-2644509536807637721.jpg', 'book_23472_-1989572025767284017.jpg', 'book_23473_-2954590327841336364.jpg',
-  'book_23474_-4651111614700749285.jpg', 'book_23475_-1034410525894211916.jpg', 'book_23476_-595105627489718745.jpg',
-  'book_23477_-3991236551704296356.jpg', 'book_23478_-8895852119986290089.jpg', 'book_23479_-1439028799579857153.jpg',
-  'book_23480_-1547457762458899076.jpg', 'book_23481_-180202356580824528.jpg', 'book_23482_-6957774958998746588.jpg',
-  'book_23483_-5377705342247136188.jpg', 'book_23484_-3040315155882100082.jpg', 'book_23485_-5290776177715764141.jpg',
-  'book_23486_-4688878994957105004.jpg', 'book_23487_-4047036779909166305.jpg', 'book_23488_-4785127773021135834.jpg',
-  'book_23489_-1527880107252110280.jpg', 'book_23490_-3991418640704574369.jpg', 'book_23491_-2428073741814601127.jpg',
-  'book_23492_-7305900420622199491.jpg', 'book_23493_-1952208562218801929.jpg', 'book_23494_-356427460137905266.jpg',
-  'book_23495_-1326261786250422145.jpg', 'book_23496_-3112494223028967790.jpg', 'book_23497_-3809915704416875526.jpg',
-  'book_23498_-4931303133990783668.jpg', 'book_23499_-1453881322533276280.jpg', 'book_23500_-2113932888190620035.jpg',
-  'book_23501_-1017525015100921835.jpg', 'book_23502_-2818108551734047517.jpg', 'book_23503_-2084525069930121299.jpg',
-  'book_23504_-1287584600303781361.jpg', 'book_23505_-3805328362596780846.jpg', 'book_23506_-7138212249551494528.jpg',
-  'book_23507_-2173593576125081931.jpg', 'book_23508_-2011166571240037922.jpg', 'book_23509_-1501405699926971148.jpg',
-  'book_23510_-3190716059409031439.jpg', 'book_23511_-4584318985217195842.jpg', 'book_23512_-2896460916388493936.jpg',
-  'book_23513_-1954720031557854277.jpg', 'book_23514_-3117046940985114847.jpg', 'book_23515_-2296156932798107117.jpg',
-  'book_23516_-1537084324154895566.jpg', 'book_24033_5774757e61cccbd0.jpg'
-];
-
-// 生成时间线数据 - 使用本地图片，跨越1932-1936年
-const generateTimelineData = (): BookstoreEvent[] => {
-  // 模拟真实的不均匀出版分布
-  const yearlyDistribution = {
-    1932: { count: 8, startIndex: 0 },   // 创立初期，出版较少
-    1933: { count: 15, startIndex: 8 },  // 业务扩展
-    1934: { count: 25, startIndex: 23 }, // 发展高峰
-    1935: { count: 30, startIndex: 48 }, // 全盛时期
-    1936: { count: 22, startIndex: 78 }  // 时局变化，略有下降
-  };
+// 生成1000条Mock数据 - 远读山峦时间轴 (1930-1950)
+const generateMountainData = (): MountainDataPoint[] => {
+  const data: MountainDataPoint[] = [];
+  const types: MountainDataPoint['type'][] = ['book', 'magazine', 'newspaper', 'pamphlet'];
+  const categories = [
+    '文学作品', '政治读物', '科学普及', '教育材料', '新闻时事', 
+    '历史传记', '哲学思辨', '艺术文化', '经济论著', '社会评论'
+  ];
 
   const titles = [
-    '生活书店成立', '北平分店开业', '《大众生活》创刊', '汉口分店成立', '发行量突破',
-    '重庆分店开业', '新书发行', '分店扩展', '读者活动', '文化传播',
-    '出版高峰', '影响扩大', '社会反响', '文化交流', '读者增长',
-    '书店网络', '文化事业', '社会进步', '思想传播', '文化建设'
+    '新青年', '生活周刊', '大众生活', '读书生活', '抗战文艺', '救国时报',
+    '文学月刊', '科学画报', '教育杂志', '妇女生活', '儿童世界', '青年界',
+    '新华日报', '解放日报', '光明日报', '文汇报', '民主报', '时事新报',
+    '社会科学', '自然科学', '医学常识', '农业技术', '工业发展', '商业指南'
   ];
+
+  // 模拟真实的历史出版分布规律
+  const yearlyWeights: Record<number, number> = {
+    1930: 0.3, 1931: 0.4, 1932: 0.5, 1933: 0.6, 1934: 0.8, // 初期发展
+    1935: 1.0, 1936: 1.2, 1937: 1.5, 1938: 1.8, 1939: 2.0, // 抗战前后高峰
+    1940: 1.9, 1941: 1.7, 1942: 1.5, 1943: 1.3, 1944: 1.1, // 战时萧条
+    1945: 1.4, 1946: 1.8, 1947: 2.2, 1948: 2.5, 1949: 3.0, // 解放前后复兴
+    1950: 2.8 // 新中国成立后
+  };
+
+  let id = 1;
   
-  const events: BookstoreEvent[] = [];
-  
-  Object.entries(yearlyDistribution).forEach(([yearStr, config]) => {
-    const year = parseInt(yearStr);
-    const yearImages = localBookImages.slice(config.startIndex, config.startIndex + config.count);
-    
-    yearImages.forEach((image, index) => {
-      events.push({
-        id: config.startIndex + index + 1,
-        year: year,
-        month: 1,
-        date: `${year}年`,
-        title: titles[(config.startIndex + index) % 20],
-        description: `第${config.startIndex + index + 1}本图书`,
-        location: ['上海', '北平', '汉口', '重庆', '南京'][year % 5],
-        type: ['establishment', 'expansion', 'publication', 'milestone', 'closure'][year % 5] as BookstoreEvent['type'],
-        image: `/images/books/${image}`,
-        details: [],
-        impact: ''
+  // 为每年生成相应数量的数据点
+  for (let year = 1930; year <= 1950; year++) {
+    const weight = yearlyWeights[year] || 1.0;
+    const baseCount = 25; // 基础每年25条
+    const yearCount = Math.floor(baseCount * weight + Math.random() * 15); // 加入随机性
+
+    for (let i = 0; i < yearCount; i++) {
+      data.push({
+        id: id++,
+        year,
+        month: Math.floor(Math.random() * 12) + 1,
+        title: titles[Math.floor(Math.random() * titles.length)],
+        type: types[Math.floor(Math.random() * types.length)],
+        category: categories[Math.floor(Math.random() * categories.length)]
       });
-    });
-  });
-  
-  console.log('📊 年度出版分布:', Object.entries(yearlyDistribution).map(([year, config]) => 
-    `${year}年: ${config.count}本`).join(', '));
-  
-  return events;
+    }
+  }
+
+  console.log(`📊 生成远读山峦数据: ${data.length}条记录 (1930-1950)`);
+  console.log('📈 年度分布:', Object.entries(yearlyWeights).map(([year, weight]) => 
+    `${year}: ${data.filter(d => d.year === parseInt(year)).length}条`).join(', '));
+
+  return data;
 };
 
-const bookstoreEvents: BookstoreEvent[] = generateTimelineData();
-
-// Convert BookstoreEvent to vis-timeline format - 极简图片展示
-const convertToVisTimelineItems = (events: BookstoreEvent[]) => {
-  return events.map((event, index) => ({
-    id: event.id,
-    content: `
-      <div class="timeline-item-wrapper">
-        <img src="${event.image}" alt="${event.title}" class="timeline-thumbnail" loading="lazy" />
-      </div>
-    `,
-    start: new Date(event.year, 0, 1), // 简化到年份，不用月份
-    type: 'box',
-    className: 'timeline-image-item'
-  }));
-};
+// 生成山峦数据
+const mountainData: MountainDataPoint[] = generateMountainData();
 
 interface BookstoreTimelineModuleProps {
   className?: string;
 }
 
 export default function BookstoreTimelineModule({ className = '' }: BookstoreTimelineModuleProps) {
-  const timelineRef = useRef<HTMLDivElement>(null);
-  const timelineInstance = useRef<Timeline | null>(null);
-
-  // 动态山峦效果控制函数
-  const applyDynamicMountainEffect = (properties?: any) => {
-    const container = timelineRef.current;
-    if (!container) return;
-
-    const images = container.querySelectorAll('.timeline-thumbnail');
-    images.forEach((img, index) => {
-      const element = img as HTMLElement;
-      
-      // 计算山峦效果参数
-      const mountainConfig = calculateMountainConfig(index);
-      
-      // 应用动态样式
-      element.style.transform = `scale(${mountainConfig.scale}) translateY(${mountainConfig.translateY}px)`;
-      element.style.opacity = mountainConfig.opacity.toString();
-      element.style.zIndex = mountainConfig.zIndex.toString();
-      element.style.transition = 'all 0.3s ease';
-    });
-  };
-
-  // 计算自适应宽度配置
-  const calculateAdaptiveWidths = () => {
-    // 统计每年的图片数量
-    const yearStats: Record<number, number> = {};
-    bookstoreEvents.forEach(event => {
-      yearStats[event.year] = (yearStats[event.year] || 0) + 1;
-    });
-
-    // 计算最小和最大图片数量
-    const counts = Object.values(yearStats);
-    const minCount = Math.min(...counts);
-    const maxCount = Math.max(...counts);
-    
-    // 定义宽度范围 (最小200px, 最大800px)
-    const minWidth = 200;
-    const maxWidth = 800;
-    
-    // 计算每年的宽度权重
-    const yearWidths: Record<number, number> = {};
-    Object.entries(yearStats).forEach(([year, count]) => {
-      // 线性映射：数量越多，宽度越大
-      const normalizedCount = (count - minCount) / (maxCount - minCount);
-      yearWidths[parseInt(year)] = minWidth + (maxWidth - minWidth) * normalizedCount;
-    });
-
-    console.log('📏 自适应宽度分配:', Object.entries(yearWidths).map(([year, width]) => 
-      `${year}年: ${Math.round(width)}px (${yearStats[parseInt(year)]}本)`).join(', '));
-
-    return { yearStats, yearWidths };
-  };
-
-  // 计算山峦配置
-  const calculateMountainConfig = (index: number) => {
-    const patterns = [
-      { scale: 0.7, translateY: 40, opacity: 0.8, zIndex: 1 },   // 3n+1
-      { scale: 1.1, translateY: -20, opacity: 1, zIndex: 5 },   // 3n+2  
-      { scale: 0.9, translateY: 10, opacity: 0.9, zIndex: 3 },  // 3n+3
-      { scale: 1.3, translateY: -40, opacity: 1, zIndex: 6 },   // 5n+1
-      { scale: 0.6, translateY: 60, opacity: 0.7, zIndex: 1 },  // 7n+1
-      { scale: 1.4, translateY: -50, opacity: 1, zIndex: 7 },   // 11n+1
-      { scale: 0.5, translateY: 80, opacity: 0.6, zIndex: 1 }   // 13n+1
-    ];
-
-    // 复制CSS nth-child逻辑
-    if ((index + 1) % 13 === 1) return patterns[6]; // 13n+1
-    if ((index + 1) % 11 === 1) return patterns[5]; // 11n+1
-    if ((index + 1) % 7 === 1) return patterns[4];  // 7n+1
-    if ((index + 1) % 5 === 1) return patterns[3];  // 5n+1
-    if ((index + 1) % 3 === 1) return patterns[0];  // 3n+1
-    if ((index + 1) % 3 === 2) return patterns[1];  // 3n+2
-    return patterns[2]; // 3n+3 (default)
-  };
+  const svgRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
-    if (!timelineRef.current) return;
+    if (!svgRef.current) return;
 
-    // 计算自适应宽度
-    const { yearStats, yearWidths } = calculateAdaptiveWidths();
+    // 清除之前的内容
+    d3.select(svgRef.current).selectAll("*").remove();
 
-    // Convert data to vis-timeline format
-    const timelineItems = convertToVisTimelineItems(bookstoreEvents);
-    
-    // 创建年份分组，使用自适应宽度
-    const groups = new DataSet(Object.keys(yearStats).map(year => ({
-      id: parseInt(year),
-      content: `${year}年<br/><small>${yearStats[parseInt(year)]}本</small>`,
-      style: `background: linear-gradient(135deg, #FEF3C7, #FCD34D); border-radius: 6px; border: 1px solid #F59E0B; font-size: 12px; text-align: center;`
-    })));
+    // 设置画布尺寸和边距
+    const containerWidth = svgRef.current.clientWidth || 1200;
+    const containerHeight = 600;
+    const margin = { top: 40, right: 40, bottom: 60, left: 60 };
+    const width = containerWidth - margin.left - margin.right;
+    const height = containerHeight - margin.top - margin.bottom;
 
-    // 为items分配对应的group
-    const itemsWithGroups = timelineItems.map(item => {
-      const event = bookstoreEvents.find(e => e.id === item.id);
-      return {
-        ...item,
-        group: event?.year
-      };
+    // 创建SVG和主群组
+    const svg = d3.select(svgRef.current)
+      .attr('width', containerWidth)
+      .attr('height', containerHeight);
+
+    const g = svg.append('g')
+      .attr('transform', `translate(${margin.left},${margin.top})`);
+
+    // 处理数据：按年份分组
+    const dataByYear = d3.group(mountainData, d => d.year);
+    const years = Array.from(dataByYear.keys()).sort();
+
+    // 设置比例尺
+    const xScale = d3.scaleLinear()
+      .domain([1930, 1950])
+      .range([0, width]);
+
+    const blockWidth = width / (1950 - 1930 + 1) * 0.8; // 每年的宽度，留一些间隔
+    const blockSize = 4; // 每个小方块的大小
+    const blockGap = 1; // 方块间的间隔
+
+    // 颜色比例尺
+    const colorScale = d3.scaleOrdinal<string>()
+      .domain(['book', 'magazine', 'newspaper', 'pamphlet'])
+      .range(['#F59E0B', '#EF4444', '#3B82F6', '#10B981']);
+
+    // 绘制山峦
+    years.forEach(year => {
+      const yearData = dataByYear.get(year) || [];
+      const yearX = xScale(year);
+      const blocksPerRow = Math.floor(blockWidth / (blockSize + blockGap));
+      const totalRows = Math.ceil(yearData.length / blocksPerRow);
+
+      // 为每年的数据创建小方块堆叠
+      yearData.forEach((d, index) => {
+        const row = Math.floor(index / blocksPerRow);
+        const col = index % blocksPerRow;
+        
+        const x = yearX - blockWidth/2 + col * (blockSize + blockGap);
+        const y = height - blockSize - (row * (blockSize + blockGap));
+
+        g.append('rect')
+          .attr('x', x)
+          .attr('y', y)
+          .attr('width', blockSize)
+          .attr('height', blockSize)
+          .attr('fill', colorScale(d.type))
+          .attr('opacity', 0.8)
+          .attr('stroke', '#fff')
+          .attr('stroke-width', 0.5)
+          .on('mouseover', function(event) {
+            // 创建tooltip
+            const tooltip = d3.select('body').append('div')
+              .attr('class', 'mountain-tooltip')
+              .style('position', 'absolute')
+              .style('background', 'rgba(0,0,0,0.8)')
+              .style('color', 'white')
+              .style('padding', '8px')
+              .style('border-radius', '4px')
+              .style('font-size', '12px')
+              .style('pointer-events', 'none')
+              .style('z-index', '1000')
+              .html(`
+                <strong>${d.title}</strong><br/>
+                ${d.year}年${d.month}月<br/>
+                类型: ${d.type}<br/>
+                分类: ${d.category}
+              `);
+
+            tooltip.style('left', (event.pageX + 10) + 'px')
+              .style('top', (event.pageY - 10) + 'px');
+          })
+          .on('mouseout', function() {
+            d3.selectAll('.mountain-tooltip').remove();
+          });
+      });
+
+      // 添加年份标签
+      g.append('text')
+        .attr('x', yearX)
+        .attr('y', height + 20)
+        .attr('text-anchor', 'middle')
+        .attr('font-size', '10px')
+        .attr('fill', '#666')
+        .text(year.toString());
+
+      // 添加每年的数量标签
+      g.append('text')
+        .attr('x', yearX)
+        .attr('y', height - totalRows * (blockSize + blockGap) - 10)
+        .attr('text-anchor', 'middle')
+        .attr('font-size', '8px')
+        .attr('fill', '#999')
+        .text(`${yearData.length}本`);
     });
 
-    const items = new DataSet(itemsWithGroups);
+    // 添加X轴
+    const xAxis = d3.axisBottom(xScale)
+      .tickFormat(d => d.toString() + '年')
+      .ticks(10);
 
-    // Timeline configuration - 自适应宽度的分组时间线
-    const options = {
-      height: '700px', // 增加高度以容纳分组标签
-      start: new Date(1931, 0, 1),
-      end: new Date(1937, 0, 1),
-      orientation: 'bottom',
-      stack: true,
-      showCurrentTime: false,
-      zoomMin: 1000 * 60 * 60 * 24 * 30,
-      zoomMax: 1000 * 60 * 60 * 24 * 365 * 10,
-      zoomable: true,
-      moveable: true,
-      margin: {
-        item: {
-          horizontal: 3,
-          vertical: 3
-        },
-        axis: 60 // 增加轴边距以容纳分组标签
-      },
-      showMajorLabels: true,
-      showMinorLabels: false,
-      format: {
-        majorLabels: {
-          year: 'YYYY年'
-        }
-      },
-      // 启用分组功能，按年份自适应宽度
-      groupOrder: (a: any, b: any) => a.id - b.id,
-      template: function(item: any) {
-        return item.content;
-      }
-    };
+    g.append('g')
+      .attr('transform', `translate(0,${height})`)
+      .call(xAxis)
+      .selectAll('text')
+      .style('font-size', '12px');
 
-    // Create timeline with groups (自适应宽度版本)
-    timelineInstance.current = new Timeline(timelineRef.current, items, groups, options);
+    // 添加图例
+    const legend = g.append('g')
+      .attr('transform', `translate(${width - 200}, 20)`);
 
-    // 添加事件监听器来同步山峦效果
-    timelineInstance.current.on('rangechange', () => {
-      // 延迟执行以确保DOM更新完成
-      setTimeout(() => applyDynamicMountainEffect(), 50);
+    const legendData = [
+      { type: 'book', label: '书籍', color: '#F59E0B' },
+      { type: 'magazine', label: '杂志', color: '#EF4444' },
+      { type: 'newspaper', label: '报纸', color: '#3B82F6' },
+      { type: 'pamphlet', label: '小册子', color: '#10B981' }
+    ];
+
+    legendData.forEach((item, i) => {
+      const legendItem = legend.append('g')
+        .attr('transform', `translate(0, ${i * 20})`);
+
+      legendItem.append('rect')
+        .attr('width', 12)
+        .attr('height', 12)
+        .attr('fill', item.color);
+
+      legendItem.append('text')
+        .attr('x', 16)
+        .attr('y', 9)
+        .attr('font-size', '12px')
+        .attr('fill', '#333')
+        .text(item.label);
     });
 
-    timelineInstance.current.on('rangechanged', () => {
-      setTimeout(() => applyDynamicMountainEffect(), 50);
-    });
+    // 添加缩放和平移功能
+    const zoom = d3.zoom<SVGSVGElement, unknown>()
+      .scaleExtent([0.5, 10])
+      .on('zoom', (event) => {
+        g.attr('transform', 
+          `translate(${margin.left + event.transform.x},${margin.top + event.transform.y}) scale(${event.transform.k})`
+        );
+      });
 
-    // 初始化山峦效果 - 等待DOM渲染完成
-    setTimeout(() => applyDynamicMountainEffect(), 200);
+    svg.call(zoom);
 
-    return () => {
-      if (timelineInstance.current) {
-        timelineInstance.current.destroy();
-      }
-    };
   }, []);
 
   return (
     <section className={`py-20 bg-white ${className}`}>
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-5xl font-bold text-charcoal mb-6 font-serif">生活书店历程</h2>
+          <h2 className="text-5xl font-bold text-charcoal mb-6 font-serif">远读山峦时间轴</h2>
           <p className="text-xl text-charcoal/70 max-w-3xl mx-auto leading-relaxed">
-            见证生活书店从创立到发展的完整历程，感受进步出版事业的时代脉动
+            1930-1950年出版物分布可视化，每个方块代表一份出版物，垂直堆叠形成时代山峦
           </p>
         </div>
 
-        {/* Vis Timeline - 自适应宽度图片时间线 */}
-        <div 
-          ref={timelineRef} 
-          className="w-full vis-timeline-container"
-          style={{ height: '700px', border: '1px solid #FCD34D', borderRadius: '8px', backgroundColor: '#FFFEF7' }}
-        />
-
-
+        {/* D3 远读山峦可视化 */}
+        <div className="w-full border border-amber-200 rounded-lg bg-amber-50 p-4">
+          <svg
+            ref={svgRef}
+            className="w-full"
+            style={{ minHeight: '600px' }}
+          />
+        </div>
 
         {/* Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-16">
           <div className="text-center p-6 bg-cream rounded-lg">
-            <div className="text-3xl font-bold text-gold mb-2">100</div>
-            <div className="text-charcoal/70">书籍图片</div>
+            <div className="text-3xl font-bold text-gold mb-2">1000+</div>
+            <div className="text-charcoal/70">出版物数据</div>
           </div>
           <div className="text-center p-6 bg-cream rounded-lg">
-            <div className="text-3xl font-bold text-gold mb-2">5</div>
-            <div className="text-charcoal/70">发展年份</div>
+            <div className="text-3xl font-bold text-gold mb-2">21</div>
+            <div className="text-charcoal/70">历史年份</div>
           </div>
           <div className="text-center p-6 bg-cream rounded-lg">
-            <div className="text-3xl font-bold text-gold mb-2">自适应</div>
-            <div className="text-charcoal/70">宽度布局</div>
+            <div className="text-3xl font-bold text-gold mb-2">D3.js</div>
+            <div className="text-charcoal/70">纯净实现</div>
           </div>
           <div className="text-center p-6 bg-cream rounded-lg">
-            <div className="text-3xl font-bold text-gold mb-2">数据驱动</div>
-            <div className="text-charcoal/70">视觉效果</div>
+            <div className="text-3xl font-bold text-gold mb-2">远读山峦</div>
+            <div className="text-charcoal/70">视觉隐喻</div>
           </div>
         </div>
       </div>
-
     </section>
   );
 }
