@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Calendar, MapPin, BookOpen, TrendingUp, Users, Building } from 'lucide-react';
+// @ts-ignore - react-chrono doesn't have proper TypeScript types
+import { Chrono } from 'react-chrono';
 
 interface BookstoreEvent {
   id: number;
@@ -137,20 +137,30 @@ const bookstoreEvents: BookstoreEvent[] = [
   }
 ];
 
-const typeIcons = {
-  establishment: Building,
-  expansion: MapPin,
-  publication: BookOpen,
-  milestone: TrendingUp,
-  closure: Calendar
-};
+// Icons are handled by react-chrono internally
 
-const typeColors = {
-  establishment: 'bg-green-500',
-  expansion: 'bg-blue-500',
-  publication: 'bg-gold',
-  milestone: 'bg-purple-500',
-  closure: 'bg-red-500'
+// Convert BookstoreEvent to react-chrono TimelineItemModel format
+const convertToChronoItems = (events: BookstoreEvent[]) => {
+  return events.map((event) => ({
+    title: event.date,
+    cardTitle: event.title,
+    cardSubtitle: `${event.location} · ${event.type}`,
+    cardDetailedText: [
+      event.description,
+      '',
+      '详细信息：',
+      ...event.details,
+      '',
+      `历史影响：${event.impact}`
+    ],
+    media: {
+      type: 'IMAGE' as const,
+      source: {
+        url: event.image
+      },
+      name: event.title
+    }
+  }));
 };
 
 interface BookstoreTimelineModuleProps {
@@ -158,49 +168,30 @@ interface BookstoreTimelineModuleProps {
 }
 
 export default function BookstoreTimelineModule({ className = '' }: BookstoreTimelineModuleProps) {
-  const [selectedEvent, setSelectedEvent] = useState<BookstoreEvent | null>(null);
-  const [visibleEvents, setVisibleEvents] = useState<Set<number>>(new Set());
-  const timelineRef = useRef<HTMLDivElement>(null);
-
-  // Calculate positions for stacked events
-  const getEventPosition = (event: BookstoreEvent, index: number) => {
-    const baseYear = 1932;
-    const yearSpan = 1936 - baseYear + 1;
-    const leftPercent = ((event.year - baseYear) / yearSpan) * 100;
-    
-    // Find events in the same year for stacking
-    const sameYearEvents = bookstoreEvents.filter(e => e.year === event.year);
-    const stackIndex = sameYearEvents.findIndex(e => e.id === event.id);
-    const stackOffset = stackIndex * 120; // 120px vertical offset for each stack level
-    
-    return {
-      left: `${leftPercent}%`,
-      top: `${stackOffset}px`
-    };
-  };
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const eventId = parseInt(entry.target.getAttribute('data-event-id') || '0');
-            setVisibleEvents(prev => new Set([...prev, eventId]));
-          }
-        });
-      },
-      { threshold: 0.3 }
-    );
-
-    const eventElements = document.querySelectorAll('[data-event-id]');
-    eventElements.forEach(el => observer.observe(el));
-
-    return () => observer.disconnect();
-  }, []);
-
-  const IconComponent = (type: BookstoreEvent['type']) => {
-    const Icon = typeIcons[type];
-    return <Icon size={20} />;
+  // Convert events to react-chrono format
+  const chronoItems = convertToChronoItems(bookstoreEvents);
+  
+  // Custom theme for react-chrono to match project design
+  const chronoTheme = {
+    primary: '#F59E0B',           // gold color
+    secondary: '#FEF3C7',         // cream color
+    cardBgColor: '#FEF3C7',       // cream background
+    cardForeColor: '#374151',     // charcoal text
+    titleColor: '#374151',        // charcoal
+    titleColorActive: '#F59E0B',  // gold for active
+    cardTitleColor: '#374151',    // charcoal
+    cardSubtitleColor: '#6B7280', // gray
+    cardDetailsColor: '#374151',  // charcoal
+    iconBackgroundColor: '#F59E0B', // gold
+    timelinePointDimension: 16,
+    cardHeight: 250,
+    cardWidth: 400,
+    fontSizes: {
+      cardSubtitle: '0.9rem',
+      cardText: '0.95rem',
+      cardTitle: '1.1rem',
+      title: '1rem'
+    }
   };
 
   return (
@@ -213,73 +204,35 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
           </p>
         </div>
 
-        {/* Timeline Container */}
-        <div className="relative" ref={timelineRef}>
-          {/* Horizontal Timeline */}
-          <div className="relative h-96 mb-12">
-            {/* Timeline Line */}
-            <div className="absolute top-8 left-0 right-0 h-1 bg-gradient-to-r from-gold/30 via-gold to-gold/30"></div>
-            
-            {/* Year Markers */}
-            {[1932, 1933, 1934, 1935, 1936].map(year => (
-              <div
-                key={year}
-                className="absolute top-0"
-                style={{ left: `${((year - 1932) / 4) * 100}%` }}
-              >
-                <div className="w-4 h-4 bg-gold rounded-full transform -translate-x-1/2"></div>
-                <div className="text-lg font-bold text-charcoal mt-2 transform -translate-x-1/2">
-                  {year}
-                </div>
-              </div>
-            ))}
-
-            {/* Events */}
-            {bookstoreEvents.map((event, index) => {
-              const position = getEventPosition(event, index);
-              return (
-                <div
-                  key={event.id}
-                  data-event-id={event.id}
-                  className={`absolute transform -translate-x-1/2 transition-all duration-1000 ${
-                    visibleEvents.has(event.id)
-                      ? 'translate-y-0 opacity-100'
-                      : 'translate-y-4 opacity-0'
-                  }`}
-                  style={position}
-                >
-                  <div
-                    className="bg-cream rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group w-64 mt-12"
-                    onClick={() => setSelectedEvent(event)}
-                  >
-                    <img
-                      src={event.image}
-                      alt={event.title}
-                      className="w-full h-32 object-cover rounded-t-lg group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className={`p-1 rounded-full ${typeColors[event.type]} text-white`}>
-                          {IconComponent(event.type)}
-                        </div>
-                        <span className="text-sm text-charcoal/60">{event.date}</span>
-                      </div>
-                      <h3 className="font-bold text-charcoal mb-1 group-hover:text-gold transition-colors">
-                        {event.title}
-                      </h3>
-                      <p className="text-sm text-charcoal/70 line-clamp-2">
-                        {event.description}
-                      </p>
-                      <div className="flex items-center mt-2 text-xs text-charcoal/60">
-                        <MapPin size={12} className="mr-1" />
-                        {event.location}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+        {/* React Chrono Timeline */}
+        <div className="w-full" style={{ height: '600px' }}>
+          <Chrono
+            items={chronoItems}
+            mode="VERTICAL_ALTERNATING"
+            theme={chronoTheme}
+            slideShow={false}
+            enableOutline={true}
+            cardHeight={250}
+            disableNavOnKey={false}
+            scrollable={{ scrollbar: false }}
+            fontSizes={{
+              cardSubtitle: '0.9rem',
+              cardText: '0.95rem',
+              cardTitle: '1.2rem',
+              title: '1rem'
+            }}
+            mediaSettings={{
+              align: 'center',
+              fit: 'cover'
+            }}
+            classNames={{
+              card: 'timeline-card',
+              cardMedia: 'timeline-media',
+              cardSubTitle: 'timeline-subtitle',
+              cardText: 'timeline-text',
+              cardTitle: 'timeline-title'
+            }}
+          />
         </div>
 
         {/* Statistics */}
@@ -303,61 +256,6 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
         </div>
       </div>
 
-      {/* Event Detail Modal */}
-      {selectedEvent && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-          <div className="bg-cream rounded-2xl max-w-4xl max-h-[90vh] overflow-y-auto">
-            <div className="relative">
-              <img
-                src={selectedEvent.image}
-                alt={selectedEvent.title}
-                className="w-full h-64 object-cover"
-              />
-              <button
-                onClick={() => setSelectedEvent(null)}
-                className="absolute top-4 right-4 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
-              >
-                ×
-              </button>
-            </div>
-            <div className="p-8">
-              <div className="flex items-center gap-4 mb-6">
-                <div className={`p-3 rounded-full ${typeColors[selectedEvent.type]} text-white`}>
-                  {IconComponent(selectedEvent.type)}
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-gold">{selectedEvent.date}</div>
-                  <div className="text-charcoal/60 flex items-center">
-                    <MapPin size={16} className="mr-1" />
-                    {selectedEvent.location}
-                  </div>
-                </div>
-              </div>
-              <h3 className="text-3xl font-bold text-charcoal mb-4 font-serif">
-                {selectedEvent.title}
-              </h3>
-              <p className="text-lg text-charcoal/80 mb-6 leading-relaxed">
-                {selectedEvent.description}
-              </p>
-              <div className="mb-6">
-                <h4 className="text-xl font-bold text-charcoal mb-3">详细信息</h4>
-                <div className="space-y-3">
-                  {selectedEvent.details.map((detail, index) => (
-                    <div key={index} className="flex items-start gap-3">
-                      <div className="w-2 h-2 bg-gold rounded-full mt-2 flex-shrink-0"></div>
-                      <p className="text-charcoal/70">{detail}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="bg-gold/10 p-4 rounded-lg">
-                <h4 className="text-lg font-bold text-charcoal mb-2">历史影响</h4>
-                <p className="text-charcoal/80">{selectedEvent.impact}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </section>
   );
 }

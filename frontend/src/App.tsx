@@ -6,12 +6,6 @@ import LifeTimelineModule from './components/LifeTimelineModule';
 import BookstoreTimelineModule from './components/BookstoreTimelineModule';
 import HandwritingModule from './components/HandwritingModule';
 
-
-
-
-
-
-
 function App() {
   const [activeSection, setActiveSection] = useState('overview');
 

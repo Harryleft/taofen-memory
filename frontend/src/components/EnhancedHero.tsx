@@ -99,12 +99,6 @@ export default function EnhancedHero() {
                 <ChevronDown className="group-hover:translate-y-1 transition-transform duration-300" size={20} />
               </span>
             </button>
-            <button className="group border-2 border-cream/50 hover:border-cream text-cream hover:bg-cream/10 px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105">
-              <span className="flex items-center gap-2">
-                <Scroll size={20} />
-                数字档案
-              </span>
-            </button>
           </div>
         </div>
 
