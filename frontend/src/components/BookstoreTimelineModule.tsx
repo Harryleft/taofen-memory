@@ -12,8 +12,7 @@ interface MountainDataPoint {
 
 // 使用真实图片数据 - 3年测试时间范围 (1934-1936)
 const generateMountainData = (): MountainDataPoint[] => {
- 
-  // 真实图片文件名数组 - 从public/images/books目录
+  const data: MountainDataPoint[] = [];
   const realImages = [
     'book_23416_-4998639186942255748.jpg', 'book_23417_-3852244789965758496.jpg', 'book_23418_4462283b97413ab9.jpg',
     'book_23419_-5632022676287629273.jpg', 'book_23420_-1855791942358398657.jpg', 'book_23421_-2042169621397586150.jpg',
@@ -34,37 +33,34 @@ const generateMountainData = (): MountainDataPoint[] => {
     'book_23465_-4562298341534676269.jpg', 'book_23466_-5843245027255920579.jpg', 'book_23467_-2617235280630217202.jpg',
     'book_23468_-2671334620773387670.jpg', 'book_23469_-2187776683781714513.jpg', 'book_23470_-602075659643498126.jpg'
   ];
-
   const titles = [
-    '生活周刊', '大众生活', '读书生活', '新生活', '文学月刊', '青年界',
-    '妇女生活', '儿童世界', '科学画报', '教育杂志', '时事周报', '民众教育',
-    '新华日报', '文汇报', '救国时报', '抗战文艺', '战时文化', '民主报',
-    '社会科学', '自然科学', '医学常识', '农业技术', '工业发展', '商业指南'
+    '生活周刊', '大众生活', '读书生活', '新生活', '文学月刊', '青年界', '妇女生活', '儿童世界',
+    '科学画报', '教育杂志', '时事周报', '民众教育', '新华日报', '文汇报', '救国时报',
   ];
+  const yearlyDistribution: Record<number, number> = { 1934: 15, 1935: 25, 1936: 12 };
 
-  const yearlyDistribution = { 1934: 15, 1935: 25, 1936: 12 };
-  const data: MountainDataPoint[] = [];
   let id = 1;
-  let imageIndex = 0;
+  let imgIdx = 0;
+  // const data: MountainDataPoint[] = [];
 
-  Object.entries(yearlyDistribution).forEach(([yearStr, count]) => {
-    const year = parseInt(yearStr);
-    for (let i = 0; i < count; i++) {
+  Object.entries(yearlyDistribution).forEach(([y, count]) => {
+    const year = +y;
+    for (let i = 0; i < count; i += 1) {
       data.push({
         id: id++,
         year,
         month: Math.floor(Math.random() * 12) + 1,
         title: titles[Math.floor(Math.random() * titles.length)],
-        imagePath: `/images/books/${realImages[imageIndex % realImages.length]}`
+        imagePath: `/images/books/${realImages[imgIdx++ % realImages.length]}`,
       });
-      imageIndex++;
     }
   });
   return data;
 };
 
-const mountainData: MountainDataPoint[] = generateMountainData();
+const mountainData = generateMountainData();
 
+/* ---------- 组件 ---------- */
 interface BookstoreTimelineModuleProps {
   className?: string;
 }
@@ -74,154 +70,142 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
   const tooltipRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!svgRef.current) return;
+    if (!svgRef.current) return;            // 早退时返回 void
 
-    d3.select(svgRef.current).selectAll("*").remove();
+    const svgNode = svgRef.current;
 
-    const containerWidth = svgRef.current.clientWidth || 1200;
+    /* ---------- 基础设置（与上一版一致，略） ---------- */
+    d3.select(svgNode).selectAll('*').remove();
+    d3.select(svgNode).on('.zoom', null);
+
+    const containerWidth = svgNode.clientWidth || 1200;
     const containerHeight = 600;
     const margin = { top: 40, right: 40, bottom: 60, left: 60 };
     const width = containerWidth - margin.left - margin.right;
     const height = containerHeight - margin.top - margin.bottom;
+    const bgColor = '#fffbef';
+    const imageSize = 40;
+    const gap = 2;
 
-    const svg = d3.select(svgRef.current)
+    const svg = d3
+      .select(svgNode)
       .attr('width', containerWidth)
-      .attr('height', containerHeight);
+      .attr('height', containerHeight)
+      .style('background-color', bgColor);
 
-    // ✅ **修改1: 修正D3图层结构和缩放目标**
-    // 创建一个总的上下文（Context）图层，用于应用边距
-    // 所有的可视化元素（山峦、坐标轴）都在这个图层里
-    // 我们将对这个`context`图层进行缩放和平移
-    // 分离图层：imageContext(可缩放) + xAxisGroup(固定)
-    const rootG = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
-    const imageContext = rootG.append('g').attr('class', 'image-context');
-    const xAxisGroup = rootG.append('g').attr('class', 'x-axis-group');
-    
-    // 按年份对数据进行分组
-    const dataByYear = d3.group(mountainData, d => d.year);
-    const years = Array.from(dataByYear.keys()).sort();
+    svg.append('defs')
+      .append('clipPath')
+      .attr('id', 'clip')
+      .append('rect')
+      .attr('width', width)
+      .attr('height', height);
 
-    // ✅ **修改2: 使用scaleBand，它更适合离散的年份数据**
-    // `padding(0.2)`会在山峰之间留出一些空隙，形成山谷
-    const xScale = d3.scaleBand()
-      .domain(years.map(String))
-      .range([0, width])
-      .padding(0.2);
+    const outer = svg.append('g')
+      .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    const imageBaseSize = 40; // 图片基础尺寸
-    const imageGap = 2; // 堆叠图片之间的缝隙
+    const zoomLayer = outer.append('g')
+      .attr('clip-path', 'url(#clip)');
 
-    // 绘制坐标轴
-    const xAxis = d3.axisBottom(xScale)
-        .tickFormat(d => d + '年');
+    const years = Array.from(new Set(mountainData.map(d => d.year))).sort();
+    const minYear = d3.min(years)! - 0.5;
+    const maxYear = d3.max(years)! + 0.5;
 
-    xAxisGroup.append('g')
-      .attr('class', 'x-axis')
+    const xScaleLinear = d3.scaleLinear()
+      .domain([minYear, maxYear])
+      .range([0, width]);
+
+    const xAxis = d3.axisBottom(xScaleLinear)
+      .tickValues(years)
+      .tickFormat(d3.format('d'));
+
+    const xAxisG = outer.append('g')
       .attr('transform', `translate(0,${height})`)
-      .call(xAxis)
-      .selectAll('text')
-      .style('font-size', '14px')
-      .style('fill', '#666');
-    
-    // ✅ **修改3: 实现“金字塔”堆叠布局算法，形成山峰**
-    years.forEach(year => {
-      const yearData = dataByYear.get(year) || [];
-      const yearX = xScale(String(year))!; // scaleBand的中心点
-      const yearBandwidth = xScale.bandwidth(); // 当前年份可用的总宽度
-      
-      let placedCount = 0;
-      let row = 0;
-      // 从下往上堆叠
-      while (placedCount < yearData.length) {
-        // 动态计算当前行能放多少图片
-        const maxImagesInRow = Math.floor(yearBandwidth / (imageBaseSize + imageGap));
-        const imagesInThisRow = Math.min(yearData.length - placedCount, maxImagesInRow);
-        
-        // 计算当前行的总宽度，并使其在年份的Bandwidth内居中
-        const rowWidth = imagesInThisRow * (imageBaseSize + imageGap) - imageGap;
-        const startX = yearX + (yearBandwidth - rowWidth) / 2;
-        
-        // 获取当前行需要放置的数据
-        const rowData = yearData.slice(placedCount, placedCount + imagesInThisRow);
+      .call(xAxis);
 
-        rowData.forEach((d, index) => {
-                     imageContext.append('image')
-            .datum(d) // 绑定完整数据到元素上
-            .attr('x', startX + index * (imageBaseSize + imageGap))
-            .attr('y', height - (row + 1) * (imageBaseSize + imageGap))
-            .attr('width', imageBaseSize)
-            .attr('height', imageBaseSize)
-            .attr('href', d.imagePath)
-            .attr('preserveAspectRatio', 'xMidYMid slice')
-            .attr('class', 'book-image') // 添加class方便统一样式
-            .style('cursor', 'pointer');
-        });
-        
-        placedCount += imagesInThisRow;
-        row++;
-      }
+    xAxisG.selectAll('text').style('font-size', '14px').style('fill', '#666');
+    xAxisG.select('.domain').style('stroke', '#ccc');
+
+    const grouped = d3.group(mountainData, d => d.year);
+
+    grouped.forEach((yearData, year) => {
+      const centerX = xScaleLinear(year);
+      const maxPerRow = Math.floor((width / years.length) / (imageSize + gap));
+
+      yearData.forEach((d, i) => {
+        const row = Math.floor(i / maxPerRow);
+        const col = i % maxPerRow;
+        const offsetX = (col - maxPerRow / 2) * (imageSize + gap) + (imageSize + gap) / 2;
+
+        zoomLayer.append('image')
+          .datum(d)
+          .attr('href', d.imagePath)
+          .attr('width', imageSize)
+          .attr('height', imageSize)
+          .attr('x', centerX + offsetX - imageSize / 2)
+          .attr('y', height - (row + 1) * (imageSize + gap))
+          .attr('preserveAspectRatio', 'xMidYMid slice')
+          .attr('class', 'book-img')
+          .style('cursor', 'pointer');
+      });
     });
-    
-    // ✅ **修改4: 增加工具提示（Tooltip）和交互效果**
-    const tooltip = d3.select(tooltipRef.current);
-    
-    context.selectAll('.book-image')
-      .on('mouseover', function(event, d: any) {
-        d3.select(this)
-          .transition().duration(150)
-          .attr('transform', `scale(1.1)`)
-          .style('outline', '2px solid #fbbF24'); // 高亮边框
-        
+
+    const tooltip = d3.select(tooltipRef.current!);      // non-null 断言
+
+    zoomLayer.selectAll<SVGImageElement, MountainDataPoint>('.book-img')
+      .on('mouseover', function (event, d) {
+        d3.select(this).raise().transition().duration(150)
+          .attr('width', imageSize * 1.1)
+          .attr('height', imageSize * 1.1);
+
         tooltip
           .style('opacity', 1)
-          .html(`<strong>${d.title}</strong><br/>${d.year}年`)
+          .html(`<strong>${d.title}</strong><br/>${d.year} 年`)
           .style('left', `${event.pageX + 15}px`)
           .style('top', `${event.pageY}px`);
       })
-      .on('mouseout', function() {
-        d3.select(this)
-          .transition().duration(150)
-          .attr('transform', 'scale(1)')
-          .style('outline', 'none');
-          
+      .on('mouseout', function () {
+        d3.select(this).transition().duration(150)
+          .attr('width', imageSize)
+          .attr('height', imageSize);
+
         tooltip.style('opacity', 0);
       });
 
-    // ✅ **修改5: 修正缩放和平移功能**
-    const zoom = d3.zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.5, 8])
-      .translateExtent([[0, 0], [width, height]]) // 限制平移范围
-      .on('zoom', (event) => {
-        const newXScale = event.transform.rescaleX(xScale);
-        // 只缩放/平移图片层
-        imageContext.attr('transform', `translate(${event.transform.x},0) scale(${event.transform.k})`);
-        // 更新坐标轴刻度
-        xAxisGroup.selectAll('g.x-axis').call(xAxis.scale(newXScale));
-      });
+    const zoomed = (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
+      const { k, x } = event.transform;
+      zoomLayer.attr('transform', `translate(${x},0) scale(${k},1)`);
+      xAxisG.call(xAxis.scale(event.transform.rescaleX(xScaleLinear)));
+    };
 
-    // 将缩放行为应用到SVG上，并设置初始位置和缩放
-    svg.call(zoom)
-       .call(zoom.transform, d3.zoomIdentity.translate(margin.left, margin.top));
+    svg.call(
+      d3.zoom<SVGSVGElement, unknown>()
+        .scaleExtent([0.5, 8])
+        .translateExtent([[-width, -Infinity], [width * 2, Infinity]])
+        .extent([[0, 0], [width, height]])
+        .on('zoom', zoomed),
+    );
 
+    /* ---------- 关键：清理函数返回 void ---------- */
+    return () => {
+      d3.select(svgNode).on('.zoom', null); // 移除监听，丢弃返回值
+    };
   }, []);
 
+  /* ---------- JSX ---------- */
   return (
     <section className={`relative py-20 bg-white ${className}`}>
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-5xl font-bold text-charcoal mb-6 font-serif">远读山峦时间轴</h2>
+          <h2 className="text-5xl font-bold text-charcoal mb-6 font-serif">
+            远读山峦时间轴
+          </h2>
           <p className="text-xl text-charcoal/70 max-w-3xl mx-auto leading-relaxed">
-            1934-1936年出版物分布可视化，真实图书封面紧密堆叠形成山峦，滚轮缩放、拖拽平移查看细节
+            1934-1936 年出版物分布可视化：滚轮缩放、拖拽平移，查看山峦般的书籍年景
           </p>
         </div>
 
         <div className="w-full border border-amber-200 rounded-lg bg-amber-50 p-4 relative">
-          <svg
-            ref={svgRef}
-            className="w-full"
-            style={{ minHeight: '600px' }}
-          />
-          {/* 工具提示 DIV */}
+          <svg ref={svgRef} className="w-full" style={{ minHeight: 600 }} />
           <div
             ref={tooltipRef}
             className="absolute bg-slate-800 text-white text-sm rounded-md px-3 py-2 pointer-events-none transition-opacity duration-200"
