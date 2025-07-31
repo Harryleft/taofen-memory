@@ -51,13 +51,13 @@
   overflow: hidden;
 }
 
-/* 时间线项目容器 - 强制紧凑布局 */
+/* 时间线项目容器 - 超紧凑布局 */
 .vis-item.timeline-image-item {
   background: transparent !important;
   border: none !important;
-  padding: 5px !important;
-  margin: 2px !important;
-  width: 130px !important; /* 略大于图片宽度 */
+  padding: 1px !important;
+  margin: 1px !important;
+  width: 122px !important; /* 紧贴图片宽度 */
   height: auto !important;
 }
 
