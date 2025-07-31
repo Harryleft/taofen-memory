@@ -197,10 +197,9 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
         .style('opacity', 0.6);
     });
 
-    // 添加受限的缩放功能 - 只缩放图片层，限制移动范围
+    // 添加优化的缩放和平移功能
     const zoom = d3.zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.8, 3]) // 更保守的缩放范围
-      .translateExtent([[-width * 0.2, -height * 0.2], [width * 1.2, height * 1.2]]) // 限制平移范围
+      .scaleExtent([0.5, 8]) // 恢复更宽的缩放范围
       .on('zoom', (event) => {
         // 只对可缩放层应用变换，固定层保持不变
         zoomableLayer.attr('transform', 
@@ -208,14 +207,9 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
         );
       });
 
+    // 应用缩放行为到SVG
     svg.call(zoom)
-      .on('dblclick.zoom', null) // 禁用双击缩放
-      .on('wheel.zoom', function(event) { // 只允许Ctrl+滚轮缩放
-        if (!event.ctrlKey) {
-          event.preventDefault();
-          return;
-        }
-      });
+      .on('dblclick.zoom', null); // 禁用双击缩放，保持其他交互
 
   }, []);
 
@@ -225,7 +219,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
         <div className="text-center mb-16">
           <h2 className="text-5xl font-bold text-charcoal mb-6 font-serif">远读山峦时间轴</h2>
           <p className="text-xl text-charcoal/70 max-w-3xl mx-auto leading-relaxed">
-            1934-1936年出版物分布可视化，真实图书封面紧密堆叠形成山峦，Ctrl+滚轮缩放查看细节
+            1934-1936年出版物分布可视化，真实图书封面紧密堆叠形成山峦，滚轮缩放、拖拽平移查看细节
           </p>
         </div>
 
@@ -253,8 +247,8 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
             <div className="text-charcoal/70">最大化利用</div>
           </div>
           <div className="text-center p-6 bg-cream rounded-lg">
-            <div className="text-3xl font-bold text-gold mb-2">Ctrl+滚轮</div>
-            <div className="text-charcoal/70">精确缩放</div>
+            <div className="text-3xl font-bold text-gold mb-2">自由交互</div>
+            <div className="text-charcoal/70">缩放平移</div>
           </div>
         </div>
       </div>
