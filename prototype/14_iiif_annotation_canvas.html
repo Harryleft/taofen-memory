@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IIIF深度注释画布 | 韬奋互联探索</title>
+    
+    <!-- OpenSeadragon for IIIF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #1a1a2e;
+            --secondary-color: #16213e;
+            --accent-color: #e94560;
+            --gold-color: #f39c12;
+            --text-primary: #ffffff;
+            --text-secondary: #b8b8b8;
+            --bg-dark: #0f0f23;
+            --overlay-bg: rgba(26, 26, 46, 0.95);
+            --border-color: #333366;
+            --shadow: 0 8px 32px rgba(233, 69, 96, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+
+        .app-container {
+            height: 100vh;
+            display: grid;
+            grid-template-areas: 
+                "header header header"
+                "sidebar viewer panel";
+            grid-template-rows: 60px 1fr;
+            grid-template-columns: 300px 1fr 350px;
+        }
+
+        /* Header */
+        .header {
+            grid-area: header;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        .header h1 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .header-tools {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .tool-btn {
+            background: var(--accent-color);
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .tool-btn:hover {
+            background: #d63447;
+            transform: translateY(-2px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            grid-area: sidebar;
+            background: var(--overlay-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--secondary-color);
+        }
+
+        .sidebar-content {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .manifest-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .manifest-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(4px);
+        }
+
+        .manifest-item.active {
+            background: rgba(233, 69, 96, 0.2);
+            border-left-color: var(--gold-color);
+        }
+
+        .manifest-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .manifest-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        /* IIIF Viewer */
+        .viewer-container {
+            grid-area: viewer;
+            position: relative;
+            background: #000;
+        }
+
+        .openseadragon-container {
+            width: 100%;
+            height: 100%;
+        }
+
+        .annotation-overlay {
+            position: absolute;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .annotation-marker {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--accent-color);
+            border: 2px solid white;
+            border-radius: 50%;
+            cursor: pointer;
+            pointer-events: auto;
+            animation: pulse 2s infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: white;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(233, 69, 96, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(233, 69, 96, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(233, 69, 96, 0); }
+        }
+
+        .zoom-controls {
+            position: absolute;
+            bottom: 2rem;
+            left: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 1000;
+        }
+
+        .zoom-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--overlay-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .zoom-btn:hover {
+            background: var(--accent-color);
+        }
+
+        /* Annotation Panel */
+        .annotation-panel {
+            grid-area: panel;
+            background: var(--overlay-bg);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--secondary-color);
+        }
+
+        .panel-content {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .annotation-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .annotation-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .annotation-item.active {
+            background: rgba(233, 69, 96, 0.2);
+            border: 1px solid var(--accent-color);
+        }
+
+        .annotation-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--gold-color);
+        }
+
+        .annotation-body {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 0.8rem;
+        }
+
+        .annotation-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .link-tag {
+            background: var(--accent-color);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .link-tag:hover {
+            background: var(--gold-color);
+            transform: scale(1.05);
+        }
+
+        .semantic-path {
+            background: rgba(243, 156, 18, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-left: 4px solid var(--gold-color);
+        }
+
+        .path-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--gold-color);
+        }
+
+        .path-chain {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .path-node {
+            background: var(--secondary-color);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .path-node:hover {
+            background: var(--accent-color);
+        }
+
+        .path-arrow {
+            color: var(--gold-color);
+        }
+
+        /* Detail Modal */
+        .detail-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .detail-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--primary-color);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--gold-color);
+        }
+
+        .linked-entities {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .entity-card {
+            background: var(--secondary-color);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .entity-card:hover {
+            background: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        .entity-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .entity-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .app-container {
+                grid-template-areas: 
+                    "header header"
+                    "viewer panel";
+                grid-template-columns: 1fr 300px;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                grid-template-areas: 
+                    "header"
+                    "viewer";
+                grid-template-columns: 1fr;
+            }
+            
+            .annotation-panel {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <h1>
+                <i class="fas fa-search-plus"></i>
+                IIIF深度注释画布
+            </h1>
+            <div class="header-tools">
+                <button class="tool-btn" onclick="resetView()">
+                    <i class="fas fa-home"></i> 重置
+                </button>
+                <button class="tool-btn" onclick="toggleFullscreen()">
+                    <i class="fas fa-expand"></i> 全屏
+                </button>
+            </div>
+        </header>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-layer-group"></i> IIIF资源</h3>
+            </div>
+            <div class="sidebar-content">
+                <div class="manifest-item active" data-manifest="taofen-photo">
+                    <div class="manifest-title">韬奋先生肖像</div>
+                    <div class="manifest-description">高分辨率历史照片，包含多层语义注释，展现人物关系网络</div>
+                </div>
+                <div class="manifest-item" data-manifest="life-magazine">
+                    <div class="manifest-title">《生活》杂志封面</div>
+                    <div class="manifest-description">杂志版面设计的深度分析，链接到相关文章和作者</div>
+                </div>
+                <div class="manifest-item" data-manifest="manuscript">
+                    <div class="manifest-title">手稿文献</div>
+                    <div class="manifest-description">韬奋亲笔手稿，每个字词都链接到相关的人物和事件</div>
+                </div>
+                <div class="manifest-item" data-manifest="bookstore-photo">
+                    <div class="manifest-title">生活书店照片</div>
+                    <div class="manifest-description">书店历史照片，展现空间布局和人员活动</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- IIIF Viewer -->
+        <main class="viewer-container">
+            <div id="openseadragon" class="openseadragon-container"></div>
+            
+            <div class="zoom-controls">
+                <button class="zoom-btn" onclick="zoomIn()">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button class="zoom-btn" onclick="zoomOut()">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button class="zoom-btn" onclick="fitToView()">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                </button>
+            </div>
+
+            <div class="annotation-overlay" id="annotationOverlay">
+                <!-- Dynamic annotation markers will be inserted here -->
+            </div>
+        </main>
+
+        <!-- Annotation Panel -->
+        <aside class="annotation-panel">
+            <div class="panel-header">
+                <h3><i class="fas fa-tags"></i> 语义注释</h3>
+            </div>
+            <div class="panel-content" id="annotationList">
+                <!-- Annotations will be populated here -->
+            </div>
+        </aside>
+    </div>
+
+    <!-- Detail Modal -->
+    <div class="detail-modal" id="detailModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <h2 class="modal-title" id="modalTitle">详细信息</h2>
+            <div id="modalContent">
+                <!-- Content will be populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // IIIF Viewer instance
+        let viewer;
+        
+        // Current annotations
+        let currentAnnotations = [];
+        let activeAnnotation = null;
+
+        // Sample IIIF manifests and annotations
+        const manifests = {
+            'taofen-photo': {
+                title: '韬奋先生肖像',
+                imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=2000&h=3000&fit=crop',
+                annotations: [
+                    {
+                        id: 'person-taofen',
+                        x: 0.45, y: 0.2, width: 0.3, height: 0.4,
+                        title: '邹韬奋本人',
+                        body: '中国著名的爱国者、政治活动家、新闻记者和出版家，《生活》周刊的主编。',
+                        linkedEntities: [
+                            { type: 'person', name: '沈钧儒', icon: 'fas fa-user' },
+                            { type: 'publication', name: '《生活》周刊', icon: 'fas fa-book' },
+                            { type: 'organization', name: '生活书店', icon: 'fas fa-store' },
+                            { type: 'event', name: '七君子事件', icon: 'fas fa-calendar' }
+                        ]
+                    },
+                    {
+                        id: 'clothing-style',
+                        x: 0.4, y: 0.35, width: 0.4, height: 0.5,
+                        title: '服装风格',
+                        body: '1930年代知识分子的典型着装，反映了当时的社会文化背景。',
+                        linkedEntities: [
+                            { type: 'period', name: '民国时期', icon: 'fas fa-clock' },
+                            { type: 'culture', name: '知识分子文化', icon: 'fas fa-graduation-cap' }
+                        ]
+                    },
+                    {
+                        id: 'background',
+                        x: 0.0, y: 0.0, width: 0.4, height: 1.0,
+                        title: '拍摄背景',
+                        body: '照片拍摄的历史背景和环境信息，反映当时的摄影技术和社会氛围。',
+                        linkedEntities: [
+                            { type: 'place', name: '上海', icon: 'fas fa-map-marker-alt' },
+                            { type: 'technology', name: '早期摄影', icon: 'fas fa-camera' }
+                        ]
+                    }
+                ]
+            },
+            'life-magazine': {
+                title: '《生活》杂志封面',
+                imageUrl: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=2000&h=3000&fit=crop',
+                annotations: [
+                    {
+                        id: 'title-design',
+                        x: 0.1, y: 0.05, width: 0.8, height: 0.15,
+                        title: '杂志标题设计',
+                        body: '《生活》杂志的标题设计体现了1920年代的设计美学，简洁而有力。',
+                        linkedEntities: [
+                            { type: 'design', name: '民国设计', icon: 'fas fa-palette' },
+                            { type: 'typography', name: '中文字体', icon: 'fas fa-font' }
+                        ]
+                    },
+                    {
+                        id: 'content-preview',
+                        x: 0.1, y: 0.2, width: 0.8, height: 0.6,
+                        title: '内容预览',
+                        body: '封面展示的文章预览，反映了当时的社会关注点和编辑理念。',
+                        linkedEntities: [
+                            { type: 'article', name: '社会评论', icon: 'fas fa-newspaper' },
+                            { type: 'author', name: '特约作者', icon: 'fas fa-pen' }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        // Initialize OpenSeadragon viewer
+        function initViewer() {
+            viewer = OpenSeadragon({
+                id: 'openseadragon',
+                prefixUrl: 'https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/images/',
+                tileSources: {
+                    type: 'image',
+                    url: manifests['taofen-photo'].imageUrl
+                },
+                showNavigationControl: false,
+                showZoomControl: false,
+                showHomeControl: false,
+                showFullPageControl: false,
+                gestureSettingsMouse: {
+                    clickToZoom: false
+                }
+            });
+
+            viewer.addHandler('open', function() {
+                loadAnnotations('taofen-photo');
+            });
+
+            viewer.addHandler('canvas-click', function(event) {
+                handleCanvasClick(event);
+            });
+        }
+
+        // Load annotations for current manifest
+        function loadAnnotations(manifestId) {
+            const manifest = manifests[manifestId];
+            if (!manifest) return;
+
+            currentAnnotations = manifest.annotations;
+            renderAnnotations();
+            updateAnnotationPanel();
+        }
+
+        // Render annotation markers on the image
+        function renderAnnotations() {
+            const overlay = document.getElementById('annotationOverlay');
+            overlay.innerHTML = '';
+
+            currentAnnotations.forEach((annotation, index) => {
+                const marker = document.createElement('div');
+                marker.className = 'annotation-marker';
+                marker.textContent = index + 1;
+                marker.dataset.annotationId = annotation.id;
+                
+                // Position marker (these would be calculated based on viewer coordinates)
+                marker.style.left = `${annotation.x * 100}%`;
+                marker.style.top = `${annotation.y * 100}%`;
+                
+                marker.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    showAnnotationDetail(annotation);
+                });
+
+                overlay.appendChild(marker);
+            });
+        }
+
+        // Update annotation panel
+        function updateAnnotationPanel() {
+            const panel = document.getElementById('annotationList');
+            panel.innerHTML = '';
+
+            currentAnnotations.forEach(annotation => {
+                const item = document.createElement('div');
+                item.className = 'annotation-item';
+                item.dataset.annotationId = annotation.id;
+
+                const linksHtml = annotation.linkedEntities.map(entity => 
+                    `<span class="link-tag" onclick="exploreEntity('${entity.type}', '${entity.name}')">
+                        <i class="${entity.icon}"></i> ${entity.name}
+                    </span>`
+                ).join('');
+
+                item.innerHTML = `
+                    <div class="annotation-title">${annotation.title}</div>
+                    <div class="annotation-body">${annotation.body}</div>
+                    <div class="annotation-links">${linksHtml}</div>
+                `;
+
+                item.addEventListener('click', () => {
+                    showAnnotationDetail(annotation);
+                    focusOnAnnotation(annotation);
+                });
+
+                panel.appendChild(item);
+            });
+
+            // Add semantic path
+            const pathElement = document.createElement('div');
+            pathElement.className = 'semantic-path';
+            pathElement.innerHTML = `
+                <div class="path-title">当前探索路径</div>
+                <div class="path-chain">
+                    <span class="path-node">韬奋肖像</span>
+                    <i class="fas fa-arrow-right path-arrow"></i>
+                    <span class="path-node">人物特征</span>
+                    <i class="fas fa-arrow-right path-arrow"></i>
+                    <span class="path-node">社会背景</span>
+                    <i class="fas fa-arrow-right path-arrow"></i>
+                    <span class="path-node">?</span>
+                </div>
+            `;
+            panel.appendChild(pathElement);
+        }
+
+        // Show annotation detail in modal
+        function showAnnotationDetail(annotation) {
+            activeAnnotation = annotation;
+            
+            const modal = document.getElementById('detailModal');
+            const title = document.getElementById('modalTitle');
+            const content = document.getElementById('modalContent');
+
+            title.textContent = annotation.title;
+
+            const entitiesHtml = annotation.linkedEntities.map(entity => `
+                <div class="entity-card" onclick="exploreEntity('${entity.type}', '${entity.name}')">
+                    <div class="entity-icon">
+                        <i class="${entity.icon}"></i>
+                    </div>
+                    <div class="entity-name">${entity.name}</div>
+                </div>
+            `).join('');
+
+            content.innerHTML = `
+                <p style="margin-bottom: 1.5rem; line-height: 1.6;">${annotation.body}</p>
+                <h3 style="color: var(--gold-color); margin-bottom: 1rem;">
+                    <i class="fas fa-link"></i> 关联实体
+                </h3>
+                <div class="linked-entities">
+                    ${entitiesHtml}
+                </div>
+            `;
+
+            modal.classList.add('active');
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('detailModal').classList.remove('active');
+            activeAnnotation = null;
+        }
+
+        // Focus on annotation
+        function focusOnAnnotation(annotation) {
+            // Calculate viewport coordinates and zoom to annotation
+            const rect = new OpenSeadragon.Rect(
+                annotation.x, annotation.y, 
+                annotation.width, annotation.height
+            );
+            viewer.viewport.fitBounds(rect, true);
+        }
+
+        // Handle canvas click
+        function handleCanvasClick(event) {
+            // Add new annotation functionality could be implemented here
+            console.log('Canvas clicked at:', event.position);
+        }
+
+        // Explore entity (navigate to related content)
+        function exploreEntity(type, name) {
+            // This would implement the infinite discovery loop
+            console.log(`Exploring ${type}: ${name}`);
+            
+            // Simulate navigation to related content
+            if (type === 'publication' && name === '《生活》周刊') {
+                loadManifest('life-magazine');
+            }
+            
+            closeModal();
+        }
+
+        // Load different manifest
+        function loadManifest(manifestId) {
+            const manifest = manifests[manifestId];
+            if (!manifest) return;
+
+            // Update active manifest in sidebar
+            document.querySelectorAll('.manifest-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.manifest === manifestId) {
+                    item.classList.add('active');
+                }
+            });
+
+            // Load new image
+            viewer.open({
+                type: 'image',
+                url: manifest.imageUrl
+            });
+
+            // Load annotations after image loads
+            viewer.addHandler('open', function() {
+                loadAnnotations(manifestId);
+            }, { once: true });
+        }
+
+        // Zoom controls
+        function zoomIn() {
+            viewer.viewport.zoomBy(1.5);
+        }
+
+        function zoomOut() {
+            viewer.viewport.zoomBy(0.67);
+        }
+
+        function fitToView() {
+            viewer.viewport.goHome();
+        }
+
+        function resetView() {
+            viewer.viewport.goHome();
+            closeModal();
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Initialize sidebar interactions
+        function initSidebar() {
+            document.querySelectorAll('.manifest-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    loadManifest(item.dataset.manifest);
+                });
+            });
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            initViewer();
+            initSidebar();
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (viewer) {
+                viewer.viewport.goHome();
+            }
+        });
+    </script>
+</body>
+</html>

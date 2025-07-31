@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生活周刊特刊 - 邹韬奋先生纪念版</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --paper-bg: #f4f1e8;
+            --ink-black: #2c2c2c;
+            --ink-red: #8b0000;
+            --sepia-brown: #704214;
+            --border-color: #d4c5a0;
+            --shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Serif SC', serif;
+            background: var(--paper-bg);
+            color: var(--ink-black);
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 100% 50%, transparent 20%, rgba(255,255,255,0.3) 21%, rgba(255,255,255,0.3) 34%, transparent 35%, transparent),
+                linear-gradient(0deg, transparent 24%, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.05) 26%, transparent 27%, transparent 74%, rgba(255,255,255,0.05) 75%, rgba(255,255,255,0.05) 76%, transparent 77%, transparent);
+        }
+
+        .newspaper-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--paper-bg);
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        /* Header - Newspaper Masthead */
+        .newspaper-header {
+            border-bottom: 4px double var(--ink-black);
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .masthead {
+            font-family: 'Crimson Text', serif;
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--ink-black);
+            letter-spacing: 0.1em;
+            text-shadow: 1px 1px 0px rgba(0,0,0,0.1);
+            margin-bottom: 0.5rem;
+        }
+
+        .edition-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 1rem;
+            border-top: 1px solid var(--ink-black);
+            border-bottom: 1px solid var(--ink-black);
+            padding: 0.5rem 0;
+        }
+
+        .price {
+            color: var(--ink-red);
+            font-weight: 600;
+        }
+
+        /* Navigation as Newspaper Sections */
+        .newspaper-nav {
+            background: var(--ink-black);
+            color: var(--paper-bg);
+            padding: 0.5rem 0;
+            text-align: center;
+        }
+
+        .nav-sections {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .nav-section {
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            transition: background 0.3s ease;
+            border: none;
+            background: none;
+            color: var(--paper-bg);
+        }
+
+        .nav-section:hover, .nav-section.active {
+            background: var(--ink-red);
+        }
+
+        /* Main Content - Newspaper Columns */
+        .newspaper-content {
+            padding: 2rem;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Front Page Layout */
+        .front-page {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .main-story {
+            border-right: 2px solid var(--border-color);
+            padding-right: 2rem;
+        }
+
+        .headline {
+            font-family: 'Crimson Text', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 0.5rem;
+            color: var(--ink-black);
+            text-align: center;
+        }
+
+        .subheadline {
+            font-size: 1.1rem;
+            font-style: italic;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: var(--sepia-brown);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        .byline {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .article-text {
+            columns: 2;
+            column-gap: 2rem;
+            column-rule: 1px solid var(--border-color);
+            text-align: justify;
+            hyphens: auto;
+        }
+
+        .drop-cap {
+            float: left;
+            font-family: 'Crimson Text', serif;
+            font-size: 4rem;
+            line-height: 3rem;
+            padding-right: 0.5rem;
+            padding-top: 0.2rem;
+            color: var(--ink-red);
+            font-weight: 700;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            background: rgba(255,255,255,0.3);
+        }
+
+        .sidebar-section {
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        .sidebar-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .sidebar-headline {
+            font-family: 'Crimson Text', serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--ink-red);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Timeline as News Timeline */
+        .news-timeline {
+            border-top: 2px solid var(--ink-black);
+            padding-top: 2rem;
+        }
+
+        .timeline-headline {
+            font-family: 'Crimson Text', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--ink-black);
+        }
+
+        .timeline-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .timeline-article {
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            background: rgba(255,255,255,0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-article:hover {
+            box-shadow: var(--shadow);
+            transform: translateY(-2px);
+        }
+
+        .timeline-date {
+            font-family: 'Crimson Text', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--ink-red);
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--ink-black);
+        }
+
+        .timeline-summary {
+            font-size: 0.9rem;
+            color: var(--sepia-brown);
+            line-height: 1.5;
+        }
+
+        /* Event Detail as Full Article */
+        .full-article {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .article-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--ink-black);
+            padding-bottom: 1rem;
+        }
+
+        .article-headline {
+            font-family: 'Crimson Text', serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            color: var(--ink-black);
+        }
+
+        .article-dateline {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--sepia-brown);
+        }
+
+        .article-body {
+            columns: 2;
+            column-gap: 2rem;
+            column-rule: 1px solid var(--border-color);
+            text-align: justify;
+        }
+
+        .article-image {
+            width: 100%;
+            max-width: 400px;
+            margin: 1rem auto;
+            display: block;
+            border: 1px solid var(--border-color);
+            padding: 0.5rem;
+            background: white;
+        }
+
+        .image-caption {
+            font-size: 0.8rem;
+            font-style: italic;
+            text-align: center;
+            margin-top: 0.5rem;
+            color: var(--sepia-brown);
+        }
+
+        /* Quote Box */
+        .quote-box {
+            border: 2px solid var(--ink-red);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            background: rgba(139,0,0,0.05);
+            font-style: italic;
+            font-size: 1.1rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .quote-box::before,
+        .quote-box::after {
+            content: '"';
+            font-family: 'Crimson Text', serif;
+            font-size: 3rem;
+            color: var(--ink-red);
+            position: absolute;
+            font-weight: 700;
+        }
+
+        .quote-box::before {
+            top: -0.5rem;
+            left: 1rem;
+        }
+
+        .quote-box::after {
+            bottom: -1.5rem;
+            right: 1rem;
+        }
+
+        /* Advertisement Style Boxes */
+        .ad-box {
+            border: 2px solid var(--ink-black);
+            padding: 1rem;
+            text-align: center;
+            margin: 1rem 0;
+            background: rgba(255,255,255,0.5);
+        }
+
+        .ad-headline {
+            font-family: 'Crimson Text', serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .masthead {
+                font-size: 2.5rem;
+            }
+            
+            .front-page {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-story {
+                border-right: none;
+                padding-right: 0;
+                border-bottom: 2px solid var(--border-color);
+                padding-bottom: 2rem;
+                margin-bottom: 2rem;
+            }
+            
+            .article-text,
+            .article-body {
+                columns: 1;
+            }
+            
+            .nav-sections {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            
+            .headline {
+                font-size: 2rem;
+            }
+            
+            .article-headline {
+                font-size: 2rem;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .newspaper-container {
+                box-shadow: none;
+            }
+            
+            .nav-section {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="newspaper-container">
+        <!-- Newspaper Header -->
+        <header class="newspaper-header">
+            <h1 class="masthead">生活周刊特刊</h1>
+            <div class="edition-info">
+                <span>第一版</span>
+                <span>邹韬奋先生纪念专刊</span>
+                <span class="price">永久保存版</span>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="newspaper-nav">
+            <div class="nav-sections">
+                <button class="nav-section active" onclick="showSection('home')">头版</button>
+                <button class="nav-section" onclick="showSection('timeline')">生平纪事</button>
+                <button class="nav-section" onclick="showSection('events')">详细报道</button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="newspaper-content">
+            <!-- Front Page -->
+            <section id="home" class="section active">
+                <div class="front-page">
+                    <article class="main-story">
+                        <h2 class="headline">永远的爱国者邹韬奋先生</h2>
+                        <p class="subheadline">中国新闻出版界的一代宗师，民主战士的光辉典范</p>
+                        <p class="byline">本报特约记者 综合报道</p>
+                        
+                        <div class="article-text">
+                            <span class="drop-cap">邹</span>韬奋先生（1895-1944），原名邹恩润，江西余江人，是中国现代史上杰出的爱国者、政治活动家、新闻记者和出版家。他的一生虽然短暂，但却如流星般璀璨，为中国的新闻出版事业和民主进步事业做出了不可磨灭的贡献。
+
+                            先生早年求学于上海圣约翰大学，接受了良好的现代教育。1926年开始主编《生活》周刊，以其敏锐的政治嗅觉和深邃的思想见解，将一个默默无闻的小刊物打造成发行量达15万份的全国性大刊。《生活》周刊以"为生活而服务"为宗旨，关注民生疾苦，抨击时弊，深受广大读者喜爱。
+
+                            1932年，先生创办生活书店，进一步扩大了进步思想的传播阵地。生活书店秉承"为读者服务，为文化服务"的理念，在全国各地设立分店，成为当时最重要的进步出版机构之一。通过这个平台，无数进步书籍得以出版发行，启发了一代又一代的中国青年。
+
+                            抗日战争爆发后，先生更是义无反顾地投身到抗日救亡的洪流中。1936年，他与沈钧儒、李公朴等六位爱国人士因积极参与抗日救亡活动而被国民党当局逮捕，史称"七君子事件"。在狱中，先生坚持原则，不屈不挠，展现了中国知识分子的铮铮铁骨。
+
+                            1944年7月24日，先生因病在上海逝世，年仅49岁。临终前，他在遗嘱中表达了要求加入中国共产党的愿望，体现了他对共产主义理想的坚定信念。毛泽东同志评价他为"热忱的爱国者，真诚的民主主义者"。
+                        </div>
+                    </article>
+
+                    <aside class="sidebar">
+                        <div class="sidebar-section">
+                            <h3 class="sidebar-headline">重要数据</h3>
+                            <p><strong>《生活》周刊发行量：</strong>从2,000份增至150,000份</p>
+                            <p><strong>生活书店分店：</strong>全国56个城市</p>
+                            <p><strong>出版图书：</strong>超过1,000种</p>
+                        </div>
+
+                        <div class="sidebar-section">
+                            <h3 class="sidebar-headline">经典语录</h3>
+                            <div class="quote-box">
+                                我生为中国人，死为中国魂，此志不渝。
+                            </div>
+                        </div>
+
+                        <div class="sidebar-section">
+                            <h3 class="sidebar-headline">相关链接</h3>
+                            <div class="ad-box">
+                                <div class="ad-headline">延伸阅读</div>
+                                <p>《邹韬奋文集》<br>《生活周刊精选》<br>《萍踪寄语》</p>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+
+                <!-- Timeline Section -->
+                <section class="news-timeline">
+                    <h2 class="timeline-headline">生平大事纪</h2>
+                    <div class="timeline-grid">
+                        <article class="timeline-article" onclick="showEventDetail('1895')">
+                            <div class="timeline-date">1895年</div>
+                            <h3 class="timeline-title">诞生江西余江</h3>
+                            <p class="timeline-summary">11月5日，邹韬奋出生于江西省余江县一个书香门第，原名邹恩润。</p>
+                        </article>
+
+                        <article class="timeline-article" onclick="showEventDetail('1921')">
+                            <div class="timeline-date">1921年</div>
+                            <h3 class="timeline-title">大学毕业</h3>
+                            <p class="timeline-summary">从上海圣约翰大学文科毕业，开始从事教育和新闻工作。</p>
+                        </article>
+
+                        <article class="timeline-article" onclick="showEventDetail('1926')">
+                            <div class="timeline-date">1926年</div>
+                            <h3 class="timeline-title">主编《生活》</h3>
+                            <p class="timeline-summary">开始主编《生活》周刊，开启辉煌的新闻生涯。</p>
+                        </article>
+
+                        <article class="timeline-article" onclick="showEventDetail('1932')">
+                            <div class="timeline-date">1932年</div>
+                            <h3 class="timeline-title">创办书店</h3>
+                            <p class="timeline-summary">创办生活书店，致力于传播进步文化。</p>
+                        </article>
+
+                        <article class="timeline-article" onclick="showEventDetail('1936')">
+                            <div class="timeline-date">1936年</div>
+                            <h3 class="timeline-title">七君子事件</h3>
+                            <p class="timeline-summary">因抗日救亡活动被捕，展现了知识分子的责任担当。</p>
+                        </article>
+
+                        <article class="timeline-article" onclick="showEventDetail('1944')">
+                            <div class="timeline-date">1944年</div>
+                            <h3 class="timeline-title">上海逝世</h3>
+                            <p class="timeline-summary">7月24日在上海逝世，临终前表达了入党愿望。</p>
+                        </article>
+                    </div>
+                </section>
+            </section>
+
+            <!-- Timeline Details -->
+            <section id="timeline" class="section">
+                <article class="full-article">
+                    <header class="article-header">
+                        <h2 class="article-headline">邹韬奋先生生平详细年表</h2>
+                        <p class="article-dateline">本报史料部 整理报道</p>
+                    </header>
+                    
+                    <div class="article-body">
+                        <span class="drop-cap">本</span>报史料部经过详细考证，整理出邹韬奋先生详细生平年表，以飨读者。
+
+                        <strong>1895年（光绪二十一年）</strong><br>
+                        11月5日，邹韬奋出生于江西省余江县，原名邹恩润。父亲邹国珍是一位开明的知识分子，母亲徐氏贤淑持家。
+
+                        <strong>1913年（民国二年）</strong><br>
+                        考入上海圣约翰大学文科，开始接受现代西方教育，开阔了国际视野。
+
+                        <strong>1921年（民国十年）</strong><br>
+                        从圣约翰大学毕业，开始从事教育工作，同时进行新闻写作。
+
+                        <strong>1926年（民国十五年）</strong><br>
+                        开始主编《生活》周刊，以"暗夜的明灯"自勉，开启了辉煌的新闻生涯。
+
+                        <strong>1930年（民国十九年）</strong><br>
+                        因抗日言论被迫流亡欧洲，在英国、法国等地考察，写下《萍踪寄语》。
+
+                        <strong>1932年（民国二十一年）</strong><br>
+                        回国后创办生活书店，致力于出版进步书籍，传播先进文化。
+
+                        <strong>1935年（民国二十四年）</strong><br>
+                        创办《大众生活》周刊，继续为抗日救国奔走呼号。
+
+                        <strong>1936年（民国二十五年）</strong><br>
+                        11月23日，与沈钧儒等六位爱国人士被国民党当局逮捕，史称"七君子事件"。
+
+                        <strong>1944年（民国三十三年）</strong><br>
+                        7月24日，因病在上海逝世，年仅49岁。临终前在遗嘱中表达了加入中国共产党的愿望。
+                    </div>
+                </article>
+            </section>
+
+            <!-- Event Details -->
+            <section id="events" class="section">
+                <div id="event-details">
+                    <p style="text-align: center; font-style: italic; color: var(--sepia-brown); font-size: 1.1rem;">
+                        请点击生平大事纪中的任一事件，查看详细报道
+                    </p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Navigation functionality
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+            
+            // Remove active class from all nav buttons
+            const navBtns = document.querySelectorAll('.nav-section');
+            navBtns.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Add active class to clicked nav button
+            event.target.classList.add('active');
+        }
+
+        // Event detail data
+        const eventArticles = {
+            '1895': {
+                headline: '书香门第育英才',
+                dateline: '1895年11月5日 江西余江报道',
+                content: `
+                    <span class="drop-cap">据</span>本报江西特派员报道，1895年11月5日，在江西省余江县一个书香门第中，一个男婴呱呱坠地，他就是后来成为中国新闻出版界巨擘的邹韬奋先生。
+
+                    先生原名邹恩润，父亲邹国珍是当地有名的教书先生，学识渊博，思想开明。母亲徐氏贤良淑德，持家有方。这样的家庭环境为先生日后的成长奠定了坚实的基础。
+
+                    据了解，先生自幼聪颖过人，酷爱读书。在父亲的悉心栽培下，他不仅熟读四书五经，还接触了不少新学著作。这种中西结合的教育方式，培养了他开阔的视野和独立的思考能力。
+
+                    邻里乡亲回忆，小韬奋常常手不释卷，即使在田间地头玩耍，也要带着书本。他的好学精神和聪慧天资，在当地传为美谈。
+
+                    <img src="https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=600&h=300&fit=crop" alt="江西乡村风光" class="article-image">
+                    <p class="image-caption">江西余江县风光（资料图片）</p>
+                `
+            },
+            '1926': {
+                headline: '《生活》周刊横空出世',
+                dateline: '1926年10月 上海特别报道',
+                content: `
+                    <span class="drop-cap">1926</span>年10月，一本名为《生活》的周刊在上海悄然创刊，主编正是年仅31岁的邹韬奋先生。当时谁也不会想到，这本看似普通的小刊物会在中国新闻史上留下浓墨重彩的一笔。
+
+                    《生活》周刊创刊之初，发行量仅有2000份左右，在当时众多的报刊中毫不起眼。但邹韬奋先生以其敏锐的政治嗅觉和深厚的文字功底，很快为这本刊物注入了独特的生命力。
+
+                    "为生活而服务"是《生活》周刊的办刊宗旨。先生认为，新闻工作者的天职就是为人民服务，为真理服务。他在创刊词中写道："我们要做人民的喉舌，不要做统治者的传声筒。"
+
+                    短短几年时间内，《生活》周刊的发行量就突破了15万份，成为全国最有影响力的刊物之一。其成功的秘诀在于始终关注民生疾苦，敢于直面社会问题，用通俗易懂的语言传播进步思想。
+
+                    <img src="https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=600&h=300&fit=crop" alt="印刷机器" class="article-image">
+                    <p class="image-caption">1920年代的印刷车间（资料图片）</p>
+                `
+            },
+            '1936': {
+                headline: '七君子慷慨赴难',
+                dateline: '1936年11月23日 上海紧急报道',
+                content: `
+                    <span class="drop-cap">昨</span>日深夜，震惊全国的"七君子事件"在上海发生。邹韬奋先生与沈钧儒、李公朴、章乃器、王造时、史良、沙千里等六位著名爱国人士，因积极参与抗日救亡运动而被国民党当局逮捕。
+
+                    据可靠消息，此次逮捕行动是在深夜进行的。当局以"危害民国"的罪名，同时逮捕了这七位在社会上享有崇高声誉的知识分子。消息传出后，举国震惊，各界人士纷纷表示抗议。
+
+                    邹韬奋先生被捕时正在家中写作，面对前来逮捕的军警，他神情镇定，慷慨就义。据目击者称，先生临行前对家人说："为国家民族而坐牢，是我们知识分子应尽的责任。"
+
+                    这七位爱国人士都是当时社会的精英人物，他们的被捕充分暴露了当局对抗日救亡运动的恐惧和镇压。但正如先生所说："真理是不会被监狱的铁窗所禁锢的。"
+
+                    <div class="quote-box">
+                        宁为玉碎，不为瓦全。为了国家的前途，个人的得失算得了什么？
+                    </div>
+
+                    据悉，全国各地的民众和社会团体已经开始组织营救活动，要求当局立即释放七君子。我们相信，正义必将战胜邪恶，光明终将驱散黑暗。
+                `
+            }
+        };
+
+        // Show event detail
+        function showEventDetail(eventId) {
+            showSection('events');
+            const eventDetails = document.getElementById('event-details');
+            const article = eventArticles[eventId];
+            
+            if (article) {
+                eventDetails.innerHTML = `
+                    <article class="full-article">
+                        <header class="article-header">
+                            <h2 class="article-headline">${article.headline}</h2>
+                            <p class="article-dateline">${article.dateline}</p>
+                        </header>
+                        <div class="article-body">
+                            ${article.content}
+                        </div>
+                    </article>
+                `;
+            } else {
+                eventDetails.innerHTML = `
+                    <article class="full-article">
+                        <header class="article-header">
+                            <h2 class="article-headline">详细报道整理中</h2>
+                            <p class="article-dateline">本报编辑部</p>
+                        </header>
+                        <div class="article-body">
+                            <p>该事件的详细报道正在整理中，请关注后续版面...</p>
+                        </div>
+                    </article>
+                `;
+            }
+        }
+
+        // Add vintage newspaper effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulate old newspaper aging effect
+            setTimeout(() => {
+                document.body.style.transition = 'all 2s ease-in-out';
+                document.body.style.filter = 'sepia(0.1) contrast(1.1)';
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

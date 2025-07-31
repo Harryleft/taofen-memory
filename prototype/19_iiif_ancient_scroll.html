@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>古籍卷轴 - 邹韬奋纪念网页</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&family=Noto+Serif+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Serif SC', serif;
+            background: linear-gradient(135deg, #f5f2e8 0%, #e8dfd0 50%, #dcc6a0 100%);
+            color: #3d2f1f;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(139, 115, 85, 0.03) 2px,
+                    rgba(139, 115, 85, 0.03) 4px
+                );
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, rgba(139, 115, 85, 0.1) 0%, rgba(160, 130, 95, 0.1) 100%);
+            border-bottom: 2px solid rgba(139, 115, 85, 0.2);
+        }
+
+        .header h1 {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 4rem;
+            color: #5d4e37;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            letter-spacing: 5px;
+        }
+
+        .header p {
+            font-family: 'ZCOOL XiaoWei', serif;
+            font-size: 1.3rem;
+            color: #6b5b47;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        .scroll-container {
+            flex: 1;
+            position: relative;
+            margin: 40px 20px;
+            overflow: hidden;
+        }
+
+        .scroll-wrapper {
+            position: relative;
+            height: 600px;
+            background: linear-gradient(180deg, 
+                rgba(255, 248, 240, 0.9) 0%, 
+                rgba(255, 248, 240, 0.95) 50%, 
+                rgba(255, 248, 240, 0.9) 100%);
+            border-radius: 20px;
+            box-shadow: 
+                inset 0 0 50px rgba(139, 115, 85, 0.1),
+                0 10px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .scroll-paper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 80px,
+                    rgba(139, 115, 85, 0.1) 80px,
+                    rgba(139, 115, 85, 0.1) 82px
+                ),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 40px,
+                    rgba(139, 115, 85, 0.05) 40px,
+                    rgba(139, 115, 85, 0.05) 42px
+                );
+            transition: transform 0.8s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .scroll-section {
+            min-width: 50%;
+            height: 100%;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .scroll-section::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 10%;
+            bottom: 10%;
+            width: 2px;
+            background: linear-gradient(180deg, 
+                transparent 0%, 
+                rgba(139, 115, 85, 0.3) 20%, 
+                rgba(139, 115, 85, 0.3) 80%, 
+                transparent 100%);
+        }
+
+        .scroll-section:last-child::after {
+            display: none;
+        }
+
+        .section-title {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 3rem;
+            color: #8b7355;
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                #8b7355 50%, 
+                transparent 100%);
+        }
+
+        .section-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .content-item {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(139, 115, 85, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .content-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(139, 115, 85, 0.2);
+            border-color: #8b7355;
+        }
+
+        .item-icon {
+            font-size: 2.5rem;
+            color: #8b7355;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .item-title {
+            font-family: 'ZCOOL XiaoWei', serif;
+            font-size: 1.5rem;
+            color: #5d4e37;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .item-description {
+            line-height: 1.8;
+            color: #6b5b47;
+            text-align: justify;
+        }
+
+        .calligraphy {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 1.2rem;
+            color: #8b7355;
+            text-align: center;
+            margin: 20px 0;
+            line-height: 2;
+        }
+
+        .seal {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: #dc143c;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 1.2rem;
+            transform: rotate(15deg);
+            opacity: 0.8;
+        }
+
+        .scroll-controls {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 10;
+        }
+
+        .scroll-btn {
+            background: rgba(139, 115, 85, 0.8);
+            border: none;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .scroll-btn:hover {
+            background: #8b7355;
+            transform: scale(1.1);
+        }
+
+        .scroll-btn:disabled {
+            background: rgba(139, 115, 85, 0.3);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+        .indicator-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(139, 115, 85, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator-dot.active {
+            background: #8b7355;
+            transform: scale(1.2);
+        }
+
+        .timeline-marker {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(139, 115, 85, 0.8);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-family: 'ZCOOL XiaoWei', serif;
+            font-size: 0.9rem;
+        }
+
+        .connection-line {
+            position: absolute;
+            top: 50%;
+            left: 100%;
+            width: 50px;
+            height: 2px;
+            background: linear-gradient(90deg, #8b7355, transparent);
+            transform: translateY(-50%);
+        }
+
+        .floating-poetry {
+            position: fixed;
+            top: 50%;
+            left: 20px;
+            transform: translateY(-50%) rotate(-90deg);
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 1.5rem;
+            color: rgba(139, 115, 85, 0.3);
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .info-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .info-modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #fff8e7 0%, #fff0d4 100%);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            border: 3px solid #8b7355;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: #8b7355;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-close:hover {
+            opacity: 1;
+        }
+
+        .modal-title {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 2.5rem;
+            color: #5d4e37;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal-text {
+            line-height: 1.8;
+            color: #6b5b47;
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        .traditional-decoration {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        .decoration-tl {
+            top: 20px;
+            left: 20px;
+            border-top: 3px solid #8b7355;
+            border-left: 3px solid #8b7355;
+        }
+
+        .decoration-tr {
+            top: 20px;
+            right: 20px;
+            border-top: 3px solid #8b7355;
+            border-right: 3px solid #8b7355;
+        }
+
+        .decoration-bl {
+            bottom: 20px;
+            left: 20px;
+            border-bottom: 3px solid #8b7355;
+            border-left: 3px solid #8b7355;
+        }
+
+        .decoration-br {
+            bottom: 20px;
+            right: 20px;
+            border-bottom: 3px solid #8b7355;
+            border-right: 3px solid #8b7355;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .header p {
+                font-size: 1.1rem;
+            }
+            
+            .scroll-wrapper {
+                height: 500px;
+                margin: 20px 10px;
+            }
+            
+            .scroll-section {
+                min-width: 100%;
+                padding: 30px 20px;
+            }
+            
+            .section-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .floating-poetry {
+                display: none;
+            }
+            
+            .modal-content {
+                margin: 20px;
+                padding: 30px 20px;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .scroll-gesture {
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            color: rgba(139, 115, 85, 0.5);
+            font-size: 1.5rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(-50%) translateX(0); }
+            40% { transform: translateY(-50%) translateX(-10px); }
+            60% { transform: translateY(-50%) translateX(-5px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-poetry">青史丹心照汗青</div>
+    
+    <div class="container">
+        <header class="header">
+            <h1>古籍卷轴</h1>
+            <p>如展开历史长卷，细细品味邹韬奋先生的一生事迹与精神传承</p>
+        </header>
+
+        <div class="scroll-container">
+            <div class="scroll-wrapper">
+                <div class="scroll-paper" id="scrollPaper">
+                    <!-- 第一部分：早年时期 -->
+                    <div class="scroll-section">
+                        <div class="traditional-decoration decoration-tl"></div>
+                        <div class="traditional-decoration decoration-tr"></div>
+                        
+                        <div class="timeline-marker">1895 - 1921</div>
+                        <h2 class="section-title">启蒙岁月</h2>
+                        
+                        <div class="calligraphy">
+                            "书香门第育英才，<br>
+                            幼承庭训志不凡"
+                        </div>
+                        
+                        <div class="section-content">
+                            <div class="content-item" onclick="showModal('birth')">
+                                <div class="item-icon">👶</div>
+                                <h3 class="item-title">诞生于福建</h3>
+                                <p class="item-description">1895年，邹韬奋出生于福建省永安县一个书香门第家庭，原名邹恩润。家庭的熏陶为他奠定了良好的文化基础。</p>
+                                <div class="connection-line"></div>
+                            </div>
+                            
+                            <div class="content-item" onclick="showModal('education')">
+                                <div class="item-icon">🎓</div>
+                                <h3 class="item-title">求学之路</h3>
+                                <p class="item-description">先后就读于上海圣约翰大学和美国哥伦比亚大学，接受了中西文化的熏陶，形成了开阔的国际视野。</p>
+                                <div class="connection-line"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="seal">启蒙</div>
+                    </div>
+
+                    <!-- 第二部分：事业起步 -->
+                    <div class="scroll-section">
+                        <div class="traditional-decoration decoration-tl"></div>
+                        <div class="traditional-decoration decoration-tr"></div>
+                        
+                        <div class="timeline-marker">1926 - 1931</div>
+                        <h2 class="section-title">创业兴学</h2>
+                        
+                        <div class="calligraphy">
+                            "笔耕不辍为民言，<br>
+                            创办周刊启民智"
+                        </div>
+                        
+                        <div class="section-content">
+                            <div class="content-item" onclick="showModal('life-weekly')">
+                                <div class="item-icon">📰</div>
+                                <h3 class="item-title">《生活》周刊</h3>
+                                <p class="item-description">1926年创办《生活》周刊，以"传播进步思想，服务社会大众"为宗旨，成为当时最有影响力的进步刊物之一。</p>
+                                <div class="connection-line"></div>
+                            </div>
+                            
+                            <div class="content-item" onclick="showModal('journalism')">
+                                <div class="item-icon">✍️</div>
+                                <h3 class="item-title">新闻理念</h3>
+                                <p class="item-description">形成了"为人民服务、说真话、办实事"的新闻理念，这一理念贯穿他的一生，影响深远。</p>
+                                <div class="connection-line"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="seal">创业</div>
+                    </div>
+
+                    <!-- 第三部分：抗日救亡 -->
+                    <div class="scroll-section">
+                        <div class="traditional-decoration decoration-tl"></div>
+                        <div class="traditional-decoration decoration-tr"></div>
+                        
+                        <div class="timeline-marker">1931 - 1937</div>
+                        <h2 class="section-title">救国图存</h2>
+                        
+                        <div class="calligraphy">
+                            "国难当头挺身出，<br>
+                            奔走呼号救危亡"
+                        </div>
+                        
+                        <div class="section-content">
+                            <div class="content-item" onclick="showModal('anti-japanese')">
+                                <div class="item-icon">🔥</div>
+                                <h3 class="item-title">抗日宣传</h3>
+                                <p class="item-description">九一八事变后，积极宣传抗日救国思想，通过《生活》周刊成为重要的抗日舆论阵地。</p>
+                                <div class="connection-line"></div>
+                            </div>
+                            
+                            <div class="content-item" onclick="showModal('seven-incident')">
+                                <div class="item-icon">⚖️</div>
+                                <h3 class="item-title">七君子事件</h3>
+                                <p class="item-description">1936年与沈钧儒等七人被国民党政府逮捕，引发了全国范围的抗议和声援，体现了为爱国事业牺牲的精神。</p>
+                                <div class="connection-line"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="seal">救国</div>
+                    </div>
+
+                    <!-- 第四部分：思想传承 -->
+                    <div class="scroll-section">
+                        <div class="traditional-decoration decoration-tl"></div>
+                        <div class="traditional-decoration decoration-tr"></div>
+                        
+                        <div class="timeline-marker">1938 - 1944</div>
+                        <h2 class="section-title">精神永存</h2>
+                        
+                        <div class="calligraphy">
+                            "丹心一片照千秋，<br>
+                            浩然正气万古存"
+                        </div>
+                        
+                        <div class="section-content">
+                            <div class="content-item" onclick="showModal('legacy')">
+                                <div class="item-icon">⭐</div>
+                                <h3 class="item-title">思想遗产</h3>
+                                <p class="item-description">1944年在上海逝世，但他的精神和理念继续影响着后人，成为中国新闻出版事业的宝贵财富。</p>
+                                <div class="connection-line"></div>
+                            </div>
+                            
+                            <div class="content-item" onclick="showModal('influence')">
+                                <div class="item-icon">🏆</div>
+                                <h3 class="item-title">历史影响</h3>
+                                <p class="item-description">他的新闻精神和爱国情怀激励着一代又一代中国人，"韬奋新闻奖"成为中国新闻界的最高荣誉之一。</p>
+                                <div class="connection-line"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="seal">传承</div>
+                    </div>
+                </div>
+
+                <div class="scroll-controls">
+                    <button class="scroll-btn" id="prevBtn" onclick="scrollPrev()">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="scroll-btn" id="nextBtn" onclick="scrollNext()">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+
+                <div class="scroll-indicator">
+                    <div class="indicator-dot active" onclick="scrollToSection(0)"></div>
+                    <div class="indicator-dot" onclick="scrollToSection(1)"></div>
+                    <div class="indicator-dot" onclick="scrollToSection(2)"></div>
+                    <div class="indicator-dot" onclick="scrollToSection(3)"></div>
+                </div>
+
+                <div class="scroll-gesture">
+                    <i class="fas fa-hand-point-left"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 信息模态框 -->
+    <div class="info-modal" id="infoModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <h2 class="modal-title" id="modalTitle">标题</h2>
+            <div class="modal-text" id="modalText">内容</div>
+        </div>
+    </div>
+
+    <script>
+        // 详细信息数据
+        const modalData = {
+            'birth': {
+                title: '诞生于福建永安',
+                content: `
+                    <p>1895年，邹韬奋出生于福建省永安县一个书香门第家庭。他的家庭环境为他提供了良好的教育基础，从小受到传统文化的熏陶。</p>
+                    <p>永安的文化底蕴和家庭教育对邹韬奋的成长产生了深远影响。在这样的环境中，他培养了对知识的渴望和对国家命运的深切关怀。</p>
+                    <p>童年的经历为他后来的人生道路奠定了重要基础，形成了他深厚的文化底蕴和爱国情怀。</p>
+                    <div class="calligraphy" style="margin-top: 20px;">
+                        "幼承庭训读诗书，<br>
+                        心系家国志不渝"
+                    </div>
+                `
+            },
+            'education': {
+                title: '求学之路',
+                content: `
+                    <p>邹韬奋先后就读于上海圣约翰大学和美国哥伦比亚大学，接受了完整的中西教育。在上海圣约翰大学期间，他主修文学，接触到了西方先进思想。</p>
+                    <p>毕业后赴美深造，进一步开阔了国际视野，为后来的新闻出版事业积累了丰富的知识和经验。这段求学经历让他深刻理解了中西方文化的差异与融合。</p>
+                    <p>教育背景使他具备了独特的视角和深刻的思想，为他后来的新闻事业奠定了坚实的理论基础。</p>
+                    <div class="calligraphy" style="margin-top: 20px;">
+                        "中西合璧开眼界，<br>
+                        学贯中西志更坚"
+                    </div>
+                `
+            },
+            'life-weekly': {
+                title: '《生活》周刊',
+                content: `
+                    <p>1926年，邹韬奋创办了《生活》周刊，这成为他新闻出版事业的重要起点。刊物以"传播进步思想，服务社会大众"为宗旨。</p>
+                    <p>《生活》周刊内容涵盖时事评论、文化教育、生活指导等多个方面，很快成为当时最有影响力的进步刊物之一。在九一八事变后，积极宣传抗日救国思想。</p>
+                    <p>通过这个平台，邹韬奋培养了大量的读者群体，传播进步思想，为中国的革命和建设事业作出了重要贡献。</p>
+                    <div class="calligraphy" style="margin-top: 20px;">
+                        "一支笔杆抵千军，<br>
+                        万众心声通过刊"
+                    </div>
+                `
+            },
+            'journalism': {
+                title: '新闻理念',
+                content: `
+                    <p>邹韬奋形成了"为人民服务、说真话、办实事"的新闻理念，这一理念贯穿他的一生，影响深远。</p>
+                    <p>他始终强调新闻出版要为人民服务，要反映民众的呼声和需求。他认为报刊杂志应该成为民众的喉舌，而不是统治者的工具。</p>
+                    <p>面对国民党的压迫和威胁，他始终坚持真理，不为权势所屈服，体现了中国知识分子的骨气和担当。</p>
+                    <div class="calligraphy" style="margin-top: 20px;">
+                        "为民请命不畏强，<br>
+                        实事求是显担当"
+                    </div>
+                `
+            },
+            'anti-japanese': {
+                title: '抗日宣传',
+                content: `
+                    <p>九一八事变后，邹韬奋积极响应抗日救亡运动，通过《生活》周刊积极宣传抗日思想，成为重要的抗日舆论阵地。</p>
+                    <p>他的文章充满爱国热情，呼吁全国人民团结起来抵抗日本侵略，激发了广大民众的爱国热情和抗日决心。</p>
+                    <p>在这一时期，他不仅是一名新闻工作者，更是一名抗日战士，用笔作为武器，为国家的独立和民族的解放而战斗。</p>
+                    <div class="calligraphy" style="margin-top: 20px;">
+                        "笔锋如剑指倭寇，<br>
+                        爱国情深动四方"
+                    </div>
+                `
+            },
+            'seven-incident': {
+                title: '七君子事件',
+                content: `
+                    <p>1936年，邹韬奋与沈钧儒等七人被国民党政府逮捕，史称"七君子事件"。他们因积极参与抗日救国运动而被指控"危害民国"。</p>
+                    <p>这一事件引发了全国范围的抗议和声援，显示了邹韬奋先生为爱国事业不惜牺牲个人自由的精神品格。</p>
+                    <p>在狱中，他始终坚持自己的信念，不为威逼利诱所动摇，表现出了崇高的民族气节和坚定的革命意志。</p>
+                    <div class="calligraphy" style="margin-top: 20px;">
+                        "身陷囹圄志不改，<br>
+                        浩然正气满乾坤"
+                    </div>
+                `
+            },
+            'legacy': {
+                title: '思想遗产',
+                content: `
+                    <p>1944年，邹韬奋因病在上海逝世，年仅49岁。临终前他仍心系国家前途，体现了中国知识分子的家国情怀。</p>
+                    <p>他的逝世是中国新闻界和进步文化事业的重大损失，但他的精神和理念继续影响着后人，成为中国新闻出版事业的宝贵财富。</p>
+                    <p>他的一生是为人民服务的一生，是为国家富强和民族独立而奋斗的一生，他的精神永远激励着后人。</p>
+                    <div class="calligraphy" style="margin-top: 20px;">
+                        "鞠躬尽瘁为人民，<br>
+                        死而后已精神存"
+                    </div>
+                `
+            },
+            'influence': {
+                title: '历史影响',
+                content: `
+                    <p>邹韬奋的新闻精神和爱国情怀激励着一代又一代中国人，"韬奋新闻奖"成为中国新闻界的最高荣誉之一。</p>
+                    <p>他的"为人民服务"的新闻理念在当今信息爆炸的时代更具现实意义，成为新闻工作者的精神指引。</p>
+                    <p>他的一生体现了中国知识分子的责任与担当，他的精神遗产将继续为中国的新闻事业和文化发展提供重要的思想资源。</p>
+                    <div class="calligraphy" style="margin-top: 20px;">
+                        "精神永照后人路，<br>
+                        正气长存天地间"
+                    </div>
+                `
+            }
+        };
+
+        let currentSection = 0;
+        const totalSections = 4;
+        const scrollPaper = document.getElementById('scrollPaper');
+
+        function scrollPrev() {
+            if (currentSection > 0) {
+                currentSection--;
+                updateScroll();
+            }
+        }
+
+        function scrollNext() {
+            if (currentSection < totalSections - 1) {
+                currentSection++;
+                updateScroll();
+            }
+        }
+
+        function scrollToSection(index) {
+            currentSection = index;
+            updateScroll();
+        }
+
+        function updateScroll() {
+            const offset = -currentSection * 50;
+            scrollPaper.style.transform = `translateX(${offset}%)`;
+            
+            // 更新指示器
+            document.querySelectorAll('.indicator-dot').forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSection);
+            });
+            
+            // 更新按钮状态
+            document.getElementById('prevBtn').disabled = currentSection === 0;
+            document.getElementById('nextBtn').disabled = currentSection === totalSections - 1;
+            
+            // 添加动画效果
+            scrollPaper.style.transition = 'transform 0.8s ease';
+        }
+
+        function showModal(topic) {
+            const modal = document.getElementById('infoModal');
+            const title = document.getElementById('modalTitle');
+            const text = document.getElementById('modalText');
+            
+            const data = modalData[topic];
+            title.textContent = data.title;
+            text.innerHTML = data.content;
+            
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('infoModal').classList.remove('active');
+        }
+
+        // 键盘控制
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') {
+                scrollPrev();
+            } else if (e.key === 'ArrowRight') {
+                scrollNext();
+            } else if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // 触摸滑动支持
+        let startX = 0;
+        let endX = 0;
+
+        scrollPaper.addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+        });
+
+        scrollPaper.addEventListener('touchend', function(e) {
+            endX = e.changedTouches[0].clientX;
+            const diff = startX - endX;
+            
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) {
+                    scrollNext();
+                } else {
+                    scrollPrev();
+                }
+            }
+        });
+
+        // 点击模态框外部关闭
+        document.getElementById('infoModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // 初始化
+        updateScroll();
+
+        // 添加滚动动画
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.content-item').forEach(item => {
+            observer.observe(item);
+        });
+
+        // 自动播放功能（可选）
+        let autoPlay = false;
+        let autoPlayInterval;
+
+        function startAutoPlay() {
+            autoPlay = true;
+            autoPlayInterval = setInterval(() => {
+                if (currentSection < totalSections - 1) {
+                    scrollNext();
+                } else {
+                    currentSection = -1;
+                    scrollNext();
+                }
+            }, 5000);
+        }
+
+        function stopAutoPlay() {
+            autoPlay = false;
+            clearInterval(autoPlayInterval);
+        }
+
+        // 双击开始/停止自动播放
+        scrollPaper.addEventListener('dblclick', function() {
+            if (autoPlay) {
+                stopAutoPlay();
+            } else {
+                startAutoPlay();
+            }
+        });
+
+        // 隐藏滚动提示
+        setTimeout(() => {
+            document.querySelector('.scroll-gesture').style.display = 'none';
+        }, 5000);
+    </script>
+</body>
+</html>

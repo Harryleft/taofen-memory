@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>关系织网 - 邹韬奋纪念网页</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Serif SC', serif;
+            background: linear-gradient(135deg, #f4e8d0 0%, #e8dcc0 50%, #ddd0b0 100%);
+            color: #3d2f1f;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 10px,
+                    rgba(189, 174, 147, 0.03) 10px,
+                    rgba(189, 174, 147, 0.03) 20px
+                );
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 40px 0;
+        }
+
+        .header h1 {
+            font-family: 'ZCOOL XiaoWei', serif;
+            font-size: 3.5rem;
+            font-weight: 400;
+            color: #5d4e37;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #6b5b47;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        .weaving-container {
+            position: relative;
+            height: 80vh;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            margin: 40px 0;
+            overflow: hidden;
+            box-shadow: inset 0 0 50px rgba(93, 78, 55, 0.1);
+            border: 2px solid rgba(189, 174, 147, 0.3);
+        }
+
+        .weaving-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
+
+        .knowledge-entity {
+            position: absolute;
+            background: #fff;
+            border: 3px solid #8b7355;
+            border-radius: 15px;
+            padding: 20px;
+            cursor: move;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            min-width: 150px;
+            text-align: center;
+            user-select: none;
+        }
+
+        .knowledge-entity:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(139, 115, 85, 0.3);
+        }
+
+        .knowledge-entity.person {
+            background: linear-gradient(135deg, #fff8e7, #fff0d4);
+            border-color: #8b6914;
+        }
+
+        .knowledge-entity.event {
+            background: linear-gradient(135deg, #f0f8ff, #e6f3ff);
+            border-color: #4682b4;
+        }
+
+        .knowledge-entity.work {
+            background: linear-gradient(135deg, #f0fff0, #e6ffe6);
+            border-color: #228b22;
+        }
+
+        .knowledge-entity.thought {
+            background: linear-gradient(135deg, #fff5ee, #ffe6d9);
+            border-color: #ff6347;
+        }
+
+        .knowledge-entity.legacy {
+            background: linear-gradient(135deg, #f8f0ff, #f0e6ff);
+            border-color: #9370db;
+        }
+
+        .entity-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #5d4e37;
+        }
+
+        .entity-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #3d2f1f;
+        }
+
+        .entity-subtitle {
+            font-size: 0.9rem;
+            color: #6b5b47;
+            opacity: 0.8;
+        }
+
+        .connection-line {
+            position: absolute;
+            height: 3px;
+            background: linear-gradient(90deg, #8b7355, #a0826d, #8b7355);
+            transform-origin: left center;
+            pointer-events: none;
+            border-radius: 2px;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .connection-line:hover {
+            opacity: 1;
+            height: 5px;
+        }
+
+        .connection-line.weaving {
+            background: linear-gradient(90deg, #cd853f, #daa520, #cd853f);
+            box-shadow: 0 0 10px rgba(205, 133, 63, 0.5);
+        }
+
+        .weaving-tools {
+            position: fixed;
+            left: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border: 2px solid #8b7355;
+            z-index: 100;
+        }
+
+        .tool-btn {
+            display: block;
+            width: 50px;
+            height: 50px;
+            background: #f4e8d0;
+            border: 2px solid #8b7355;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #5d4e37;
+        }
+
+        .tool-btn:hover {
+            background: #8b7355;
+            color: #fff;
+            transform: scale(1.1);
+        }
+
+        .tool-btn.active {
+            background: #8b7355;
+            color: #fff;
+        }
+
+        .info-panel {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            width: 400px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-left: 3px solid #8b7355;
+            padding: 30px;
+            transition: right 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .info-panel.active {
+            right: 0;
+        }
+
+        .info-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #8b7355;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .info-close:hover {
+            opacity: 1;
+        }
+
+        .info-content h2 {
+            color: #5d4e37;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            font-weight: 400;
+        }
+
+        .info-content p {
+            line-height: 1.8;
+            margin-bottom: 15px;
+            color: #3d2f1f;
+        }
+
+        .connection-info {
+            background: #f4e8d0;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #8b7355;
+        }
+
+        .connection-info h4 {
+            color: #5d4e37;
+            margin-bottom: 10px;
+        }
+
+        .pattern-selector {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 25px;
+            border-radius: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border: 2px solid #8b7355;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        .pattern-btn {
+            background: #f4e8d0;
+            border: 2px solid #8b7355;
+            border-radius: 20px;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            color: #5d4e37;
+            font-family: 'Noto Serif SC', serif;
+        }
+
+        .pattern-btn:hover {
+            background: #8b7355;
+            color: #fff;
+        }
+
+        .pattern-btn.active {
+            background: #8b7355;
+            color: #fff;
+        }
+
+        .instructions {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border: 2px solid #8b7355;
+            max-width: 300px;
+            z-index: 100;
+        }
+
+        .instructions h3 {
+            color: #5d4e37;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .instructions ul {
+            list-style: none;
+            color: #6b5b47;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .instructions li::before {
+            content: '•';
+            color: #8b7355;
+            position: absolute;
+            left: 0;
+        }
+
+        .thread-animation {
+            position: absolute;
+            width: 2px;
+            background: linear-gradient(45deg, #cd853f, #daa520);
+            pointer-events: none;
+            border-radius: 1px;
+            opacity: 0.8;
+            z-index: 5;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .weaving-tools {
+                left: 10px;
+                padding: 15px;
+            }
+            
+            .tool-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+            
+            .info-panel {
+                width: 100vw;
+                right: -100vw;
+            }
+            
+            .instructions {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin-bottom: 20px;
+            }
+            
+            .pattern-selector {
+                bottom: 20px;
+                left: 20px;
+                right: 20px;
+                transform: none;
+                flex-wrap: wrap;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .gentle-pulse {
+            animation: gentlePulse 3s ease-in-out infinite;
+        }
+
+        @keyframes gentlePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .weaving-effect {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .weaving-thread {
+            position: absolute;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(205, 133, 63, 0.3), transparent);
+            animation: weavingMove 8s linear infinite;
+        }
+
+        @keyframes weavingMove {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>关系织网</h1>
+            <p>亲手编织历史的关系网络，感受人与人、事与物之间的深厚联系</p>
+        </header>
+
+        <div class="weaving-container" id="weavingContainer">
+            <canvas class="weaving-canvas" id="weavingCanvas"></canvas>
+            
+            <!-- 知识实体 -->
+            <div class="knowledge-entity person" data-id="zou-taofen" style="top: 20%; left: 50%; transform: translateX(-50%);">
+                <div class="entity-icon">👤</div>
+                <div class="entity-title">邹韬奋</div>
+                <div class="entity-subtitle">爱国新闻工作者</div>
+            </div>
+
+            <div class="knowledge-entity event" data-id="life-weekly" style="top: 40%; left: 20%;">
+                <div class="entity-icon">📰</div>
+                <div class="entity-title">《生活》周刊</div>
+                <div class="entity-subtitle">1926年创刊</div>
+            </div>
+
+            <div class="knowledge-entity work" data-id="mass-books" style="top: 60%; right: 25%;">
+                <div class="entity-icon">📚</div>
+                <div class="entity-title">生活书店</div>
+                <div class="entity-subtitle">1932年建立</div>
+            </div>
+
+            <div class="knowledge-entity thought" data-id="patriotism" style="top: 35%; right: 20%;">
+                <div class="entity-icon">❤️</div>
+                <div class="entity-title">爱国情怀</div>
+                <div class="entity-subtitle">思想核心</div>
+            </div>
+
+            <div class="knowledge-entity legacy" data-id="journalism" style="top: 70%; left: 30%;">
+                <div class="entity-icon">✍️</div>
+                <div class="entity-title">新闻精神</div>
+                <div class="entity-subtitle">永恒遗产</div>
+            </div>
+
+            <div class="knowledge-entity event" data-id="seven-incident" style="top: 50%; right: 40%;">
+                <div class="entity-icon">⚖️</div>
+                <div class="entity-title">七君子事件</div>
+                <div class="entity-subtitle">1936年</div>
+            </div>
+
+            <div class="weaving-effect" id="weavingEffect"></div>
+        </div>
+    </div>
+
+    <div class="weaving-tools">
+        <div class="tool-btn active" data-tool="move" title="移动模式">
+            <i class="fas fa-arrows-alt"></i>
+        </div>
+        <div class="tool-btn" data-tool="connect" title="连接模式">
+            <i class="fas fa-project-diagram"></i>
+        </div>
+        <div class="tool-btn" data-tool="weave" title="编织模式">
+            <i class="fas fa-magic"></i>
+        </div>
+        <div class="tool-btn" data-tool="info" title="信息模式">
+            <i class="fas fa-info"></i>
+        </div>
+    </div>
+
+    <div class="instructions">
+        <h3>编织指南</h3>
+        <ul>
+            <li>拖拽实体到想要的位置</li>
+            <li>选择连接模式创建关联</li>
+            <li>使用编织模式艺术化连接</li>
+            <li>点击实体查看详细信息</li>
+        </ul>
+    </div>
+
+    <div class="pattern-selector">
+        <div class="pattern-btn active" data-pattern="linear">直线型</div>
+        <div class="pattern-btn" data-pattern="radial">放射型</div>
+        <div class="pattern-btn" data-pattern="web">网状型</div>
+        <div class="pattern-btn" data-pattern="spiral">螺旋型</div>
+    </div>
+
+    <div class="info-panel" id="infoPanel">
+        <button class="info-close" id="infoClose">&times;</button>
+        <div class="info-content" id="infoContent">
+            <!-- 动态内容 -->
+        </div>
+    </div>
+
+    <script>
+        // 数据模型
+        const entityData = {
+            'zou-taofen': {
+                title: '邹韬奋',
+                type: 'person',
+                description: '中国近代著名的新闻记者、出版家和爱国民主人士',
+                details: '邹韬奋先生（1895-1944）原名邹恩润，是中国近代新闻出版事业的先驱。他创办《生活》周刊，建立生活书店，积极宣传抗日救国思想。',
+                connections: ['life-weekly', 'mass-books', 'patriotism', 'journalism', 'seven-incident']
+            },
+            'life-weekly': {
+                title: '《生活》周刊',
+                type: 'event',
+                description: '1926年创办的进步刊物',
+                details: '《生活》周刊以"传播进步思想，服务社会大众"为宗旨，成为当时最有影响力的进步刊物之一。',
+                connections: ['zou-taofen', 'patriotism', 'mass-books']
+            },
+            'mass-books': {
+                title: '生活书店',
+                type: 'work',
+                description: '1932年建立的文化机构',
+                details: '生活书店成为进步文化的重要阵地，出版了大量马克思主义著作和进步书籍。',
+                connections: ['zou-taofen', 'life-weekly', 'journalism']
+            },
+            'patriotism': {
+                title: '爱国情怀',
+                type: 'thought',
+                description: '邹韬奋先生的精神核心',
+                details: '"我生为中国人，死为中国魂，此志不渝"体现了他的爱国情怀。',
+                connections: ['zou-taofen', 'life-weekly', 'seven-incident', 'journalism']
+            },
+            'journalism': {
+                title: '新闻精神',
+                type: 'legacy',
+                description: '为人民服务的新闻理念',
+                details: '说真话、办实事、为人民服务的新闻精神至今仍在影响着中国的新闻事业。',
+                connections: ['zou-taofen', 'mass-books', 'patriotism']
+            },
+            'seven-incident': {
+                title: '七君子事件',
+                type: 'event',
+                description: '1936年的重要历史事件',
+                details: '邹韬奋与沈钧儒等七人因抗日救国运动被国民党政府逮捕，引发全国抗议。',
+                connections: ['zou-taofen', 'patriotism']
+            }
+        };
+
+        // 全局变量
+        let currentTool = 'move';
+        let currentPattern = 'linear';
+        let isDragging = false;
+        let dragElement = null;
+        let connections = [];
+        let isConnecting = false;
+        let connectStart = null;
+        let mousePos = { x: 0, y: 0 };
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeWeaving();
+            initializeTools();
+            initializePatterns();
+            initializeEntities();
+            createWeavingEffect();
+        });
+
+        function initializeWeaving() {
+            const canvas = document.getElementById('weavingCanvas');
+            const ctx = canvas.getContext('2d');
+            const container = document.getElementById('weavingContainer');
+            
+            function resizeCanvas() {
+                canvas.width = container.offsetWidth;
+                canvas.height = container.offsetHeight;
+                drawConnections();
+            }
+            
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+        }
+
+        function initializeTools() {
+            const toolBtns = document.querySelectorAll('.tool-btn');
+            toolBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    toolBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentTool = this.getAttribute('data-tool');
+                    updateCursor();
+                });
+            });
+        }
+
+        function initializePatterns() {
+            const patternBtns = document.querySelectorAll('.pattern-btn');
+            patternBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    patternBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentPattern = this.getAttribute('data-pattern');
+                    arrangePattern();
+                });
+            });
+        }
+
+        function initializeEntities() {
+            const entities = document.querySelectorAll('.knowledge-entity');
+            
+            entities.forEach(entity => {
+                // 拖拽功能
+                entity.addEventListener('mousedown', startDrag);
+                
+                // 点击功能
+                entity.addEventListener('click', function(e) {
+                    if (currentTool === 'info') {
+                        showEntityInfo(this.getAttribute('data-id'));
+                    } else if (currentTool === 'connect') {
+                        handleConnection(this);
+                    }
+                });
+                
+                // 悬停效果
+                entity.addEventListener('mouseenter', function() {
+                    if (currentTool === 'weave') {
+                        this.classList.add('gentle-pulse');
+                    }
+                });
+                
+                entity.addEventListener('mouseleave', function() {
+                    this.classList.remove('gentle-pulse');
+                });
+            });
+            
+            // 全局鼠标事件
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', stopDrag);
+        }
+
+        function updateCursor() {
+            const container = document.getElementById('weavingContainer');
+            switch(currentTool) {
+                case 'move':
+                    container.style.cursor = 'move';
+                    break;
+                case 'connect':
+                    container.style.cursor = 'crosshair';
+                    break;
+                case 'weave':
+                    container.style.cursor = 'crosshair';
+                    break;
+                case 'info':
+                    container.style.cursor = 'pointer';
+                    break;
+            }
+        }
+
+        function startDrag(e) {
+            if (currentTool !== 'move') return;
+            
+            isDragging = true;
+            dragElement = e.currentTarget;
+            
+            const rect = dragElement.getBoundingClientRect();
+            const containerRect = document.getElementById('weavingContainer').getBoundingClientRect();
+            
+            dragElement.offsetX = e.clientX - rect.left;
+            dragElement.offsetY = e.clientY - rect.top;
+            
+            dragElement.style.zIndex = '1000';
+            e.preventDefault();
+        }
+
+        function handleMouseMove(e) {
+            const container = document.getElementById('weavingContainer');
+            const containerRect = container.getBoundingClientRect();
+            
+            mousePos.x = e.clientX - containerRect.left;
+            mousePos.y = e.clientY - containerRect.top;
+            
+            if (isDragging && dragElement) {
+                const x = mousePos.x - dragElement.offsetX;
+                const y = mousePos.y - dragElement.offsetY;
+                
+                dragElement.style.left = x + 'px';
+                dragElement.style.top = y + 'px';
+                dragElement.style.transform = 'none';
+                
+                drawConnections();
+            }
+            
+            if (isConnecting && connectStart) {
+                drawTemporaryConnection();
+            }
+        }
+
+        function stopDrag() {
+            if (isDragging && dragElement) {
+                dragElement.style.zIndex = '';
+                isDragging = false;
+                dragElement = null;
+            }
+        }
+
+        function handleConnection(entity) {
+            if (!isConnecting) {
+                isConnecting = true;
+                connectStart = entity;
+                entity.style.boxShadow = '0 0 20px rgba(205, 133, 63, 0.8)';
+            } else {
+                if (connectStart !== entity) {
+                    createConnection(connectStart, entity);
+                }
+                isConnecting = false;
+                connectStart.style.boxShadow = '';
+                connectStart = null;
+                clearTemporaryConnection();
+            }
+        }
+
+        function createConnection(entity1, entity2) {
+            const connection = {
+                from: entity1.getAttribute('data-id'),
+                to: entity2.getAttribute('data-id'),
+                element1: entity1,
+                element2: entity2
+            };
+            
+            connections.push(connection);
+            drawConnections();
+            
+            // 编织效果
+            if (currentTool === 'weave') {
+                createWeavingAnimation(entity1, entity2);
+            }
+        }
+
+        function drawConnections() {
+            const canvas = document.getElementById('weavingCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            connections.forEach(connection => {
+                const rect1 = connection.element1.getBoundingClientRect();
+                const rect2 = connection.element2.getBoundingClientRect();
+                const containerRect = canvas.getBoundingClientRect();
+                
+                const x1 = rect1.left + rect1.width / 2 - containerRect.left;
+                const y1 = rect1.top + rect1.height / 2 - containerRect.top;
+                const x2 = rect2.left + rect2.width / 2 - containerRect.left;
+                const y2 = rect2.top + rect2.height / 2 - containerRect.top;
+                
+                drawConnectionLine(ctx, x1, y1, x2, y2);
+            });
+        }
+
+        function drawConnectionLine(ctx, x1, y1, x2, y2) {
+            ctx.strokeStyle = currentTool === 'weave' ? '#cd853f' : '#8b7355';
+            ctx.lineWidth = currentTool === 'weave' ? 3 : 2;
+            ctx.lineCap = 'round';
+            
+            if (currentTool === 'weave') {
+                // 绘制编织效果的曲线
+                const midX = (x1 + x2) / 2;
+                const midY = (y1 + y2) / 2;
+                const offset = Math.sin(Date.now() * 0.001) * 20;
+                
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.quadraticCurveTo(midX + offset, midY - offset, x2, y2);
+                ctx.stroke();
+            } else {
+                // 直线连接
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+            }
+        }
+
+        function drawTemporaryConnection() {
+            if (!connectStart) return;
+            
+            const canvas = document.getElementById('weavingCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            const rect = connectStart.getBoundingClientRect();
+            const containerRect = canvas.getBoundingClientRect();
+            
+            const x1 = rect.left + rect.width / 2 - containerRect.left;
+            const y1 = rect.top + rect.height / 2 - containerRect.top;
+            
+            drawConnections();
+            
+            ctx.strokeStyle = '#daa520';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(mousePos.x, mousePos.y);
+            ctx.stroke();
+            
+            ctx.setLineDash([]);
+        }
+
+        function clearTemporaryConnection() {
+            drawConnections();
+        }
+
+        function arrangePattern() {
+            const entities = document.querySelectorAll('.knowledge-entity');
+            const container = document.getElementById('weavingContainer');
+            const containerRect = container.getBoundingClientRect();
+            
+            switch(currentPattern) {
+                case 'linear':
+                    arrangeLinearPattern(entities, containerRect);
+                    break;
+                case 'radial':
+                    arrangeRadialPattern(entities, containerRect);
+                    break;
+                case 'web':
+                    arrangeWebPattern(entities, containerRect);
+                    break;
+                case 'spiral':
+                    arrangeSpiralPattern(entities, containerRect);
+                    break;
+            }
+            
+            setTimeout(drawConnections, 300);
+        }
+
+        function arrangeLinearPattern(entities, containerRect) {
+            entities.forEach((entity, index) => {
+                const x = (containerRect.width / (entities.length + 1)) * (index + 1);
+                const y = containerRect.height / 2;
+                
+                entity.style.left = x + 'px';
+                entity.style.top = y + 'px';
+                entity.style.transform = 'translate(-50%, -50%)';
+            });
+        }
+
+        function arrangeRadialPattern(entities, containerRect) {
+            const centerX = containerRect.width / 2;
+            const centerY = containerRect.height / 2;
+            const radius = Math.min(containerRect.width, containerRect.height) * 0.3;
+            
+            entities.forEach((entity, index) => {
+                const angle = (2 * Math.PI / entities.length) * index;
+                const x = centerX + Math.cos(angle) * radius;
+                const y = centerY + Math.sin(angle) * radius;
+                
+                entity.style.left = x + 'px';
+                entity.style.top = y + 'px';
+                entity.style.transform = 'translate(-50%, -50%)';
+            });
+        }
+
+        function arrangeWebPattern(entities, containerRect) {
+            const rows = Math.ceil(Math.sqrt(entities.length));
+            const cols = Math.ceil(entities.length / rows);
+            const cellWidth = containerRect.width / (cols + 1);
+            const cellHeight = containerRect.height / (rows + 1);
+            
+            entities.forEach((entity, index) => {
+                const row = Math.floor(index / cols);
+                const col = index % cols;
+                const x = cellWidth * (col + 1);
+                const y = cellHeight * (row + 1);
+                
+                entity.style.left = x + 'px';
+                entity.style.top = y + 'px';
+                entity.style.transform = 'translate(-50%, -50%)';
+            });
+        }
+
+        function arrangeSpiralPattern(entities, containerRect) {
+            const centerX = containerRect.width / 2;
+            const centerY = containerRect.height / 2;
+            const maxRadius = Math.min(containerRect.width, containerRect.height) * 0.4;
+            
+            entities.forEach((entity, index) => {
+                const progress = index / entities.length;
+                const angle = progress * 4 * Math.PI;
+                const radius = progress * maxRadius;
+                
+                const x = centerX + Math.cos(angle) * radius;
+                const y = centerY + Math.sin(angle) * radius;
+                
+                entity.style.left = x + 'px';
+                entity.style.top = y + 'px';
+                entity.style.transform = 'translate(-50%, -50%)';
+            });
+        }
+
+        function createWeavingAnimation(entity1, entity2) {
+            const rect1 = entity1.getBoundingClientRect();
+            const rect2 = entity2.getBoundingClientRect();
+            const containerRect = document.getElementById('weavingContainer').getBoundingClientRect();
+            
+            const thread = document.createElement('div');
+            thread.className = 'thread-animation';
+            thread.style.left = (rect1.left + rect1.width / 2 - containerRect.left) + 'px';
+            thread.style.top = (rect1.top + rect1.height / 2 - containerRect.top) + 'px';
+            
+            document.getElementById('weavingContainer').appendChild(thread);
+            
+            setTimeout(() => {
+                thread.style.height = Math.sqrt(
+                    Math.pow(rect2.left - rect1.left, 2) + 
+                    Math.pow(rect2.top - rect1.top, 2)
+                ) + 'px';
+                thread.style.transform = `rotate(${Math.atan2(
+                    rect2.top - rect1.top, 
+                    rect2.left - rect1.left
+                )}rad)`;
+                thread.style.transformOrigin = '0 0';
+            }, 100);
+            
+            setTimeout(() => {
+                thread.remove();
+            }, 2000);
+        }
+
+        function createWeavingEffect() {
+            const effect = document.getElementById('weavingEffect');
+            
+            for (let i = 0; i < 5; i++) {
+                const thread = document.createElement('div');
+                thread.className = 'weaving-thread';
+                thread.style.top = Math.random() * 100 + '%';
+                thread.style.animationDelay = Math.random() * 8 + 's';
+                effect.appendChild(thread);
+            }
+        }
+
+        function showEntityInfo(entityId) {
+            const data = entityData[entityId];
+            const panel = document.getElementById('infoPanel');
+            const content = document.getElementById('infoContent');
+            
+            content.innerHTML = `
+                <h2>${data.title}</h2>
+                <p><strong>类型：</strong>${getTypeLabel(data.type)}</p>
+                <p>${data.description}</p>
+                <p>${data.details}</p>
+                
+                <div class="connection-info">
+                    <h4>现有连接</h4>
+                    <p>已建立 ${data.connections.length} 个关联</p>
+                </div>
+                
+                <div class="connection-info">
+                    <h4>建议连接</h4>
+                    <p>基于算法分析，建议连接到相关实体</p>
+                </div>
+            `;
+            
+            panel.classList.add('active');
+        }
+
+        function getTypeLabel(type) {
+            const labels = {
+                'person': '人物',
+                'event': '事件',
+                'work': '作品',
+                'thought': '思想',
+                'legacy': '遗产'
+            };
+            return labels[type] || type;
+        }
+
+        // 关闭信息面板
+        document.getElementById('infoClose').addEventListener('click', function() {
+            document.getElementById('infoPanel').classList.remove('active');
+        });
+
+        // 初始化一些连接
+        setTimeout(() => {
+            const entities = document.querySelectorAll('.knowledge-entity');
+            connections.push({
+                from: 'zou-taofen',
+                to: 'life-weekly',
+                element1: entities[0],
+                element2: entities[1]
+            });
+            connections.push({
+                from: 'zou-taofen',
+                to: 'patriotism',
+                element1: entities[0],
+                element2: entities[3]
+            });
+            drawConnections();
+        }, 1000);
+    </script>
+</body>
+</html>

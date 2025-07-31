@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文字的温度 - 邹韬奋文字世界深度体验</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700;900&family=Long+Cang&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --paper-cream: #faf8f3;
+            --ink-black: #2c2c2c;
+            --ink-blue: #1e3a8a;
+            --warm-gold: #d97706;
+            --soft-red: #dc2626;
+            --gentle-gray: #6b7280;
+            --light-gray: #f3f4f6;
+            --shadow-soft: 0 4px 20px rgba(0,0,0,0.08);
+            --shadow-strong: 0 10px 40px rgba(0,0,0,0.15);
+            --text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Serif SC', serif;
+            background: var(--paper-cream);
+            color: var(--ink-black);
+            line-height: 1.8;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(217, 119, 6, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(30, 58, 138, 0.03) 0%, transparent 50%);
+        }
+
+        /* Reading Environment */
+        .reading-environment {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, 
+                rgba(250, 248, 243, 0.95) 0%, 
+                rgba(248, 246, 240, 0.95) 100%);
+            backdrop-filter: blur(2px);
+            z-index: -1;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(250, 248, 243, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid rgba(217, 119, 6, 0.2);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 1.8rem;
+            color: var(--ink-black);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .reading-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .control-btn {
+            background: none;
+            border: 2px solid var(--warm-gold);
+            color: var(--warm-gold);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .control-btn:hover {
+            background: var(--warm-gold);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .control-btn.active {
+            background: var(--warm-gold);
+            color: white;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 100px 2rem 2rem;
+            min-height: 100vh;
+        }
+
+        /* Article Selection */
+        .article-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .article-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: var(--shadow-soft);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(217, 119, 6, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .article-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--warm-gold);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .article-card:hover::before {
+            transform: scaleY(1);
+        }
+
+        .article-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: var(--gentle-gray);
+        }
+
+        .article-year {
+            background: var(--ink-blue);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-weight: 500;
+        }
+
+        .article-type {
+            background: var(--light-gray);
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+        }
+
+        .article-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--ink-black);
+            margin-bottom: 1rem;
+            font-family: 'Long Cang', cursive;
+        }
+
+        .article-preview {
+            color: var(--gentle-gray);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .article-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            background: rgba(217, 119, 6, 0.1);
+            color: var(--warm-gold);
+            padding: 0.2rem 0.6rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+        }
+
+        /* Reading View */
+        .reading-view {
+            display: none;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .reading-view.active {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Article Header */
+        .article-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid rgba(217, 119, 6, 0.2);
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: var(--warm-gold);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: inherit;
+        }
+
+        .back-btn:hover {
+            background: var(--soft-red);
+            transform: translateY(-2px);
+        }
+
+        .reading-title {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: clamp(2rem, 5vw, 3rem);
+            color: var(--ink-black);
+            margin-bottom: 1rem;
+            text-shadow: var(--text-shadow);
+        }
+
+        .reading-meta {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            color: var(--gentle-gray);
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .reading-context {
+            background: rgba(30, 58, 138, 0.05);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid var(--ink-blue);
+            font-style: italic;
+            margin-bottom: 2rem;
+        }
+
+        /* Text Content */
+        .text-content {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .text-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--warm-gold), var(--ink-blue));
+            border-radius: 20px 20px 0 0;
+        }
+
+        .text-paragraph {
+            font-size: 1.2rem;
+            line-height: 2;
+            margin-bottom: 2rem;
+            text-align: justify;
+            text-indent: 2em;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s ease;
+        }
+
+        .text-paragraph.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .text-paragraph.highlight {
+            background: linear-gradient(120deg, transparent 0%, rgba(217, 119, 6, 0.1) 0%, rgba(217, 119, 6, 0.1) 100%, transparent 100%);
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--warm-gold);
+            font-weight: 500;
+        }
+
+        .text-quote {
+            font-size: 1.4rem;
+            line-height: 1.8;
+            text-align: center;
+            font-style: italic;
+            color: var(--soft-red);
+            margin: 3rem 0;
+            padding: 2rem;
+            background: rgba(220, 38, 38, 0.05);
+            border-radius: 15px;
+            position: relative;
+        }
+
+        .text-quote::before,
+        .text-quote::after {
+            content: '"';
+            font-size: 4rem;
+            color: var(--warm-gold);
+            font-family: serif;
+            position: absolute;
+            opacity: 0.3;
+        }
+
+        .text-quote::before {
+            top: -1rem;
+            left: 1rem;
+        }
+
+        .text-quote::after {
+            bottom: -2rem;
+            right: 1rem;
+        }
+
+        /* Interactive Annotations */
+        .annotation {
+            position: relative;
+            display: inline;
+            background: rgba(217, 119, 6, 0.2);
+            padding: 0.1rem 0.3rem;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .annotation:hover {
+            background: rgba(217, 119, 6, 0.4);
+        }
+
+        .annotation-popup {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--ink-black);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            width: 250px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .annotation-popup::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: var(--ink-black);
+        }
+
+        .annotation:hover .annotation-popup {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Emotional Response */
+        .emotional-response {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 2rem;
+        }
+
+        .response-title {
+            font-size: 1.3rem;
+            color: var(--ink-black);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .emotion-buttons {
+            display: flex;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .emotion-btn {
+            background: var(--light-gray);
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: inherit;
+        }
+
+        .emotion-btn:hover {
+            background: var(--warm-gold);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .emotion-btn.selected {
+            background: var(--warm-gold);
+            color: white;
+        }
+
+        .personal-note {
+            width: 100%;
+            min-height: 100px;
+            padding: 1rem;
+            border: 2px solid var(--light-gray);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        .personal-note:focus {
+            outline: none;
+            border-color: var(--warm-gold);
+        }
+
+        /* Reading Progress */
+        .reading-progress {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--warm-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            box-shadow: var(--shadow-strong);
+            z-index: 1000;
+        }
+
+        /* Audio Player */
+        .audio-player {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .play-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--warm-gold);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .play-btn:hover {
+            background: var(--soft-red);
+            transform: scale(1.1);
+        }
+
+        .audio-info {
+            flex: 1;
+        }
+
+        .audio-title {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .audio-description {
+            font-size: 0.9rem;
+            color: var(--gentle-gray);
+        }
+
+        /* Word Cloud */
+        .word-cloud {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .cloud-title {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            color: var(--ink-black);
+        }
+
+        .cloud-words {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .cloud-word {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .cloud-word:nth-child(3n+1) {
+            background: rgba(217, 119, 6, 0.1);
+            color: var(--warm-gold);
+            font-size: 1.2rem;
+        }
+
+        .cloud-word:nth-child(3n+2) {
+            background: rgba(30, 58, 138, 0.1);
+            color: var(--ink-blue);
+            font-size: 1rem;
+        }
+
+        .cloud-word:nth-child(3n) {
+            background: rgba(220, 38, 38, 0.1);
+            color: var(--soft-red);
+            font-size: 0.9rem;
+        }
+
+        .cloud-word:hover {
+            transform: scale(1.2);
+            box-shadow: var(--shadow-soft);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+
+            .header-title {
+                font-size: 1.4rem;
+            }
+
+            .reading-controls {
+                gap: 0.5rem;
+            }
+
+            .container {
+                padding: 90px 1rem 2rem;
+            }
+
+            .text-content {
+                padding: 1.5rem;
+            }
+
+            .text-paragraph {
+                font-size: 1.1rem;
+                text-indent: 1.5em;
+            }
+
+            .reading-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .emotion-buttons {
+                justify-content: center;
+            }
+
+            .reading-progress {
+                bottom: 1rem;
+                right: 1rem;
+                width: 50px;
+                height: 50px;
+            }
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Selection highlighting */
+        ::selection {
+            background: rgba(217, 119, 6, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="reading-environment"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <h1 class="header-title">
+                <i class="fas fa-feather-alt"></i>
+                文字的温度
+            </h1>
+            <div class="reading-controls">
+                <button class="control-btn" id="fontSizeBtn" title="调整字体大小">
+                    <i class="fas fa-text-height"></i>
+                </button>
+                <button class="control-btn" id="nightModeBtn" title="夜间模式">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="control-btn" id="soundBtn" title="背景音乐">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+                <button class="control-btn" id="focusBtn" title="专注模式">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Article Selection -->
+        <div class="article-selection" id="articleSelection">
+            <div class="article-card" onclick="readArticle('shenghuozhoukan')">
+                <div class="article-meta">
+                    <span class="article-year">1926</span>
+                    <span class="article-type">创刊词</span>
+                </div>
+                <h3 class="article-title">《生活》周刊发刊词</h3>
+                <p class="article-preview">
+                    "我们相信，只有真正为生活而服务的刊物，才能在读者心中占有一席之地。
+                    我们要做人民的喉舌，不要做统治者的传声筒..."
+                </p>
+                <div class="article-tags">
+                    <span class="tag">新闻理想</span>
+                    <span class="tag">社会责任</span>
+                    <span class="tag">民生关怀</span>
+                </div>
+            </div>
+
+            <div class="article-card" onclick="readArticle('pingzongjiyu')">
+                <div class="article-meta">
+                    <span class="article-year">1933</span>
+                    <span class="article-type">游记</span>
+                </div>
+                <h3 class="article-title">《萍踪寄语》选段</h3>
+                <p class="article-preview">
+                    "在伦敦的雾中漫步，我想起了故国的种种。异国他乡的生活让我更加深刻地理解了什么是爱国，
+                    什么是民族的尊严..."
+                </p>
+                <div class="article-tags">
+                    <span class="tag">爱国情怀</span>
+                    <span class="tag">海外见闻</span>
+                    <span class="tag">民族自省</span>
+                </div>
+            </div>
+
+            <div class="article-card" onclick="readArticle('qijunzi')">
+                <div class="article-meta">
+                    <span class="article-year">1936</span>
+                    <span class="article-type">书信</span>
+                </div>
+                <h3 class="article-title">狱中家书</h3>
+                <p class="article-preview">
+                    "亲爱的家人，请不要为我担心。我在这里很好，心境反而更加平静。
+                    为国家民族而坐牢，是我们知识分子应尽的责任..."
+                </p>
+                <div class="article-tags">
+                    <span class="tag">家国情怀</span>
+                    <span class="tag">坚定信念</span>
+                    <span class="tag">知识分子</span>
+                </div>
+            </div>
+
+            <div class="article-card" onclick="readArticle('yizhu')">
+                <div class="article-meta">
+                    <span class="article-year">1944</span>
+                    <span class="article-type">遗嘱</span>
+                </div>
+                <h3 class="article-title">临终遗言</h3>
+                <p class="article-preview">
+                    "我生为中国人，死为中国魂，此志不渝。我希望能够加入中国共产党，
+                    为人民的解放事业贡献最后一份力量..."
+                </p>
+                <div class="article-tags">
+                    <span class="tag">临终心愿</span>
+                    <span class="tag">信仰坚持</span>
+                    <span class="tag">人民情怀</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reading View -->
+        <div class="reading-view" id="readingView">
+            <div class="article-header">
+                <button class="back-btn" onclick="backToSelection()">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>返回选择</span>
+                </button>
+                <h2 class="reading-title" id="readingTitle">文章标题</h2>
+                <div class="reading-meta" id="readingMeta">
+                    <div class="meta-item">
+                        <i class="fas fa-calendar"></i>
+                        <span id="articleDate">时间</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span id="articleLocation">地点</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-tag"></i>
+                        <span id="articleCategory">类型</span>
+                    </div>
+                </div>
+                <div class="reading-context" id="readingContext">
+                    历史背景和写作情境...
+                </div>
+            </div>
+
+            <!-- Audio Player -->
+            <div class="audio-player">
+                <button class="play-btn" onclick="toggleAudio()">
+                    <i class="fas fa-play" id="audioIcon"></i>
+                </button>
+                <div class="audio-info">
+                    <div class="audio-title">朗读版本</div>
+                    <div class="audio-description">聆听韬奋先生的文字，感受文字背后的温度</div>
+                </div>
+            </div>
+
+            <!-- Text Content -->
+            <div class="text-content" id="textContent">
+                <!-- Content will be loaded here -->
+            </div>
+
+            <!-- Word Cloud -->
+            <div class="word-cloud">
+                <h3 class="cloud-title">文章关键词</h3>
+                <div class="cloud-words" id="cloudWords">
+                    <!-- Keywords will be generated here -->
+                </div>
+            </div>
+
+            <!-- Emotional Response -->
+            <div class="emotional-response">
+                <h3 class="response-title">
+                    <i class="fas fa-heart"></i>
+                    你的感受
+                </h3>
+                <div class="emotion-buttons">
+                    <button class="emotion-btn" onclick="selectEmotion(this, 'moved')">
+                        <i class="fas fa-heart"></i>
+                        <span>感动</span>
+                    </button>
+                    <button class="emotion-btn" onclick="selectEmotion(this, 'inspired')">
+                        <i class="fas fa-lightbulb"></i>
+                        <span>启发</span>
+                    </button>
+                    <button class="emotion-btn" onclick="selectEmotion(this, 'thoughtful')">
+                        <i class="fas fa-brain"></i>
+                        <span>深思</span>
+                    </button>
+                    <button class="emotion-btn" onclick="selectEmotion(this, 'resonance')">
+                        <i class="fas fa-radio"></i>
+                        <span>共鸣</span>
+                    </button>
+                    <button class="emotion-btn" onclick="selectEmotion(this, 'respect')">
+                        <i class="fas fa-hands"></i>
+                        <span>敬佩</span>
+                    </button>
+                </div>
+                <textarea class="personal-note" placeholder="写下你读完这篇文章后的感想和思考..."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reading Progress -->
+    <div class="reading-progress" id="readingProgress">0%</div>
+
+    <!-- Audio Element -->
+    <audio id="backgroundAudio" loop>
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp56hVFApGn+DyvmwhBjiR1/LMeSwFJHfH8N2QQAoUXrTp56hVFApGn+DyvmshBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmshBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmshBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmwhBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmwhBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmwhBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmwhBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmwhBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmwhBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmwhBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmwhBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmwhBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmwhBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmwhBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmwhBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmwhBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmwhBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmwhBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmwhBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmwhBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmwhBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmwhBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmwhBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmwhBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmwhBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmwhBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmshBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmshBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmshBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmshBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmshBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmshBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmshBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvmshBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvnohBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvnohBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvnohBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvnohBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvnohBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvnohBjiS2fDNeCsFJHfH8N2QAoUXrTp56hVFApGn+DyvnohBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvnohBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvnohBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hVFApGn+DyvnohBjiS2fDNeCsFJHfH8N2QQAoUXrTp56hfH8N2QQAoUXrTp561FApGn+DyvnohBjiS2fDNeCsBF" type="audio/wav">
+    </audio>
+
+    <script>
+        // Article data
+        const articles = {
+            shenghuozhoukan: {
+                title: '《生活》周刊发刊词',
+                date: '1926年10月',
+                location: '上海',
+                category: '创刊词',
+                context: '1926年，31岁的邹韬奋接手了《生活》周刊。当时这本杂志发行量仅有2000份，在众多报刊中毫不起眼。韬奋在创刊词中表达了自己的办刊理念和对未来的展望。',
+                content: [
+                    '我们深深地相信，只有真正为生活而服务的刊物，才能在读者心中占有一席之地。',
+                    '我们要做<span class="annotation">人民的喉舌<div class="annotation-popup">韬奋认为新闻工作者的职责是为人民发声，而不是为统治者辩护。这一理念在当时是非常前卫和勇敢的。</div></span>，不要做统治者的传声筒。我们要用我们的笔，写出人民的心声，反映人民的疾苦。',
+                    '这个世界上有太多的不公，有太多需要改变的地方。我们希望通过我们的努力，能够为这个社会带来一些光明，为人民带来一些希望。',
+                    '<div class="text-quote">暗夜里的明灯，是我们对自己的期许；人民的朋友，是我们对自己的定位。</div>',
+                    '我们相信，<span class="annotation">真理的力量<div class="annotation-popup">韬奋坚信真理终将战胜谬误，正义终将战胜邪恶。这种信念支撑着他在艰难时期依然坚持办刊。</div></span>是无穷的。无论面临多大的困难和压力，我们都将坚持下去，为了我们心中的理想，为了人民的福祉。',
+                    '让我们携手前进，用文字的力量，用理性的声音，为建设一个更美好的中国而努力奋斗！'
+                ],
+                keywords: ['人民', '服务', '真理', '理想', '责任', '进步', '光明', '希望', '正义', '奋斗']
+            },
+            pingzongjiyu: {
+                title: '《萍踪寄语》选段',
+                date: '1933年',
+                location: '伦敦',
+                category: '游记散文',
+                context: '1930年，由于《生活》周刊的进步立场，韬奋受到政治压力，被迫流亡欧洲。在英国期间，他写下了著名的《萍踪寄语》，记录了海外的见闻和思考。',
+                content: [
+                    '在伦敦的雾中漫步，我想起了故国的种种。这里的一切都那么整洁有序，人们的生活那么安详宁静，而我的祖国却还在苦难中挣扎。',
+                    '异国他乡的生活让我更加深刻地理解了什么是<span class="annotation">爱国<div class="annotation-popup">韬奋的爱国不是狭隘的民族主义，而是对祖国人民的深深关怀和对国家进步的热切期盼。</div></span>，什么是民族的尊严。不是因为我们的国家强大而爱它，而是因为我们爱它才要让它变得强大。',
+                    '在大英博物馆里，我看到了中国古代的文物，那些精美的瓷器，那些古老的书籍，见证着我们民族曾经的辉煌。',
+                    '<div class="text-quote">我们的民族有着悠久的历史和灿烂的文化，我们没有理由不相信她会重新崛起。</div>',
+                    '但崛起需要我们每一个人的努力，需要我们用知识武装自己，用理性改造社会，用勤劳建设家园。',
+                    '海外的经历让我看到了差距，但更坚定了我的信心。我相信，只要我们不懈努力，<span class="annotation">中华民族的复兴<div class="annotation-popup">这是韬奋在1930年代就提出的民族复兴理念，体现了他的远见卓识和历史担当。</div></span>一定会到来。'
+                ],
+                keywords: ['爱国', '民族', '尊严', '文化', '历史', '复兴', '努力', '理性', '信心', '希望']
+            },
+            qijunzi: {
+                title: '狱中家书',
+                date: '1936年12月',
+                location: '苏州监狱',
+                category: '私人书信',
+                context: '1936年11月，韬奋与沈钧儒等六位爱国人士因积极参与抗日救亡运动而被国民党当局逮捕，史称"七君子事件"。在狱中，韬奋给家人写了这封感人至深的信。',
+                content: [
+                    '亲爱的家人们，请不要为我担心。我在这里很好，心境反而更加平静了。',
+                    '为国家民族而坐牢，是我们<span class="annotation">知识分子应尽的责任<div class="annotation-popup">韬奋认为知识分子不应该只是象牙塔里的学者，而应该承担起社会责任，为国家和民族的前途而奋斗。</div></span>。如果因为害怕坐牢就不敢说真话，不敢为正义而斗争，那我们还配做知识分子吗？',
+                    '这些天来，我一直在思考一个问题：什么是真正的自由？是身体的自由，还是精神的自由？我觉得，真正的自由是内心的坚持，是对真理的追求，是对正义的坚守。',
+                    '<div class="text-quote">宁为玉碎，不为瓦全。这不是狭隘的个人英雄主义，而是对原则的坚持。</div>',
+                    '我知道我的选择给家庭带来了困难，但我相信你们会理解我。如果每个人都只考虑自己的安危，都不愿意为正义付出代价，那我们的国家还有希望吗？',
+                    '请告诉孩子们，<span class="annotation">做人要有骨气<div class="annotation-popup">韬奋希望下一代能够继承知识分子的精神品格，做有原则、有担当的人。</div></span>，要有是非观念。财富可以失去，地位可以失去，但做人的尊严不能失去，对真理的坚持不能动摇。'
+                ],
+                keywords: ['责任', '正义', '自由', '坚持', '原则', '骨气', '尊严', '真理', '担当', '希望']
+            },
+            yizhu: {
+                title: '临终遗言',
+                date: '1944年7月',
+                location: '上海',
+                category: '遗嘱',
+                context: '1944年夏天，49岁的韬奋因病重在上海。预感到自己时日无多，他写下了这份感人至深的遗嘱，表达了自己的最后心愿。',
+                content: [
+                    '我生为中国人，死为中国魂，此志不渝。在我即将离开这个世界的时候，我有几句话想对大家说。',
+                    '首先，我要感谢生活给了我为人民服务的机会。虽然我的生命即将结束，但我觉得这一生过得很有意义，因为我把它献给了我所热爱的事业。',
+                    '我希望能够<span class="annotation">加入中国共产党<div class="annotation-popup">这是韬奋生前的最大心愿。他经过长期的思考和观察，认为只有共产党才能救中国。</div></span>。经过这些年的观察和思考，我深深地相信，只有中国共产党才能带领中国人民走向光明的未来。',
+                    '<div class="text-quote">我愿意把我的一切，包括我的生命，都献给人民解放的伟大事业。</div>',
+                    '对于我所从事的新闻和出版工作，我有一个期望：希望后来者能够继续坚持为人民服务的宗旨，用手中的笔为正义呐喊，为真理辩护。',
+                    '最后，我想对我的家人说：<span class="annotation">不要因为我的离去而悲伤<div class="annotation-popup">韬奋希望家人能够理解他的选择，继续为理想而奋斗。</div></span>。我走得很安详，因为我知道我为之奋斗的事业一定会成功，我们的祖国一定会富强。',
+                    '愿我的祖国永远繁荣昌盛，愿人民永远幸福安康！'
+                ],
+                keywords: ['中国魂', '人民', '服务', '共产党', '解放', '正义', '真理', '理想', '祖国', '幸福']
+            }
+        };
+
+        let currentArticle = null;
+        let isAudioPlaying = false;
+        let readingProgressValue = 0;
+        let fontSize = 1.2;
+        let isNightMode = false;
+        let isFocusMode = false;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            setupReadingProgress();
+            loadUserPreferences();
+        });
+
+        // Read article
+        function readArticle(articleId) {
+            currentArticle = articles[articleId];
+            
+            // Hide selection, show reading view
+            document.getElementById('articleSelection').style.display = 'none';
+            const readingView = document.getElementById('readingView');
+            readingView.classList.add('active');
+            
+            // Load article content
+            loadArticleContent(currentArticle);
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Start progressive text display
+            setTimeout(() => {
+                displayTextProgressively();
+            }, 1000);
+        }
+
+        // Load article content
+        function loadArticleContent(article) {
+            document.getElementById('readingTitle').textContent = article.title;
+            document.getElementById('articleDate').textContent = article.date;
+            document.getElementById('articleLocation').textContent = article.location;
+            document.getElementById('articleCategory').textContent = article.category;
+            document.getElementById('readingContext').textContent = article.context;
+            
+            // Load text content
+            const textContent = document.getElementById('textContent');
+            textContent.innerHTML = article.content.map((paragraph, index) => 
+                `<div class="text-paragraph" data-index="${index}">${paragraph}</div>`
+            ).join('');
+            
+            // Load keywords
+            const cloudWords = document.getElementById('cloudWords');
+            cloudWords.innerHTML = article.keywords.map(keyword => 
+                `<span class="cloud-word" onclick="highlightKeyword('${keyword}')">${keyword}</span>`
+            ).join('');
+        }
+
+        // Display text progressively
+        function displayTextProgressively() {
+            const paragraphs = document.querySelectorAll('.text-paragraph');
+            let delay = 0;
+            
+            paragraphs.forEach((paragraph, index) => {
+                setTimeout(() => {
+                    paragraph.classList.add('visible');
+                    updateReadingProgress();
+                }, delay);
+                delay += 800;
+            });
+        }
+
+        // Back to selection
+        function backToSelection() {
+            document.getElementById('readingView').classList.remove('active');
+            document.getElementById('articleSelection').style.display = 'grid';
+            
+            // Reset audio
+            if (isAudioPlaying) {
+                toggleAudio();
+            }
+            
+            // Reset progress
+            readingProgressValue = 0;
+            updateReadingProgressDisplay();
+        }
+
+        // Setup reading progress
+        function setupReadingProgress() {
+            window.addEventListener('scroll', updateReadingProgress);
+        }
+
+        // Update reading progress
+        function updateReadingProgress() {
+            if (!document.getElementById('readingView').classList.contains('active')) return;
+            
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight - windowHeight;
+            const scrollTop = window.pageYOffset;
+            
+            readingProgressValue = Math.round((scrollTop / documentHeight) * 100);
+            updateReadingProgressDisplay();
+        }
+
+        // Update progress display
+        function updateReadingProgressDisplay() {
+            const progressElement = document.getElementById('readingProgress');
+            progressElement.textContent = readingProgressValue + '%';
+            
+            // Change color based on progress
+            if (readingProgressValue < 30) {
+                progressElement.style.background = '#dc2626';
+            } else if (readingProgressValue < 70) {
+                progressElement.style.background = '#d97706';
+            } else {
+                progressElement.style.background = '#059669';
+            }
+        }
+
+        // Toggle audio
+        function toggleAudio() {
+            const audio = document.getElementById('backgroundAudio');
+            const icon = document.getElementById('audioIcon');
+            
+            if (isAudioPlaying) {
+                audio.pause();
+                icon.className = 'fas fa-play';
+                isAudioPlaying = false;
+            } else {
+                audio.play().catch(e => console.log('Audio play failed:', e));
+                icon.className = 'fas fa-pause';
+                isAudioPlaying = true;
+            }
+        }
+
+        // Select emotion
+        function selectEmotion(button, emotion) {
+            // Remove previous selection
+            document.querySelectorAll('.emotion-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // Add selection to current button
+            button.classList.add('selected');
+            
+            // Save emotion (could be sent to analytics)
+            localStorage.setItem(`emotion_${currentArticle.title}`, emotion);
+        }
+
+        // Highlight keyword
+        function highlightKeyword(keyword) {
+            const textContent = document.getElementById('textContent');
+            const content = textContent.innerHTML;
+            
+            // Remove previous highlights
+            const cleanContent = content.replace(/<mark class="keyword-highlight">/g, '').replace(/<\/mark>/g, '');
+            
+            // Add new highlight
+            const regex = new RegExp(`(${keyword})`, 'gi');
+            const highlightedContent = cleanContent.replace(regex, '<mark class="keyword-highlight">$1</mark>');
+            
+            textContent.innerHTML = highlightedContent;
+            
+            // Scroll to first occurrence
+            const firstHighlight = textContent.querySelector('.keyword-highlight');
+            if (firstHighlight) {
+                firstHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // Control functions
+        document.getElementById('fontSizeBtn').addEventListener('click', () => {
+            fontSize = fontSize >= 1.6 ? 1.0 : fontSize + 0.2;
+            document.querySelectorAll('.text-paragraph').forEach(p => {
+                p.style.fontSize = fontSize + 'rem';
+            });
+            
+            // Visual feedback
+            document.getElementById('fontSizeBtn').style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                document.getElementById('fontSizeBtn').style.transform = 'scale(1)';
+            }, 200);
+        });
+
+        document.getElementById('nightModeBtn').addEventListener('click', () => {
+            isNightMode = !isNightMode;
+            document.body.style.filter = isNightMode ? 'invert(1) hue-rotate(180deg)' : 'none';
+            document.getElementById('nightModeBtn').classList.toggle('active', isNightMode);
+        });
+
+        document.getElementById('soundBtn').addEventListener('click', () => {
+            toggleAudio();
+            document.getElementById('soundBtn').classList.toggle('active', isAudioPlaying);
+        });
+
+        document.getElementById('focusBtn').addEventListener('click', () => {
+            isFocusMode = !isFocusMode;
+            document.body.style.filter = isFocusMode ? 'blur(0.5px) contrast(1.2)' : 'none';
+            document.querySelector('.text-content').style.filter = isFocusMode ? 'blur(0) contrast(1)' : 'none';
+            document.getElementById('focusBtn').classList.toggle('active', isFocusMode);
+        });
+
+        // Save user preferences
+        function saveUserPreferences() {
+            localStorage.setItem('reading_preferences', JSON.stringify({
+                fontSize,
+                isNightMode,
+                isFocusMode
+            }));
+        }
+
+        // Load user preferences
+        function loadUserPreferences() {
+            const saved = localStorage.getItem('reading_preferences');
+            if (saved) {
+                const prefs = JSON.parse(saved);
+                fontSize = prefs.fontSize || 1.2;
+                isNightMode = prefs.isNightMode || false;
+                isFocusMode = prefs.isFocusMode || false;
+                
+                // Apply preferences
+                if (isNightMode) document.getElementById('nightModeBtn').click();
+                if (isFocusMode) document.getElementById('focusBtn').click();
+            }
+        }
+
+        // Save preferences on page unload
+        window.addEventListener('beforeunload', saveUserPreferences);
+
+        // Auto-save notes
+        document.addEventListener('input', (e) => {
+            if (e.target.classList.contains('personal-note')) {
+                localStorage.setItem(`note_${currentArticle?.title}`, e.target.value);
+            }
+        });
+
+        // Load saved notes
+        function loadSavedNote() {
+            if (currentArticle) {
+                const saved = localStorage.getItem(`note_${currentArticle.title}`);
+                if (saved) {
+                    document.querySelector('.personal-note').value = saved;
+                }
+            }
+        }
+
+        // CSS for keyword highlighting
+        const style = document.createElement('style');
+        style.textContent = `
+            .keyword-highlight {
+                background: rgba(217, 119, 6, 0.3);
+                padding: 0.1rem 0.2rem;
+                border-radius: 3px;
+                animation: highlight-pulse 1s ease;
+            }
+            
+            @keyframes highlight-pulse {
+                0% { background: rgba(217, 119, 6, 0.6); }
+                100% { background: rgba(217, 119, 6, 0.3); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

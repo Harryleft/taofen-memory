@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(docker:*)",
+      "Bash(dig:*)",
+      "Bash(host:*)",
+      "Bash(npm install)",
+      "Bash(pkill:*)",
+      "Bash(true)",
+      "Bash(npm run dev:*)",
+      "Bash(npx vite:*)",
+      "Bash(cat:*)",
+      "Bash(grep:*)",
+      "Bash(npm run build:*)",
+      "Bash(npx tailwindcss:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(mv:*)",
+      "WebFetch(domain:www.zoutaofen.com)"
+    ],
+    "deny": []
+  }
+}

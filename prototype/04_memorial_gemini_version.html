@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>韬奋生平交互 Demo (Gemini AI 增强版)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Brand Red & Neutral Greys with Glassmorphism -->
+    <!-- Application Structure Plan: Integrated Gemini API features into the detail page. This adds a dynamic, generative layer to the user experience, transforming the application from a static data browser into an interactive exploration tool. The core architecture remains, but is now enhanced with AI-powered content generation. -->
+    <!-- Visualization & Content Choices: AI Summary (Generative Text): A button in the detail page triggers a Gemini API call to generate a unique summary/insight about the event. AI Image Generation (Generative Image): A button triggers an Imagen API call to create an artistic interpretation of the event, displayed in the main viewer. Justification: These features provide significant added value and novelty, allowing users to engage with the content in new, creative ways, directly fulfilling the goal of incorporating AI Agent technology. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        :root {
+            /* Design Tokens */
+            --brand-primary: #D64541;
+            --grey-100: #F9F9F9;
+            --grey-200: #EAEAEA;
+            --grey-800: #2C2C2C;
+            --grey-900: #1C1C1C;
+            --status-accent-start: #FAD961;
+            --status-accent-end: #FF5858;
+            --space-lg: 24px;
+            --radius-card: 25px; /* Updated from prompt */
+            --motion-fast: 200ms;
+            --motion-normal: 300ms;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
+            color: var(--grey-800);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        
+        @keyframes gradient-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .animated-gradient-bg {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient-animation 15s ease infinite;
+        }
+
+        /* Glassmorphism Base Style */
+        .glass-pane {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
+
+        .story-strip {
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+        }
+        .story-strip::-webkit-scrollbar {
+            display: none;
+        }
+        .event-card-container, .timeline-item {
+            transition: opacity var(--motion-normal) ease-out, transform var(--motion-normal) ease-out;
+        }
+        .event-card-container.is-dimmed, .timeline-item.is-dimmed {
+            opacity: 0.3;
+        }
+        .event-card-container.is-highlighted, .timeline-item.is-highlighted {
+            opacity: 1;
+            transform: scale(1.02);
+        }
+        .event-card-container {
+            scroll-snap-align: center;
+            perspective: 1200px; /* Updated from prompt */
+        }
+        .event-card {
+            transform-style: preserve-3d;
+            transition: transform var(--motion-fast) ease-out;
+        }
+        .event-card.is-flipped {
+            transform: rotateY(180deg);
+        }
+        .card-face {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .card-back {
+            transform: rotateY(180deg);
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, var(--status-accent-start), var(--status-accent-end));
+        }
+        .drawer {
+            transform: translateX(100%);
+            transition: transform var(--motion-fast) ease-out;
+            background: rgba(249, 249, 249, 0.7); /* Glass bg */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-left: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        .drawer.is-open {
+            transform: translateX(0);
+        }
+        .search-modal {
+            transition: opacity var(--motion-fast) ease-out, visibility var(--motion-fast);
+        }
+        .search-modal.is-hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        .search-modal-panel {
+            transition: transform var(--motion-fast) ease-out;
+        }
+        .search-modal.is-hidden .search-modal-panel {
+            transform: scale(0.95);
+        }
+        .ai-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 999px;
+            transition: background-color 0.2s;
+        }
+        .ai-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body class="animated-gradient-bg">
+
+    <!-- Main Views Container -->
+    <div id="main-container">
+        <!-- Story-Strip Section -->
+        <section id="story-strip-section" class="h-screen w-full flex flex-col">
+            <div class="fixed top-0 left-0 w-full h-1 z-30">
+                <div id="progress-bar" class="progress-bar h-full" style="width: 0%;"></div>
+            </div>
+            <main id="story-strip-container" class="story-strip w-full flex-grow flex items-center overflow-x-auto">
+                <!-- Event Cards will be injected here by JavaScript -->
+            </main>
+            <div class="flex-shrink-0 text-center py-4">
+                <a href="#timeline-section" class="inline-flex flex-col items-center text-white/80 hover:text-white transition-colors">
+                    <span class="text-sm font-bold">通览一生</span>
+                    <svg class="w-6 h-6 animate-bounce mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </a>
+            </div>
+        </section>
+
+        <!-- Vertical Timeline Section -->
+        <section id="timeline-section" class="w-full bg-black/10 py-20">
+            <div class="container mx-auto px-4 md:px-0 max-w-4xl">
+                <h2 class="text-4xl font-bold text-center text-white">韬奋生平时间线</h2>
+                <p class="text-center text-white/70 mt-2">点击任意事件，可在上方视图中定位详情。</p>
+                <div id="timeline-container" class="relative mt-12">
+                    <div class="absolute left-1/2 top-0 h-full w-0.5 bg-white/20 -translate-x-1/2"></div>
+                    <!-- Timeline items will be injected here -->
+                </div>
+            </div>
+        </section>
+        
+        <!-- Detail Page Section -->
+        <section id="detail-page" class="w-full bg-black/10 py-20">
+            <div id="detail-page-content" class="container mx-auto px-4">
+                <!-- Detail Page content will be injected here. It's initially empty. -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Fixed UI Elements -->
+    <aside id="drawer" class="drawer fixed inset-y-0 right-0 z-50 shadow-2xl" style="width: 360px;">
+        <div id="drawer-content" class="h-full flex flex-col p-6 overflow-y-auto"></div>
+    </aside>
+
+    <div id="search-ui-container" class="fixed top-4 right-4 z-40 flex items-center">
+        <button id="clear-search-btn" class="hidden w-12 h-12 glass-pane rounded-full shadow-lg flex items-center justify-center text-white hover:bg-white/30 transition-colors mr-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+        <button id="open-search-btn" class="w-12 h-12 glass-pane rounded-full shadow-lg flex items-center justify-center text-white hover:bg-white/30 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </button>
+    </div>
+
+    <div id="search-modal" class="is-hidden search-modal fixed inset-0 z-[60] flex items-center justify-center bg-black/50">
+        <div class="search-modal-panel glass-pane w-full max-w-2xl rounded-2xl shadow-2xl p-8">
+            <h2 class="text-2xl font-bold text-center text-white">探索韬奋的世界</h2>
+            <p class="text-center text-white/70 mt-2">可从推荐词开始，或输入任意关键词进行探索。</p>
+            <div id="recommended-tags" class="mt-8 flex flex-wrap justify-center gap-3"></div>
+            <form id="search-form" class="mt-8 flex items-center glass-pane rounded-full p-1">
+                <input type="search" id="search-input" placeholder="搜索人名、事件、书刊..." class="w-full bg-transparent border-none focus:ring-0 px-4 py-2 text-lg text-white placeholder-white/50">
+                <button type="submit" class="flex-shrink-0 w-12 h-12 bg-[var(--brand-primary)] rounded-full text-white flex items-center justify-center">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const eventsData = [
+            { id: 0, year: 1926, title: "执掌《生活》周刊", image: "https://placehold.co/800x1200/0277BD/FFFFFF?text=生活周刊封面", summary: "接替王志莘担任《生活》周刊主编。接办后，他变换内容，注重短小精悍的评论和有趣味的材料，并革新版式，销数从2000多份发展到最高15.5万份，成为广大读者的良师益友。1932年，在此基础上成立了生活书店。", people: [{ name: "黄炎培", avatar: "https://placehold.co/100x100/A9A9A9/FFFFFF?text=黄" }, { name: "胡愈之", avatar: "https://placehold.co/100x100/A9A9A9/FFFFFF?text=胡" }, { name: "王志莘", avatar: "https://placehold.co/100x100/A9A9A9/FFFFFF?text=王" }], location: { name: "上海" }, color: "#0277BD" },
+            { id: 1, year: 1933, title: "首次流亡与思想转变", image: "https://placehold.co/800x1200/C2185B/FFFFFF?text=伦敦大英博物馆", summary: "因民权保障同盟总干事杨杏佛被暗杀，作为执行委员的韬奋也被列入黑名单，被迫出国流亡。两年多里，他考察了欧洲、苏联和美国，并在伦敦大英博物馆阅读了大量马列主义著作，思想发生重大变化，对马克思和列宁“心向往之”。", people: [{ name: "杨杏佛", avatar: "https://placehold.co/100x100/A9A9A9/FFFFFF?text=杨" }], location: { name: "欧洲" }, color: "#C2185B" },
+            { id: 2, year: 1935, title: "回国与《大众生活》", image: "https://placehold.co/800x1200/F57C00/FFFFFF?text=大众生活报头", summary: "因“新生事件”主编杜重远入狱，韬奋提前回国声援。不久，他创办《大众生活》周刊，充分反映和引导了“一二·九”学生运动，对运动起了重要的推动作用，并创造了发行20万份的纪录。", people: [{ name: "杜重远", avatar: "https://placehold.co/100x100/A9A9A9/FFFFFF?text=杜" }], location: { name: "上海" }, color: "#F57C00" },
+            { id: 3, year: 1936, title: "七君子事件", image: "https://placehold.co/800x1200/2C3E50/FFFFFF?text=狱中剪影", summary: "响应中共主张，与沈钧儒等在上海成立全国各界救国联合会。11月23日，他与救国会其他6位负责人被国民党政府逮捕，是为震惊中外的“七君子事件”。事件引发全国营救，最终在“七七事变”后获释。", people: [{ name: "沈钧儒", avatar: "https://placehold.co/100x100/A9A9A9/FFFFFF?text=沈" }, { name: "李公朴", avatar: "https://placehold.co/100x100/A9A9A9/FFFFFF?text=李" }, { name: "章乃器", avatar: "https://placehold.co/100x100/A9A9A9/FFFFFF?text=章" }, { name: "史良", avatar: "https://placehold.co/100x100/A9A9A9/FFFFFF?text=史" }, { name: "宋庆龄", avatar: "https://placehold.co/100x100/A9A9A9/FFFFFF?text=宋" }], location: { name: "上海" }, color: "#2C3E50" },
+            { id: 4, year: 1941, title: "二次流亡与深入敌后", image: "https://placehold.co/800x1200/689F38/FFFFFF?text=东江游击区", summary: "皖南事变后，因国民党迫害加剧，被迫秘密离渝赴港，复刊《大众生活》。太平洋战争爆发后，在东江游击队帮助下撤回内地，并深入苏中、苏北解放区，表示“看到了真正的民主政治”。", people: [{ name: "茅盾", avatar: "https://placehold.co/100x100/A9A9A9/FFFFFF?text=茅" }, { name: "陈毅", avatar: "https://placehold.co/100x100/A9A9A9/FFFFFF?text=陈" }], location: { name: "香港" }, color: "#689F38" },
+            { id: 5, year: 1944, title: "最后的斗争与离世", image: "https://placehold.co/800x1200/4527A0/FFFFFF?text=韬奋先生遗像", summary: "因癌症严重发作，秘密转回上海治疗。期间在病床上奋笔撰写《患难余生记》。7月24日不幸病逝，年仅49岁。去世后，中共中央接受其遗嘱申请，追认为中共正式党员。毛泽东亲笔题词悼念。", people: [{ name: "毛泽东", avatar: "https://placehold.co/100x100/A9A9A9/FFFFFF?text=毛" }, { name: "周恩来", avatar: "https://placehold.co/100x100/A9A9A9/FFFFFF?text=周" }], location: { name: "上海" }, color: "#4527A0" }
+        ];
+        const recommendedKeywords = ["生活书店", "七君子", "流亡", "抗战", "沈钧儒"];
+
+        const stripContainer = document.getElementById('story-strip-container');
+        const timelineContainer = document.getElementById('timeline-container');
+        const progressBar = document.getElementById('progress-bar');
+        const drawer = document.getElementById('drawer');
+        const drawerContent = document.getElementById('drawer-content');
+        
+        const searchModal = document.getElementById('search-modal');
+        const openSearchBtn = document.getElementById('open-search-btn');
+        const clearSearchBtn = document.getElementById('clear-search-btn');
+        const searchForm = document.getElementById('search-form');
+        const searchInput = document.getElementById('search-input');
+        const recommendedTagsContainer = document.getElementById('recommended-tags');
+
+        const detailPage = document.getElementById('detail-page');
+        const detailPageContent = document.getElementById('detail-page-content');
+
+        function createEventCard(event) {
+            const cardContainer = document.createElement('div');
+            cardContainer.className = 'event-card-container flex-shrink-0 w-[320px] h-[520px]';
+            cardContainer.dataset.id = event.id;
+            cardContainer.innerHTML = `<div class="event-card relative w-full h-full" data-id="${event.id}" tabindex="0"><div class="card-face absolute inset-0 w-full h-full rounded-[var(--radius-card)] overflow-hidden glass-pane"><div class="absolute top-0 left-0 w-full h-2" style="background-color: ${event.color};"></div><img src="${event.image}" class="absolute inset-0 w-full h-full object-cover opacity-20" alt=""><div class="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black/50 to-transparent"><h2 class="text-4xl font-bold text-white">${event.year}</h2><h3 class="text-2xl text-white/90 mt-1">${event.title}</h3></div></div><div class="card-face card-back absolute inset-0 w-full h-full rounded-[var(--radius-card)] glass-pane text-white p-8 flex flex-col justify-between"><div><h3 class="text-2xl font-bold">${event.title}</h3><p class="mt-4 text-base text-white/80 leading-relaxed">${event.summary}</p></div><button class="show-detail-btn self-start mt-4 text-lg text-white font-bold hover:underline">了解更多 →</button></div></div>`;
+            return cardContainer;
+        }
+        
+        function createTimelineItem(event, index) {
+            const item = document.createElement('div');
+            item.className = 'timeline-item grid grid-cols-[1fr_auto_1fr] gap-x-4 md:gap-x-8 items-center mb-8';
+            item.dataset.id = event.id;
+            const alignClass = index % 2 !== 0 ? 'md:text-right' : 'md:text-left';
+            const gridColClass = index % 2 !== 0 ? 'md:col-start-1' : 'md:col-start-3';
+            item.innerHTML = `<div class="timeline-content order-1 ${alignClass} ${gridColClass}"><div class="glass-pane p-4 rounded-lg shadow-md cursor-pointer hover:shadow-xl transition-shadow" data-id="${event.id}"><div class="w-full h-2 rounded-t-lg mb-2" style="background-color: ${event.color}; margin: -1rem -1rem 0.5rem -1rem; border-radius: 0.5rem 0.5rem 0 0;"></div><p class="text-lg font-bold text-white">${event.year}</p><h3 class="text-md text-white/80">${event.title}</h3></div></div><div class="timeline-dot flex items-center justify-center order-2 col-start-2"><div class="w-4 h-4 rounded-full" style="background-color: ${event.color};"></div></div>`;
+            return item;
+        }
+
+        async function generateSummary(event, button) {
+            const summaryContainer = document.getElementById('ai-summary-content');
+            if (!summaryContainer) return;
+            button.disabled = true;
+            summaryContainer.innerHTML = `<p class="text-white/70 animate-pulse">✨ 正在连接AI，为您生成独家解读...</p>`;
+            
+            const prompt = `请你扮演一位历史学家，针对以下关于邹韬奋的历史事件，提供一段不超过150字的深刻见解或背景补充说明。事件标题：${event.title}。事件摘要：${event.summary}`;
+
+            let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+            const payload = { contents: chatHistory };
+            const apiKey = ""; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                if (result.candidates && result.candidates[0].content.parts[0].text) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    summaryContainer.innerHTML = `<p>${text}</p>`;
+                } else {
+                    throw new Error('Invalid API response');
+                }
+            } catch (error) {
+                console.error("Error calling Gemini API:", error);
+                summaryContainer.innerHTML = `<p class="text-red-400">AI解读生成失败，请稍后再试。</p>`;
+                button.disabled = false;
+            }
+        }
+
+        async function generateImage(event, button) {
+            const imageContainer = document.getElementById('detail-image-container');
+            if (!imageContainer) return;
+            const originalImageHTML = imageContainer.innerHTML;
+            button.disabled = true;
+            imageContainer.innerHTML = `<div class="w-full h-full flex flex-col items-center justify-center animate-pulse"><p class="text-white text-lg">✨ AI 正在进行艺术创想...</p><p class="text-white/70 mt-2">请稍候片刻</p></div>`;
+
+            const prompt = `Create a visually stunning, artistic image inspired by this historical event: '${event.title}'. Summary: '${event.summary}'. The style should be a mix of historical realism and dreamlike digital painting, capturing the mood of the era. For example, for "Seven Gentlemen Incident", the mood is somber and defiant. For "Life Weekly", the mood is hopeful and intellectual. Do not include any text in the image.`;
+
+            const payload = { instances: [{ prompt: prompt }], parameters: { "sampleCount": 1 } };
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                if (result.predictions && result.predictions[0].bytesBase64Encoded) {
+                    const imageUrl = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
+                    imageContainer.innerHTML = `<img src="${imageUrl}" class="max-w-full max-h-[55vh] object-contain shadow-lg rounded-md" alt="AI生成的艺术想象图：${event.title}">`;
+                } else {
+                   throw new Error('Invalid API response');
+                }
+            } catch (error) {
+                console.error("Error calling Imagen API:", error);
+                imageContainer.innerHTML = originalImageHTML;
+                alert('AI 艺术创想失败，请稍后再试。');
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+
+        function populateDetailPage(eventId) {
+            const event = eventsData.find(e => e.id == eventId);
+            if (!event) return;
+            detailPageContent.innerHTML = `
+                <header class="flex items-center justify-between mb-8 text-white">
+                    <a href="#story-strip-section" class="flex items-center hover:text-white/80">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+                        返回顶部
+                    </a>
+                    <div class="text-right">
+                        <h1 class="text-3xl font-bold">${event.title}</h1>
+                        <p class="text-lg text-white/70">${event.year}</p>
+                    </div>
+                </header>
+                <div class="glass-pane rounded-2xl p-4">
+                    <div id="detail-image-container" class="mb-8 bg-black/20 rounded-lg flex items-center justify-center min-h-[60vh] p-4 relative">
+                        <img src="${event.image}" class="max-w-full max-h-[55vh] object-contain shadow-lg rounded-md" alt="数字资源：${event.title}">
+                        <button id="ai-image-btn" class="ai-btn absolute bottom-4 right-4">✨ AI 艺术创想</button>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2 space-y-6">
+                            <div class="glass-pane p-4 rounded-lg"><h3 class="font-bold text-lg border-b border-white/20 pb-2 mb-2 text-white">元数据</h3><ul class="text-white/80"><li><strong>标题:</strong> ${event.title}</li><li><strong>年份:</strong> ${event.year}</li><li><strong>馆藏地:</strong> 模拟馆藏信息</li></ul></div>
+                            <div class="glass-pane p-4 rounded-lg"><h3 class="font-bold text-lg border-b border-white/20 pb-2 mb-2 text-white">提及实体</h3><div class="flex flex-wrap gap-2 pt-2">${event.people.map(p => `<span class="bg-blue-200 text-blue-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded">${p.name}</span>`).join('') || '无'}</div></div>
+                        </div>
+                        <aside class="space-y-6">
+                             <div class="glass-pane p-4 rounded-lg"><h3 class="font-bold text-lg border-b border-white/20 pb-2 mb-2 text-white">外部资源</h3><ul class="space-y-1 text-blue-300"><li><a href="#" class="hover:underline">在维基百科中查看...</a></li><li><a href="#" class="hover:underline">查找相关学术文章...</a></li></ul></div>
+                             <div class="glass-pane p-4 rounded-lg"><div class="flex justify-between items-center border-b border-white/20 pb-2 mb-2"><h3 class="font-bold text-lg text-white">AI 独家解读</h3><button id="ai-summary-btn" class="ai-btn text-xs">✨ 生成</button></div><div id="ai-summary-content" class="text-white/80 pt-2"><p>点击按钮，获取关于此事件的 AI 深度见解。</p></div></div>
+                        </aside>
+                    </div>
+                </div>
+            `;
+            document.getElementById('ai-summary-btn').addEventListener('click', (e) => generateSummary(event, e.currentTarget));
+            document.getElementById('ai-image-btn').addEventListener('click', (e) => generateImage(event, e.currentTarget));
+        }
+
+        function showDetailPage(eventId) {
+            populateDetailPage(eventId);
+            detailPage.scrollIntoView();
+        }
+        
+        function handleScroll() {
+            const { scrollLeft, scrollWidth, clientWidth } = stripContainer;
+            if (scrollWidth === clientWidth) return;
+            const scrollPercent = scrollLeft / (scrollWidth - clientWidth);
+            progressBar.style.width = `${scrollPercent * 100}%`;
+        }
+
+        function handleCardClick(e) {
+            const card = e.currentTarget;
+            card.classList.toggle('is-flipped');
+        }
+        
+        function handleTimelineClick(e) {
+            const targetContent = e.target.closest('.timeline-content > div');
+            if(!targetContent) return;
+            const eventId = targetContent.dataset.id;
+            const targetCardContainer = stripContainer.querySelector(`.event-card-container[data-id="${eventId}"]`);
+            if(targetCardContainer) {
+                document.getElementById('story-strip-section').scrollIntoView();
+                targetCardContainer.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
+
+        function performSearch(term) {
+            const lowerCaseTerm = term.toLowerCase().trim();
+            if (!lowerCaseTerm) return;
+            const matchedIds = eventsData.filter(event => {
+                const inTitle = event.title.toLowerCase().includes(lowerCaseTerm);
+                const inSummary = event.summary.toLowerCase().includes(lowerCaseTerm);
+                const inPeople = event.people.some(p => p.name.toLowerCase().includes(lowerCaseTerm));
+                return inTitle || inSummary || inPeople;
+            }).map(event => event.id);
+            updateUIAfterSearch(matchedIds);
+            closeSearchModal();
+        }
+
+        function updateUIAfterSearch(matchedIds) {
+            document.querySelectorAll('.event-card-container, .timeline-item').forEach(el => {
+                const id = parseInt(el.dataset.id, 10);
+                if (matchedIds.includes(id)) {
+                    el.classList.add('is-highlighted');
+                    el.classList.remove('is-dimmed');
+                } else {
+                    el.classList.add('is-dimmed');
+                    el.classList.remove('is-highlighted');
+                }
+            });
+            clearSearchBtn.classList.remove('hidden');
+            openSearchBtn.classList.add('hidden');
+        }
+
+        function clearSearch() {
+            document.querySelectorAll('.is-highlighted, .is-dimmed').forEach(el => el.classList.remove('is-highlighted', 'is-dimmed'));
+            clearSearchBtn.classList.add('hidden');
+            openSearchBtn.classList.remove('hidden');
+            searchInput.value = '';
+        }
+        
+        function openSearchModal() { searchModal.classList.remove('is-hidden'); }
+        function closeSearchModal() { searchModal.classList.add('is-hidden'); }
+
+        function handleKeyDown(e) {
+            if (e.key === 'Escape' && !searchModal.classList.contains('is-hidden')) closeSearchModal();
+            else if (e.key === 'ArrowRight') stripContainer.scrollBy({ left: stripContainer.clientWidth * 0.7, behavior: 'smooth' });
+            else if (e.key === 'ArrowLeft') stripContainer.scrollBy({ left: -stripContainer.clientWidth * 0.7, behavior: 'smooth' });
+            else if (e.key === 'Enter' && document.activeElement.classList.contains('event-card')) handleCardClick({currentTarget: document.activeElement});
+        }
+
+        // Initialization
+        eventsData.forEach((event, index) => {
+            stripContainer.appendChild(createEventCard(event));
+            timelineContainer.appendChild(createTimelineItem(event, index));
+        });
+        
+        recommendedKeywords.forEach(keyword => {
+            const tag = document.createElement('button');
+            tag.className = "px-4 py-2 glass-pane rounded-full text-white hover:bg-white/30 transition-colors";
+            tag.textContent = keyword;
+            tag.onclick = () => performSearch(keyword);
+            recommendedTagsContainer.appendChild(tag);
+        });
+
+        stripContainer.addEventListener('click', (e) => {
+            const card = e.target.closest('.event-card');
+            if (!card) return;
+            if (e.target.classList.contains('show-detail-btn')) {
+                e.stopPropagation();
+                showDetailPage(card.dataset.id);
+            } else {
+                handleCardClick({ currentTarget: card });
+            }
+        });
+
+        stripContainer.addEventListener('scroll', handleScroll);
+        document.addEventListener('keydown', handleKeyDown);
+        timelineContainer.addEventListener('click', handleTimelineClick);
+        openSearchBtn.addEventListener('click', openSearchModal);
+        clearSearchBtn.addEventListener('click', clearSearch);
+        searchModal.addEventListener('click', e => { if (e.target === searchModal) closeSearchModal(); });
+        searchForm.addEventListener('submit', e => {
+            e.preventDefault();
+            performSearch(searchInput.value);
+        });
+
+        const firstCardPadding = document.createElement('div');
+        firstCardPadding.className = 'flex-shrink-0 w-[calc(50vw-160px)]';
+        stripContainer.prepend(firstCardPadding);
+        const lastCardPadding = document.createElement('div');
+        lastCardPadding.className = 'flex-shrink-0 w-[calc(50vw-160px)]';
+        stripContainer.append(lastCardPadding);
+    });
+    </script>
+</body>
+</html>

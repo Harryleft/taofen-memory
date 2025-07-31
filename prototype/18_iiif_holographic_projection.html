@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全息投影 - 邹韬奋纪念网页</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: radial-gradient(ellipse at center, #0a0a0f 0%, #000000 100%);
+            color: #ffffff;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+
+        .holographic-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            perspective: 1200px;
+            overflow: hidden;
+        }
+
+        .holographic-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 0, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(0, 255, 0, 0.05) 0%, transparent 50%);
+            animation: holographicPulse 8s ease-in-out infinite;
+        }
+
+        @keyframes holographicPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        .grid-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .header {
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, #00ffff, #ff00ff, #00ff00, #00ffff);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 4s ease-in-out infinite;
+            text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+            letter-spacing: 3px;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 10px;
+            font-weight: 300;
+        }
+
+        .holographic-space {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 600px;
+            transform-style: preserve-3d;
+            animation: spaceRotate 60s linear infinite;
+        }
+
+        @keyframes spaceRotate {
+            0% { transform: translate(-50%, -50%) rotateY(0deg); }
+            100% { transform: translate(-50%, -50%) rotateY(360deg); }
+        }
+
+        .hologram-card {
+            position: absolute;
+            width: 250px;
+            height: 350px;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.1) 0%, 
+                rgba(255, 255, 255, 0.05) 50%, 
+                rgba(255, 255, 255, 0.1) 100%);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .hologram-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #00ffff, #ff00ff, #00ff00, #00ffff);
+            border-radius: 15px;
+            z-index: -1;
+            opacity: 0.7;
+            animation: hologramBorder 3s linear infinite;
+        }
+
+        @keyframes hologramBorder {
+            0% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+            100% { opacity: 0.3; }
+        }
+
+        .hologram-card:hover {
+            transform: translateZ(50px) scale(1.05);
+            border-color: rgba(0, 255, 255, 0.8);
+            box-shadow: 
+                0 15px 50px rgba(0, 255, 255, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .hologram-card.person {
+            transform: translateX(-400px) translateZ(-100px);
+        }
+
+        .hologram-card.event {
+            transform: translateX(-200px) translateY(-150px) translateZ(50px);
+        }
+
+        .hologram-card.work {
+            transform: translateX(0px) translateZ(-200px);
+        }
+
+        .hologram-card.thought {
+            transform: translateX(200px) translateY(-150px) translateZ(50px);
+        }
+
+        .hologram-card.legacy {
+            transform: translateX(400px) translateZ(-100px);
+        }
+
+        .card-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: iconFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .card-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        .card-subtitle {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+
+        .card-description {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.6;
+        }
+
+        .holographic-beam {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 2px;
+            height: 100vh;
+            background: linear-gradient(to bottom, 
+                transparent 0%, 
+                rgba(0, 255, 255, 0.8) 50%, 
+                transparent 100%);
+            transform: translateX(-50%);
+            animation: beamScan 4s ease-in-out infinite;
+        }
+
+        @keyframes beamScan {
+            0%, 100% { opacity: 0.3; height: 20vh; top: 40vh; }
+            50% { opacity: 0.8; height: 60vh; top: 20vh; }
+        }
+
+        .control-panel {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(0, 255, 255, 0.5);
+            color: #00ffff;
+            padding: 15px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .control-btn:hover {
+            background: rgba(0, 255, 255, 0.2);
+            border-color: #00ffff;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
+        }
+
+        .control-btn.active {
+            background: rgba(0, 255, 255, 0.3);
+            border-color: #00ffff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+
+        .info-panel {
+            position: absolute;
+            right: -500px;
+            top: 0;
+            width: 500px;
+            height: 100vh;
+            background: linear-gradient(135deg, 
+                rgba(0, 20, 40, 0.95) 0%, 
+                rgba(0, 0, 0, 0.95) 100%);
+            backdrop-filter: blur(20px);
+            border-left: 2px solid rgba(0, 255, 255, 0.5);
+            padding: 40px;
+            transition: right 0.5s ease;
+            z-index: 200;
+            overflow-y: auto;
+        }
+
+        .info-panel.active {
+            right: 0;
+        }
+
+        .info-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #00ffff;
+            font-size: 2rem;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .info-close:hover {
+            opacity: 1;
+        }
+
+        .info-content h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #00ffff;
+            text-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+        }
+
+        .info-content p {
+            line-height: 1.8;
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .connection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .connection-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .connection-item:hover {
+            background: rgba(0, 255, 255, 0.1);
+            border-color: #00ffff;
+            transform: translateY(-5px);
+        }
+
+        .connection-item i {
+            font-size: 2rem;
+            color: #00ffff;
+            margin-bottom: 10px;
+        }
+
+        .connection-item h4 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        .connection-item p {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #00ffff;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particleFloat 15s linear infinite;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .data-stream {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .data-line {
+            position: absolute;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(0, 255, 255, 0.8) 50%, 
+                transparent 100%);
+            animation: dataFlow 3s linear infinite;
+        }
+
+        @keyframes dataFlow {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .loading-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            color: #00ffff;
+            margin-bottom: 20px;
+            animation: loadingPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes loadingPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .loading-bar {
+            width: 300px;
+            height: 4px;
+            background: rgba(0, 255, 255, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .loading-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #00ffff, #ff00ff);
+            border-radius: 2px;
+            animation: loadingProgress 2s ease-in-out infinite;
+        }
+
+        @keyframes loadingProgress {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .holographic-space {
+                width: 90vw;
+                height: 70vh;
+            }
+            
+            .hologram-card {
+                width: 200px;
+                height: 280px;
+                padding: 20px;
+            }
+            
+            .info-panel {
+                width: 100vw;
+                right: -100vw;
+            }
+            
+            .control-panel {
+                bottom: 20px;
+                left: 20px;
+                right: 20px;
+                transform: none;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .control-btn {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <div class="loading-text">全息系统启动中</div>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="holographic-container">
+        <div class="holographic-bg"></div>
+        <div class="grid-overlay"></div>
+        <div class="data-stream" id="dataStream"></div>
+        
+        <div class="holographic-beam"></div>
+        
+        <header class="header">
+            <h1>全息投影</h1>
+            <p>在3D空间中探索邹韬奋的思想宇宙</p>
+        </header>
+
+        <div class="holographic-space" id="holographicSpace">
+            <div class="hologram-card person" data-id="zou-taofen">
+                <div class="card-icon">👤</div>
+                <div class="card-title">邹韬奋</div>
+                <div class="card-subtitle">爱国新闻工作者</div>
+                <div class="card-description">1895-1944<br>中国近代新闻出版事业先驱</div>
+            </div>
+
+            <div class="hologram-card event" data-id="life-weekly">
+                <div class="card-icon">📰</div>
+                <div class="card-title">《生活》周刊</div>
+                <div class="card-subtitle">重要事件</div>
+                <div class="card-description">1926年创刊<br>传播进步思想的重要阵地</div>
+            </div>
+
+            <div class="hologram-card work" data-id="mass-books">
+                <div class="card-icon">📚</div>
+                <div class="card-title">生活书店</div>
+                <div class="card-subtitle">文化作品</div>
+                <div class="card-description">1932年建立<br>进步文化的重要载体</div>
+            </div>
+
+            <div class="hologram-card thought" data-id="patriotism">
+                <div class="card-icon">❤️</div>
+                <div class="card-title">爱国情怀</div>
+                <div class="card-subtitle">核心思想</div>
+                <div class="card-description">精神追求<br>"我生为中国人，死为中国魂"</div>
+            </div>
+
+            <div class="hologram-card legacy" data-id="journalism">
+                <div class="card-icon">✍️</div>
+                <div class="card-title">新闻精神</div>
+                <div class="card-subtitle">永恒遗产</div>
+                <div class="card-description">职业精神<br>为人民服务，说真话办实事</div>
+            </div>
+        </div>
+
+        <div class="control-panel">
+            <button class="control-btn active" id="rotateBtn">
+                <i class="fas fa-sync-alt"></i> 自动旋转
+            </button>
+            <button class="control-btn" id="connectBtn">
+                <i class="fas fa-project-diagram"></i> 显示连接
+            </button>
+            <button class="control-btn" id="expandBtn">
+                <i class="fas fa-expand"></i> 扩展视图
+            </button>
+            <button class="control-btn" id="resetBtn">
+                <i class="fas fa-undo"></i> 重置位置
+            </button>
+        </div>
+
+        <div class="info-panel" id="infoPanel">
+            <button class="info-close" id="infoClose">&times;</button>
+            <div class="info-content" id="infoContent">
+                <!-- 动态内容 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 数据模型
+        const hologramData = {
+            'zou-taofen': {
+                title: '邹韬奋',
+                type: 'person',
+                description: '中国近代著名的新闻记者、出版家和爱国民主人士',
+                details: '邹韬奋先生（1895-1944）原名邹恩润，是中国近代新闻出版事业的先驱。他创办《生活》周刊，建立生活书店，积极宣传抗日救国思想，被誉为"永远的爱国者"。',
+                connections: ['life-weekly', 'mass-books', 'patriotism', 'journalism'],
+                timeline: '1895年出生于福建永安，1944年在上海逝世',
+                achievements: ['创办《生活》周刊', '建立生活书店', '参与抗日救亡运动', '七君子事件']
+            },
+            'life-weekly': {
+                title: '《生活》周刊',
+                type: 'event',
+                description: '1926年创办的进步刊物',
+                details: '1926年，邹韬奋创办了《生活》周刊，这成为他新闻出版事业的重要起点。刊物以"传播进步思想，服务社会大众"为宗旨，内容涵盖时事评论、文化教育、生活指导等多个方面。',
+                connections: ['zou-taofen', 'patriotism', 'mass-books'],
+                timeline: '1926年创刊，九一八事变后积极宣传抗日',
+                impact: '成为当时最有影响力的进步刊物之一'
+            },
+            'mass-books': {
+                title: '生活书店',
+                type: 'work',
+                description: '1932年建立的文化机构',
+                details: '1932年，邹韬奋建立了生活书店，成为进步文化的重要阵地。书店出版了大量的马克思主义著作和进步书籍，为中国革命事业培养了大批人才。',
+                connections: ['zou-taofen', 'life-weekly', 'journalism'],
+                timeline: '1932年建立，抗战期间继续发挥作用',
+                significance: '进步文化的重要传播中心'
+            },
+            'patriotism': {
+                title: '爱国情怀',
+                type: 'thought',
+                description: '邹韬奋先生的精神核心',
+                details: '"我生为中国人，死为中国魂，此志不渝"是邹韬奋先生的爱国情怀的真实写照。他的爱国思想体现在新闻出版事业的方方面面，始终站在人民立场。',
+                connections: ['zou-taofen', 'life-weekly', 'journalism'],
+                philosophy: '将个人命运与国家命运紧密相连',
+                expression: '通过新闻出版传播爱国思想'
+            },
+            'journalism': {
+                title: '新闻精神',
+                type: 'legacy',
+                description: '为人民服务的新闻理念',
+                details: '邹韬奋先生的新闻精神核心是"为人民服务、说真话、办实事"。这一理念至今仍在影响着中国的新闻事业，成为新闻工作者的宝贵精神财富。',
+                connections: ['zou-taofen', 'mass-books', 'patriotism'],
+                principles: ['为人民服务', '说真话', '办实事', '坚持真理'],
+                influence: '成为中国新闻事业的重要精神遗产'
+            }
+        };
+
+        // 全局变量
+        let isRotating = true;
+        let isShowingConnections = false;
+        let isExpanded = false;
+        let selectedCard = null;
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeHologram();
+            initializeControls();
+            initializeParticles();
+            initializeDataStream();
+            
+            // 隐藏加载屏幕
+            setTimeout(() => {
+                const loadingScreen = document.getElementById('loadingScreen');
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                }, 500);
+            }, 2000);
+        });
+
+        function initializeHologram() {
+            const cards = document.querySelectorAll('.hologram-card');
+            const space = document.getElementById('holographicSpace');
+            
+            cards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const cardId = this.getAttribute('data-id');
+                    showCardInfo(cardId);
+                    
+                    // 选中效果
+                    cards.forEach(c => c.style.transform = c.style.transform.replace(' scale(1.1)', ''));
+                    this.style.transform += ' scale(1.1)';
+                    selectedCard = this;
+                });
+                
+                // 鼠标悬停3D效果
+                card.addEventListener('mouseenter', function() {
+                    if (!isRotating) {
+                        this.style.transform += ' translateZ(100px)';
+                    }
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    if (!isRotating && selectedCard !== this) {
+                        this.style.transform = this.style.transform.replace(' translateZ(100px)', '');
+                    }
+                });
+            });
+            
+            // 鼠标控制旋转
+            let mouseX = 0;
+            let mouseY = 0;
+            
+            document.addEventListener('mousemove', function(e) {
+                if (!isRotating) {
+                    mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+                    mouseY = (e.clientY / window.innerHeight) * 2 - 1;
+                    
+                    const rotateX = mouseY * 20;
+                    const rotateY = mouseX * 20;
+                    
+                    space.style.transform = `translate(-50%, -50%) rotateX(${-rotateX}deg) rotateY(${rotateY}deg)`;
+                }
+            });
+        }
+
+        function initializeControls() {
+            const rotateBtn = document.getElementById('rotateBtn');
+            const connectBtn = document.getElementById('connectBtn');
+            const expandBtn = document.getElementById('expandBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const infoClose = document.getElementById('infoClose');
+            
+            rotateBtn.addEventListener('click', function() {
+                isRotating = !isRotating;
+                this.classList.toggle('active');
+                
+                const space = document.getElementById('holographicSpace');
+                if (isRotating) {
+                    space.style.animation = 'spaceRotate 60s linear infinite';
+                } else {
+                    space.style.animation = 'none';
+                }
+            });
+            
+            connectBtn.addEventListener('click', function() {
+                isShowingConnections = !isShowingConnections;
+                this.classList.toggle('active');
+                
+                if (isShowingConnections) {
+                    showConnections();
+                } else {
+                    hideConnections();
+                }
+            });
+            
+            expandBtn.addEventListener('click', function() {
+                isExpanded = !isExpanded;
+                this.classList.toggle('active');
+                
+                const cards = document.querySelectorAll('.hologram-card');
+                if (isExpanded) {
+                    expandCards(cards);
+                } else {
+                    resetCards(cards);
+                }
+            });
+            
+            resetBtn.addEventListener('click', function() {
+                resetAll();
+            });
+            
+            infoClose.addEventListener('click', function() {
+                document.getElementById('infoPanel').classList.remove('active');
+            });
+        }
+
+        function showConnections() {
+            const cards = document.querySelectorAll('.hologram-card');
+            
+            // 创建连接线
+            cards.forEach(card => {
+                const cardId = card.getAttribute('data-id');
+                const data = hologramData[cardId];
+                
+                data.connections.forEach(connectionId => {
+                    const targetCard = document.querySelector(`[data-id="${connectionId}"]`);
+                    if (targetCard) {
+                        createConnectionLine(card, targetCard);
+                    }
+                });
+            });
+        }
+
+        function hideConnections() {
+            const existingLines = document.querySelectorAll('.connection-line');
+            existingLines.forEach(line => line.remove());
+        }
+
+        function createConnectionLine(card1, card2) {
+            const line = document.createElement('div');
+            line.className = 'connection-line';
+            line.style.position = 'absolute';
+            line.style.height = '2px';
+            line.style.background = 'linear-gradient(90deg, rgba(0, 255, 255, 0.8), rgba(255, 0, 255, 0.8))';
+            line.style.transformOrigin = 'left center';
+            line.style.pointerEvents = 'none';
+            line.style.zIndex = '10';
+            line.style.animation = 'connectionPulse 2s ease-in-out infinite';
+            
+            document.getElementById('holographicSpace').appendChild(line);
+            
+            function updateLine() {
+                const rect1 = card1.getBoundingClientRect();
+                const rect2 = card2.getBoundingClientRect();
+                const spaceRect = document.getElementById('holographicSpace').getBoundingClientRect();
+                
+                const x1 = rect1.left + rect1.width / 2 - spaceRect.left;
+                const y1 = rect1.top + rect1.height / 2 - spaceRect.top;
+                const x2 = rect2.left + rect2.width / 2 - spaceRect.left;
+                const y2 = rect2.top + rect2.height / 2 - spaceRect.top;
+                
+                const length = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+                const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+                
+                line.style.width = length + 'px';
+                line.style.left = x1 + 'px';
+                line.style.top = y1 + 'px';
+                line.style.transform = `rotate(${angle}deg)`;
+            }
+            
+            updateLine();
+            setInterval(updateLine, 50);
+        }
+
+        function expandCards(cards) {
+            cards.forEach((card, index) => {
+                const angle = (index / cards.length) * 2 * Math.PI;
+                const radius = 400;
+                
+                const x = Math.cos(angle) * radius;
+                const z = Math.sin(angle) * radius;
+                
+                card.style.transform = `translateX(${x}px) translateZ(${z}px) scale(1.2)`;
+            });
+        }
+
+        function resetCards(cards) {
+            cards.forEach((card, index) => {
+                switch(index) {
+                    case 0:
+                        card.style.transform = 'translateX(-400px) translateZ(-100px)';
+                        break;
+                    case 1:
+                        card.style.transform = 'translateX(-200px) translateY(-150px) translateZ(50px)';
+                        break;
+                    case 2:
+                        card.style.transform = 'translateX(0px) translateZ(-200px)';
+                        break;
+                    case 3:
+                        card.style.transform = 'translateX(200px) translateY(-150px) translateZ(50px)';
+                        break;
+                    case 4:
+                        card.style.transform = 'translateX(400px) translateZ(-100px)';
+                        break;
+                }
+            });
+        }
+
+        function resetAll() {
+            isRotating = true;
+            isShowingConnections = false;
+            isExpanded = false;
+            selectedCard = null;
+            
+            document.getElementById('rotateBtn').classList.add('active');
+            document.getElementById('connectBtn').classList.remove('active');
+            document.getElementById('expandBtn').classList.remove('active');
+            
+            const space = document.getElementById('holographicSpace');
+            space.style.animation = 'spaceRotate 60s linear infinite';
+            
+            hideConnections();
+            resetCards(document.querySelectorAll('.hologram-card'));
+            
+            document.getElementById('infoPanel').classList.remove('active');
+        }
+
+        function showCardInfo(cardId) {
+            const data = hologramData[cardId];
+            const panel = document.getElementById('infoPanel');
+            const content = document.getElementById('infoContent');
+            
+            content.innerHTML = `
+                <h2>${data.title}</h2>
+                <p><strong>类型：</strong>${getTypeLabel(data.type)}</p>
+                <p><strong>描述：</strong>${data.description}</p>
+                <p><strong>详细信息：</strong>${data.details}</p>
+                
+                ${data.timeline ? `<p><strong>时间线：</strong>${data.timeline}</p>` : ''}
+                ${data.impact ? `<p><strong>影响：</strong>${data.impact}</p>` : ''}
+                ${data.significance ? `<p><strong>意义：</strong>${data.significance}</p>` : ''}
+                
+                ${data.achievements ? `
+                    <div style="margin-top: 20px;">
+                        <h3>主要成就</h3>
+                        <ul style="list-style: none; padding: 0;">
+                            ${data.achievements.map(achievement => 
+                                `<li style="padding: 5px 0; color: rgba(255,255,255,0.8);">• ${achievement}</li>`
+                            ).join('')}
+                        </ul>
+                    </div>
+                ` : ''}
+                
+                ${data.principles ? `
+                    <div style="margin-top: 20px;">
+                        <h3>核心原则</h3>
+                        <ul style="list-style: none; padding: 0;">
+                            ${data.principles.map(principle => 
+                                `<li style="padding: 5px 0; color: rgba(255,255,255,0.8);">• ${principle}</li>`
+                            ).join('')}
+                        </ul>
+                    </div>
+                ` : ''}
+                
+                <div class="connection-grid">
+                    <h3 style="grid-column: 1 / -1; color: #00ffff; margin-bottom: 15px;">相关连接</h3>
+                    ${data.connections.map(connectionId => {
+                        const connection = hologramData[connectionId];
+                        return `
+                            <div class="connection-item" onclick="focusCard('${connectionId}')">
+                                <i class="fas fa-${getIconByType(connection.type)}"></i>
+                                <h4>${connection.title}</h4>
+                                <p>${getTypeLabel(connection.type)}</p>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+            
+            panel.classList.add('active');
+        }
+
+        function getTypeLabel(type) {
+            const labels = {
+                'person': '人物',
+                'event': '事件',
+                'work': '作品',
+                'thought': '思想',
+                'legacy': '遗产'
+            };
+            return labels[type] || type;
+        }
+
+        function getIconByType(type) {
+            const icons = {
+                'person': 'user',
+                'event': 'calendar',
+                'work': 'book',
+                'thought': 'lightbulb',
+                'legacy': 'star'
+            };
+            return icons[type] || 'circle';
+        }
+
+        function focusCard(cardId) {
+            const card = document.querySelector(`[data-id="${cardId}"]`);
+            if (card) {
+                card.click();
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        function initializeParticles() {
+            setInterval(() => {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.background = `hsl(${Math.random() * 60 + 180}, 100%, 50%)`;
+                document.body.appendChild(particle);
+                
+                setTimeout(() => {
+                    particle.remove();
+                }, 15000);
+            }, 3000);
+        }
+
+        function initializeDataStream() {
+            const dataStream = document.getElementById('dataStream');
+            
+            for (let i = 0; i < 5; i++) {
+                const line = document.createElement('div');
+                line.className = 'data-line';
+                line.style.top = Math.random() * 100 + '%';
+                line.style.animationDelay = Math.random() * 3 + 's';
+                line.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                dataStream.appendChild(line);
+            }
+        }
+
+        // 添加CSS动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes connectionPulse {
+                0%, 100% { opacity: 0.3; }
+                50% { opacity: 0.8; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

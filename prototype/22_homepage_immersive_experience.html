@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>邹韬奋纪念网站 - 时光相册·灵魂对话</title>
+    <title>邹韬奋纪念网站 - 沉浸式体验风格</title>
     <link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Noto+Serif+SC:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -47,6 +47,7 @@
         }
 
         .loading-text {
+            
             font-family: 'ZCOOL XiaoWei', serif;
             font-size: 2rem;
             color: #d4af37;
@@ -149,146 +150,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: 
-                linear-gradient(45deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)),
-                linear-gradient(rgba(244, 228, 188, 0.1), rgba(244, 228, 188, 0.05));
+            background: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&h=1080&fit=crop') center/cover;
+            filter: brightness(0.3) sepia(0.2);
             animation: heroZoom 20s ease-in-out infinite;
-        }
-
-        /* Photo Collage Elements */
-        .photo-collage {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        .collage-photo {
-            position: absolute;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
-            filter: sepia(0.3) brightness(0.8) contrast(1.1);
-            border: 3px solid rgba(212, 175, 55, 0.3);
-        }
-
-        .collage-photo:hover {
-            transform: scale(1.05) rotate(2deg);
-            filter: sepia(0.1) brightness(1) contrast(1.2);
-            border-color: rgba(212, 175, 55, 0.6);
-        }
-
-        /* 主要肖像 - 中心位置 */
-        .collage-main {
-            width: 250px;
-            height: 300px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-2deg);
-            z-index: 5;
-            background: url('data/web-data/taofen_images/韬奋像/001_韬奋像照片1.jpg') center/cover;
-        }
-
-        /* 青年时期照片 - 左上角 */
-        .collage-young {
-            width: 180px;
-            height: 220px;
-            top: 15%;
-            left: 10%;
-            transform: rotate(-8deg);
-            z-index: 3;
-            background: url('data/web-data/taofen_images/韬奋像/070_韬奋像_70.jpg') center/cover;
-        }
-
-        /* 中年时期照片 - 右上角 */
-        .collage-middle {
-            width: 160px;
-            height: 200px;
-            top: 20%;
-            right: 15%;
-            transform: rotate(5deg);
-            z-index: 3;
-            background: url('data/web-data/taofen_images/韬奋像/071_韬奋像_71.jpg') center/cover;
-        }
-
-        /* 家庭照片 - 左下角 */
-        .collage-family {
-            width: 200px;
-            height: 150px;
-            bottom: 20%;
-            left: 8%;
-            transform: rotate(3deg);
-            z-index: 2;
-            background: url('data/web-data/taofen_images/韬奋与家人/058_韬奋与家人_58.jpg') center/cover;
-        }
-
-        /* 朋友合影 - 右下角 */
-        .collage-friends {
-            width: 180px;
-            height: 140px;
-            bottom: 15%;
-            right: 12%;
-            transform: rotate(-4deg);
-            z-index: 2;
-            background: url('data/web-data/taofen_images/韬奋与朋友/030_韬奋与朋友_30.jpg') center/cover;
-        }
-
-        /* 小照片装饰 */
-        .collage-small1 {
-            width: 120px;
-            height: 100px;
-            top: 35%;
-            left: 20%;
-            transform: rotate(12deg);
-            z-index: 1;
-            background: url('data/web-data/taofen_images/韬奋与朋友/086_韬奋与朋友_86.jpg') center/cover;
-        }
-
-        .collage-small2 {
-            width: 100px;
-            height: 120px;
-            top: 60%;
-            right: 25%;
-            transform: rotate(-10deg);
-            z-index: 1;
-            background: url('data/web-data/taofen_images/韬奋像/072_韬奋像_72.jpg') center/cover;
-        }
-
-        /* 历史文档背景纹理 */
-        .hero-texture {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                repeating-linear-gradient(
-                    45deg,
-                    transparent,
-                    transparent 2px,
-                    rgba(244, 228, 188, 0.05) 2px,
-                    rgba(244, 228, 188, 0.05) 4px
-                ),
-                radial-gradient(circle at 20% 30%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(212, 175, 55, 0.08) 0%, transparent 50%);
-            z-index: 1;
-        }
-
-        .hero-portrait-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(
-                ellipse at center, 
-                transparent 0%, 
-                rgba(0, 0, 0, 0.3) 60%, 
-                rgba(0, 0, 0, 0.7) 100%
-            );
-            z-index: 6;
         }
 
         @keyframes heroZoom {
@@ -746,8 +610,6 @@
             color: #d4af37;
         }
 
-
-
         /* Mobile Responsive */
         @media (max-width: 768px) {
             .nav-menu {
@@ -794,54 +656,6 @@
                 flex-direction: column;
                 align-items: center;
             }
-
-            /* Mobile collage adjustments */
-            .collage-main {
-                width: 180px;
-                height: 220px;
-            }
-
-            .collage-young {
-                width: 120px;
-                height: 150px;
-                top: 20%;
-                left: 5%;
-            }
-
-            .collage-middle {
-                width: 100px;
-                height: 130px;
-                top: 25%;
-                right: 8%;
-            }
-
-            .collage-family {
-                width: 140px;
-                height: 100px;
-                bottom: 25%;
-                left: 5%;
-            }
-
-            .collage-friends {
-                width: 120px;
-                height: 90px;
-                bottom: 20%;
-                right: 8%;
-            }
-
-            .collage-small1 {
-                width: 80px;
-                height: 70px;
-                top: 40%;
-                left: 15%;
-            }
-
-            .collage-small2 {
-                width: 70px;
-                height: 80px;
-                top: 65%;
-                right: 20%;
-            }
         }
     </style>
 </head>
@@ -863,9 +677,9 @@
                 <div class="nav-logo">邹韬奋 · 数字纪念</div>
                 <ul class="nav-menu">
                     <li><a href="#timeline">时间之旅</a></li>
+                    <li><a href="#works">作品档案</a></li>
                     <li><a href="#philosophy">思想之光</a></li>
                     <li><a href="#context">历史回响</a></li>
-                    <li><a href="#cta">探索之旅</a></li>
                 </ul>
             </div>
         </div>
@@ -874,20 +688,6 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-bg"></div>
-        <div class="hero-texture"></div>
-        
-        <!-- Photo Collage -->
-        <div class="photo-collage">
-            <div class="collage-photo collage-main"></div>
-            <div class="collage-photo collage-young"></div>
-            <div class="collage-photo collage-middle"></div>
-            <div class="collage-photo collage-family"></div>
-            <div class="collage-photo collage-friends"></div>
-            <div class="collage-photo collage-small1"></div>
-            <div class="collage-photo collage-small2"></div>
-        </div>
-        
-        <div class="hero-portrait-overlay"></div>
         <div class="hero-overlay"></div>
         <div class="hero-particles" id="heroParticles"></div>
         
@@ -904,8 +704,6 @@
             <div class="scroll-arrow"></div>
         </div>
     </section>
-
-
 
     <!-- Journey Section -->
     <section class="journey" id="timeline">
@@ -994,7 +792,7 @@
     </section>
 
     <!-- CTA Section -->
-    <section class="cta" id="cta">
+    <section class="cta">
         <div class="container">
             <div class="cta-content">
                 <h2>开始探索之旅</h2>
@@ -1013,16 +811,14 @@
             <div class="footer-content">
                 <div class="footer-links">
                     <a href="#timeline">时间之旅</a>
+                    <a href="#works">作品档案</a>
                     <a href="#philosophy">思想之光</a>
                     <a href="#context">历史回响</a>
-                    <a href="#cta">探索之旅</a>
                 </div>
                 <p>&copy; 2024 邹韬奋数字纪念馆. 用现代科技传承历史记忆.</p>
             </div>
         </div>
     </footer>
-
-
 
     <script>
         // Hide loading screen
@@ -1104,8 +900,6 @@
                 heroContent.style.transform = `translateY(${scrolled * 0.3}px)`;
             }
         });
-
-
     </script>
 </body>
 </html>

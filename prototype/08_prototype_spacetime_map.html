@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>韬奋时空地图导航系统 | 原型演示</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #2c5530;
+            --secondary-color: #8b4513;
+            --accent-color: #cd853f;
+            --text-primary: #2c2c2c;
+            --text-secondary: #666;
+            --bg-primary: #f8f6f0;
+            --bg-secondary: #ffffff;
+            --border-color: #e0d5c0;
+            --shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+
+        .app-container {
+            height: 100vh;
+            display: grid;
+            grid-template-areas: 
+                "header header header"
+                "sidebar map timeline";
+            grid-template-rows: 60px 1fr;
+            grid-template-columns: 300px 1fr 350px;
+        }
+
+        /* Header */
+        .header {
+            grid-area: header;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            grid-area: sidebar;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(135deg, var(--accent-color), #deb887);
+            color: white;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .filter-section {
+            margin-bottom: 2rem;
+        }
+
+        .filter-section h3 {
+            font-size: 1rem;
+            margin-bottom: 0.8rem;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.3rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .filter-item:hover {
+            background: rgba(205, 133, 63, 0.1);
+        }
+
+        .filter-item input[type="checkbox"] {
+            accent-color: var(--accent-color);
+        }
+
+        .legend {
+            margin-top: 1rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        /* Map Container */
+        .map-container {
+            grid-area: map;
+            position: relative;
+            background: #a8dba8;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .map-overlay {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: rgba(255,255,255,0.95);
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            max-width: 300px;
+        }
+
+        .current-location {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .location-info {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Timeline */
+        .timeline-container {
+            grid-area: timeline;
+            background: var(--bg-secondary);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .timeline-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(135deg, var(--secondary-color), #a0522d);
+            color: white;
+        }
+
+        .timeline-slider {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .slider-container {
+            position: relative;
+            margin: 1rem 0;
+        }
+
+        .time-slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border-color);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .time-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .timeline-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .timeline-events {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .event-item {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .event-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+            border-color: var(--accent-color);
+        }
+
+        .event-item.active {
+            border-color: var(--primary-color);
+            background: rgba(44, 85, 48, 0.05);
+        }
+
+        .event-date {
+            font-size: 0.9rem;
+            color: var(--accent-color);
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .event-title {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .event-location {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .event-type {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .type-birth { background: #ff6b6b; }
+        .type-education { background: #4ecdc4; }
+        .type-career { background: #45b7d1; }
+        .type-publication { background: #96ceb4; }
+        .type-political { background: #feca57; }
+        .type-personal { background: #ff9ff3; }
+
+        /* Detail Panel */
+        .detail-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100vh;
+            background: var(--bg-secondary);
+            box-shadow: -4px 0 20px rgba(0,0,0,0.1);
+            z-index: 2000;
+            transition: right 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .detail-panel.open {
+            right: 0;
+        }
+
+        .detail-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .detail-content {
+            padding: 1rem;
+        }
+
+        .detail-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .detail-description {
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .detail-resources {
+            border-top: 1px solid var(--border-color);
+            padding-top: 1rem;
+        }
+
+        .resource-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin-bottom: 0.3rem;
+        }
+
+        .resource-item:hover {
+            background: var(--bg-primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .app-container {
+                grid-template-areas: 
+                    "header header"
+                    "map timeline";
+                grid-template-columns: 1fr 300px;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                grid-template-areas: 
+                    "header"
+                    "map";
+                grid-template-columns: 1fr;
+            }
+            
+            .timeline-container {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <h1><i class="fas fa-map-marked-alt"></i> 韬奋时空地图</h1>
+            <div class="header-controls">
+                <button class="btn" onclick="resetView()">
+                    <i class="fas fa-home"></i> 重置视图
+                </button>
+                <button class="btn" onclick="toggleFullscreen()">
+                    <i class="fas fa-expand"></i> 全屏
+                </button>
+            </div>
+        </header>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-filter"></i> 筛选控制</h2>
+            </div>
+            <div class="sidebar-content">
+                <div class="filter-section">
+                    <h3>事件类型</h3>
+                    <div class="filter-group">
+                        <label class="filter-item">
+                            <input type="checkbox" checked data-type="birth">
+                            <span>出生成长</span>
+                        </label>
+                        <label class="filter-item">
+                            <input type="checkbox" checked data-type="education">
+                            <span>求学经历</span>
+                        </label>
+                        <label class="filter-item">
+                            <input type="checkbox" checked data-type="career">
+                            <span>职业生涯</span>
+                        </label>
+                        <label class="filter-item">
+                            <input type="checkbox" checked data-type="publication">
+                            <span>出版事业</span>
+                        </label>
+                        <label class="filter-item">
+                            <input type="checkbox" checked data-type="political">
+                            <span>政治活动</span>
+                        </label>
+                        <label class="filter-item">
+                            <input type="checkbox" checked data-type="personal">
+                            <span>个人生活</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <h3>地理区域</h3>
+                    <div class="filter-group">
+                        <label class="filter-item">
+                            <input type="checkbox" checked data-region="jiangxi">
+                            <span>江西</span>
+                        </label>
+                        <label class="filter-item">
+                            <input type="checkbox" checked data-region="shanghai">
+                            <span>上海</span>
+                        </label>
+                        <label class="filter-item">
+                            <input type="checkbox" checked data-region="beijing">
+                            <span>北京</span>
+                        </label>
+                        <label class="filter-item">
+                            <input type="checkbox" checked data-region="europe">
+                            <span>欧洲</span>
+                        </label>
+                        <label class="filter-item">
+                            <input type="checkbox" checked data-region="hongkong">
+                            <span>香港</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="legend">
+                    <h3>图例说明</h3>
+                    <div class="legend-item">
+                        <div class="legend-color type-birth"></div>
+                        <span>出生成长</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color type-education"></div>
+                        <span>求学经历</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color type-career"></div>
+                        <span>职业生涯</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color type-publication"></div>
+                        <span>出版事业</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color type-political"></div>
+                        <span>政治活动</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color type-personal"></div>
+                        <span>个人生活</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Map -->
+        <main class="map-container">
+            <div id="map"></div>
+            <div class="map-overlay">
+                <div class="current-location">当前选中：江西余江</div>
+                <div class="location-info">1895年，韬奋先生诞生地</div>
+            </div>
+        </main>
+
+        <!-- Timeline -->
+        <aside class="timeline-container">
+            <div class="timeline-header">
+                <h2><i class="fas fa-timeline"></i> 时间轴</h2>
+            </div>
+            
+            <div class="timeline-slider">
+                <input type="range" class="time-slider" min="1895" max="1944" value="1895" step="1" id="yearSlider">
+                <div class="timeline-labels">
+                    <span>1895</span>
+                    <span id="currentYear">1895</span>
+                    <span>1944</span>
+                </div>
+            </div>
+
+            <div class="timeline-events" id="timelineEvents">
+                <!-- Events will be populated by JavaScript -->
+            </div>
+        </aside>
+    </div>
+
+    <!-- Detail Panel -->
+    <div class="detail-panel" id="detailPanel">
+        <div class="detail-header">
+            <h3 id="detailTitle">事件详情</h3>
+            <button class="btn" onclick="closeDetail()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="detail-content" id="detailContent">
+            <!-- Content will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script>
+        // Historical events data
+        const historicalEvents = [
+            {
+                id: 1,
+                year: 1895,
+                date: "1895年11月5日",
+                title: "诞生于江西余江",
+                location: "江西余江",
+                coords: [28.2124, 116.8347],
+                type: "birth",
+                region: "jiangxi",
+                description: "邹韬奋先生出生于江西省余江县一个书香门第，原名邹恩润。父亲邹国珍是当地的教书先生，母亲徐氏贤淑持家。",
+                image: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=300&fit=crop",
+                resources: [
+                    { type: "document", name: "出生证明", icon: "fas fa-file-alt" },
+                    { type: "photo", name: "故居照片", icon: "fas fa-image" },
+                    { type: "genealogy", name: "家族族谱", icon: "fas fa-sitemap" }
+                ]
+            },
+            {
+                id: 2,
+                year: 1913,
+                date: "1913年",
+                title: "考入圣约翰大学",
+                location: "上海",
+                coords: [31.2304, 121.4737],
+                type: "education",
+                region: "shanghai",
+                description: "考入上海圣约翰大学文科，开始接受现代西方教育，开阔了国际视野。",
+                image: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=400&h=300&fit=crop",
+                resources: [
+                    { type: "document", name: "入学记录", icon: "fas fa-graduation-cap" },
+                    { type: "photo", name: "校园照片", icon: "fas fa-university" }
+                ]
+            },
+            {
+                id: 3,
+                year: 1921,
+                date: "1921年",
+                title: "大学毕业",
+                location: "上海",
+                coords: [31.2304, 121.4737],
+                type: "education",
+                region: "shanghai",
+                description: "从圣约翰大学毕业，开始从事教育工作，同时进行新闻写作。",
+                image: "https://images.unsplash.com/photo-1523050854058-8df90110c9d1?w=400&h=300&fit=crop",
+                resources: [
+                    { type: "diploma", name: "毕业证书", icon: "fas fa-certificate" },
+                    { type: "article", name: "早期文章", icon: "fas fa-newspaper" }
+                ]
+            },
+            {
+                id: 4,
+                year: 1926,
+                date: "1926年10月",
+                title: "主编《生活》周刊",
+                location: "上海",
+                coords: [31.2304, 121.4737],
+                type: "career",
+                region: "shanghai",
+                description: "开始主编《生活》周刊，以'暗夜的明灯'自勉，开启了辉煌的新闻生涯。",
+                image: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&h=300&fit=crop",
+                resources: [
+                    { type: "magazine", name: "《生活》创刊号", icon: "fas fa-book-open" },
+                    { type: "editorial", name: "创刊词", icon: "fas fa-pen" },
+                    { type: "statistics", name: "发行数据", icon: "fas fa-chart-line" }
+                ]
+            },
+            {
+                id: 5,
+                year: 1930,
+                date: "1930年",
+                title: "流亡欧洲",
+                location: "英国伦敦",
+                coords: [51.5074, -0.1278],
+                type: "political",
+                region: "europe",
+                description: "因抗日言论被迫流亡欧洲，在英国、法国等地考察，写下《萍踪寄语》。",
+                image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&h=300&fit=crop",
+                resources: [
+                    { type: "book", name: "《萍踪寄语》", icon: "fas fa-book" },
+                    { type: "letter", name: "海外通信", icon: "fas fa-envelope" },
+                    { type: "photo", name: "欧洲留影", icon: "fas fa-camera" }
+                ]
+            },
+            {
+                id: 6,
+                year: 1932,
+                date: "1932年",
+                title: "创办生活书店",
+                location: "上海",
+                coords: [31.2304, 121.4737],
+                type: "publication",
+                region: "shanghai",
+                description: "回国后创办生活书店，致力于出版进步书籍，传播先进文化。",
+                image: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=300&fit=crop",
+                resources: [
+                    { type: "business", name: "营业执照", icon: "fas fa-store" },
+                    { type: "catalog", name: "出版目录", icon: "fas fa-list" },
+                    { type: "photo", name: "书店照片", icon: "fas fa-building" }
+                ]
+            },
+            {
+                id: 7,
+                year: 1936,
+                date: "1936年11月23日",
+                title: "七君子事件",
+                location: "上海",
+                coords: [31.2304, 121.4737],
+                type: "political",
+                region: "shanghai",
+                description: "与沈钧儒等六位爱国人士因积极参与抗日救亡运动而被国民党当局逮捕。",
+                image: "https://images.unsplash.com/photo-1589578228447-e1a4e481c6c8?w=400&h=300&fit=crop",
+                resources: [
+                    { type: "news", name: "新闻报道", icon: "fas fa-newspaper" },
+                    { type: "letter", name: "狱中书信", icon: "fas fa-envelope-open" },
+                    { type: "support", name: "社会声援", icon: "fas fa-users" }
+                ]
+            },
+            {
+                id: 8,
+                year: 1944,
+                date: "1944年7月24日",
+                title: "在上海逝世",
+                location: "上海",
+                coords: [31.2304, 121.4737],
+                type: "personal",
+                region: "shanghai",
+                description: "因病在上海逝世，享年49岁。临终前表达了加入中国共产党的愿望。",
+                image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
+                resources: [
+                    { type: "will", name: "遗嘱", icon: "fas fa-scroll" },
+                    { type: "obituary", name: "讣告", icon: "fas fa-cross" },
+                    { type: "memorial", name: "纪念文章", icon: "fas fa-heart" }
+                ]
+            }
+        ];
+
+        let map;
+        let markers = [];
+        let currentEventId = null;
+
+        // Initialize map
+        function initMap() {
+            map = L.map('map').setView([31.2304, 121.4737], 5);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Add custom markers
+            addMarkersToMap();
+        }
+
+        // Add markers to map
+        function addMarkersToMap() {
+            historicalEvents.forEach(event => {
+                const markerColor = getMarkerColor(event.type);
+                
+                const marker = L.circleMarker(event.coords, {
+                    radius: 8,
+                    fillColor: markerColor,
+                    color: '#fff',
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                }).addTo(map);
+
+                marker.bindPopup(`
+                    <div style="text-align: center;">
+                        <strong>${event.title}</strong><br>
+                        <small>${event.date}</small><br>
+                        <small>${event.location}</small>
+                    </div>
+                `);
+
+                marker.on('click', () => {
+                    showEventDetail(event);
+                    highlightTimelineEvent(event.id);
+                });
+
+                markers.push({ marker, event });
+            });
+        }
+
+        // Get marker color based on event type
+        function getMarkerColor(type) {
+            const colors = {
+                birth: '#ff6b6b',
+                education: '#4ecdc4',
+                career: '#45b7d1',
+                publication: '#96ceb4',
+                political: '#feca57',
+                personal: '#ff9ff3'
+            };
+            return colors[type] || '#666';
+        }
+
+        // Initialize timeline
+        function initTimeline() {
+            const yearSlider = document.getElementById('yearSlider');
+            const currentYearSpan = document.getElementById('currentYear');
+            const timelineEvents = document.getElementById('timelineEvents');
+
+            // Update current year display
+            yearSlider.addEventListener('input', (e) => {
+                const year = parseInt(e.target.value);
+                currentYearSpan.textContent = year;
+                filterEventsByYear(year);
+            });
+
+            // Populate timeline events
+            updateTimelineEvents();
+        }
+
+        // Filter events by year
+        function filterEventsByYear(maxYear) {
+            const filteredEvents = historicalEvents.filter(event => event.year <= maxYear);
+            
+            // Update map markers
+            markers.forEach(({ marker, event }) => {
+                if (event.year <= maxYear) {
+                    marker.setStyle({ fillOpacity: 0.8, opacity: 1 });
+                } else {
+                    marker.setStyle({ fillOpacity: 0.2, opacity: 0.3 });
+                }
+            });
+
+            // Update timeline
+            updateTimelineEvents(filteredEvents);
+        }
+
+        // Update timeline events
+        function updateTimelineEvents(events = historicalEvents) {
+            const container = document.getElementById('timelineEvents');
+            container.innerHTML = '';
+
+            events.forEach(event => {
+                const eventElement = document.createElement('div');
+                eventElement.className = 'event-item';
+                eventElement.dataset.id = event.id;
+                
+                eventElement.innerHTML = `
+                    <div class="event-type type-${event.type}"></div>
+                    <div class="event-date">${event.date}</div>
+                    <div class="event-title">${event.title}</div>
+                    <div class="event-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        ${event.location}
+                    </div>
+                `;
+
+                eventElement.addEventListener('click', () => {
+                    showEventDetail(event);
+                    focusMapOnEvent(event);
+                    highlightTimelineEvent(event.id);
+                });
+
+                container.appendChild(eventElement);
+            });
+        }
+
+        // Show event detail
+        function showEventDetail(event) {
+            currentEventId = event.id;
+            const panel = document.getElementById('detailPanel');
+            const title = document.getElementById('detailTitle');
+            const content = document.getElementById('detailContent');
+
+            title.textContent = event.title;
+            
+            const resourcesHtml = event.resources.map(resource => `
+                <div class="resource-item">
+                    <i class="${resource.icon}"></i>
+                    <span>${resource.name}</span>
+                </div>
+            `).join('');
+
+            content.innerHTML = `
+                <img src="${event.image}" alt="${event.title}" class="detail-image">
+                <div class="detail-description">
+                    <strong>时间：</strong>${event.date}<br>
+                    <strong>地点：</strong>${event.location}<br><br>
+                    ${event.description}
+                </div>
+                <div class="detail-resources">
+                    <h4><i class="fas fa-archive"></i> 相关资源</h4>
+                    ${resourcesHtml}
+                </div>
+            `;
+
+            panel.classList.add('open');
+            updateMapOverlay(event);
+        }
+
+        // Close detail panel
+        function closeDetail() {
+            document.getElementById('detailPanel').classList.remove('open');
+            clearTimelineHighlight();
+        }
+
+        // Focus map on event
+        function focusMapOnEvent(event) {
+            map.setView(event.coords, 8);
+        }
+
+        // Highlight timeline event
+        function highlightTimelineEvent(eventId) {
+            // Clear previous highlights
+            clearTimelineHighlight();
+            
+            // Highlight current event
+            const eventElement = document.querySelector(`[data-id="${eventId}"]`);
+            if (eventElement) {
+                eventElement.classList.add('active');
+            }
+        }
+
+        // Clear timeline highlight
+        function clearTimelineHighlight() {
+            document.querySelectorAll('.event-item.active').forEach(el => {
+                el.classList.remove('active');
+            });
+        }
+
+        // Update map overlay
+        function updateMapOverlay(event) {
+            const overlay = document.querySelector('.map-overlay');
+            overlay.querySelector('.current-location').textContent = `当前选中：${event.location}`;
+            overlay.querySelector('.location-info').textContent = `${event.date}，${event.title}`;
+        }
+
+        // Filter functionality
+        function initFilters() {
+            const typeCheckboxes = document.querySelectorAll('[data-type]');
+            const regionCheckboxes = document.querySelectorAll('[data-region]');
+
+            typeCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', applyFilters);
+            });
+
+            regionCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', applyFilters);
+            });
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const checkedTypes = Array.from(document.querySelectorAll('[data-type]:checked')).map(cb => cb.dataset.type);
+            const checkedRegions = Array.from(document.querySelectorAll('[data-region]:checked')).map(cb => cb.dataset.region);
+
+            const filteredEvents = historicalEvents.filter(event => 
+                checkedTypes.includes(event.type) && checkedRegions.includes(event.region)
+            );
+
+            // Update markers
+            markers.forEach(({ marker, event }) => {
+                if (filteredEvents.includes(event)) {
+                    marker.setStyle({ fillOpacity: 0.8, opacity: 1 });
+                } else {
+                    marker.setStyle({ fillOpacity: 0.1, opacity: 0.2 });
+                }
+            });
+
+            // Update timeline
+            updateTimelineEvents(filteredEvents);
+        }
+
+        // Utility functions
+        function resetView() {
+            map.setView([31.2304, 121.4737], 5);
+            document.getElementById('yearSlider').value = 1895;
+            document.getElementById('currentYear').textContent = '1895';
+            filterEventsByYear(1895);
+            closeDetail();
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', () => {
+            initMap();
+            initTimeline();
+            initFilters();
+        });
+    </script>
+</body>
+</html>

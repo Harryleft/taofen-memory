@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>邹韬奋 | Minimalist Memorial</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --black: #000000;
+            --white: #ffffff;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-400: #ced4da;
+            --gray-500: #adb5bd;
+            --gray-600: #6c757d;
+            --gray-700: #495057;
+            --gray-800: #343a40;
+            --gray-900: #212529;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
+            font-weight: 300;
+            line-height: 1.8;
+            color: var(--gray-900);
+            background: var(--white);
+            overflow-x: hidden;
+        }
+
+        /* Typography Scale */
+        .text-xs { font-size: 0.75rem; }
+        .text-sm { font-size: 0.875rem; }
+        .text-base { font-size: 1rem; }
+        .text-lg { font-size: 1.125rem; }
+        .text-xl { font-size: 1.25rem; }
+        .text-2xl { font-size: 1.5rem; }
+        .text-3xl { font-size: 1.875rem; }
+        .text-4xl { font-size: 2.25rem; }
+        .text-5xl { font-size: 3rem; }
+        .text-6xl { font-size: 3.75rem; }
+        .text-7xl { font-size: 4.5rem; }
+        .text-8xl { font-size: 6rem; }
+        .text-9xl { font-size: 8rem; }
+
+        /* Layout Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Header - Minimal & Clean */
+        .header {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: linear-gradient(135deg, var(--white) 0%, var(--gray-100) 100%);
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 800px;
+        }
+
+        .hero-name {
+            font-size: clamp(4rem, 12vw, 8rem);
+            font-weight: 100;
+            letter-spacing: -0.02em;
+            color: var(--black);
+            margin-bottom: 2rem;
+            line-height: 0.9;
+        }
+
+        .hero-title {
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            font-weight: 200;
+            color: var(--gray-600);
+            margin-bottom: 3rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .hero-years {
+            font-size: clamp(2rem, 6vw, 3rem);
+            font-weight: 100;
+            color: var(--gray-800);
+            margin-bottom: 4rem;
+            letter-spacing: 0.05em;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            color: var(--gray-500);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .scroll-indicator:hover {
+            color: var(--black);
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 4rem;
+            background: linear-gradient(to bottom, var(--gray-500), transparent);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scaleY(1); opacity: 1; }
+            50% { transform: scaleY(0.5); opacity: 0.5; }
+        }
+
+        /* Navigation - Floating */
+        .nav {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--gray-200);
+            border-radius: 50px;
+            padding: 0.75rem 1.5rem;
+            text-decoration: none;
+            color: var(--gray-700);
+            font-size: 0.875rem;
+            font-weight: 400;
+            transition: all 0.3s ease;
+            text-align: center;
+            min-width: 100px;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: var(--black);
+            color: var(--white);
+            border-color: var(--black);
+        }
+
+        /* Main Content Sections */
+        .section {
+            min-height: 100vh;
+            padding: 8rem 0;
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .section-header {
+            margin-bottom: 6rem;
+            text-align: center;
+        }
+
+        .section-number {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-500);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-weight: 100;
+            color: var(--black);
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+
+        /* Biography Section */
+        .bio-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 8rem;
+            align-items: start;
+        }
+
+        .bio-image-container {
+            position: sticky;
+            top: 8rem;
+        }
+
+        .bio-image {
+            width: 100%;
+            height: 600px;
+            object-fit: cover;
+            filter: grayscale(100%);
+            transition: filter 0.3s ease;
+        }
+
+        .bio-image:hover {
+            filter: grayscale(0%);
+        }
+
+        .bio-content {
+            font-size: 1.125rem;
+            line-height: 2;
+            color: var(--gray-700);
+        }
+
+        .bio-content p {
+            margin-bottom: 2rem;
+        }
+
+        .quote {
+            font-size: 1.5rem;
+            font-weight: 200;
+            font-style: italic;
+            color: var(--black);
+            text-align: center;
+            padding: 4rem 0;
+            border-top: 1px solid var(--gray-200);
+            border-bottom: 1px solid var(--gray-200);
+            margin: 4rem 0;
+            position: relative;
+        }
+
+        .quote::before,
+        .quote::after {
+            content: '"';
+            font-size: 3rem;
+            color: var(--gray-300);
+            position: absolute;
+            font-weight: 100;
+        }
+
+        .quote::before {
+            top: 2rem;
+            left: 0;
+        }
+
+        .quote::after {
+            bottom: 2rem;
+            right: 0;
+        }
+
+        /* Timeline Section */
+        .timeline-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .timeline-item {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 4rem;
+            margin-bottom: 6rem;
+            padding-bottom: 6rem;
+            border-bottom: 1px solid var(--gray-200);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item:hover {
+            transform: translateX(1rem);
+        }
+
+        .timeline-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .timeline-year {
+            font-size: 3rem;
+            font-weight: 100;
+            color: var(--black);
+            line-height: 1;
+            position: sticky;
+            top: 8rem;
+        }
+
+        .timeline-content {
+            padding-top: 0.5rem;
+        }
+
+        .timeline-title {
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: var(--black);
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .timeline-description {
+            font-size: 1rem;
+            color: var(--gray-600);
+            line-height: 1.8;
+        }
+
+        /* Event Detail Section */
+        .event-detail {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .event-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .event-title {
+            font-size: clamp(2rem, 6vw, 3rem);
+            font-weight: 200;
+            color: var(--black);
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .event-date {
+            font-size: 1rem;
+            color: var(--gray-500);
+            font-weight: 300;
+            letter-spacing: 0.1em;
+        }
+
+        .event-content {
+            font-size: 1.125rem;
+            line-height: 2;
+            color: var(--gray-700);
+        }
+
+        .event-content p {
+            margin-bottom: 2rem;
+        }
+
+        .event-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            margin: 3rem 0;
+            filter: grayscale(100%);
+            transition: filter 0.3s ease;
+        }
+
+        .event-image:hover {
+            filter: grayscale(0%);
+        }
+
+        .event-links {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin-top: 4rem;
+            flex-wrap: wrap;
+        }
+
+        .event-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 50px;
+            text-decoration: none;
+            color: var(--gray-700);
+            font-weight: 400;
+            transition: all 0.3s ease;
+        }
+
+        .event-link:hover {
+            background: var(--black);
+            color: var(--white);
+            border-color: var(--black);
+        }
+
+        /* Geometric Decorations */
+        .geometric-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.03;
+        }
+
+        .geometric-shape {
+            position: absolute;
+            border: 1px solid var(--black);
+        }
+
+        .shape-1 {
+            width: 200px;
+            height: 200px;
+            top: 20%;
+            left: 10%;
+            border-radius: 50%;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .shape-2 {
+            width: 100px;
+            height: 100px;
+            top: 60%;
+            right: 15%;
+            animation: float 25s infinite ease-in-out reverse;
+        }
+
+        .shape-3 {
+            width: 150px;
+            height: 150px;
+            bottom: 20%;
+            left: 20%;
+            transform: rotate(45deg);
+            animation: float 30s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        /* Loading Animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-text {
+            font-size: 2rem;
+            font-weight: 100;
+            color: var(--black);
+            letter-spacing: 0.2em;
+            animation: fade 2s infinite ease-in-out;
+        }
+
+        @keyframes fade {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            .nav {
+                top: 1rem;
+                right: 1rem;
+                flex-direction: row;
+                gap: 0.25rem;
+            }
+
+            .nav-item {
+                padding: 0.5rem 1rem;
+                font-size: 0.75rem;
+                min-width: auto;
+            }
+
+            .section {
+                padding: 4rem 0;
+            }
+
+            .bio-grid {
+                grid-template-columns: 1fr;
+                gap: 4rem;
+            }
+
+            .bio-image-container {
+                position: static;
+            }
+
+            .timeline-item {
+                grid-template-columns: 100px 1fr;
+                gap: 2rem;
+                margin-bottom: 4rem;
+                padding-bottom: 4rem;
+            }
+
+            .timeline-year {
+                font-size: 2rem;
+                position: static;
+            }
+
+            .quote {
+                font-size: 1.25rem;
+                padding: 2rem 0;
+            }
+
+            .event-links {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .nav,
+            .scroll-indicator,
+            .geometric-bg {
+                display: none;
+            }
+
+            .section {
+                display: block !important;
+                page-break-before: always;
+            }
+
+            .hero-name {
+                font-size: 4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-overlay" id="loading">
+        <div class="loading-text">邹韬奋</div>
+    </div>
+
+    <!-- Geometric Background -->
+    <div class="geometric-bg">
+        <div class="geometric-shape shape-1"></div>
+        <div class="geometric-shape shape-2"></div>
+        <div class="geometric-shape shape-3"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <a href="#" class="nav-item active" onclick="showSection('home')">首页</a>
+        <a href="#" class="nav-item" onclick="showSection('timeline')">生平</a>
+        <a href="#" class="nav-item" onclick="showSection('events')">详情</a>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="header">
+        <div class="hero-content">
+            <h1 class="hero-name">邹韬奋</h1>
+            <p class="hero-title">Patriot · Journalist · Publisher</p>
+            <p class="hero-years">1895 — 1944</p>
+        </div>
+        <div class="scroll-indicator" onclick="showSection('home')">
+            <i class="fas fa-mouse text-sm"></i>
+            <div class="scroll-line"></div>
+            <span class="text-xs">SCROLL</span>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Home Section -->
+        <section id="home" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-number">01</div>
+                    <h2 class="section-title">Biography</h2>
+                </div>
+
+                <div class="bio-grid">
+                    <div class="bio-image-container">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=800&fit=crop&crop=face" alt="邹韬奋先生" class="bio-image">
+                    </div>
+
+                    <div class="bio-content">
+                        <p>邹韬奋（1895年11月5日－1944年7月24日），原名邹恩润，江西余江人，中国著名爱国者、政治活动家、新闻记者和出版家。</p>
+
+                        <p>他是中国现代新闻出版事业的重要开拓者，曾主编《生活》周刊，创办生活书店，为传播进步思想、推动社会进步做出了卓越贡献。在他的主持下，《生活》周刊从一个默默无闻的小刊物发展成为发行量达15万份的全国性大刊。</p>
+
+                        <p>1936年，邹韬奋与沈钧儒、李公朴、章乃器、王造时、史良、沙千里等人被国民党当局逮捕，史称"七君子事件"。他的一生都在为国家的独立、民族的解放而奋斗。</p>
+
+                        <div class="quote">
+                            我生为中国人，死为中国魂，此志不渝。
+                        </div>
+
+                        <p>1944年7月24日，邹韬奋在上海逝世。临终前，他在遗嘱中表达了要求加入中国共产党的愿望，体现了他对共产主义理想的坚定信念。毛泽东称他为"热忱的爱国者，真诚的民主主义者"。</p>
+
+                        <p>他的新闻理想、爱国精神和出版事业为后世树立了光辉典范，他的思想和精神财富将永远激励着中国人民前进。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Timeline Section -->
+        <section id="timeline" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-number">02</div>
+                    <h2 class="section-title">Timeline</h2>
+                </div>
+
+                <div class="timeline-container">
+                    <div class="timeline-item" onclick="showEventDetail('1895')">
+                        <div class="timeline-year">1895</div>
+                        <div class="timeline-content">
+                            <h3 class="timeline-title">出生于江西余江</h3>
+                            <p class="timeline-description">11月5日，邹韬奋出生于江西省余江县一个书香门第，原名邹恩润。从小接受良好的传统文化教育，培养了对知识的渴望和对正义的追求。</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item" onclick="showEventDetail('1921')">
+                        <div class="timeline-year">1921</div>
+                        <div class="timeline-content">
+                            <h3 class="timeline-title">毕业于圣约翰大学</h3>
+                            <p class="timeline-description">从上海圣约翰大学文科毕业，接受了现代西方教育，开阔了国际视野。开始从事教育工作，同时进行新闻写作，为日后的成就打下坚实基础。</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item" onclick="showEventDetail('1926')">
+                        <div class="timeline-year">1926</div>
+                        <div class="timeline-content">
+                            <h3 class="timeline-title">主编《生活》周刊</h3>
+                            <p class="timeline-description">开始主编《生活》周刊，以"暗夜的明灯"自勉。在他的主持下，发行量从2000份增至15万份，成为当时最有影响力的进步刊物。</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item" onclick="showEventDetail('1932')">
+                        <div class="timeline-year">1932</div>
+                        <div class="timeline-content">
+                            <h3 class="timeline-title">创办生活书店</h3>
+                            <p class="timeline-description">创办生活书店，致力于出版进步书籍，传播先进文化。书店在全国各地设立分店，成为当时最重要的进步出版机构之一。</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item" onclick="showEventDetail('1936')">
+                        <div class="timeline-year">1936</div>
+                        <div class="timeline-content">
+                            <h3 class="timeline-title">"七君子事件"</h3>
+                            <p class="timeline-description">与沈钧儒、李公朴等六位爱国人士因积极参与抗日救亡运动而被国民党当局逮捕，史称"七君子事件"，体现了知识分子的责任担当。</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item" onclick="showEventDetail('1944')">
+                        <div class="timeline-year">1944</div>
+                        <div class="timeline-content">
+                            <h3 class="timeline-title">在上海逝世</h3>
+                            <p class="timeline-description">7月24日在上海逝世，享年49岁。临终前表达了加入中国共产党的愿望。毛泽东称他为"热忱的爱国者，真诚的民主主义者"。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Event Details Section -->
+        <section id="events" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-number">03</div>
+                    <h2 class="section-title">Details</h2>
+                </div>
+
+                <div class="event-detail" id="event-content">
+                    <div style="text-align: center; color: var(--gray-500); font-size: 1.125rem; margin-top: 4rem;">
+                        点击时间线中的任一事件查看详细信息
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Remove loading screen
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                document.getElementById('loading').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loading').style.display = 'none';
+                }, 500);
+            }, 1500);
+        });
+
+        // Navigation functionality
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+            
+            // Remove active class from all nav items
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            // Show selected section
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+            
+            // Add active class to clicked nav item
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+        }
+
+        // Event details data
+        const eventDetails = {
+            '1895': {
+                title: '书香门第的诞生',
+                date: '1895年11月5日',
+                content: `
+                    <p>邹韬奋于1895年11月5日出生在江西省余江县的一个书香门第。他的父亲邹国珍是一位开明的知识分子，母亲徐氏贤淑持家。这样的家庭环境为他日后的成长奠定了坚实的基础。</p>
+                    
+                    <img src="https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=800&h=400&fit=crop" alt="江西余江风光" class="event-image">
+                    
+                    <p>从小，邹韬奋就在这样充满书香气息的环境中成长。父亲不仅让他熟读四书五经，还接触了许多新学著作。这种中西结合的教育方式，培养了他开阔的视野和独立的思考能力。</p>
+                    
+                    <p>童年的邹韬奋表现出了对知识的强烈渴望。邻里乡亲都记得，这个孩子总是手不释卷，即使在田间地头玩耍，也要带着书本。这种好学的精神和聪慧的天资，为他日后成为杰出的新闻工作者和爱国者奠定了基础。</p>
+                `,
+                links: [
+                    { text: '江西余江县志', url: '#', icon: 'fas fa-book' },
+                    { text: '家族族谱', url: '#', icon: 'fas fa-family' }
+                ]
+            },
+            '1926': {
+                title: '《生活》周刊的辉煌时代',
+                date: '1926年10月',
+                content: `
+                    <p>1926年10月，31岁的邹韬奋开始主编《生活》周刊。当时，这只是一本默默无闻的小刊物，发行量仅有2000份左右。但在邹韬奋的精心经营下，很快就展现出了强大的生命力。</p>
+                    
+                    <img src="https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=800&h=400&fit=crop" alt="印刷车间" class="event-image">
+                    
+                    <p>邹韬奋为《生活》周刊确立了"为生活而服务"的办刊宗旨。他认为，新闻工作者的天职就是为人民服务，为真理服务。在他的主持下，《生活》周刊始终关注民生疾苦，敢于直面社会问题，用通俗易懂的语言传播进步思想。</p>
+                    
+                    <p>短短几年时间内，《生活》周刊的发行量就突破了15万份，成为全国最有影响力的刊物之一。它不仅在知识分子中享有崇高声誉，也深受普通民众的喜爱，真正实现了雅俗共赏。</p>
+                    
+                    <p>《生活》周刊的成功，标志着邹韬奋新闻事业的全面起步，也为中国进步新闻事业树立了光辉典范。</p>
+                `,
+                links: [
+                    { text: '《生活》周刊合集', url: '#', icon: 'fas fa-newspaper' },
+                    { text: '发行数据统计', url: '#', icon: 'fas fa-chart-line' },
+                    { text: '读者反馈集', url: '#', icon: 'fas fa-comments' }
+                ]
+            },
+            '1936': {
+                title: '七君子的慷慨赴难',
+                date: '1936年11月23日',
+                content: `
+                    <p>1936年11月23日深夜，震惊全国的"七君子事件"发生。邹韬奋与沈钧儒、李公朴、章乃器、王造时、史良、沙千里等六位著名爱国人士，因积极参与抗日救亡运动而被国民党当局逮捕。</p>
+                    
+                    <img src="https://images.unsplash.com/photo-1589578228447-e1a4e481c6c8?w=800&h=400&fit=crop" alt="监狱" class="event-image">
+                    
+                    <p>当局以"危害民国"的罪名，同时逮捕了这七位在社会上享有崇高声誉的知识分子。邹韬奋被捕时正在家中写作，面对前来逮捕的军警，他神情镇定，慷慨就义。临行前，他对家人说："为国家民族而坐牢，是我们知识分子应尽的责任。"</p>
+                    
+                    <p>七君子事件引起了全国人民的强烈抗议。各界人士纷纷声援，要求当局立即释放七君子。这一事件充分展现了中国知识分子在民族危亡关头的责任担当和不屈精神。</p>
+                    
+                    <p>在巨大的社会压力下，国民党当局最终被迫释放了七君子。但这一事件也更加坚定了邹韬奋等人为民族解放而奋斗的决心。</p>
+                `,
+                links: [
+                    { text: '七君子事件详情', url: '#', icon: 'fas fa-gavel' },
+                    { text: '社会各界声援', url: '#', icon: 'fas fa-bullhorn' },
+                    { text: '狱中书信集', url: '#', icon: 'fas fa-envelope' }
+                ]
+            }
+        };
+
+        // Show event detail
+        function showEventDetail(eventId) {
+            showSection('events');
+            const eventContent = document.getElementById('event-content');
+            const detail = eventDetails[eventId];
+            
+            if (detail) {
+                const linksHtml = detail.links.map(link => 
+                    `<a href="${link.url}" class="event-link"><i class="${link.icon}"></i>${link.text}</a>`
+                ).join('');
+                
+                eventContent.innerHTML = `
+                    <div class="event-header">
+                        <h3 class="event-title">${detail.title}</h3>
+                        <p class="event-date">${detail.date}</p>
+                    </div>
+                    <div class="event-content">
+                        ${detail.content}
+                        <div class="event-links">
+                            ${linksHtml}
+                        </div>
+                    </div>
+                `;
+            } else {
+                eventContent.innerHTML = `
+                    <div class="event-header">
+                        <h3 class="event-title">详细信息整理中</h3>
+                        <p class="event-date">敬请期待</p>
+                    </div>
+                    <div class="event-content">
+                        <p>该事件的详细信息正在整理中，请关注后续更新...</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show home section by default
+            showSection('home');
+            
+            // Smooth scrolling for internal links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
