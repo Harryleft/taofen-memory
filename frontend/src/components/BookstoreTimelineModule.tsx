@@ -89,20 +89,21 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
     // Convert data to vis-timeline format
     const items = new DataSet(convertToVisTimelineItems(bookstoreEvents));
 
-    // Timeline configuration - 简洁的图片时间线
+    // Timeline configuration - 强制堆叠的图片时间线
     const options = {
-      height: '300px',
+      height: '400px',
       start: new Date(1931, 0, 1),
       end: new Date(1937, 0, 1),
       orientation: 'bottom',
       stack: true,
+      stackSubgroups: true,
       showCurrentTime: false,
       zoomMin: 1000 * 60 * 60 * 24 * 365, // 1 year
       zoomMax: 1000 * 60 * 60 * 24 * 365 * 20, // 20 years
       margin: {
         item: {
-          horizontal: 20,
-          vertical: 10
+          horizontal: 5, // 减少水平间距
+          vertical: 5    // 减少垂直间距
         },
         axis: 50
       },
@@ -142,7 +143,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
         <div 
           ref={timelineRef} 
           className="w-full vis-timeline-container"
-          style={{ height: '300px', border: '1px solid #FCD34D', borderRadius: '8px', backgroundColor: '#FFFEF7' }}
+          style={{ height: '400px', border: '1px solid #FCD34D', borderRadius: '8px', backgroundColor: '#FFFEF7' }}
         />
 
 

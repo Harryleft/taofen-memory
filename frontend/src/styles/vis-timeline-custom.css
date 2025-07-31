@@ -11,10 +11,12 @@
   text-align: center;
 }
 
-/* 图片缩略图样式 - 自适应设计 */
+/* 图片缩略图样式 - 强制尺寸控制 */
 .timeline-thumbnail {
-  width: 120px;
-  height: 90px;
+  width: 120px !important;
+  height: 90px !important;
+  max-width: 120px !important;
+  max-height: 90px !important;
   object-fit: cover;
   border-radius: 8px;
   border: 2px solid #F59E0B;
@@ -42,11 +44,14 @@
   overflow: hidden;
 }
 
-/* 时间线项目容器 */
+/* 时间线项目容器 - 强制紧凑布局 */
 .vis-item.timeline-image-item {
   background: transparent !important;
   border: none !important;
-  padding: 10px;
+  padding: 5px !important;
+  margin: 2px !important;
+  width: 130px !important; /* 略大于图片宽度 */
+  height: auto !important;
 }
 
 /* 隐藏组相关元素 */
