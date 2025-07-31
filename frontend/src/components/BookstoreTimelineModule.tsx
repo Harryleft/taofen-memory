@@ -12,8 +12,7 @@ interface MountainDataPoint {
 
 // 使用真实图片数据 - 3年测试时间范围 (1934-1936)
 const generateMountainData = (): MountainDataPoint[] => {
-  const data: MountainDataPoint[] = [];
-  
+ 
   // 真实图片文件名数组 - 从public/images/books目录
   const realImages = [
     'book_23416_-4998639186942255748.jpg', 'book_23417_-3852244789965758496.jpg', 'book_23418_4462283b97413ab9.jpg',
@@ -43,20 +42,13 @@ const generateMountainData = (): MountainDataPoint[] => {
     '社会科学', '自然科学', '医学常识', '农业技术', '工业发展', '商业指南'
   ];
 
-  // 3年测试数据分布 (1934-1936)
-  const yearlyDistribution = {
-    1934: 15, // 发展期
-    1935: 25, // 高峰期
-    1936: 12  // 调整期
-  };
-
+  const yearlyDistribution = { 1934: 15, 1935: 25, 1936: 12 };
+  const data: MountainDataPoint[] = [];
   let id = 1;
   let imageIndex = 0;
-  
-  // 为每年生成相应数量的数据点
+
   Object.entries(yearlyDistribution).forEach(([yearStr, count]) => {
     const year = parseInt(yearStr);
-    
     for (let i = 0; i < count; i++) {
       data.push({
         id: id++,
@@ -68,15 +60,9 @@ const generateMountainData = (): MountainDataPoint[] => {
       imageIndex++;
     }
   });
-
-  console.log(`📊 生成真实图片数据: ${data.length}条记录 (1934-1936)`);
-  console.log('📈 年度分布:', Object.entries(yearlyDistribution).map(([year, count]) => 
-    `${year}年: ${count}本`).join(', '));
-
   return data;
 };
 
-// 生成山峦数据
 const mountainData: MountainDataPoint[] = generateMountainData();
 
 interface BookstoreTimelineModuleProps {
@@ -85,136 +71,142 @@ interface BookstoreTimelineModuleProps {
 
 export default function BookstoreTimelineModule({ className = '' }: BookstoreTimelineModuleProps) {
   const svgRef = useRef<SVGSVGElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!svgRef.current) return;
 
-    // 清除之前的内容
     d3.select(svgRef.current).selectAll("*").remove();
 
-    // 设置画布尺寸和边距
     const containerWidth = svgRef.current.clientWidth || 1200;
     const containerHeight = 600;
     const margin = { top: 40, right: 40, bottom: 60, left: 60 };
     const width = containerWidth - margin.left - margin.right;
     const height = containerHeight - margin.top - margin.bottom;
 
-    // 创建SVG
     const svg = d3.select(svgRef.current)
       .attr('width', containerWidth)
       .attr('height', containerHeight);
 
-    // 创建固定的背景层（X轴等不缩放元素）
-    const fixedLayer = svg.append('g')
-      .attr('class', 'fixed-layer')
-      .attr('transform', `translate(${margin.left},${margin.top})`);
-
-    // 创建可缩放的内容层（图片）
-    const zoomableLayer = svg.append('g')
-      .attr('class', 'zoomable-layer')
-      .attr('transform', `translate(${margin.left},${margin.top})`);
-
-    // 处理数据：按年份分组
+    // ✅ **修改1: 修正D3图层结构和缩放目标**
+    // 创建一个总的上下文（Context）图层，用于应用边距
+    // 所有的可视化元素（山峦、坐标轴）都在这个图层里
+    // 我们将对这个`context`图层进行缩放和平移
+    // 分离图层：imageContext(可缩放) + xAxisGroup(固定)
+    const rootG = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+    const imageContext = rootG.append('g').attr('class', 'image-context');
+    const xAxisGroup = rootG.append('g').attr('class', 'x-axis-group');
+    
+    // 按年份对数据进行分组
     const dataByYear = d3.group(mountainData, d => d.year);
     const years = Array.from(dataByYear.keys()).sort();
 
-    // 设置比例尺 - 3年测试范围
-    const xScale = d3.scaleLinear()
-      .domain([1934, 1936])
-      .range([0, width]);
+    // ✅ **修改2: 使用scaleBand，它更适合离散的年份数据**
+    // `padding(0.2)`会在山峰之间留出一些空隙，形成山谷
+    const xScale = d3.scaleBand()
+      .domain(years.map(String))
+      .range([0, width])
+      .padding(0.2);
 
-    const yearWidth = width / (1936 - 1934 + 1) * 0.95; // 增加每年可用宽度
-    const imageBaseSize = 45; // 稍微增大图片尺寸
-    const imageGap = 1; // 减少图片间隔，更紧密
+    const imageBaseSize = 40; // 图片基础尺寸
+    const imageGap = 2; // 堆叠图片之间的缝隙
 
-    // 绘制真实图片山峦
-    years.forEach(year => {
-      const yearData = dataByYear.get(year) || [];
-      const yearX = xScale(year);
-      
-      // 计算图片排列：基于可用宽度最大化利用空间
-      const maxImagesPerRow = Math.floor(yearWidth / (imageBaseSize + imageGap));
-      const imagesPerRow = Math.min(maxImagesPerRow, Math.ceil(Math.sqrt(yearData.length * 1.5))); // 稍微偏向垂直
-      const totalRows = Math.ceil(yearData.length / imagesPerRow);
-
-      // 居中排列，充分利用年份区域宽度
-      const actualStackWidth = imagesPerRow * (imageBaseSize + imageGap) - imageGap;
-      const startX = yearX - actualStackWidth / 2;
-
-      // 为每年的数据创建真实图片堆叠
-      yearData.forEach((d, index) => {
-        const row = Math.floor(index / imagesPerRow);
-        const col = index % imagesPerRow;
-        
-        const x = startX + col * (imageBaseSize + imageGap);
-        const y = height - imageBaseSize - (row * (imageBaseSize + imageGap));
-
-        // 创建图片元素
-        zoomableLayer.append('image')
-          .attr('x', x)
-          .attr('y', y)
-          .attr('width', imageBaseSize)
-          .attr('height', imageBaseSize)
-          .attr('href', d.imagePath)
-          .attr('preserveAspectRatio', 'xMidYMid slice') // 保持比例并裁剪
-          .style('opacity', 0.9)
-          .style('cursor', 'pointer')
-          .on('mouseover', function() {
-            d3.select(this).style('opacity', 1);
-          })
-          .on('mouseout', function() {
-            d3.select(this).style('opacity', 0.9);
-          });
-      });
-
-      // 移除数字标签 - 简化视觉效果
-    });
-
-    // 在固定层添加X轴 - 不会被缩放
+    // 绘制坐标轴
     const xAxis = d3.axisBottom(xScale)
-      .tickFormat(d => (d as number).toString() + '年')
-      .tickValues([1934, 1935, 1936]);
+        .tickFormat(d => d + '年');
 
-    fixedLayer.append('g')
+    xAxisGroup.append('g')
+      .attr('class', 'x-axis')
       .attr('transform', `translate(0,${height})`)
       .call(xAxis)
       .selectAll('text')
       .style('font-size', '14px')
-      .style('fill', '#666')
-      .style('font-weight', 'bold')
-      .style('text-anchor', 'middle');
-
-    // 添加年份分割线 - 更subtle的视觉引导
+      .style('fill', '#666');
+    
+    // ✅ **修改3: 实现“金字塔”堆叠布局算法，形成山峰**
     years.forEach(year => {
-      const yearX = xScale(year);
-      fixedLayer.append('line')
-        .attr('x1', yearX)
-        .attr('y1', height - 20) // 只在底部显示短线
-        .attr('x2', yearX)
-        .attr('y2', height)
-        .attr('stroke', '#bbb')
-        .attr('stroke-width', 2)
-        .style('opacity', 0.6);
-    });
+      const yearData = dataByYear.get(year) || [];
+      const yearX = xScale(String(year))!; // scaleBand的中心点
+      const yearBandwidth = xScale.bandwidth(); // 当前年份可用的总宽度
+      
+      let placedCount = 0;
+      let row = 0;
+      // 从下往上堆叠
+      while (placedCount < yearData.length) {
+        // 动态计算当前行能放多少图片
+        const maxImagesInRow = Math.floor(yearBandwidth / (imageBaseSize + imageGap));
+        const imagesInThisRow = Math.min(yearData.length - placedCount, maxImagesInRow);
+        
+        // 计算当前行的总宽度，并使其在年份的Bandwidth内居中
+        const rowWidth = imagesInThisRow * (imageBaseSize + imageGap) - imageGap;
+        const startX = yearX + (yearBandwidth - rowWidth) / 2;
+        
+        // 获取当前行需要放置的数据
+        const rowData = yearData.slice(placedCount, placedCount + imagesInThisRow);
 
-    // 添加优化的缩放和平移功能
-    const zoom = d3.zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.5, 8]) // 恢复更宽的缩放范围
-      .on('zoom', (event) => {
-        // 只对可缩放层应用变换，固定层保持不变
-        zoomableLayer.attr('transform', 
-          `translate(${margin.left + event.transform.x},${margin.top + event.transform.y}) scale(${event.transform.k})`
-        );
+        rowData.forEach((d, index) => {
+                     imageContext.append('image')
+            .datum(d) // 绑定完整数据到元素上
+            .attr('x', startX + index * (imageBaseSize + imageGap))
+            .attr('y', height - (row + 1) * (imageBaseSize + imageGap))
+            .attr('width', imageBaseSize)
+            .attr('height', imageBaseSize)
+            .attr('href', d.imagePath)
+            .attr('preserveAspectRatio', 'xMidYMid slice')
+            .attr('class', 'book-image') // 添加class方便统一样式
+            .style('cursor', 'pointer');
+        });
+        
+        placedCount += imagesInThisRow;
+        row++;
+      }
+    });
+    
+    // ✅ **修改4: 增加工具提示（Tooltip）和交互效果**
+    const tooltip = d3.select(tooltipRef.current);
+    
+    context.selectAll('.book-image')
+      .on('mouseover', function(event, d: any) {
+        d3.select(this)
+          .transition().duration(150)
+          .attr('transform', `scale(1.1)`)
+          .style('outline', '2px solid #fbbF24'); // 高亮边框
+        
+        tooltip
+          .style('opacity', 1)
+          .html(`<strong>${d.title}</strong><br/>${d.year}年`)
+          .style('left', `${event.pageX + 15}px`)
+          .style('top', `${event.pageY}px`);
+      })
+      .on('mouseout', function() {
+        d3.select(this)
+          .transition().duration(150)
+          .attr('transform', 'scale(1)')
+          .style('outline', 'none');
+          
+        tooltip.style('opacity', 0);
       });
 
-    // 应用缩放行为到SVG
+    // ✅ **修改5: 修正缩放和平移功能**
+    const zoom = d3.zoom<SVGSVGElement, unknown>()
+      .scaleExtent([0.5, 8])
+      .translateExtent([[0, 0], [width, height]]) // 限制平移范围
+      .on('zoom', (event) => {
+        const newXScale = event.transform.rescaleX(xScale);
+        // 只缩放/平移图片层
+        imageContext.attr('transform', `translate(${event.transform.x},0) scale(${event.transform.k})`);
+        // 更新坐标轴刻度
+        xAxisGroup.selectAll('g.x-axis').call(xAxis.scale(newXScale));
+      });
+
+    // 将缩放行为应用到SVG上，并设置初始位置和缩放
     svg.call(zoom)
-      .on('dblclick.zoom', null); // 禁用双击缩放，保持其他交互
+       .call(zoom.transform, d3.zoomIdentity.translate(margin.left, margin.top));
 
   }, []);
 
   return (
-    <section className={`py-20 bg-white ${className}`}>
+    <section className={`relative py-20 bg-white ${className}`}>
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="text-5xl font-bold text-charcoal mb-6 font-serif">远读山峦时间轴</h2>
@@ -223,33 +215,18 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
           </p>
         </div>
 
-        {/* D3 远读山峦可视化 */}
-        <div className="w-full border border-amber-200 rounded-lg bg-amber-50 p-4">
+        <div className="w-full border border-amber-200 rounded-lg bg-amber-50 p-4 relative">
           <svg
             ref={svgRef}
             className="w-full"
             style={{ minHeight: '600px' }}
           />
-        </div>
-
-        {/* Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-16">
-          <div className="text-center p-6 bg-cream rounded-lg">
-            <div className="text-3xl font-bold text-gold mb-2">52</div>
-            <div className="text-charcoal/70">真实封面</div>
-          </div>
-          <div className="text-center p-6 bg-cream rounded-lg">
-            <div className="text-3xl font-bold text-gold mb-2">3</div>
-            <div className="text-charcoal/70">测试年份</div>
-          </div>
-          <div className="text-center p-6 bg-cream rounded-lg">
-            <div className="text-3xl font-bold text-gold mb-2">紧密布局</div>
-            <div className="text-charcoal/70">最大化利用</div>
-          </div>
-          <div className="text-center p-6 bg-cream rounded-lg">
-            <div className="text-3xl font-bold text-gold mb-2">自由交互</div>
-            <div className="text-charcoal/70">缩放平移</div>
-          </div>
+          {/* 工具提示 DIV */}
+          <div
+            ref={tooltipRef}
+            className="absolute bg-slate-800 text-white text-sm rounded-md px-3 py-2 pointer-events-none transition-opacity duration-200"
+            style={{ opacity: 0 }}
+          />
         </div>
       </div>
     </section>
