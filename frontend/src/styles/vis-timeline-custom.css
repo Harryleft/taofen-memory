@@ -11,12 +11,12 @@
   text-align: center;
 }
 
-/* 图片缩略图样式 - 强制尺寸控制 */
+/* 图片缩略图样式 - 山峦式随机高度 */
 .timeline-thumbnail {
   width: 120px !important;
-  height: 90px !important;
+  min-height: 80px !important;
+  max-height: 160px !important;
   max-width: 120px !important;
-  max-height: 90px !important;
   object-fit: cover;
   border-radius: 8px;
   border: 2px solid #F59E0B;
@@ -25,6 +25,13 @@
   cursor: pointer;
   display: block;
 }
+
+/* 创造山峦效果 - 不同高度的随机分布 */
+.timeline-thumbnail:nth-child(3n+1) { height: 100px !important; }
+.timeline-thumbnail:nth-child(3n+2) { height: 140px !important; }
+.timeline-thumbnail:nth-child(3n+3) { height: 120px !important; }
+.timeline-thumbnail:nth-child(5n+1) { height: 160px !important; }
+.timeline-thumbnail:nth-child(7n+1) { height: 85px !important; }
 
 .timeline-thumbnail:hover {
   transform: scale(1.1) translateY(-5px);

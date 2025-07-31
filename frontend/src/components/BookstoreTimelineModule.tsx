@@ -66,7 +66,6 @@ const convertToVisTimelineItems = (events: BookstoreEvent[]) => {
     content: `
       <div class="timeline-item-wrapper">
         <img src="${event.image}" alt="${event.title}" class="timeline-thumbnail" loading="lazy" />
-        <div class="timeline-item-label">${event.title}</div>
       </div>
     `,
     start: new Date(event.year, 0, 1), // 简化到年份，不用月份
@@ -91,7 +90,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
 
     // Timeline configuration - 强制堆叠的图片时间线
     const options = {
-      height: '400px',
+      height: '600px',
       start: new Date(1931, 0, 1),
       end: new Date(1937, 0, 1),
       orientation: 'bottom',
@@ -143,7 +142,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
         <div 
           ref={timelineRef} 
           className="w-full vis-timeline-container"
-          style={{ height: '400px', border: '1px solid #FCD34D', borderRadius: '8px', backgroundColor: '#FFFEF7' }}
+          style={{ height: '600px', border: '1px solid #FCD34D', borderRadius: '8px', backgroundColor: '#FFFEF7' }}
         />
 
 
