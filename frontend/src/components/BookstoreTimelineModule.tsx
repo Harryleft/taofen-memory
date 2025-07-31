@@ -123,22 +123,23 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
       .domain([1934, 1936])
       .range([0, width]);
 
-    const yearWidth = width / (1936 - 1934 + 1) * 0.8; // 每年可用宽度
-    const imageBaseSize = 40; // 基础图片尺寸
-    const imageGap = 2; // 图片间隔
+    const yearWidth = width / (1936 - 1934 + 1) * 0.95; // 增加每年可用宽度
+    const imageBaseSize = 45; // 稍微增大图片尺寸
+    const imageGap = 1; // 减少图片间隔，更紧密
 
     // 绘制真实图片山峦
     years.forEach(year => {
       const yearData = dataByYear.get(year) || [];
       const yearX = xScale(year);
       
-      // 计算图片排列：优先垂直堆叠形成山峦效果
-      const imagesPerRow = Math.ceil(Math.sqrt(yearData.length));
+      // 计算图片排列：基于可用宽度最大化利用空间
+      const maxImagesPerRow = Math.floor(yearWidth / (imageBaseSize + imageGap));
+      const imagesPerRow = Math.min(maxImagesPerRow, Math.ceil(Math.sqrt(yearData.length * 1.5))); // 稍微偏向垂直
       const totalRows = Math.ceil(yearData.length / imagesPerRow);
 
-      // 居中排列
-      const totalStackWidth = imagesPerRow * (imageBaseSize + imageGap) - imageGap;
-      const startX = yearX - totalStackWidth / 2;
+      // 居中排列，充分利用年份区域宽度
+      const actualStackWidth = imagesPerRow * (imageBaseSize + imageGap) - imageGap;
+      const startX = yearX - actualStackWidth / 2;
 
       // 为每年的数据创建真实图片堆叠
       yearData.forEach((d, index) => {
@@ -166,17 +167,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
           });
       });
 
-      // 在固定层添加每年的数量标签
-      if (yearData.length > 0) {
-        fixedLayer.append('text')
-          .attr('x', yearX)
-          .attr('y', height - totalRows * (imageBaseSize + imageGap) - 10)
-          .attr('text-anchor', 'middle')
-          .attr('font-size', '12px')
-          .attr('font-weight', 'bold')
-          .attr('fill', '#666')
-          .text(`${yearData.length}本`);
-      }
+      // 移除数字标签 - 简化视觉效果
     });
 
     // 在固定层添加X轴 - 不会被缩放
@@ -193,23 +184,23 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
       .style('font-weight', 'bold')
       .style('text-anchor', 'middle');
 
-    // 添加年份分割线 - 固定不缩放
+    // 添加年份分割线 - 更subtle的视觉引导
     years.forEach(year => {
       const yearX = xScale(year);
       fixedLayer.append('line')
         .attr('x1', yearX)
-        .attr('y1', 0)
+        .attr('y1', height - 20) // 只在底部显示短线
         .attr('x2', yearX)
         .attr('y2', height)
-        .attr('stroke', '#ddd')
-        .attr('stroke-width', 1)
-        .attr('stroke-dasharray', '3,3')
-        .style('opacity', 0.5);
+        .attr('stroke', '#bbb')
+        .attr('stroke-width', 2)
+        .style('opacity', 0.6);
     });
 
-    // 添加缩放功能 - 只缩放图片层，X轴保持固定
+    // 添加受限的缩放功能 - 只缩放图片层，限制移动范围
     const zoom = d3.zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.5, 5]) // 合理的缩放范围
+      .scaleExtent([0.8, 3]) // 更保守的缩放范围
+      .translateExtent([[-width * 0.2, -height * 0.2], [width * 1.2, height * 1.2]]) // 限制平移范围
       .on('zoom', (event) => {
         // 只对可缩放层应用变换，固定层保持不变
         zoomableLayer.attr('transform', 
@@ -218,7 +209,13 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
       });
 
     svg.call(zoom)
-      .on('dblclick.zoom', null);
+      .on('dblclick.zoom', null) // 禁用双击缩放
+      .on('wheel.zoom', function(event) { // 只允许Ctrl+滚轮缩放
+        if (!event.ctrlKey) {
+          event.preventDefault();
+          return;
+        }
+      });
 
   }, []);
 
@@ -228,7 +225,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
         <div className="text-center mb-16">
           <h2 className="text-5xl font-bold text-charcoal mb-6 font-serif">远读山峦时间轴</h2>
           <p className="text-xl text-charcoal/70 max-w-3xl mx-auto leading-relaxed">
-            1934-1936年出版物分布可视化，真实图书封面垂直堆叠形成山峦，支持缩放查看细节
+            1934-1936年出版物分布可视化，真实图书封面紧密堆叠形成山峦，Ctrl+滚轮缩放查看细节
           </p>
         </div>
 
@@ -252,12 +249,12 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
             <div className="text-charcoal/70">测试年份</div>
           </div>
           <div className="text-center p-6 bg-cream rounded-lg">
-            <div className="text-3xl font-bold text-gold mb-2">固定轴线</div>
-            <div className="text-charcoal/70">独立缩放</div>
+            <div className="text-3xl font-bold text-gold mb-2">紧密布局</div>
+            <div className="text-charcoal/70">最大化利用</div>
           </div>
           <div className="text-center p-6 bg-cream rounded-lg">
-            <div className="text-3xl font-bold text-gold mb-2">可交互</div>
-            <div className="text-charcoal/70">山峦浏览</div>
+            <div className="text-3xl font-bold text-gold mb-2">Ctrl+滚轮</div>
+            <div className="text-charcoal/70">精确缩放</div>
           </div>
         </div>
       </div>
