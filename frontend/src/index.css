@@ -111,3 +111,16 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+.book-image {
+  transform-origin: center;
+  transition: transform 0.15s ease-out;
+  outline-offset: 2px;
+}
+.x-axis .domain, .x-axis .tick line {
+  stroke: #ccc;
+}
+.x-axis text {
+  font-weight: 600;
+  color: #555;
+}
