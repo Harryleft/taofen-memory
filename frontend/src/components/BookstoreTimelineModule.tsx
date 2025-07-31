@@ -58,7 +58,15 @@ const localBookImages = [
 
 // 生成时间线数据 - 使用本地图片，跨越1932-1936年
 const generateTimelineData = (): BookstoreEvent[] => {
-  const years = [1932, 1933, 1934, 1935, 1936];
+  // 模拟真实的不均匀出版分布
+  const yearlyDistribution = {
+    1932: { count: 8, startIndex: 0 },   // 创立初期，出版较少
+    1933: { count: 15, startIndex: 8 },  // 业务扩展
+    1934: { count: 25, startIndex: 23 }, // 发展高峰
+    1935: { count: 30, startIndex: 48 }, // 全盛时期
+    1936: { count: 22, startIndex: 78 }  // 时局变化，略有下降
+  };
+
   const titles = [
     '生活书店成立', '北平分店开业', '《大众生活》创刊', '汉口分店成立', '发行量突破',
     '重庆分店开业', '新书发行', '分店扩展', '读者活动', '文化传播',
@@ -66,19 +74,33 @@ const generateTimelineData = (): BookstoreEvent[] => {
     '书店网络', '文化事业', '社会进步', '思想传播', '文化建设'
   ];
   
-  return localBookImages.map((image, index) => ({
-    id: index + 1,
-    year: years[index % 5], // 循环分配到5年中
-    month: 1,
-    date: `${years[index % 5]}年`,
-    title: titles[index % 20], // 循环使用标题
-    description: `第${index + 1}本图书`,
-    location: ['上海', '北平', '汉口', '重庆', '南京'][index % 5],
-    type: ['establishment', 'expansion', 'publication', 'milestone', 'closure'][index % 5] as BookstoreEvent['type'],
-    image: `/images/books/${image}`, // public目录图片路径
-    details: [],
-    impact: ''
-  }));
+  const events: BookstoreEvent[] = [];
+  
+  Object.entries(yearlyDistribution).forEach(([yearStr, config]) => {
+    const year = parseInt(yearStr);
+    const yearImages = localBookImages.slice(config.startIndex, config.startIndex + config.count);
+    
+    yearImages.forEach((image, index) => {
+      events.push({
+        id: config.startIndex + index + 1,
+        year: year,
+        month: 1,
+        date: `${year}年`,
+        title: titles[(config.startIndex + index) % 20],
+        description: `第${config.startIndex + index + 1}本图书`,
+        location: ['上海', '北平', '汉口', '重庆', '南京'][year % 5],
+        type: ['establishment', 'expansion', 'publication', 'milestone', 'closure'][year % 5] as BookstoreEvent['type'],
+        image: `/images/books/${image}`,
+        details: [],
+        impact: ''
+      });
+    });
+  });
+  
+  console.log('📊 年度出版分布:', Object.entries(yearlyDistribution).map(([year, config]) => 
+    `${year}年: ${config.count}本`).join(', '));
+  
+  return events;
 };
 
 const bookstoreEvents: BookstoreEvent[] = generateTimelineData();
@@ -126,6 +148,37 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
     });
   };
 
+  // 计算自适应宽度配置
+  const calculateAdaptiveWidths = () => {
+    // 统计每年的图片数量
+    const yearStats: Record<number, number> = {};
+    bookstoreEvents.forEach(event => {
+      yearStats[event.year] = (yearStats[event.year] || 0) + 1;
+    });
+
+    // 计算最小和最大图片数量
+    const counts = Object.values(yearStats);
+    const minCount = Math.min(...counts);
+    const maxCount = Math.max(...counts);
+    
+    // 定义宽度范围 (最小200px, 最大800px)
+    const minWidth = 200;
+    const maxWidth = 800;
+    
+    // 计算每年的宽度权重
+    const yearWidths: Record<number, number> = {};
+    Object.entries(yearStats).forEach(([year, count]) => {
+      // 线性映射：数量越多，宽度越大
+      const normalizedCount = (count - minCount) / (maxCount - minCount);
+      yearWidths[parseInt(year)] = minWidth + (maxWidth - minWidth) * normalizedCount;
+    });
+
+    console.log('📏 自适应宽度分配:', Object.entries(yearWidths).map(([year, width]) => 
+      `${year}年: ${Math.round(width)}px (${yearStats[parseInt(year)]}本)`).join(', '));
+
+    return { yearStats, yearWidths };
+  };
+
   // 计算山峦配置
   const calculateMountainConfig = (index: number) => {
     const patterns = [
@@ -151,43 +204,65 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
   useEffect(() => {
     if (!timelineRef.current) return;
 
-    // Convert data to vis-timeline format
-    const items = new DataSet(convertToVisTimelineItems(bookstoreEvents));
+    // 计算自适应宽度
+    const { yearStats, yearWidths } = calculateAdaptiveWidths();
 
-    // Timeline configuration - 强制堆叠的图片时间线 + 响应式缩放
+    // Convert data to vis-timeline format
+    const timelineItems = convertToVisTimelineItems(bookstoreEvents);
+    
+    // 创建年份分组，使用自适应宽度
+    const groups = new DataSet(Object.keys(yearStats).map(year => ({
+      id: parseInt(year),
+      content: `${year}年<br/><small>${yearStats[parseInt(year)]}本</small>`,
+      style: `background: linear-gradient(135deg, #FEF3C7, #FCD34D); border-radius: 6px; border: 1px solid #F59E0B; font-size: 12px; text-align: center;`
+    })));
+
+    // 为items分配对应的group
+    const itemsWithGroups = timelineItems.map(item => {
+      const event = bookstoreEvents.find(e => e.id === item.id);
+      return {
+        ...item,
+        group: event?.year
+      };
+    });
+
+    const items = new DataSet(itemsWithGroups);
+
+    // Timeline configuration - 自适应宽度的分组时间线
     const options = {
-      height: '600px',
+      height: '700px', // 增加高度以容纳分组标签
       start: new Date(1931, 0, 1),
       end: new Date(1937, 0, 1),
       orientation: 'bottom',
       stack: true,
-      stackSubgroups: true,
       showCurrentTime: false,
-      zoomMin: 1000 * 60 * 60 * 24 * 30, // 1 month - 允许更深层缩放
-      zoomMax: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
-      zoomable: true, // 确保缩放功能启用
-      moveable: true, // 允许拖拽移动
+      zoomMin: 1000 * 60 * 60 * 24 * 30,
+      zoomMax: 1000 * 60 * 60 * 24 * 365 * 10,
+      zoomable: true,
+      moveable: true,
       margin: {
         item: {
-          horizontal: 2, // 进一步减少水平间距
-          vertical: 2    // 进一步减少垂直间距
+          horizontal: 3,
+          vertical: 3
         },
-        axis: 40
+        axis: 60 // 增加轴边距以容纳分组标签
       },
       showMajorLabels: true,
-      showMinorLabels: false, // 不显示月份
+      showMinorLabels: false,
       format: {
         majorLabels: {
           year: 'YYYY年'
         }
       },
+      // 启用分组功能，按年份自适应宽度
+      groupOrder: (a: any, b: any) => a.id - b.id,
       template: function(item: any) {
         return item.content;
       }
     };
 
-    // Create timeline without groups (简化版本)
-    timelineInstance.current = new Timeline(timelineRef.current, items, options);
+    // Create timeline with groups (自适应宽度版本)
+    timelineInstance.current = new Timeline(timelineRef.current, items, groups, options);
 
     // 添加事件监听器来同步山峦效果
     timelineInstance.current.on('rangechange', () => {
@@ -219,11 +294,11 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
           </p>
         </div>
 
-        {/* Vis Timeline - 极简图片时间线 */}
+        {/* Vis Timeline - 自适应宽度图片时间线 */}
         <div 
           ref={timelineRef} 
           className="w-full vis-timeline-container"
-          style={{ height: '600px', border: '1px solid #FCD34D', borderRadius: '8px', backgroundColor: '#FFFEF7' }}
+          style={{ height: '700px', border: '1px solid #FCD34D', borderRadius: '8px', backgroundColor: '#FFFEF7' }}
         />
 
 
@@ -239,12 +314,12 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
             <div className="text-charcoal/70">发展年份</div>
           </div>
           <div className="text-center p-6 bg-cream rounded-lg">
-            <div className="text-3xl font-bold text-gold mb-2">Public</div>
-            <div className="text-charcoal/70">图片目录</div>
+            <div className="text-3xl font-bold text-gold mb-2">自适应</div>
+            <div className="text-charcoal/70">宽度布局</div>
           </div>
           <div className="text-center p-6 bg-cream rounded-lg">
-            <div className="text-3xl font-bold text-gold mb-2">山峦</div>
-            <div className="text-charcoal/70">起伏效果</div>
+            <div className="text-3xl font-bold text-gold mb-2">数据驱动</div>
+            <div className="text-charcoal/70">视觉效果</div>
           </div>
         </div>
       </div>
