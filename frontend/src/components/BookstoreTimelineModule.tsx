@@ -1,64 +1,77 @@
 import React, { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 
-// D3 远读山峦数据结构
+// D3 远读山峦数据结构 - 简化版本
 interface MountainDataPoint {
   id: number;
   year: number;
   month: number;
   title: string;
-  type: 'book' | 'magazine' | 'newspaper' | 'pamphlet';
-  category: string;
+  imagePath: string;
 }
 
-// 生成1000条Mock数据 - 远读山峦时间轴 (1930-1950)
+// 使用真实图片数据 - 3年测试时间范围 (1934-1936)
 const generateMountainData = (): MountainDataPoint[] => {
   const data: MountainDataPoint[] = [];
-  const types: MountainDataPoint['type'][] = ['book', 'magazine', 'newspaper', 'pamphlet'];
-  const categories = [
-    '文学作品', '政治读物', '科学普及', '教育材料', '新闻时事', 
-    '历史传记', '哲学思辨', '艺术文化', '经济论著', '社会评论'
+  
+  // 真实图片文件名数组 - 从public/images/books目录
+  const realImages = [
+    'book_23416_-4998639186942255748.jpg', 'book_23417_-3852244789965758496.jpg', 'book_23418_4462283b97413ab9.jpg',
+    'book_23419_-5632022676287629273.jpg', 'book_23420_-1855791942358398657.jpg', 'book_23421_-2042169621397586150.jpg',
+    'book_23422_-7115342089587619670.jpg', 'book_23423_-8373031078909513017.jpg', 'book_23424_-2604910119916886782.jpg',
+    'book_23425_-1785525125771768182.jpg', 'book_23426_-159901723489253475.jpg', 'book_23427_-3844244803203524888.jpg',
+    'book_23428_-3837940625291627111.jpg', 'book_23429_-1477639427932003088.jpg', 'book_23430_-5562129265642608756.jpg',
+    'book_23431_-7892229097442701058.jpg', 'book_23432_-2581749817470159686.jpg', 'book_23433_-3470636951303014949.jpg',
+    'book_23434_-4623327514967615735.jpg', 'book_23435_-2087955644272572478.jpg', 'book_23436_-7714621659299364889.jpg',
+    'book_23437_-3360823350712026630.jpg', 'book_23438_-2232596915751383319.jpg', 'book_23439_-1368073078858966529.jpg',
+    'book_23440_-3658158069634473578.jpg', 'book_23441_-3916099362726884917.jpg', 'book_23442_-1255433671954459195.jpg',
+    'book_23443_-4910439981153704181.jpg', 'book_23444_-2195130034922510191.jpg', 'book_23445_-2400332830789112399.jpg',
+    'book_23446_-2224633863020081482.jpg', 'book_23447_-1075169616984349866.jpg', 'book_23448_-614297641780091019.jpg',
+    'book_23450_-206594605777767237.jpg', 'book_23451_-1203391813805897094.jpg', 'book_23452_-3392186564342118941.jpg',
+    'book_23453_-8880444755985866078.jpg', 'book_23454_2218799157042891040.jpg', 'book_23455_-1762059586010719922.jpg',
+    'book_23456_1ce7a45c9c64e7f4.jpg', 'book_23457_-1262639379820779836.jpg', 'book_23458_-7405423048627670781.jpg',
+    'book_23459_-1023150637824470312.jpg', 'book_23460_-4390334948177620911.jpg', 'book_23461_-3933660030092891077.jpg',
+    'book_23462_-5613829804670559247.jpg', 'book_23463_-2427818215605441259.jpg', 'book_23464_-2873368441043783992.jpg',
+    'book_23465_-4562298341534676269.jpg', 'book_23466_-5843245027255920579.jpg', 'book_23467_-2617235280630217202.jpg',
+    'book_23468_-2671334620773387670.jpg', 'book_23469_-2187776683781714513.jpg', 'book_23470_-602075659643498126.jpg'
   ];
 
   const titles = [
-    '新青年', '生活周刊', '大众生活', '读书生活', '抗战文艺', '救国时报',
-    '文学月刊', '科学画报', '教育杂志', '妇女生活', '儿童世界', '青年界',
-    '新华日报', '解放日报', '光明日报', '文汇报', '民主报', '时事新报',
+    '生活周刊', '大众生活', '读书生活', '新生活', '文学月刊', '青年界',
+    '妇女生活', '儿童世界', '科学画报', '教育杂志', '时事周报', '民众教育',
+    '新华日报', '文汇报', '救国时报', '抗战文艺', '战时文化', '民主报',
     '社会科学', '自然科学', '医学常识', '农业技术', '工业发展', '商业指南'
   ];
 
-  // 模拟真实的历史出版分布规律
-  const yearlyWeights: Record<number, number> = {
-    1930: 0.3, 1931: 0.4, 1932: 0.5, 1933: 0.6, 1934: 0.8, // 初期发展
-    1935: 1.0, 1936: 1.2, 1937: 1.5, 1938: 1.8, 1939: 2.0, // 抗战前后高峰
-    1940: 1.9, 1941: 1.7, 1942: 1.5, 1943: 1.3, 1944: 1.1, // 战时萧条
-    1945: 1.4, 1946: 1.8, 1947: 2.2, 1948: 2.5, 1949: 3.0, // 解放前后复兴
-    1950: 2.8 // 新中国成立后
+  // 3年测试数据分布 (1934-1936)
+  const yearlyDistribution = {
+    1934: 15, // 发展期
+    1935: 25, // 高峰期
+    1936: 12  // 调整期
   };
 
   let id = 1;
+  let imageIndex = 0;
   
   // 为每年生成相应数量的数据点
-  for (let year = 1930; year <= 1950; year++) {
-    const weight = yearlyWeights[year] || 1.0;
-    const baseCount = 25; // 基础每年25条
-    const yearCount = Math.floor(baseCount * weight + Math.random() * 15); // 加入随机性
-
-    for (let i = 0; i < yearCount; i++) {
+  Object.entries(yearlyDistribution).forEach(([yearStr, count]) => {
+    const year = parseInt(yearStr);
+    
+    for (let i = 0; i < count; i++) {
       data.push({
         id: id++,
         year,
         month: Math.floor(Math.random() * 12) + 1,
         title: titles[Math.floor(Math.random() * titles.length)],
-        type: types[Math.floor(Math.random() * types.length)],
-        category: categories[Math.floor(Math.random() * categories.length)]
+        imagePath: `/images/books/${realImages[imageIndex % realImages.length]}`
       });
+      imageIndex++;
     }
-  }
+  });
 
-  console.log(`📊 生成远读山峦数据: ${data.length}条记录 (1930-1950)`);
-  console.log('📈 年度分布:', Object.entries(yearlyWeights).map(([year, weight]) => 
-    `${year}: ${data.filter(d => d.year === parseInt(year)).length}条`).join(', '));
+  console.log(`📊 生成真实图片数据: ${data.length}条记录 (1934-1936)`);
+  console.log('📈 年度分布:', Object.entries(yearlyDistribution).map(([year, count]) => 
+    `${year}年: ${count}本`).join(', '));
 
   return data;
 };
@@ -98,19 +111,17 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
     const dataByYear = d3.group(mountainData, d => d.year);
     const years = Array.from(dataByYear.keys()).sort();
 
-    // 设置比例尺
+    // 设置比例尺 - 3年测试范围
     const xScale = d3.scaleLinear()
-      .domain([1930, 1950])
+      .domain([1934, 1936])
       .range([0, width]);
 
-    const blockWidth = width / (1950 - 1930 + 1) * 0.9; // 增加每年可用宽度
-    const blockSize = 6; // 增大方块尺寸以提升视觉效果
+    const blockWidth = width / (1936 - 1934 + 1) * 0.8; // 3年范围，每年更宽
+    const blockSize = 8; // 增大方块尺寸，更清晰
     const blockGap = 1; // 保持紧密间隔
 
-    // 颜色比例尺
-    const colorScale = d3.scaleOrdinal<string>()
-      .domain(['book', 'magazine', 'newspaper', 'pamphlet'])
-      .range(['#F59E0B', '#EF4444', '#3B82F6', '#10B981']);
+    // 统一颜色 - 移除类型区分
+    const blockColor = '#F59E0B'; // 金黄色统一色调
 
     // 绘制山峦 - 优化堆叠算法
     years.forEach(year => {
@@ -140,12 +151,12 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
           .attr('y', y)
           .attr('width', blockSize)
           .attr('height', blockSize)
-          .attr('fill', colorScale(d.type))
-          .attr('opacity', 0.85)
+          .attr('fill', blockColor)
+          .attr('opacity', 0.9)
           .attr('stroke', '#fff')
-          .attr('stroke-width', 0.3)
-          .attr('rx', 0.5) // 轻微圆角增加美感
-          // 移除tooltip交互，简化视觉效果
+          .attr('stroke-width', 0.5)
+          .attr('rx', 1) // 轻微圆角增加美感
+          // 简化交互，专注视觉效果
           .style('cursor', 'default');
       });
 
@@ -162,54 +173,21 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
       }
     });
 
-    // 添加X轴 - 避免标签重叠
+    // 添加X轴 - 3年范围清晰显示
     const xAxis = d3.axisBottom(xScale)
-      .tickFormat(d => {
-        const year = d as number;
-        // 只显示特定年份以避免重叠
-        if (year % 5 === 0 || year === 1937 || year === 1949) {
-          return year.toString() + '年';
-        }
-        return '';
-      })
-      .tickValues([1930, 1935, 1937, 1940, 1945, 1949, 1950]); // 明确指定显示的年份
+      .tickFormat(d => (d as number).toString() + '年')
+      .tickValues([1934, 1935, 1936]); // 明确显示3个年份
 
     g.append('g')
       .attr('transform', `translate(0,${height})`)
       .call(xAxis)
       .selectAll('text')
-      .style('font-size', '11px')
+      .style('font-size', '14px')
       .style('fill', '#666')
-      .attr('transform', 'rotate(-45)') // 倾斜标签进一步避免重叠
-      .style('text-anchor', 'end');
+      .style('font-weight', 'bold')
+      .style('text-anchor', 'middle'); // 居中对齐，不需要倾斜
 
-    // 添加图例
-    const legend = g.append('g')
-      .attr('transform', `translate(${width - 200}, 20)`);
-
-    const legendData = [
-      { type: 'book', label: '书籍', color: '#F59E0B' },
-      { type: 'magazine', label: '杂志', color: '#EF4444' },
-      { type: 'newspaper', label: '报纸', color: '#3B82F6' },
-      { type: 'pamphlet', label: '小册子', color: '#10B981' }
-    ];
-
-    legendData.forEach((item, i) => {
-      const legendItem = legend.append('g')
-        .attr('transform', `translate(0, ${i * 20})`);
-
-      legendItem.append('rect')
-        .attr('width', 12)
-        .attr('height', 12)
-        .attr('fill', item.color);
-
-      legendItem.append('text')
-        .attr('x', 16)
-        .attr('y', 9)
-        .attr('font-size', '12px')
-        .attr('fill', '#333')
-        .text(item.label);
-    });
+    // 移除图例 - 统一颜色无需说明
 
     // 添加缩放和平移功能 - 优化交互体验
     const zoom = d3.zoom<SVGSVGElement, unknown>()
@@ -232,7 +210,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
         <div className="text-center mb-16">
           <h2 className="text-5xl font-bold text-charcoal mb-6 font-serif">远读山峦时间轴</h2>
           <p className="text-xl text-charcoal/70 max-w-3xl mx-auto leading-relaxed">
-            1930-1950年出版物分布可视化，每个方块代表一份出版物，垂直堆叠形成时代山峦
+            1934-1936年出版物分布可视化，每个方块代表一本真实图书，垂直堆叠形成山峦
           </p>
         </div>
 
@@ -248,20 +226,20 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
         {/* Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-16">
           <div className="text-center p-6 bg-cream rounded-lg">
-            <div className="text-3xl font-bold text-gold mb-2">1000+</div>
-            <div className="text-charcoal/70">出版物数据</div>
+            <div className="text-3xl font-bold text-gold mb-2">52</div>
+            <div className="text-charcoal/70">真实图书</div>
           </div>
           <div className="text-center p-6 bg-cream rounded-lg">
-            <div className="text-3xl font-bold text-gold mb-2">21</div>
-            <div className="text-charcoal/70">历史年份</div>
+            <div className="text-3xl font-bold text-gold mb-2">3</div>
+            <div className="text-charcoal/70">测试年份</div>
           </div>
           <div className="text-center p-6 bg-cream rounded-lg">
             <div className="text-3xl font-bold text-gold mb-2">D3.js</div>
             <div className="text-charcoal/70">纯净实现</div>
           </div>
           <div className="text-center p-6 bg-cream rounded-lg">
-            <div className="text-3xl font-bold text-gold mb-2">远读山峦</div>
-            <div className="text-charcoal/70">视觉隐喻</div>
+            <div className="text-3xl font-bold text-gold mb-2">统一金色</div>
+            <div className="text-charcoal/70">简化视觉</div>
           </div>
         </div>
       </div>
