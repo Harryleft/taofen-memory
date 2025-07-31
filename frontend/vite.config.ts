@@ -14,7 +14,10 @@ export default defineConfig({
       allow: ['..', '.']
     }
   },
-  // 配置静态资源路径
-  publicDir: path.resolve(__dirname, '../data'),
-  base: '/'
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+      '@data': path.resolve(__dirname, '../data')
+    }
+  }
 });

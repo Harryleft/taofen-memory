@@ -18,26 +18,18 @@ interface BookstoreEvent {
   impact: string;
 }
 
-// 本地图片数据源 - 随机选择50张书籍图片
+// 本地图片数据源 - 使用public目录中的图片
 const localBookImages = [
-  'book_24033_5774757e61cccbd0.jpg', 'book_24887_0fe32f3001899765.jpg', 'book_24588_2e50371863f5a957.jpg',
-  'book_24589_4faa030caf512a01.jpg', 'book_24009_a3cfb236f5490c96.jpg', 'book_23733_0efe86683a6e47cf.jpg',
-  'book_24073_2ada7ba4866d8a72.jpg', 'book_24074_79870f9daf46b40a.jpg', 'book_24075_0a04886d23da0e0a.jpg',
-  'book_24076_de4c835b4da33a9f.jpg', 'book_24077_de507994f4227af4.jpg', 'book_24078_61fb0e2502421083.jpg',
-  'book_24079_083216c9bef7f1e3.jpg', 'book_24080_54f72e6ef053811d.jpg', 'book_24081_b604e0ab4263aa06.jpg',
-  'book_24082_e98446d65dc8e442.jpg', 'book_24083_c3ba6e8e8c19a4b8.jpg', 'book_24084_ea791a622b7b02d6.jpg',
-  'book_24085_082d3885b9a86191.jpg', 'book_24086_a6b109426ee95d0e.jpg', 'book_24087_7550d62518c03cff.jpg',
-  'book_24088_6479729830409a6a.jpg', 'book_24089_1efb046cfed41253.jpg', 'book_24090_09f8a03bbec23545.jpg',
-  'book_24091_519364addd1740b9.jpg', 'book_24092_d30159246d78fefd.jpg', 'book_23860_0f44a9a23f9a33b6.jpg',
-  'book_23919_1176d3a14c04640b.jpg', 'book_23731_8adaa9332eaf67c6.jpg', 'book_24067_5caa926a9cee39cb.jpg',
-  'book_24573_1815c8bdd1dba7c2.jpg', 'book_24574_e4ec602a098df987.jpg', 'book_24017_6ceca9569575216f.jpg',
-  'book_24027_e5d1c5bbcab84c8c.jpg', 'book_24028_a3fc1d014749ec22.jpg', 'book_24656_db0d6b0e05b04116.jpg',
-  'book_24657_135e9acdcec63606.jpg', 'book_24658_ea4d75e22f5f4e42.jpg', 'book_24660_c49c4e0b372ee847.jpg',
-  'book_24661_0ae83db55287cfcb.jpg', 'book_24662_aa16dfd92d9f0ecd.jpg', 'book_24663_d2a4bbe4ae247997.jpg',
-  'book_24664_592c2375da73eb7b.jpg', 'book_24665_267c9998a9448665.jpg', 'book_24666_bb3f78ed290ebe68.jpg',
-  'book_24041_5ac125b65265454d.jpg', 'book_24667_654c8ea4571be528.jpg', 'book_24668_fa72a893da335324.jpg',
-  'book_24042_4a9656f967141b6d.jpg', 'book_24669_18dee28d77ee2006.jpg', 'book_24670_35b664a2e361a2ce.jpg',
-  'book_24043_61097f42afa08e7c.jpg', 'book_24672_ace02fedd520c9d9.jpg'
+  'book_24033_5774757e61cccbd0.jpg',
+  'book_23416_-4998639186942255748.jpg',
+  'book_23417_-3852244789965758496.jpg', 
+  'book_23418_4462283b97413ab9.jpg',
+  'book_23419_-5632022676287629273.jpg',
+  'book_23420_-1855791942358398657.jpg',
+  'book_23421_-2042169621397586150.jpg',
+  'book_23422_-7115342089587619670.jpg',
+  'book_23423_-8373031078909513017.jpg',
+  'book_23424_-2604910119916886782.jpg'
 ];
 
 // 生成时间线数据 - 使用本地图片，跨越1932-1936年
@@ -50,7 +42,7 @@ const generateTimelineData = (): BookstoreEvent[] => {
     '书店网络', '文化事业', '社会进步', '思想传播', '文化建设'
   ];
   
-  return localBookImages.slice(0, 50).map((image, index) => ({
+  return localBookImages.map((image, index) => ({
     id: index + 1,
     year: years[index % 5], // 循环分配到5年中
     month: 1,
@@ -59,7 +51,7 @@ const generateTimelineData = (): BookstoreEvent[] => {
     description: `第${index + 1}本图书`,
     location: ['上海', '北平', '汉口', '重庆', '南京'][index % 5],
     type: ['establishment', 'expansion', 'publication', 'milestone', 'closure'][index % 5] as BookstoreEvent['type'],
-    image: `/data/api_results/images/books/${image}`, // 本地图片路径
+    image: `/images/books/${image}`, // public目录图片路径
     details: [],
     impact: ''
   }));
@@ -158,7 +150,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
         {/* Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-16">
           <div className="text-center p-6 bg-cream rounded-lg">
-            <div className="text-3xl font-bold text-gold mb-2">50</div>
+            <div className="text-3xl font-bold text-gold mb-2">10</div>
             <div className="text-charcoal/70">书籍图片</div>
           </div>
           <div className="text-center p-6 bg-cream rounded-lg">
@@ -166,8 +158,8 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
             <div className="text-charcoal/70">发展年份</div>
           </div>
           <div className="text-center p-6 bg-cream rounded-lg">
-            <div className="text-3xl font-bold text-gold mb-2">50</div>
-            <div className="text-charcoal/70">本地图片</div>
+            <div className="text-3xl font-bold text-gold mb-2">Public</div>
+            <div className="text-charcoal/70">图片目录</div>
           </div>
           <div className="text-center p-6 bg-cream rounded-lg">
             <div className="text-3xl font-bold text-gold mb-2">测试</div>
