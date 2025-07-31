@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -7,4 +8,13 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
+  server: {
+    fs: {
+      // 允许访问上级目录的静态资源
+      allow: ['..', '.']
+    }
+  },
+  // 配置静态资源路径
+  publicDir: path.resolve(__dirname, '../data'),
+  base: '/'
 });

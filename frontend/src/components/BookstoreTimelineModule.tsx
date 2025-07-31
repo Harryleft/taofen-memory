@@ -1,5 +1,8 @@
-// @ts-ignore - react-chrono doesn't have proper TypeScript types
-import { Chrono } from 'react-chrono';
+import { Timeline } from 'vis-timeline/esnext';
+import { DataSet } from 'vis-data/esnext';
+import 'vis-timeline/styles/vis-timeline-graph2d.css';
+import { useEffect, useRef } from 'react';
+import '../styles/vis-timeline-custom.css';
 
 interface BookstoreEvent {
   id: number;
@@ -15,151 +18,68 @@ interface BookstoreEvent {
   impact: string;
 }
 
-const bookstoreEvents: BookstoreEvent[] = [
-  {
-    id: 1,
-    year: 1932,
-    month: 7,
-    date: '1932年7月',
-    title: '生活书店成立',
-    description: '在上海正式成立生活书店，开启现代出版事业',
-    location: '上海',
-    type: 'establishment',
-    image: 'https://images.pexels.com/photos/159832/shanghai-china-city-modern-159832.jpeg?auto=compress&cs=tinysrgb&w=600',
-    details: [
-      '注册资本5000元，员工12人',
-      '以"为大众服务"为宗旨',
-      '首批出版《生活》周刊合订本'
-    ],
-    impact: '奠定了现代进步出版事业的基础'
-  },
-  {
-    id: 2,
-    year: 1933,
-    month: 3,
-    date: '1933年3月',
-    title: '北平分店开业',
-    description: '在北平设立第一家分店，开始全国布局',
-    location: '北平',
-    type: 'expansion',
-    image: 'https://images.pexels.com/photos/1181467/pexels-photo-1181467.jpeg?auto=compress&cs=tinysrgb&w=600',
-    details: [
-      '选址在繁华的王府井大街',
-      '主要销售进步书籍和期刊',
-      '成为北方进步文化的重要阵地'
-    ],
-    impact: '扩大了进步思想在华北地区的影响'
-  },
-  {
-    id: 3,
-    year: 1933,
-    month: 8,
-    date: '1933年8月',
-    title: '《大众生活》创刊',
-    description: '创办《大众生活》周刊，发行量创新高',
-    location: '上海',
-    type: 'publication',
-    image: 'https://images.pexels.com/photos/518543/pexels-photo-518543.jpeg?auto=compress&cs=tinysrgb&w=600',
-    details: [
-      '首期发行量达到5万份',
-      '关注社会现实和民生问题',
-      '成为最受欢迎的进步刊物'
-    ],
-    impact: '进一步扩大了生活书店的社会影响力'
-  },
-  {
-    id: 4,
-    year: 1934,
-    month: 5,
-    date: '1934年5月',
-    title: '汉口分店成立',
-    description: '在华中重镇汉口开设分店，完善中部布局',
-    location: '汉口',
-    type: 'expansion',
-    image: 'https://images.pexels.com/photos/1029141/pexels-photo-1029141.jpeg?auto=compress&cs=tinysrgb&w=600',
-    details: [
-      '位于汉口租界繁华地段',
-      '服务华中地区读者',
-      '建立区域发行网络'
-    ],
-    impact: '构建了覆盖华中的发行体系'
-  },
-  {
-    id: 5,
-    year: 1935,
-    month: 2,
-    date: '1935年2月',
-    title: '发行量突破15万',
-    description: '《大众生活》发行量突破15万份，创历史新高',
-    location: '全国',
-    type: 'milestone',
-    image: 'https://images.pexels.com/photos/1148820/pexels-photo-1148820.jpeg?auto=compress&cs=tinysrgb&w=600',
-    details: [
-      '成为当时发行量最大的周刊',
-      '读者遍布全国各地',
-      '影响力达到顶峰'
-    ],
-    impact: '确立了在中国出版界的领导地位'
-  },
-  {
-    id: 6,
-    year: 1935,
-    month: 12,
-    date: '1935年12月',
-    title: '《大众生活》被迫停刊',
-    description: '因政治压力，《大众生活》被迫停刊',
-    location: '上海',
-    type: 'closure',
-    image: 'https://images.pexels.com/photos/789555/pexels-photo-789555.jpeg?auto=compress&cs=tinysrgb&w=600',
-    details: [
-      '遭到国民党当局查禁',
-      '邹韬奋被迫流亡海外',
-      '生活书店业务受到重创'
-    ],
-    impact: '标志着一个时代的结束，但精神影响延续至今'
-  },
-  {
-    id: 7,
-    year: 1936,
-    month: 6,
-    date: '1936年6月',
-    title: '重庆分店开业',
-    description: '在重庆开设分店，继续传播进步文化',
-    location: '重庆',
-    type: 'expansion',
-    image: 'https://images.pexels.com/photos/2041540/pexels-photo-2041540.jpeg?auto=compress&cs=tinysrgb&w=600',
-    details: [
-      '选址在重庆市中心',
-      '主要经营抗战文献',
-      '成为西南地区文化中心'
-    ],
-    impact: '在抗战时期发挥了重要的文化宣传作用'
-  }
+// 本地图片数据源 - 随机选择50张书籍图片
+const localBookImages = [
+  'book_24033_5774757e61cccbd0.jpg', 'book_24887_0fe32f3001899765.jpg', 'book_24588_2e50371863f5a957.jpg',
+  'book_24589_4faa030caf512a01.jpg', 'book_24009_a3cfb236f5490c96.jpg', 'book_23733_0efe86683a6e47cf.jpg',
+  'book_24073_2ada7ba4866d8a72.jpg', 'book_24074_79870f9daf46b40a.jpg', 'book_24075_0a04886d23da0e0a.jpg',
+  'book_24076_de4c835b4da33a9f.jpg', 'book_24077_de507994f4227af4.jpg', 'book_24078_61fb0e2502421083.jpg',
+  'book_24079_083216c9bef7f1e3.jpg', 'book_24080_54f72e6ef053811d.jpg', 'book_24081_b604e0ab4263aa06.jpg',
+  'book_24082_e98446d65dc8e442.jpg', 'book_24083_c3ba6e8e8c19a4b8.jpg', 'book_24084_ea791a622b7b02d6.jpg',
+  'book_24085_082d3885b9a86191.jpg', 'book_24086_a6b109426ee95d0e.jpg', 'book_24087_7550d62518c03cff.jpg',
+  'book_24088_6479729830409a6a.jpg', 'book_24089_1efb046cfed41253.jpg', 'book_24090_09f8a03bbec23545.jpg',
+  'book_24091_519364addd1740b9.jpg', 'book_24092_d30159246d78fefd.jpg', 'book_23860_0f44a9a23f9a33b6.jpg',
+  'book_23919_1176d3a14c04640b.jpg', 'book_23731_8adaa9332eaf67c6.jpg', 'book_24067_5caa926a9cee39cb.jpg',
+  'book_24573_1815c8bdd1dba7c2.jpg', 'book_24574_e4ec602a098df987.jpg', 'book_24017_6ceca9569575216f.jpg',
+  'book_24027_e5d1c5bbcab84c8c.jpg', 'book_24028_a3fc1d014749ec22.jpg', 'book_24656_db0d6b0e05b04116.jpg',
+  'book_24657_135e9acdcec63606.jpg', 'book_24658_ea4d75e22f5f4e42.jpg', 'book_24660_c49c4e0b372ee847.jpg',
+  'book_24661_0ae83db55287cfcb.jpg', 'book_24662_aa16dfd92d9f0ecd.jpg', 'book_24663_d2a4bbe4ae247997.jpg',
+  'book_24664_592c2375da73eb7b.jpg', 'book_24665_267c9998a9448665.jpg', 'book_24666_bb3f78ed290ebe68.jpg',
+  'book_24041_5ac125b65265454d.jpg', 'book_24667_654c8ea4571be528.jpg', 'book_24668_fa72a893da335324.jpg',
+  'book_24042_4a9656f967141b6d.jpg', 'book_24669_18dee28d77ee2006.jpg', 'book_24670_35b664a2e361a2ce.jpg',
+  'book_24043_61097f42afa08e7c.jpg', 'book_24672_ace02fedd520c9d9.jpg'
 ];
 
-// Icons are handled by react-chrono internally
+// 生成时间线数据 - 使用本地图片，跨越1932-1936年
+const generateTimelineData = (): BookstoreEvent[] => {
+  const years = [1932, 1933, 1934, 1935, 1936];
+  const titles = [
+    '生活书店成立', '北平分店开业', '《大众生活》创刊', '汉口分店成立', '发行量突破',
+    '重庆分店开业', '新书发行', '分店扩展', '读者活动', '文化传播',
+    '出版高峰', '影响扩大', '社会反响', '文化交流', '读者增长',
+    '书店网络', '文化事业', '社会进步', '思想传播', '文化建设'
+  ];
+  
+  return localBookImages.slice(0, 50).map((image, index) => ({
+    id: index + 1,
+    year: years[index % 5], // 循环分配到5年中
+    month: 1,
+    date: `${years[index % 5]}年`,
+    title: titles[index % 20], // 循环使用标题
+    description: `第${index + 1}本图书`,
+    location: ['上海', '北平', '汉口', '重庆', '南京'][index % 5],
+    type: ['establishment', 'expansion', 'publication', 'milestone', 'closure'][index % 5] as BookstoreEvent['type'],
+    image: `/data/api_results/images/books/${image}`, // 本地图片路径
+    details: [],
+    impact: ''
+  }));
+};
 
-// Convert BookstoreEvent to react-chrono TimelineItemModel format
-const convertToChronoItems = (events: BookstoreEvent[]) => {
-  return events.map((event) => ({
-    title: event.date,
-    cardTitle: event.title,
-    cardSubtitle: `${event.location} · ${event.type}`,
-    cardDetailedText: [
-      event.description,
-      '',
-      '详细信息：',
-      ...event.details,
-      '',
-      `历史影响：${event.impact}`
-    ],
-    media: {
-      type: 'IMAGE' as const,
-      source: {
-        url: event.image
-      },
-      name: event.title
-    }
+const bookstoreEvents: BookstoreEvent[] = generateTimelineData();
+
+// Convert BookstoreEvent to vis-timeline format - 极简图片展示
+const convertToVisTimelineItems = (events: BookstoreEvent[]) => {
+  return events.map((event, index) => ({
+    id: event.id,
+    content: `
+      <div class="timeline-item-wrapper">
+        <img src="${event.image}" alt="${event.title}" class="timeline-thumbnail" loading="lazy" />
+        <div class="timeline-item-label">${event.title}</div>
+      </div>
+    `,
+    start: new Date(event.year, 0, 1), // 简化到年份，不用月份
+    type: 'box',
+    className: 'timeline-image-item'
   }));
 };
 
@@ -168,31 +88,53 @@ interface BookstoreTimelineModuleProps {
 }
 
 export default function BookstoreTimelineModule({ className = '' }: BookstoreTimelineModuleProps) {
-  // Convert events to react-chrono format
-  const chronoItems = convertToChronoItems(bookstoreEvents);
-  
-  // Custom theme for react-chrono to match project design
-  const chronoTheme = {
-    primary: '#F59E0B',           // gold color
-    secondary: '#FEF3C7',         // cream color
-    cardBgColor: '#FEF3C7',       // cream background
-    cardForeColor: '#374151',     // charcoal text
-    titleColor: '#374151',        // charcoal
-    titleColorActive: '#F59E0B',  // gold for active
-    cardTitleColor: '#374151',    // charcoal
-    cardSubtitleColor: '#6B7280', // gray
-    cardDetailsColor: '#374151',  // charcoal
-    iconBackgroundColor: '#F59E0B', // gold
-    timelinePointDimension: 16,
-    cardHeight: 250,
-    cardWidth: 400,
-    fontSizes: {
-      cardSubtitle: '0.9rem',
-      cardText: '0.95rem',
-      cardTitle: '1.1rem',
-      title: '1rem'
-    }
-  };
+  const timelineRef = useRef<HTMLDivElement>(null);
+  const timelineInstance = useRef<Timeline | null>(null);
+
+  useEffect(() => {
+    if (!timelineRef.current) return;
+
+    // Convert data to vis-timeline format
+    const items = new DataSet(convertToVisTimelineItems(bookstoreEvents));
+
+    // Timeline configuration - 简洁的图片时间线
+    const options = {
+      height: '300px',
+      start: new Date(1931, 0, 1),
+      end: new Date(1937, 0, 1),
+      orientation: 'bottom',
+      stack: true,
+      showCurrentTime: false,
+      zoomMin: 1000 * 60 * 60 * 24 * 365, // 1 year
+      zoomMax: 1000 * 60 * 60 * 24 * 365 * 20, // 20 years
+      margin: {
+        item: {
+          horizontal: 20,
+          vertical: 10
+        },
+        axis: 50
+      },
+      showMajorLabels: true,
+      showMinorLabels: false, // 不显示月份
+      format: {
+        majorLabels: {
+          year: 'YYYY年'
+        }
+      },
+      template: function(item: any) {
+        return item.content;
+      }
+    };
+
+    // Create timeline without groups (简化版本)
+    timelineInstance.current = new Timeline(timelineRef.current, items, options);
+
+    return () => {
+      if (timelineInstance.current) {
+        timelineInstance.current.destroy();
+      }
+    };
+  }, []);
 
   return (
     <section className={`py-20 bg-white ${className}`}>
@@ -204,54 +146,32 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
           </p>
         </div>
 
-        {/* React Chrono Timeline */}
-        <div className="w-full" style={{ height: '600px' }}>
-          <Chrono
-            items={chronoItems}
-            mode="VERTICAL_ALTERNATING"
-            theme={chronoTheme}
-            slideShow={false}
-            enableOutline={true}
-            cardHeight={250}
-            disableNavOnKey={false}
-            scrollable={{ scrollbar: false }}
-            fontSizes={{
-              cardSubtitle: '0.9rem',
-              cardText: '0.95rem',
-              cardTitle: '1.2rem',
-              title: '1rem'
-            }}
-            mediaSettings={{
-              align: 'center',
-              fit: 'cover'
-            }}
-            classNames={{
-              card: 'timeline-card',
-              cardMedia: 'timeline-media',
-              cardSubTitle: 'timeline-subtitle',
-              cardText: 'timeline-text',
-              cardTitle: 'timeline-title'
-            }}
-          />
-        </div>
+        {/* Vis Timeline - 极简图片时间线 */}
+        <div 
+          ref={timelineRef} 
+          className="w-full vis-timeline-container"
+          style={{ height: '300px', border: '1px solid #FCD34D', borderRadius: '8px', backgroundColor: '#FFFEF7' }}
+        />
+
+
 
         {/* Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-16">
           <div className="text-center p-6 bg-cream rounded-lg">
-            <div className="text-3xl font-bold text-gold mb-2">7</div>
-            <div className="text-charcoal/70">重要事件</div>
+            <div className="text-3xl font-bold text-gold mb-2">50</div>
+            <div className="text-charcoal/70">书籍图片</div>
           </div>
           <div className="text-center p-6 bg-cream rounded-lg">
             <div className="text-3xl font-bold text-gold mb-2">5</div>
             <div className="text-charcoal/70">发展年份</div>
           </div>
           <div className="text-center p-6 bg-cream rounded-lg">
-            <div className="text-3xl font-bold text-gold mb-2">15万</div>
-            <div className="text-charcoal/70">最高发行量</div>
+            <div className="text-3xl font-bold text-gold mb-2">50</div>
+            <div className="text-charcoal/70">本地图片</div>
           </div>
           <div className="text-center p-6 bg-cream rounded-lg">
-            <div className="text-3xl font-bold text-gold mb-2">全国</div>
-            <div className="text-charcoal/70">影响范围</div>
+            <div className="text-3xl font-bold text-gold mb-2">测试</div>
+            <div className="text-charcoal/70">功能完整性</div>
           </div>
         </div>
       </div>

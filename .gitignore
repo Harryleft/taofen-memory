@@ -104,3 +104,4 @@ dump.rdb
 .dockerignore
 
 data/
+.claude/
