@@ -99,12 +99,19 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
     const width = containerWidth - margin.left - margin.right;
     const height = containerHeight - margin.top - margin.bottom;
 
-    // 创建SVG和主群组
+    // 创建SVG
     const svg = d3.select(svgRef.current)
       .attr('width', containerWidth)
       .attr('height', containerHeight);
 
-    const g = svg.append('g')
+    // 创建固定的背景层（X轴等不缩放元素）
+    const fixedLayer = svg.append('g')
+      .attr('class', 'fixed-layer')
+      .attr('transform', `translate(${margin.left},${margin.top})`);
+
+    // 创建可缩放的内容层（图片）
+    const zoomableLayer = svg.append('g')
+      .attr('class', 'zoomable-layer')
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
     // 处理数据：按年份分组
@@ -116,91 +123,102 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
       .domain([1934, 1936])
       .range([0, width]);
 
-    const blockWidth = width / (1936 - 1934 + 1) * 0.8; // 3年范围，每年更宽
-    const blockSize = 8; // 增大方块尺寸，更清晰
-    const blockGap = 1; // 保持紧密间隔
+    const yearWidth = width / (1936 - 1934 + 1) * 0.8; // 每年可用宽度
+    const imageBaseSize = 40; // 基础图片尺寸
+    const imageGap = 2; // 图片间隔
 
-    // 统一颜色 - 移除类型区分
-    const blockColor = '#F59E0B'; // 金黄色统一色调
-
-    // 绘制山峦 - 优化堆叠算法
+    // 绘制真实图片山峦
     years.forEach(year => {
       const yearData = dataByYear.get(year) || [];
       const yearX = xScale(year);
       
-      // 计算最优排列：尽可能形成正方形或接近正方形的堆叠
-      const totalBlocks = yearData.length;
-      const idealWidth = Math.ceil(Math.sqrt(totalBlocks * (blockWidth / (blockSize + blockGap))));
-      const blocksPerRow = Math.min(idealWidth, Math.floor(blockWidth / (blockSize + blockGap)));
-      const totalRows = Math.ceil(totalBlocks / blocksPerRow);
+      // 计算图片排列：优先垂直堆叠形成山峦效果
+      const imagesPerRow = Math.ceil(Math.sqrt(yearData.length));
+      const totalRows = Math.ceil(yearData.length / imagesPerRow);
 
-      // 居中排列小方块
-      const totalStackWidth = blocksPerRow * (blockSize + blockGap) - blockGap;
+      // 居中排列
+      const totalStackWidth = imagesPerRow * (imageBaseSize + imageGap) - imageGap;
       const startX = yearX - totalStackWidth / 2;
 
-      // 为每年的数据创建紧密堆叠的小方块
+      // 为每年的数据创建真实图片堆叠
       yearData.forEach((d, index) => {
-        const row = Math.floor(index / blocksPerRow);
-        const col = index % blocksPerRow;
+        const row = Math.floor(index / imagesPerRow);
+        const col = index % imagesPerRow;
         
-        const x = startX + col * (blockSize + blockGap);
-        const y = height - blockSize - (row * (blockSize + blockGap));
+        const x = startX + col * (imageBaseSize + imageGap);
+        const y = height - imageBaseSize - (row * (imageBaseSize + imageGap));
 
-        g.append('rect')
+        // 创建图片元素
+        zoomableLayer.append('image')
           .attr('x', x)
           .attr('y', y)
-          .attr('width', blockSize)
-          .attr('height', blockSize)
-          .attr('fill', blockColor)
-          .attr('opacity', 0.9)
-          .attr('stroke', '#fff')
-          .attr('stroke-width', 0.5)
-          .attr('rx', 1) // 轻微圆角增加美感
-          // 简化交互，专注视觉效果
-          .style('cursor', 'default');
+          .attr('width', imageBaseSize)
+          .attr('height', imageBaseSize)
+          .attr('href', d.imagePath)
+          .attr('preserveAspectRatio', 'xMidYMid slice') // 保持比例并裁剪
+          .style('opacity', 0.9)
+          .style('cursor', 'pointer')
+          .on('mouseover', function() {
+            d3.select(this).style('opacity', 1);
+          })
+          .on('mouseout', function() {
+            d3.select(this).style('opacity', 0.9);
+          });
       });
 
-      // 添加每年的数量标签在山顶
+      // 在固定层添加每年的数量标签
       if (yearData.length > 0) {
-        g.append('text')
+        fixedLayer.append('text')
           .attr('x', yearX)
-          .attr('y', height - totalRows * (blockSize + blockGap) - 8)
+          .attr('y', height - totalRows * (imageBaseSize + imageGap) - 10)
           .attr('text-anchor', 'middle')
-          .attr('font-size', '9px')
+          .attr('font-size', '12px')
           .attr('font-weight', 'bold')
           .attr('fill', '#666')
-          .text(`${yearData.length}`);
+          .text(`${yearData.length}本`);
       }
     });
 
-    // 添加X轴 - 3年范围清晰显示
+    // 在固定层添加X轴 - 不会被缩放
     const xAxis = d3.axisBottom(xScale)
       .tickFormat(d => (d as number).toString() + '年')
-      .tickValues([1934, 1935, 1936]); // 明确显示3个年份
+      .tickValues([1934, 1935, 1936]);
 
-    g.append('g')
+    fixedLayer.append('g')
       .attr('transform', `translate(0,${height})`)
       .call(xAxis)
       .selectAll('text')
       .style('font-size', '14px')
       .style('fill', '#666')
       .style('font-weight', 'bold')
-      .style('text-anchor', 'middle'); // 居中对齐，不需要倾斜
+      .style('text-anchor', 'middle');
 
-    // 移除图例 - 统一颜色无需说明
+    // 添加年份分割线 - 固定不缩放
+    years.forEach(year => {
+      const yearX = xScale(year);
+      fixedLayer.append('line')
+        .attr('x1', yearX)
+        .attr('y1', 0)
+        .attr('x2', yearX)
+        .attr('y2', height)
+        .attr('stroke', '#ddd')
+        .attr('stroke-width', 1)
+        .attr('stroke-dasharray', '3,3')
+        .style('opacity', 0.5);
+    });
 
-    // 添加缩放和平移功能 - 优化交互体验
+    // 添加缩放功能 - 只缩放图片层，X轴保持固定
     const zoom = d3.zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.3, 8]) // 调整缩放范围
-      .translateExtent([[-width * 2, -height * 2], [width * 3, height * 3]]) // 限制平移范围
+      .scaleExtent([0.5, 5]) // 合理的缩放范围
       .on('zoom', (event) => {
-        g.attr('transform', 
+        // 只对可缩放层应用变换，固定层保持不变
+        zoomableLayer.attr('transform', 
           `translate(${margin.left + event.transform.x},${margin.top + event.transform.y}) scale(${event.transform.k})`
         );
       });
 
     svg.call(zoom)
-      .on('dblclick.zoom', null); // 禁用双击缩放，避免意外操作
+      .on('dblclick.zoom', null);
 
   }, []);
 
@@ -210,7 +228,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
         <div className="text-center mb-16">
           <h2 className="text-5xl font-bold text-charcoal mb-6 font-serif">远读山峦时间轴</h2>
           <p className="text-xl text-charcoal/70 max-w-3xl mx-auto leading-relaxed">
-            1934-1936年出版物分布可视化，每个方块代表一本真实图书，垂直堆叠形成山峦
+            1934-1936年出版物分布可视化，真实图书封面垂直堆叠形成山峦，支持缩放查看细节
           </p>
         </div>
 
@@ -227,19 +245,19 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-16">
           <div className="text-center p-6 bg-cream rounded-lg">
             <div className="text-3xl font-bold text-gold mb-2">52</div>
-            <div className="text-charcoal/70">真实图书</div>
+            <div className="text-charcoal/70">真实封面</div>
           </div>
           <div className="text-center p-6 bg-cream rounded-lg">
             <div className="text-3xl font-bold text-gold mb-2">3</div>
             <div className="text-charcoal/70">测试年份</div>
           </div>
           <div className="text-center p-6 bg-cream rounded-lg">
-            <div className="text-3xl font-bold text-gold mb-2">D3.js</div>
-            <div className="text-charcoal/70">纯净实现</div>
+            <div className="text-3xl font-bold text-gold mb-2">固定轴线</div>
+            <div className="text-charcoal/70">独立缩放</div>
           </div>
           <div className="text-center p-6 bg-cream rounded-lg">
-            <div className="text-3xl font-bold text-gold mb-2">统一金色</div>
-            <div className="text-charcoal/70">简化视觉</div>
+            <div className="text-3xl font-bold text-gold mb-2">可交互</div>
+            <div className="text-charcoal/70">山峦浏览</div>
           </div>
         </div>
       </div>
