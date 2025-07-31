@@ -106,6 +106,48 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
   const timelineRef = useRef<HTMLDivElement>(null);
   const timelineInstance = useRef<Timeline | null>(null);
 
+  // 动态山峦效果控制函数
+  const applyDynamicMountainEffect = (properties?: any) => {
+    const container = timelineRef.current;
+    if (!container) return;
+
+    const images = container.querySelectorAll('.timeline-thumbnail');
+    images.forEach((img, index) => {
+      const element = img as HTMLElement;
+      
+      // 计算山峦效果参数
+      const mountainConfig = calculateMountainConfig(index);
+      
+      // 应用动态样式
+      element.style.transform = `scale(${mountainConfig.scale}) translateY(${mountainConfig.translateY}px)`;
+      element.style.opacity = mountainConfig.opacity.toString();
+      element.style.zIndex = mountainConfig.zIndex.toString();
+      element.style.transition = 'all 0.3s ease';
+    });
+  };
+
+  // 计算山峦配置
+  const calculateMountainConfig = (index: number) => {
+    const patterns = [
+      { scale: 0.7, translateY: 40, opacity: 0.8, zIndex: 1 },   // 3n+1
+      { scale: 1.1, translateY: -20, opacity: 1, zIndex: 5 },   // 3n+2  
+      { scale: 0.9, translateY: 10, opacity: 0.9, zIndex: 3 },  // 3n+3
+      { scale: 1.3, translateY: -40, opacity: 1, zIndex: 6 },   // 5n+1
+      { scale: 0.6, translateY: 60, opacity: 0.7, zIndex: 1 },  // 7n+1
+      { scale: 1.4, translateY: -50, opacity: 1, zIndex: 7 },   // 11n+1
+      { scale: 0.5, translateY: 80, opacity: 0.6, zIndex: 1 }   // 13n+1
+    ];
+
+    // 复制CSS nth-child逻辑
+    if ((index + 1) % 13 === 1) return patterns[6]; // 13n+1
+    if ((index + 1) % 11 === 1) return patterns[5]; // 11n+1
+    if ((index + 1) % 7 === 1) return patterns[4];  // 7n+1
+    if ((index + 1) % 5 === 1) return patterns[3];  // 5n+1
+    if ((index + 1) % 3 === 1) return patterns[0];  // 3n+1
+    if ((index + 1) % 3 === 2) return patterns[1];  // 3n+2
+    return patterns[2]; // 3n+3 (default)
+  };
+
   useEffect(() => {
     if (!timelineRef.current) return;
 
@@ -146,6 +188,19 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
 
     // Create timeline without groups (简化版本)
     timelineInstance.current = new Timeline(timelineRef.current, items, options);
+
+    // 添加事件监听器来同步山峦效果
+    timelineInstance.current.on('rangechange', () => {
+      // 延迟执行以确保DOM更新完成
+      setTimeout(() => applyDynamicMountainEffect(), 50);
+    });
+
+    timelineInstance.current.on('rangechanged', () => {
+      setTimeout(() => applyDynamicMountainEffect(), 50);
+    });
+
+    // 初始化山峦效果 - 等待DOM渲染完成
+    setTimeout(() => applyDynamicMountainEffect(), 200);
 
     return () => {
       if (timelineInstance.current) {
