@@ -709,7 +709,9 @@ export default function TaofenHeritageModule({ className = '' }: TaofenHeritageM
                       <div
                         key={item.id}
                         data-item-id={item.id}
-                        className={`group cursor-pointer transform transition-all duration-${isRapidScrolling ? '300' : '700'} ${
+                        className={`group cursor-pointer transform transition-all ${
+                          isRapidScrolling ? 'duration-300' : 'duration-700'
+                        } ${
                           visibleItems.has(item.id)
                             ? 'translate-y-0 opacity-100'
                             : 'translate-y-8 opacity-0'
