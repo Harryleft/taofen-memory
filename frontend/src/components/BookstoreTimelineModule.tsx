@@ -55,34 +55,32 @@ const loadAllBooksData = async (): Promise<BookItem[]> => {
   allBooksCache = booksData
     .filter(book => book.image && book.year >= 1900 && book.year <= 1949)
     .map(book => {
-      // 智能分类书籍
-      let category = '图书';
+      // 智能分类书籍 - 简化为两种分类
+      let category = '其他出版社';
       let tags = [];
       
-      // 根据出版社分类
-      if (book.publisher?.includes('生活书店') || 
-          book.publisher?.includes('生活周刊社') ||
-          book.publisher?.includes('读书生活出版社') ||
-          book.publisher?.includes('读书生活社') ||
-          book.publisher?.includes('生活出版社') ||
-          book.publisher?.includes('新生活书店')) {
+      // 判断是否属于生活书店系（检查出版社和作者）
+      const isLifeBookstore = 
+        // 检查出版社
+        book.publisher?.includes('生活书店') || 
+        book.publisher?.includes('生活周刊社') ||
+        book.publisher?.includes('读书生活出版社') ||
+        book.publisher?.includes('读书生活社') ||
+        book.publisher?.includes('生活出版社') ||
+        book.publisher?.includes('新生活书店') ||
+        // 检查作者（生活书店相关作者）
+        book.writer?.includes('邹韬奋') ||
+        book.writer?.includes('韬奋') ||
+        book.writer?.includes('生活书店') ||
+        // 可以根据需要添加更多生活书店系相关作者
+        false;
+      
+      if (isLifeBookstore) {
         category = '生活书店系';
         tags.push('生活书店系');
-      } else if (book.publisher?.includes('商务印书馆')) {
-        category = '商务印书馆';
-        tags.push('商务印书馆');
-      } else if (book.publisher?.includes('中华书局')) {
-        category = '中华书局';
-        tags.push('中华书局');
-      } else if (book.publisher?.includes('开明书店')) {
-        category = '开明书店';
-        tags.push('开明书店');
-      } else if (book.publisher?.includes('世界书局')) {
-        category = '世界书局';
-        tags.push('世界书局');
       } else {
         category = '其他出版社';
-        tags.push('其他');
+        tags.push('其他出版社');
       }
       
       // 添加年代标签
@@ -131,23 +129,35 @@ const loadBooksDataPaginated = async (
   pageSize: number = 30,
   filters?: FilterOptions
 ): Promise<PaginatedResponse> => {
+  console.log('📖 [DEBUG] loadBooksDataPaginated 调用:', { page, pageSize, filters });
+  
   const allBooks = await loadAllBooksData();
+  console.log('📚 [DEBUG] 获取全量数据:', allBooks.length, '本书');
   
   // 应用筛选
   let filteredBooks = allBooks;
   
   if (filters) {
+    console.log('🔍 [DEBUG] 开始应用筛选条件:', filters);
     filteredBooks = allBooks.filter(item => {
+      const searchTerm = filters.searchTerm.toLowerCase();
+      
+      // 增强搜索逻辑：检查标题、作者、出版社，以及特殊的生活书店系关键词
       const matchesSearch = !filters.searchTerm || 
-        item.title.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
-        item.author.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
-        item.publisher.toLowerCase().includes(filters.searchTerm.toLowerCase());
+        item.title.toLowerCase().includes(searchTerm) ||
+        item.author.toLowerCase().includes(searchTerm) ||
+        item.publisher.toLowerCase().includes(searchTerm) ||
+        // 如果搜索"生活书店"相关词汇，包含所有生活书店系书籍
+        (searchTerm.includes('生活书店') || searchTerm.includes('韬奋') || searchTerm.includes('生活') && item.category === '生活书店系');
       
       const matchesYear = filters.year === 'all' || item.year.toString() === filters.year;
       const matchesCategory = filters.category === 'all' || item.category === filters.category;
       
       return matchesSearch && matchesYear && matchesCategory;
     });
+    console.log('🎯 [DEBUG] 筛选后数据:', filteredBooks.length, '本书');
+  } else {
+    console.log('🔄 [DEBUG] 未提供筛选条件，使用全量数据');
   }
   
   // 分页
@@ -155,20 +165,27 @@ const loadBooksDataPaginated = async (
   const items = filteredBooks.slice(start, start + pageSize);
   const hasMore = start + pageSize < filteredBooks.length;
   
-  return {
+  const result = {
     items,
     hasMore,
     total: filteredBooks.length,
     currentPage: page
   };
+  
+  console.log('📊 [DEBUG] 分页结果:', {
+    page,
+    start,
+    itemsCount: items.length,
+    hasMore,
+    total: result.total,
+    currentPage: result.currentPage
+  });
+  
+  return result;
 };
 
 const categoryColors = {
   '生活书店系': 'bg-gold',
-  '商务印书馆': 'bg-blue-500',
-  '中华书局': 'bg-red-500',
-  '开明书店': 'bg-green-500',
-  '世界书局': 'bg-purple-500',
   '其他出版社': 'bg-gray-500'
 };
 
@@ -177,6 +194,8 @@ interface BookstoreTimelineModuleProps {
 }
 
 export default function BookstoreTimelineModule({ className = '' }: BookstoreTimelineModuleProps) {
+  // *** 懒加载版本 v2.0 - 2025-01-30 ***
+  
   // 筛选状态
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedYear, setSelectedYear] = useState<string>('all');
@@ -190,6 +209,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
+  const [isInitialized, setIsInitialized] = useState(false); // 防止重复初始化
   
   // 灯箱状态
   const [selectedItem, setSelectedItem] = useState<BookItem | null>(null);
@@ -209,33 +229,73 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
 
   // 初始化加载数据
   useEffect(() => {
-    loadInitialData();
-  }, []);
+    if (!isInitialized) {
+      console.log('🔄 [DEBUG] 首次初始化开始');
+      setIsInitialized(true);
+      loadInitialData();
+    }
+  }, [isInitialized]);
 
   // 加载首页数据
   const loadInitialData = async () => {
+    console.log('🚀 [DEBUG] loadInitialData 开始执行');
     setIsInitialLoading(true);
     try {
       // 加载全量数据以获取统计信息
       const allBooks = await loadAllBooksData();
+      console.log('📚 [DEBUG] 全量数据加载完成，总数:', allBooks.length);
       setAllData(allBooks);
       
+      // 构建初始筛选条件，确保与后续加载保持一致
+      const filters: FilterOptions = {
+        category: selectedCategory,
+        year: selectedYear,
+        searchTerm
+      };
+      console.log('🔍 [DEBUG] 初始筛选条件:', filters);
+      
       // 加载第一页数据
-      const firstPage = await loadBooksDataPaginated(0, PAGE_SIZE);
+      const firstPage = await loadBooksDataPaginated(0, PAGE_SIZE, filters);
+      console.log('📄 [DEBUG] 首页数据加载结果:', {
+        items: firstPage.items.length,
+        hasMore: firstPage.hasMore,
+        total: firstPage.total,
+        currentPage: firstPage.currentPage
+      });
+      
       setDisplayedData(firstPage.items);
       setHasMore(firstPage.hasMore);
       setTotalCount(firstPage.total);
       setCurrentPage(0);
+      
+      // 设置初始可见项目（首屏项目立即可见）
+      setTimeout(() => {
+        const initialVisibleIds = new Set(firstPage.items.slice(0, 12).map(item => item.id));
+        console.log('🎆 [DEBUG] 设置初始可见项目:', initialVisibleIds.size, '个');
+        setVisibleItems(initialVisibleIds);
+      }, 100);
+      
     } catch (error) {
-      console.error('加载数据失败:', error);
+      console.error('❌ [DEBUG] 加载数据失败:', error);
     } finally {
       setIsInitialLoading(false);
+      console.log('✅ [DEBUG] loadInitialData 执行完成');
     }
   };
 
   // 加载更多数据
   const loadMoreData = useCallback(async () => {
-    if (isLoading || !hasMore) return;
+    console.log('🔄 [DEBUG] loadMoreData 被调用，当前状态:', {
+      isLoading,
+      hasMore,
+      currentPage,
+      displayedCount: displayedData.length
+    });
+    
+    if (isLoading || !hasMore) {
+      console.log('⏹️ [DEBUG] loadMoreData 提前返回:', { isLoading, hasMore });
+      return;
+    }
     
     setIsLoading(true);
     try {
@@ -245,22 +305,35 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
         year: selectedYear,
         searchTerm
       };
+      console.log('📄 [DEBUG] 准备加载第', nextPage, '页，筛选条件:', filters);
       
       const pageData = await loadBooksDataPaginated(nextPage, PAGE_SIZE, filters);
+      console.log('📊 [DEBUG] 加载更多数据结果:', {
+        newItems: pageData.items.length,
+        hasMore: pageData.hasMore,
+        total: pageData.total,
+        currentPage: pageData.currentPage
+      });
       
-      setDisplayedData(prev => [...prev, ...pageData.items]);
+      setDisplayedData(prev => {
+        const newData = [...prev, ...pageData.items];
+        console.log('📈 [DEBUG] 数据更新：从', prev.length, '增加到', newData.length);
+        return newData;
+      });
       setHasMore(pageData.hasMore);
       setCurrentPage(nextPage);
       setTotalCount(pageData.total);
     } catch (error) {
-      console.error('加载更多数据失败:', error);
+      console.error('❌ [DEBUG] 加载更多数据失败:', error);
     } finally {
       setIsLoading(false);
+      console.log('✅ [DEBUG] loadMoreData 执行完成');
     }
   }, [currentPage, hasMore, isLoading, selectedCategory, selectedYear, searchTerm]);
 
   // 重置并重新加载数据（搜索/筛选时使用）
   const resetAndReload = useCallback(async () => {
+    console.log('🔄 [DEBUG] resetAndReload 开始执行');
     setIsLoading(true);
     try {
       const filters: FilterOptions = {
@@ -274,7 +347,16 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
       setHasMore(firstPage.hasMore);
       setTotalCount(firstPage.total);
       setCurrentPage(0);
-      setVisibleItems(new Set()); // 重置可见项目
+      
+      // 不立即清空 visibleItems，让首屏项目立即可见
+      console.log('👁️ [DEBUG] 准备设置首屏项目为可见');
+      // 使用 setTimeout 确保 DOM 更新后再设置可见性
+      setTimeout(() => {
+        const initialVisibleIds = new Set(firstPage.items.slice(0, 12).map(item => item.id)); // 前12个项目立即可见
+        console.log('🎆 [DEBUG] 设置初始可见项目:', initialVisibleIds.size, '个');
+        setVisibleItems(initialVisibleIds);
+      }, 100);
+      
     } catch (error) {
       console.error('重新加载数据失败:', error);
     } finally {
@@ -297,62 +379,122 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
     return () => window.removeEventListener('resize', updateColumns);
   }, []);
 
-  // 搜索/筛选变化时重新加载数据
+  // 搜索/筛选变化时重新加载数据（跳过初始化时的触发）
   useEffect(() => {
+    // 跳过初始化时的调用，避免与 loadInitialData 产生竞争
+    if (isInitialLoading) return;
+    
     const debounceTimer = setTimeout(() => {
       resetAndReload();
     }, 300); // 300ms防抖
 
     return () => clearTimeout(debounceTimer);
-  }, [searchTerm, selectedCategory, selectedYear]);
+  }, [searchTerm, selectedCategory, selectedYear, isInitialLoading]);
 
   // 卡片可见性观察器（用于渐进动画）
   useEffect(() => {
+    console.log('👀 [DEBUG] 设置卡片可见性观察器');
+    
     observerRef.current = new IntersectionObserver(
       (entries) => {
+        const newVisibleIds = new Set<number>();
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             const itemId = parseInt(entry.target.getAttribute('data-item-id') || '0');
-            setVisibleItems(prev => new Set([...prev, itemId]));
+            newVisibleIds.add(itemId);
+            console.log(`✨ [DEBUG] 项目 ${itemId} 变为可见`);
           }
         });
+        
+        if (newVisibleIds.size > 0) {
+          setVisibleItems(prev => {
+            const updated = new Set([...prev, ...newVisibleIds]);
+            console.log(`📊 [DEBUG] 可见项目更新: ${prev.size} -> ${updated.size}`);
+            return updated;
+          });
+        }
       },
       { threshold: 0.1, rootMargin: '50px' }
     );
 
-    return () => observerRef.current?.disconnect();
+    return () => {
+      console.log('🔌 [DEBUG] 断开卡片可见性观察器');
+      observerRef.current?.disconnect();
+    };
   }, []);
 
   // 无限滚动观察器（监听"加载更多"触发点）
   useEffect(() => {
+    // 等待初始数据加载完成再设置观察器
+    if (isInitialLoading || displayedData.length === 0) {
+      console.log('⏳ [DEBUG] 等待初始数据加载完成，跳过观察器设置');
+      return;
+    }
+    
+    console.log('🔭 [DEBUG] 设置无限滚动观察器，当前状态:', { hasMore, isLoading, displayedCount: displayedData.length });
+    
     const loadMoreObserver = new IntersectionObserver(
       (entries) => {
         const target = entries[0];
+        console.log('👁️ [DEBUG] 观察器触发:', {
+          isIntersecting: target.isIntersecting,
+          hasMore,
+          isLoading,
+          boundingClientRect: target.boundingClientRect
+        });
+        
         if (target.isIntersecting && hasMore && !isLoading) {
+          console.log('🎯 [DEBUG] 触发加载更多数据');
           loadMoreData();
+        } else {
+          console.log('⛔ [DEBUG] 未触发加载更多，原因:', {
+            intersecting: target.isIntersecting,
+            hasMore,
+            notLoading: !isLoading
+          });
         }
       },
       { threshold: 1.0, rootMargin: '100px' } // 提前100px开始加载
     );
 
-    if (loadMoreRef.current) {
-      loadMoreObserver.observe(loadMoreRef.current);
-    }
+    // 延迟设置观察器，确保DOM已渲染
+    const timeoutId = setTimeout(() => {
+      if (loadMoreRef.current) {
+        console.log('📍 [DEBUG] 开始观察加载触发点元素');
+        loadMoreObserver.observe(loadMoreRef.current);
+      } else {
+        console.log('⚠️ [DEBUG] 加载触发点元素不存在');
+      }
+    }, 100);
 
-    return () => loadMoreObserver.disconnect();
-  }, [hasMore, isLoading, loadMoreData]);
+    return () => {
+      clearTimeout(timeoutId);
+      console.log('🔌 [DEBUG] 断开无限滚动观察器');
+      loadMoreObserver.disconnect();
+    };
+  }, [hasMore, isLoading, loadMoreData, displayedData.length, isInitialLoading]);
 
   // 瀑布流布局计算
   const distributeItems = useCallback(() => {
+    console.log('🏗️ [DEBUG] 计算瀑布流布局:', { 
+      displayedDataLength: displayedData.length, 
+      columns 
+    });
+    
     const columnArrays: BookItem[][] = Array.from({ length: columns }, () => []);
     const columnHeights = new Array(columns).fill(0);
 
-    displayedData.forEach((item) => {
+    displayedData.forEach((item, index) => {
       const shortestColumnIndex = columnHeights.indexOf(Math.min(...columnHeights));
       columnArrays[shortestColumnIndex].push(item);
       columnHeights[shortestColumnIndex] += item.dimensions.height + 20; // 20px gap
+      
+      if (index < 5) { // 只记录前5个项目的分布
+        console.log(`📋 [DEBUG] 项目 ${index} 分配到列 ${shortestColumnIndex}`);
+      }
     });
 
+    console.log('📊 [DEBUG] 布局分配结果:', columnArrays.map((col, i) => `列${i}: ${col.length}项`).join(', '));
     return columnArrays;
   }, [displayedData, columns]);
 
@@ -390,11 +532,29 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedItem, currentIndex]);
 
-  // 观察项目
+  // 观察项目（当数据更新时重新观察）
   useEffect(() => {
-    const items = document.querySelectorAll('[data-item-id]');
-    items.forEach(item => observerRef.current?.observe(item));
-  }, [displayedData]);
+    if (!observerRef.current || displayedData.length === 0) return;
+    
+    console.log('🔍 [DEBUG] 开始观察', displayedData.length, '个新项目');
+    
+    // 延迟观察，确保DOM已渲染
+    const timeoutId = setTimeout(() => {
+      const items = document.querySelectorAll('[data-item-id]');
+      console.log('📋 [DEBUG] 找到', items.length, '个可观察元素');
+      
+      items.forEach((item, index) => {
+        if (observerRef.current) {
+          observerRef.current.observe(item);
+          if (index < 5) { // 只记录前5个
+            console.log(`🔗 [DEBUG] 开始观察项目 ${item.getAttribute('data-item-id')}`);
+          }
+        }
+      });
+    }, 50);
+    
+    return () => clearTimeout(timeoutId);
+  }, [displayedData.length]); // 只在数据长度变化时重新观察
 
   const uniqueYears = [...new Set(allData.map(item => item.year))].sort();
   const uniqueCategories = [...new Set(allData.map(item => item.category))].sort();
@@ -429,9 +589,6 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
           <h2 className="text-5xl font-bold text-charcoal mb-6 font-serif">
             远读山峦时间轴
           </h2>
-          <p className="text-xl text-charcoal/70 max-w-3xl mx-auto leading-relaxed">
-            {yearRange && `${yearRange} 年出版物卡片展示：共 ${allData.length} 本书籍，时间流瀑布式浏览`}
-          </p>
         </div>
 
         {/* Filters */}
@@ -470,78 +627,82 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
           </select>
         </div>
 
-        {/* Results count */}
-        <div className="text-center mb-8">
-          <p className="text-charcoal/60">
-            显示 <span className="font-bold text-gold">{displayedData.length}</span> / <span className="font-bold text-gold">{totalCount}</span> 本书籍
-            {totalCount > displayedData.length && (
-              <span className="ml-2 text-sm text-charcoal/50">（向下滚动加载更多）</span>
-            )}
-          </p>
-        </div>
-
-        {/* Masonry Grid */}
+{/* Masonry Grid */}
         <div ref={masonryRef} className="flex gap-5">
-          {columnArrays.map((column, columnIndex) => (
-            <div key={columnIndex} className="flex-1 flex flex-col gap-5">
-              {column.map((item) => (
-                <div
-                  key={item.id}
-                  data-item-id={item.id}
-                  className={`group cursor-pointer transform transition-all duration-700 ${
-                    visibleItems.has(item.id)
-                      ? 'translate-y-0 opacity-100'
-                      : 'translate-y-8 opacity-0'
-                  }`}
-                  onClick={() => openLightbox(item)}
-                  style={{
-                    animationDelay: `${columnIndex * 100}ms`
-                  }}
-                >
-                  <div className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-amber-200">
-                    <div className="relative overflow-hidden">
-                      <img
-                        src={item.image}
-                        alt={item.title}
-                        className="w-full object-cover group-hover:scale-110 transition-transform duration-700"
-                        style={{ height: `${item.dimensions.height}px` }}
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
-                        <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={32} />
+          {columnArrays.length > 0 ? (
+            columnArrays.map((column, columnIndex) => {
+              console.log(`🏛️ [DEBUG] 渲染列 ${columnIndex}，包含 ${column.length} 个项目`);
+              return (
+                <div key={columnIndex} className="flex-1 flex flex-col gap-5">
+                  {column.map((item, itemIndex) => {
+                    if (itemIndex < 3) { // 只调试前3个项目
+                      console.log(`🎨 [DEBUG] 渲染项目 ${item.id} 在列 ${columnIndex}`);
+                    }
+                    return (
+                      <div
+                        key={item.id}
+                        data-item-id={item.id}
+                        className={`group cursor-pointer transform transition-all duration-700 ${
+                          visibleItems.has(item.id)
+                            ? 'translate-y-0 opacity-100'
+                            : 'translate-y-8 opacity-0'
+                        }`}
+                        onClick={() => openLightbox(item)}
+                        style={{
+                          animationDelay: `${columnIndex * 100}ms`
+                        }}
+                      >
+                        <div className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-amber-200">
+                          <div className="relative overflow-hidden">
+                            <img
+                              src={item.image}
+                              alt={item.title}
+                              className="w-full object-cover group-hover:scale-110 transition-transform duration-700"
+                              style={{ height: `${item.dimensions.height}px` }}
+                              loading="lazy"
+                            />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+                              <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={32} />
+                            </div>
+                          </div>
+                          <div className="p-4 bg-amber-50">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="px-2 py-1 rounded-full text-xs text-white bg-gold">
+                                {item.year}年
+                              </span>
+                              <span className={`px-2 py-1 rounded-full text-xs text-white ${categoryColors[item.category as keyof typeof categoryColors] || 'bg-gray-500'}`}>
+                                {item.category}
+                              </span>
+                            </div>
+                            <h3 className="font-bold text-charcoal mb-2 group-hover:text-gold transition-colors line-clamp-2">
+                              {item.title}
+                            </h3>
+                            <p className="text-sm text-charcoal/70 mb-1">
+                              作者：{item.author}
+                            </p>
+                            <p className="text-sm text-charcoal/70 mb-2">
+                              出版：{item.publisher}
+                            </p>
+                            <div className="flex flex-wrap gap-1">
+                              {item.tags.slice(0, 2).map((tag, index) => (
+                                <span key={index} className="text-xs bg-gold/10 text-gold px-2 py-1 rounded">
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                    <div className="p-4 bg-amber-50">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="px-2 py-1 rounded-full text-xs text-white bg-gold">
-                          {item.year}年
-                        </span>
-                        <span className={`px-2 py-1 rounded-full text-xs text-white ${categoryColors[item.category as keyof typeof categoryColors] || 'bg-gray-500'}`}>
-                          {item.category}
-                        </span>
-                      </div>
-                      <h3 className="font-bold text-charcoal mb-2 group-hover:text-gold transition-colors line-clamp-2">
-                        {item.title}
-                      </h3>
-                      <p className="text-sm text-charcoal/70 mb-1">
-                        作者：{item.author}
-                      </p>
-                      <p className="text-sm text-charcoal/70 mb-2">
-                        出版：{item.publisher}
-                      </p>
-                      <div className="flex flex-wrap gap-1">
-                        {item.tags.slice(0, 2).map((tag, index) => (
-                          <span key={index} className="text-xs bg-gold/10 text-gold px-2 py-1 rounded">
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+                    );
+                  })}
                 </div>
-              ))}
+              );
+            })
+          ) : (
+            <div className="w-full text-center py-8">
+              <p className="text-charcoal/60">🔍 [DEBUG] columnArrays 为空，无数据渲染</p>
             </div>
-          ))}
+          )}
         </div>
 
         {/* Load more trigger point */}

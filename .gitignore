@@ -105,3 +105,5 @@ dump.rdb
 
 data/
 .claude/
+.specstory/
+.gitignore
