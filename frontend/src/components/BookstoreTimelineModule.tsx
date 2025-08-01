@@ -87,21 +87,6 @@ const loadAllBooksData = async (): Promise<BookItem[]> => {
       const decade = Math.floor(book.year / 10) * 10;
       tags.push(`${decade}年代`);
       
-      // 根据书名关键词添加主题标签
-      const title = book.bookname?.toLowerCase() || '';
-      if (title.includes('文学') || title.includes('小说') || title.includes('诗') || title.includes('散文')) {
-        tags.push('文学');
-      } else if (title.includes('政治') || title.includes('革命') || title.includes('主义')) {
-        tags.push('政治');
-      } else if (title.includes('教育') || title.includes('学校') || title.includes('教学')) {
-        tags.push('教育');
-      } else if (title.includes('科学') || title.includes('技术') || title.includes('工程')) {
-        tags.push('科技');
-      } else if (title.includes('历史') || title.includes('史')) {
-        tags.push('历史');
-      } else if (title.includes('哲学') || title.includes('思想')) {
-        tags.push('哲学');
-      }
       
       return {
         id: book.id,
@@ -111,7 +96,7 @@ const loadAllBooksData = async (): Promise<BookItem[]> => {
         publisher: book.publisher || '未知出版社',
         image: book.image,
         category,
-        tags: tags.slice(0, 3), // 最多保留3个标签
+        tags: tags.slice(0, 2), // 最多保留2个标签：分类标签和年代标签
         dimensions: {
           width: 200,
           height: Math.floor(Math.random() * 100) + 250 // 随机高度模拟不同封面尺寸
@@ -129,16 +114,12 @@ const loadBooksDataPaginated = async (
   pageSize: number = 30,
   filters?: FilterOptions
 ): Promise<PaginatedResponse> => {
-  console.log('📖 [DEBUG] loadBooksDataPaginated 调用:', { page, pageSize, filters });
-  
   const allBooks = await loadAllBooksData();
-  console.log('📚 [DEBUG] 获取全量数据:', allBooks.length, '本书');
   
   // 应用筛选
   let filteredBooks = allBooks;
   
   if (filters) {
-    console.log('🔍 [DEBUG] 开始应用筛选条件:', filters);
     filteredBooks = allBooks.filter(item => {
       const searchTerm = filters.searchTerm.toLowerCase();
       
@@ -148,16 +129,13 @@ const loadBooksDataPaginated = async (
         item.author.toLowerCase().includes(searchTerm) ||
         item.publisher.toLowerCase().includes(searchTerm) ||
         // 如果搜索"生活书店"相关词汇，包含所有生活书店系书籍
-        (searchTerm.includes('生活书店') || searchTerm.includes('韬奋') || searchTerm.includes('生活') && item.category === '生活书店系');
+        (searchTerm.includes('生活书店') || searchTerm.includes('韬奋') || (searchTerm.includes('生活') && item.category === '生活书店系'));
       
       const matchesYear = filters.year === 'all' || item.year.toString() === filters.year;
       const matchesCategory = filters.category === 'all' || item.category === filters.category;
       
       return matchesSearch && matchesYear && matchesCategory;
     });
-    console.log('🎯 [DEBUG] 筛选后数据:', filteredBooks.length, '本书');
-  } else {
-    console.log('🔄 [DEBUG] 未提供筛选条件，使用全量数据');
   }
   
   // 分页
@@ -171,15 +149,6 @@ const loadBooksDataPaginated = async (
     total: filteredBooks.length,
     currentPage: page
   };
-  
-  console.log('📊 [DEBUG] 分页结果:', {
-    page,
-    start,
-    itemsCount: items.length,
-    hasMore,
-    total: result.total,
-    currentPage: result.currentPage
-  });
   
   return result;
 };
@@ -230,7 +199,6 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
   // 初始化加载数据
   useEffect(() => {
     if (!isInitialized) {
-      console.log('🔄 [DEBUG] 首次初始化开始');
       setIsInitialized(true);
       loadInitialData();
     }
@@ -238,12 +206,10 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
 
   // 加载首页数据
   const loadInitialData = async () => {
-    console.log('🚀 [DEBUG] loadInitialData 开始执行');
     setIsInitialLoading(true);
     try {
       // 加载全量数据以获取统计信息
       const allBooks = await loadAllBooksData();
-      console.log('📚 [DEBUG] 全量数据加载完成，总数:', allBooks.length);
       setAllData(allBooks);
       
       // 构建初始筛选条件，确保与后续加载保持一致
@@ -252,16 +218,9 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
         year: selectedYear,
         searchTerm
       };
-      console.log('🔍 [DEBUG] 初始筛选条件:', filters);
       
       // 加载第一页数据
       const firstPage = await loadBooksDataPaginated(0, PAGE_SIZE, filters);
-      console.log('📄 [DEBUG] 首页数据加载结果:', {
-        items: firstPage.items.length,
-        hasMore: firstPage.hasMore,
-        total: firstPage.total,
-        currentPage: firstPage.currentPage
-      });
       
       setDisplayedData(firstPage.items);
       setHasMore(firstPage.hasMore);
@@ -271,29 +230,19 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
       // 设置初始可见项目（首屏项目立即可见）
       setTimeout(() => {
         const initialVisibleIds = new Set(firstPage.items.slice(0, 12).map(item => item.id));
-        console.log('🎆 [DEBUG] 设置初始可见项目:', initialVisibleIds.size, '个');
         setVisibleItems(initialVisibleIds);
       }, 100);
       
     } catch (error) {
-      console.error('❌ [DEBUG] 加载数据失败:', error);
+      console.error('加载数据失败:', error);
     } finally {
       setIsInitialLoading(false);
-      console.log('✅ [DEBUG] loadInitialData 执行完成');
     }
   };
 
   // 加载更多数据
   const loadMoreData = useCallback(async () => {
-    console.log('🔄 [DEBUG] loadMoreData 被调用，当前状态:', {
-      isLoading,
-      hasMore,
-      currentPage,
-      displayedCount: displayedData.length
-    });
-    
     if (isLoading || !hasMore) {
-      console.log('⏹️ [DEBUG] loadMoreData 提前返回:', { isLoading, hasMore });
       return;
     }
     
@@ -305,35 +254,25 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
         year: selectedYear,
         searchTerm
       };
-      console.log('📄 [DEBUG] 准备加载第', nextPage, '页，筛选条件:', filters);
       
       const pageData = await loadBooksDataPaginated(nextPage, PAGE_SIZE, filters);
-      console.log('📊 [DEBUG] 加载更多数据结果:', {
-        newItems: pageData.items.length,
-        hasMore: pageData.hasMore,
-        total: pageData.total,
-        currentPage: pageData.currentPage
-      });
       
       setDisplayedData(prev => {
         const newData = [...prev, ...pageData.items];
-        console.log('📈 [DEBUG] 数据更新：从', prev.length, '增加到', newData.length);
         return newData;
       });
       setHasMore(pageData.hasMore);
       setCurrentPage(nextPage);
       setTotalCount(pageData.total);
     } catch (error) {
-      console.error('❌ [DEBUG] 加载更多数据失败:', error);
+      console.error('加载更多数据失败:', error);
     } finally {
       setIsLoading(false);
-      console.log('✅ [DEBUG] loadMoreData 执行完成');
     }
   }, [currentPage, hasMore, isLoading, selectedCategory, selectedYear, searchTerm]);
 
   // 重置并重新加载数据（搜索/筛选时使用）
   const resetAndReload = useCallback(async () => {
-    console.log('🔄 [DEBUG] resetAndReload 开始执行');
     setIsLoading(true);
     try {
       const filters: FilterOptions = {
@@ -349,11 +288,9 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
       setCurrentPage(0);
       
       // 不立即清空 visibleItems，让首屏项目立即可见
-      console.log('👁️ [DEBUG] 准备设置首屏项目为可见');
       // 使用 setTimeout 确保 DOM 更新后再设置可见性
       setTimeout(() => {
         const initialVisibleIds = new Set(firstPage.items.slice(0, 12).map(item => item.id)); // 前12个项目立即可见
-        console.log('🎆 [DEBUG] 设置初始可见项目:', initialVisibleIds.size, '个');
         setVisibleItems(initialVisibleIds);
       }, 100);
       
@@ -393,8 +330,6 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
 
   // 卡片可见性观察器（用于渐进动画）
   useEffect(() => {
-    console.log('👀 [DEBUG] 设置卡片可见性观察器');
-    
     observerRef.current = new IntersectionObserver(
       (entries) => {
         const newVisibleIds = new Set<number>();
@@ -402,14 +337,12 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
           if (entry.isIntersecting) {
             const itemId = parseInt(entry.target.getAttribute('data-item-id') || '0');
             newVisibleIds.add(itemId);
-            console.log(`✨ [DEBUG] 项目 ${itemId} 变为可见`);
           }
         });
         
         if (newVisibleIds.size > 0) {
           setVisibleItems(prev => {
             const updated = new Set([...prev, ...newVisibleIds]);
-            console.log(`📊 [DEBUG] 可见项目更新: ${prev.size} -> ${updated.size}`);
             return updated;
           });
         }
@@ -418,7 +351,6 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
     );
 
     return () => {
-      console.log('🔌 [DEBUG] 断开卡片可见性观察器');
       observerRef.current?.disconnect();
     };
   }, []);
@@ -427,31 +359,15 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
   useEffect(() => {
     // 等待初始数据加载完成再设置观察器
     if (isInitialLoading || displayedData.length === 0) {
-      console.log('⏳ [DEBUG] 等待初始数据加载完成，跳过观察器设置');
       return;
     }
-    
-    console.log('🔭 [DEBUG] 设置无限滚动观察器，当前状态:', { hasMore, isLoading, displayedCount: displayedData.length });
     
     const loadMoreObserver = new IntersectionObserver(
       (entries) => {
         const target = entries[0];
-        console.log('👁️ [DEBUG] 观察器触发:', {
-          isIntersecting: target.isIntersecting,
-          hasMore,
-          isLoading,
-          boundingClientRect: target.boundingClientRect
-        });
         
         if (target.isIntersecting && hasMore && !isLoading) {
-          console.log('🎯 [DEBUG] 触发加载更多数据');
           loadMoreData();
-        } else {
-          console.log('⛔ [DEBUG] 未触发加载更多，原因:', {
-            intersecting: target.isIntersecting,
-            hasMore,
-            notLoading: !isLoading
-          });
         }
       },
       { threshold: 1.0, rootMargin: '100px' } // 提前100px开始加载
@@ -460,27 +376,18 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
     // 延迟设置观察器，确保DOM已渲染
     const timeoutId = setTimeout(() => {
       if (loadMoreRef.current) {
-        console.log('📍 [DEBUG] 开始观察加载触发点元素');
         loadMoreObserver.observe(loadMoreRef.current);
-      } else {
-        console.log('⚠️ [DEBUG] 加载触发点元素不存在');
       }
     }, 100);
 
     return () => {
       clearTimeout(timeoutId);
-      console.log('🔌 [DEBUG] 断开无限滚动观察器');
       loadMoreObserver.disconnect();
     };
   }, [hasMore, isLoading, loadMoreData, displayedData.length, isInitialLoading]);
 
   // 瀑布流布局计算
   const distributeItems = useCallback(() => {
-    console.log('🏗️ [DEBUG] 计算瀑布流布局:', { 
-      displayedDataLength: displayedData.length, 
-      columns 
-    });
-    
     const columnArrays: BookItem[][] = Array.from({ length: columns }, () => []);
     const columnHeights = new Array(columns).fill(0);
 
@@ -488,13 +395,8 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
       const shortestColumnIndex = columnHeights.indexOf(Math.min(...columnHeights));
       columnArrays[shortestColumnIndex].push(item);
       columnHeights[shortestColumnIndex] += item.dimensions.height + 20; // 20px gap
-      
-      if (index < 5) { // 只记录前5个项目的分布
-        console.log(`📋 [DEBUG] 项目 ${index} 分配到列 ${shortestColumnIndex}`);
-      }
     });
 
-    console.log('📊 [DEBUG] 布局分配结果:', columnArrays.map((col, i) => `列${i}: ${col.length}项`).join(', '));
     return columnArrays;
   }, [displayedData, columns]);
 
@@ -536,19 +438,13 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
   useEffect(() => {
     if (!observerRef.current || displayedData.length === 0) return;
     
-    console.log('🔍 [DEBUG] 开始观察', displayedData.length, '个新项目');
-    
     // 延迟观察，确保DOM已渲染
     const timeoutId = setTimeout(() => {
       const items = document.querySelectorAll('[data-item-id]');
-      console.log('📋 [DEBUG] 找到', items.length, '个可观察元素');
       
       items.forEach((item, index) => {
         if (observerRef.current) {
           observerRef.current.observe(item);
-          if (index < 5) { // 只记录前5个
-            console.log(`🔗 [DEBUG] 开始观察项目 ${item.getAttribute('data-item-id')}`);
-          }
         }
       });
     }, 50);
@@ -631,13 +527,9 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
         <div ref={masonryRef} className="flex gap-5">
           {columnArrays.length > 0 ? (
             columnArrays.map((column, columnIndex) => {
-              console.log(`🏛️ [DEBUG] 渲染列 ${columnIndex}，包含 ${column.length} 个项目`);
               return (
                 <div key={columnIndex} className="flex-1 flex flex-col gap-5">
                   {column.map((item, itemIndex) => {
-                    if (itemIndex < 3) { // 只调试前3个项目
-                      console.log(`🎨 [DEBUG] 渲染项目 ${item.id} 在列 ${columnIndex}`);
-                    }
                     return (
                       <div
                         key={item.id}
@@ -675,9 +567,6 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
                             <p className="text-sm text-charcoal/70 mb-2">
                               出版：{item.publisher}
                             </p>
-                            <p className="text-xs text-charcoal/50">
-                              {item.year}年
-                            </p>
                           </div>
                         </div>
                       </div>
@@ -688,7 +577,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
             })
           ) : (
             <div className="w-full text-center py-8">
-              <p className="text-charcoal/60">🔍 [DEBUG] columnArrays 为空，无数据渲染</p>
+              <p className="text-charcoal/60">无数据可显示</p>
             </div>
           )}
         </div>
