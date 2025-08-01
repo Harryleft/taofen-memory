@@ -41,7 +41,6 @@ const generateMountainData = (): MountainDataPoint[] => {
 
   let id = 1;
   let imgIdx = 0;
-  // const data: MountainDataPoint[] = [];
 
   Object.entries(yearlyDistribution).forEach(([y, count]) => {
     const year = +y;
@@ -60,7 +59,135 @@ const generateMountainData = (): MountainDataPoint[] => {
 
 const mountainData = generateMountainData();
 
-/* ---------- 组件 ---------- */
+const CHART_CONFIG = {
+  CONTAINER_HEIGHT: 600,
+  IMAGE_SIZE: 40,
+  IMAGE_GAP: 2,
+  ZOOM_EXTENT: [0.5, 8] as [number, number],
+  BG_COLOR: '#fffbef',
+  MARGIN: { top: 40, right: 40, bottom: 60, left: 60 },
+  AXIS_TEXT_COLOR: '#666',
+  AXIS_LINE_COLOR: '#ccc',
+  TOOLTIP_OFFSET_X: 15,
+  HOVER_SCALE_FACTOR: 1.1,
+  TRANSITION_DURATION: 150,
+};
+
+const drawTimelineChart = (
+  svgNode: SVGSVGElement,
+  tooltipNode: HTMLDivElement,
+  data: MountainDataPoint[],
+) => {
+  d3.select(svgNode).selectAll('*').remove();
+  d3.select(svgNode).on('.zoom', null);
+
+  const containerWidth = svgNode.clientWidth || 1200;
+  const width = containerWidth - CHART_CONFIG.MARGIN.left - CHART_CONFIG.MARGIN.right;
+  const height = CHART_CONFIG.CONTAINER_HEIGHT - CHART_CONFIG.MARGIN.top - CHART_CONFIG.MARGIN.bottom;
+
+  const svg = d3
+    .select(svgNode)
+    .attr('width', containerWidth)
+    .attr('height', CHART_CONFIG.CONTAINER_HEIGHT)
+    .style('background-color', CHART_CONFIG.BG_COLOR);
+
+  svg.append('defs')
+    .append('clipPath')
+    .attr('id', 'clip')
+    .append('rect')
+    .attr('width', width)
+    .attr('height', height);
+
+  const outer = svg.append('g')
+    .attr('transform', `translate(${CHART_CONFIG.MARGIN.left},${CHART_CONFIG.MARGIN.top})`);
+
+  const zoomLayer = outer.append('g')
+    .attr('clip-path', 'url(#clip)');
+
+  const years = Array.from(new Set(data.map(d => d.year))).sort();
+  const minYear = d3.min(years)! - 0.5;
+  const maxYear = d3.max(years)! + 0.5;
+
+  const xScaleLinear = d3.scaleLinear()
+    .domain([minYear, maxYear])
+    .range([0, width]);
+
+  const xAxis = d3.axisBottom(xScaleLinear)
+    .tickValues(years)
+    .tickFormat(d3.format('d'));
+
+  const xAxisG = outer.append('g')
+    .attr('transform', `translate(0,${height})`)
+    .call(xAxis);
+
+  xAxisG.selectAll('text').style('font-size', '14px').style('fill', CHART_CONFIG.AXIS_TEXT_COLOR);
+  xAxisG.select('.domain').style('stroke', CHART_CONFIG.AXIS_LINE_COLOR);
+
+  const grouped = d3.group(data, d => d.year);
+
+  grouped.forEach((yearData, year) => {
+    const centerX = xScaleLinear(year);
+    const maxPerRow = Math.floor((width / years.length) / (CHART_CONFIG.IMAGE_SIZE + CHART_CONFIG.IMAGE_GAP));
+
+    yearData.forEach((d, i) => {
+      const row = Math.floor(i / maxPerRow);
+      const col = i % maxPerRow;
+      const offsetX = (col - maxPerRow / 2) * (CHART_CONFIG.IMAGE_SIZE + CHART_CONFIG.IMAGE_GAP) + (CHART_CONFIG.IMAGE_SIZE + CHART_CONFIG.IMAGE_GAP) / 2;
+
+      zoomLayer.append('image')
+        .datum(d)
+        .attr('href', d.imagePath)
+        .attr('width', CHART_CONFIG.IMAGE_SIZE)
+        .attr('height', CHART_CONFIG.IMAGE_SIZE)
+        .attr('x', centerX + offsetX - CHART_CONFIG.IMAGE_SIZE / 2)
+        .attr('y', height - (row + 1) * (CHART_CONFIG.IMAGE_SIZE + CHART_CONFIG.IMAGE_GAP))
+        .attr('preserveAspectRatio', 'xMidYMid slice')
+        .attr('class', 'book-img')
+        .style('cursor', 'pointer');
+    });
+  });
+
+  const tooltip = d3.select(tooltipNode);
+
+  zoomLayer.selectAll<SVGImageElement, MountainDataPoint>('.book-img')
+    .on('mouseover', function (event, d) {
+      d3.select(this).raise().transition().duration(CHART_CONFIG.TRANSITION_DURATION)
+        .attr('width', CHART_CONFIG.IMAGE_SIZE * CHART_CONFIG.HOVER_SCALE_FACTOR)
+        .attr('height', CHART_CONFIG.IMAGE_SIZE * CHART_CONFIG.HOVER_SCALE_FACTOR);
+
+      tooltip
+        .style('opacity', 1)
+        .html(`<strong>${d.title}</strong><br/>${d.year} 年`)
+        .style('left', `${event.pageX + CHART_CONFIG.TOOLTIP_OFFSET_X}px`)
+        .style('top', `${event.pageY}px`);
+    })
+    .on('mouseout', function () {
+      d3.select(this).transition().duration(CHART_CONFIG.TRANSITION_DURATION)
+        .attr('width', CHART_CONFIG.IMAGE_SIZE)
+        .attr('height', CHART_CONFIG.IMAGE_SIZE);
+
+      tooltip.style('opacity', 0);
+    });
+
+  const zoomed = (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
+    const { k, x } = event.transform;
+    zoomLayer.attr('transform', `translate(${x},0) scale(${k},1)`);
+    xAxisG.call(xAxis.scale(event.transform.rescaleX(xScaleLinear)));
+  };
+
+  svg.call(
+    d3.zoom<SVGSVGElement, unknown>()
+      .scaleExtent(CHART_CONFIG.ZOOM_EXTENT)
+      .translateExtent([[-width, -Infinity], [width * 2, Infinity]])
+      .extent([[0, 0], [width, height]])
+      .on('zoom', zoomed),
+  );
+
+  return () => {
+    d3.select(svgNode).on('.zoom', null);
+  };
+};
+
 interface BookstoreTimelineModuleProps {
   className?: string;
 }
@@ -70,128 +197,12 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
   const tooltipRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!svgRef.current) return;            // 早退时返回 void
-
-    const svgNode = svgRef.current;
-
-    /* ---------- 基础设置（与上一版一致，略） ---------- */
-    d3.select(svgNode).selectAll('*').remove();
-    d3.select(svgNode).on('.zoom', null);
-
-    const containerWidth = svgNode.clientWidth || 1200;
-    const containerHeight = 600;
-    const margin = { top: 40, right: 40, bottom: 60, left: 60 };
-    const width = containerWidth - margin.left - margin.right;
-    const height = containerHeight - margin.top - margin.bottom;
-    const bgColor = '#fffbef';
-    const imageSize = 40;
-    const gap = 2;
-
-    const svg = d3
-      .select(svgNode)
-      .attr('width', containerWidth)
-      .attr('height', containerHeight)
-      .style('background-color', bgColor);
-
-    svg.append('defs')
-      .append('clipPath')
-      .attr('id', 'clip')
-      .append('rect')
-      .attr('width', width)
-      .attr('height', height);
-
-    const outer = svg.append('g')
-      .attr('transform', `translate(${margin.left},${margin.top})`);
-
-    const zoomLayer = outer.append('g')
-      .attr('clip-path', 'url(#clip)');
-
-    const years = Array.from(new Set(mountainData.map(d => d.year))).sort();
-    const minYear = d3.min(years)! - 0.5;
-    const maxYear = d3.max(years)! + 0.5;
-
-    const xScaleLinear = d3.scaleLinear()
-      .domain([minYear, maxYear])
-      .range([0, width]);
-
-    const xAxis = d3.axisBottom(xScaleLinear)
-      .tickValues(years)
-      .tickFormat(d3.format('d'));
-
-    const xAxisG = outer.append('g')
-      .attr('transform', `translate(0,${height})`)
-      .call(xAxis);
-
-    xAxisG.selectAll('text').style('font-size', '14px').style('fill', '#666');
-    xAxisG.select('.domain').style('stroke', '#ccc');
-
-    const grouped = d3.group(mountainData, d => d.year);
-
-    grouped.forEach((yearData, year) => {
-      const centerX = xScaleLinear(year);
-      const maxPerRow = Math.floor((width / years.length) / (imageSize + gap));
-
-      yearData.forEach((d, i) => {
-        const row = Math.floor(i / maxPerRow);
-        const col = i % maxPerRow;
-        const offsetX = (col - maxPerRow / 2) * (imageSize + gap) + (imageSize + gap) / 2;
-
-        zoomLayer.append('image')
-          .datum(d)
-          .attr('href', d.imagePath)
-          .attr('width', imageSize)
-          .attr('height', imageSize)
-          .attr('x', centerX + offsetX - imageSize / 2)
-          .attr('y', height - (row + 1) * (imageSize + gap))
-          .attr('preserveAspectRatio', 'xMidYMid slice')
-          .attr('class', 'book-img')
-          .style('cursor', 'pointer');
-      });
-    });
-
-    const tooltip = d3.select(tooltipRef.current!);      // non-null 断言
-
-    zoomLayer.selectAll<SVGImageElement, MountainDataPoint>('.book-img')
-      .on('mouseover', function (event, d) {
-        d3.select(this).raise().transition().duration(150)
-          .attr('width', imageSize * 1.1)
-          .attr('height', imageSize * 1.1);
-
-        tooltip
-          .style('opacity', 1)
-          .html(`<strong>${d.title}</strong><br/>${d.year} 年`)
-          .style('left', `${event.pageX + 15}px`)
-          .style('top', `${event.pageY}px`);
-      })
-      .on('mouseout', function () {
-        d3.select(this).transition().duration(150)
-          .attr('width', imageSize)
-          .attr('height', imageSize);
-
-        tooltip.style('opacity', 0);
-      });
-
-    const zoomed = (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
-      const { k, x } = event.transform;
-      zoomLayer.attr('transform', `translate(${x},0) scale(${k},1)`);
-      xAxisG.call(xAxis.scale(event.transform.rescaleX(xScaleLinear)));
-    };
-
-    svg.call(
-      d3.zoom<SVGSVGElement, unknown>()
-        .scaleExtent([0.5, 8])
-        .translateExtent([[-width, -Infinity], [width * 2, Infinity]])
-        .extent([[0, 0], [width, height]])
-        .on('zoom', zoomed),
-    );
-
-    /* ---------- 关键：清理函数返回 void ---------- */
-    return () => {
-      d3.select(svgNode).on('.zoom', null); // 移除监听，丢弃返回值
-    };
+    if (svgRef.current && tooltipRef.current) {
+      const cleanup = drawTimelineChart(svgRef.current, tooltipRef.current, mountainData);
+      return cleanup;
+    }
   }, []);
 
-  /* ---------- JSX ---------- */
   return (
     <section className={`relative py-20 bg-white ${className}`}>
       <div className="max-w-7xl mx-auto px-6">
@@ -205,7 +216,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
         </div>
 
         <div className="w-full border border-amber-200 rounded-lg bg-amber-50 p-4 relative">
-          <svg ref={svgRef} className="w-full" style={{ minHeight: 600 }} />
+          <svg ref={svgRef} className="w-full" style={{ minHeight: CHART_CONFIG.CONTAINER_HEIGHT }} />
           <div
             ref={tooltipRef}
             className="absolute bg-slate-800 text-white text-sm rounded-md px-3 py-2 pointer-events-none transition-opacity duration-200"
