@@ -666,14 +666,6 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
                             </div>
                           </div>
                           <div className="p-4 bg-amber-50">
-                            <div className="flex items-center gap-2 mb-2">
-                              <span className="px-2 py-1 rounded-full text-xs text-white bg-gold">
-                                {item.year}年
-                              </span>
-                              <span className={`px-2 py-1 rounded-full text-xs text-white ${categoryColors[item.category as keyof typeof categoryColors] || 'bg-gray-500'}`}>
-                                {item.category}
-                              </span>
-                            </div>
                             <h3 className="font-bold text-charcoal mb-2 group-hover:text-gold transition-colors line-clamp-2">
                               {item.title}
                             </h3>
@@ -683,13 +675,9 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
                             <p className="text-sm text-charcoal/70 mb-2">
                               出版：{item.publisher}
                             </p>
-                            <div className="flex flex-wrap gap-1">
-                              {item.tags.slice(0, 2).map((tag, index) => (
-                                <span key={index} className="text-xs bg-gold/10 text-gold px-2 py-1 rounded">
-                                  {tag}
-                                </span>
-                              ))}
-                            </div>
+                            <p className="text-xs text-charcoal/50">
+                              {item.year}年
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -776,15 +764,6 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
               
               {/* Details */}
               <div className="w-full lg:w-96 p-6 overflow-y-auto bg-white">
-                <div className="flex items-center gap-3 mb-4">
-                  <span className="px-3 py-1 rounded-full text-sm text-white bg-gold">
-                    {selectedItem.year}年
-                  </span>
-                  <span className={`px-3 py-1 rounded-full text-sm text-white ${categoryColors[selectedItem.category as keyof typeof categoryColors] || 'bg-gray-500'}`}>
-                    {selectedItem.category}
-                  </span>
-                </div>
-                
                 <h3 className="text-2xl font-bold text-charcoal mb-4 font-serif">
                   {selectedItem.title}
                 </h3>
@@ -799,17 +778,6 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
                   <p className="text-charcoal/80">
                     <span className="font-semibold">出版年份：</span>{selectedItem.year}年
                   </p>
-                </div>
-                
-                <div className="mb-4">
-                  <h4 className="font-bold text-charcoal mb-2">标签</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedItem.tags.map((tag, index) => (
-                      <span key={index} className="bg-gold/10 text-gold px-3 py-1 rounded-full text-sm">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
                 </div>
                 
                 <div className="mt-4 text-sm text-charcoal/60 text-center">
