@@ -13,6 +13,8 @@ import { useLightbox } from '../../hooks/useLightbox';
 import { useResponsiveColumns } from '../../hooks/useResponsiveColumns';
 
 const SEARCH_DEBOUNCE_DELAY = 300;
+const COLUMN_GAP = 20;
+const LOAD_MORE_INDICATOR_HEIGHT = 4;
 
 interface BookstoreTimelineModuleProps {
   className?: string;
@@ -85,7 +87,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
     displayedData.forEach((item) => {
       const shortestColumnIndex = heights.indexOf(Math.min(...heights));
       arrays[shortestColumnIndex].push(item);
-      heights[shortestColumnIndex] += item.dimensions.height + 20;
+      heights[shortestColumnIndex] += item.dimensions.height + COLUMN_GAP;
     });
 
     return arrays;
@@ -141,7 +143,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
           onOpenLightbox={handleOpenLightbox}
         />
 
-        <div ref={loadMoreRef} className="w-full h-4" />
+        <div ref={loadMoreRef} className={`w-full h-${LOAD_MORE_INDICATOR_HEIGHT}`} />
 
         {isLoading && hasMore && (
           <div className="text-center py-8">
