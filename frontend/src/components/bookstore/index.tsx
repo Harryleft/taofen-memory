@@ -1,98 +1,18 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { BookItem, FilterOptions, BookData, PaginatedResponse } from '../../types/bookTypes';
-import { PAGE_SIZE } from '../../constants/bookConstants';
-import { fuzzyMatch, downloadCSV } from '../../utils/bookUtils';
+import { useState, useEffect, useMemo } from 'react';
+import { BookItem, FilterOptions } from '../../types/bookTypes';
+import { downloadCSV } from '../../utils/bookUtils';
 
 import BookstoreHeader from './BookstoreHeader';
 import BookstoreFilters from './BookstoreFilters';
 import BookGrid from './BookGrid';
 import BookLightbox from './BookLightbox';
 
+import { useBookData } from '../../hooks/useBookData';
+import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
+import { useLightbox } from '../../hooks/useLightbox';
+import { useResponsiveColumns } from '../../hooks/useResponsiveColumns';
 
-// 全局缓存
-let allBooksCache: BookItem[] | null = null;
-
-// 加载和处理所有书籍数据
-const loadAllBooksData = async (): Promise<BookItem[]> => {
-  if (allBooksCache) return allBooksCache;
-  
-  const response = await fetch('/data/books_clean.json');
-  const booksData: BookData[] = await response.json();
-  
-  allBooksCache = booksData
-    .filter(book => book.image && book.year >= 1900 && book.year <= 1949)
-    .map(book => {
-      let category = '其他出版社';
-      const isLifeBookstore = 
-        book.publisher?.includes('生活书店') || 
-        book.publisher?.includes('生活周刊社') ||
-        book.publisher?.includes('读书生活出版社') ||
-        book.publisher?.includes('读书生活社') ||
-        book.publisher?.includes('生活出版社') ||
-        book.publisher?.includes('新生活书店') ||
-        book.writer?.includes('邹韬奋') ||
-        book.writer?.includes('韬奋') ||
-        book.writer?.includes('生活书店');
-      
-      if (isLifeBookstore) {
-        category = '生活书店系';
-      }
-      
-      return {
-        id: book.id,
-        title: book.bookname,
-        year: book.year,
-        author: book.writer || '佚名',
-        publisher: book.publisher || '未知出版社',
-        image: book.image,
-        category,
-        tags: [category, `${Math.floor(book.year / 10) * 10}年代`],
-        dimensions: {
-          width: 200,
-          height: Math.floor(Math.random() * 100) + 250
-        }
-      };
-    })
-    .sort((a, b) => a.year - b.year);
-    
-  return allBooksCache;
-};
-
-// 分页加载和筛选数据
-const loadBooksDataPaginated = async (
-  page: number = 0,
-  pageSize: number = 30,
-  filters?: FilterOptions
-): Promise<PaginatedResponse> => {
-  const allBooks = await loadAllBooksData();
-  
-  let filteredBooks = allBooks;
-  
-  if (filters) {
-    filteredBooks = allBooks.filter(item => {
-      const matchesSearch = !filters.searchTerm || 
-        fuzzyMatch(filters.searchTerm, item.title) ||
-        fuzzyMatch(filters.searchTerm, item.author) ||
-        fuzzyMatch(filters.searchTerm, item.publisher);
-      
-      const matchesYear = filters.year === 'all' || item.year.toString() === filters.year;
-      const matchesCategory = filters.category === 'all' || item.category === filters.category;
-      
-      return matchesSearch && matchesYear && matchesCategory;
-    });
-  }
-  
-  const start = page * pageSize;
-  const items = filteredBooks.slice(start, start + pageSize);
-  const hasMore = start + pageSize < filteredBooks.length;
-  
-  return {
-    items,
-    hasMore,
-    total: filteredBooks.length,
-    currentPage: page
-  };
-};
+const SEARCH_DEBOUNCE_DELAY = 300;
 
 interface BookstoreTimelineModuleProps {
   className?: string;
@@ -103,208 +23,60 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
   const [selectedYear, setSelectedYear] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   
-  const [displayedData, setDisplayedData] = useState<BookItem[]>([]);
-  const [allData, setAllData] = useState<BookItem[]>([]);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const filters: FilterOptions = { searchTerm, category: selectedCategory, year: selectedYear };
   
-  const [selectedItem, setSelectedItem] = useState<BookItem | null>(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const {
+    allData,
+    displayedData,
+    hasMore,
+    isLoading,
+    isInitialLoading,
+    uniqueYears,
+    uniqueCategories,
+    loadMoreData,
+    resetAndReload
+  } = useBookData(filters);
   
-  const [visibleItems, setVisibleItems] = useState<Set<number>>(new Set());
-  const [columns, setColumns] = useState(4);
-  const [isRapidScrolling, setIsRapidScrolling] = useState(false);
+  const { columns } = useResponsiveColumns();
   
-  const observerRef = useRef<IntersectionObserver | null>(null);
-  const loadMoreRef = useRef<HTMLDivElement>(null);
-  const lastScrollY = useRef(0);
-  const scrollTimeout = useRef<number | null>(null);
-
-  const loadInitialData = useCallback(async () => {
-    setIsInitialLoading(true);
-    try {
-      const allBooks = await loadAllBooksData();
-      setAllData(allBooks);
-      
-      const filters: FilterOptions = { category: 'all', year: 'all', searchTerm: '' };
-      const firstPage = await loadBooksDataPaginated(0, PAGE_SIZE, filters);
-      
-      setDisplayedData(firstPage.items);
-      setHasMore(firstPage.hasMore);
-      setCurrentPage(0);
-      
-      setTimeout(() => {
-        const initialVisibleIds = new Set(firstPage.items.slice(0, 20).map(item => item.id));
-        setVisibleItems(initialVisibleIds);
-      }, 100);
-      
-    } catch (error) {
-      console.error('加载数据失败:', error);
-    } finally {
-      setIsInitialLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadInitialData();
-  }, [loadInitialData]);
-
-  const loadMoreData = useCallback(async () => {
-    if (isLoading || !hasMore) return;
-    
-    setIsLoading(true);
-    try {
-      const nextPage = currentPage + 1;
-      const filters: FilterOptions = { category: selectedCategory, year: selectedYear, searchTerm };
-      
-      const pageData = await loadBooksDataPaginated(nextPage, PAGE_SIZE, filters);
-      
-      setDisplayedData(prev => [...prev, ...pageData.items]);
-      setHasMore(pageData.hasMore);
-      setCurrentPage(nextPage);
-    } catch (error) {
-      console.error('加载更多数据失败:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [currentPage, hasMore, isLoading, selectedCategory, selectedYear, searchTerm]);
-
-  const resetAndReload = useCallback(async () => {
-    setIsLoading(true);
-    setDisplayedData([]);
-    try {
-      const filters: FilterOptions = { category: selectedCategory, year: selectedYear, searchTerm };
-      
-      const firstPage = await loadBooksDataPaginated(0, PAGE_SIZE, filters);
-      setDisplayedData(firstPage.items);
-      setHasMore(firstPage.hasMore);
-      setCurrentPage(0);
-      
-      setTimeout(() => {
-        const initialVisibleIds = new Set(firstPage.items.slice(0, 20).map(item => item.id));
-        setVisibleItems(initialVisibleIds);
-      }, 100);
-      
-    } catch (error) {
-      console.error('重新加载数据失败:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [selectedCategory, selectedYear, searchTerm]);
-
-  useEffect(() => {
-    const updateColumns = () => {
-      const width = window.innerWidth;
-      if (width < 640) setColumns(1);
-      else if (width < 768) setColumns(2);
-      else if (width < 1024) setColumns(3);
-      else setColumns(4);
-    };
-
-    updateColumns();
-    window.addEventListener('resize', updateColumns);
-    return () => window.removeEventListener('resize', updateColumns);
-  }, []);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      const scrollSpeed = Math.abs(currentScrollY - lastScrollY.current);
-      lastScrollY.current = currentScrollY;
-      
-      if (scrollSpeed > 30) {
-        setIsRapidScrolling(true);
-        const viewportHeight = window.innerHeight;
-        const scrollTop = window.scrollY;
-        const triggerZone = scrollTop + viewportHeight + 400;
-        
-        const cardElements = document.querySelectorAll('[data-item-id]');
-        const newVisibleIds = new Set(visibleItems);
-        
-        cardElements.forEach((element) => {
-          const rect = element.getBoundingClientRect();
-          const elementTop = rect.top + scrollTop;
-          
-          if (elementTop < triggerZone) {
-            const itemId = parseInt(element.getAttribute('data-item-id') || '0');
-            newVisibleIds.add(itemId);
-          }
-        });
-        
-        setVisibleItems(newVisibleIds);
-      }
-      
-      if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
-      
-      scrollTimeout.current = setTimeout(() => {
-        setIsRapidScrolling(false);
-      }, 500);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
-    };
-  }, [visibleItems]);
+  const {
+    visibleItems,
+    isRapidScrolling,
+    loadMoreRef,
+    invalidateCache,
+    setInitialVisibleItems
+  } = useInfiniteScroll({
+    hasMore,
+    isLoading,
+    onLoadMore: loadMoreData,
+    displayedDataLength: displayedData.length
+  });
+  
+  const {
+    selectedItem,
+    currentIndex,
+    openLightbox,
+    closeLightbox,
+    nextItem,
+    prevItem
+  } = useLightbox();
 
   useEffect(() => {
     if (isInitialLoading) return;
     
     const debounceTimer = setTimeout(() => {
-      resetAndReload();
-    }, 300);
+      resetAndReload(filters);
+      invalidateCache();
+    }, SEARCH_DEBOUNCE_DELAY);
 
     return () => clearTimeout(debounceTimer);
-  }, [searchTerm, selectedCategory, selectedYear, isInitialLoading, resetAndReload]);
-
+  }, [searchTerm, selectedCategory, selectedYear, isInitialLoading, resetAndReload, invalidateCache, filters]);
+  
   useEffect(() => {
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        const newVisibleIds = new Set<number>();
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const itemId = parseInt(entry.target.getAttribute('data-item-id') || '0');
-            newVisibleIds.add(itemId);
-          }
-        });
-        
-        if (newVisibleIds.size > 0) {
-          setVisibleItems(prev => new Set([...prev, ...newVisibleIds]));
-        }
-      },
-      { threshold: 0.1, rootMargin: '200px' }
-    );
-
-    return () => observerRef.current?.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (isInitialLoading || displayedData.length === 0) return;
-    
-    const loadMoreObserver = new IntersectionObserver(
-      (entries) => {
-        const target = entries[0];
-        if (target.isIntersecting && hasMore && !isLoading) {
-          loadMoreData();
-        }
-      },
-      { threshold: 1.0, rootMargin: '300px' }
-    );
-
-    const timeoutId = setTimeout(() => {
-      if (loadMoreRef.current) {
-        loadMoreObserver.observe(loadMoreRef.current);
-      }
-    }, 100);
-
-    return () => {
-      clearTimeout(timeoutId);
-      loadMoreObserver.disconnect();
-    };
-  }, [hasMore, isLoading, loadMoreData, displayedData.length, isInitialLoading]);
+    if (displayedData.length > 0) {
+      setInitialVisibleItems(displayedData);
+    }
+  }, [displayedData, setInitialVisibleItems]);
 
   const columnArrays = useMemo(() => {
     const arrays: BookItem[][] = Array.from({ length: columns }, () => []);
@@ -319,44 +91,17 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
     return arrays;
   }, [displayedData, columns]);
 
-  const openLightbox = (item: BookItem) => {
-    setSelectedItem(item);
-    setCurrentIndex(displayedData.findIndex(i => i.id === item.id));
+  const handleOpenLightbox = (item: BookItem) => {
+    openLightbox(item, displayedData);
   };
-
-  const closeLightbox = () => setSelectedItem(null);
-
-  const nextItem = useCallback(() => {
-    if (!selectedItem) return;
-    const newIndex = (currentIndex + 1) % displayedData.length;
-    setCurrentIndex(newIndex);
-    setSelectedItem(displayedData[newIndex]);
-  }, [currentIndex, displayedData, selectedItem]);
-
-  const prevItem = useCallback(() => {
-    if (!selectedItem) return;
-    const newIndex = currentIndex === 0 ? displayedData.length - 1 : currentIndex - 1;
-    setCurrentIndex(newIndex);
-    setSelectedItem(displayedData[newIndex]);
-  }, [currentIndex, displayedData, selectedItem]);
-
-  useEffect(() => {
-    if (!observerRef.current || displayedData.length === 0) return;
-    
-    const timeoutId = setTimeout(() => {
-      const items = document.querySelectorAll('[data-item-id]');
-      items.forEach((item) => {
-        if (observerRef.current) {
-          observerRef.current.observe(item);
-        }
-      });
-    }, 20);
-    
-    return () => clearTimeout(timeoutId);
-  }, [displayedData.length]);
-
-  const uniqueYears = useMemo(() => [...new Set(allData.map(item => item.year))].sort((a,b) => a-b), [allData]);
-  const uniqueCategories = useMemo(() => [...new Set(allData.map(item => item.category))].sort(), [allData]);
+  
+  const handleNextItem = () => {
+    nextItem(displayedData);
+  };
+  
+  const handlePrevItem = () => {
+    prevItem(displayedData);
+  };
 
   if (isInitialLoading) {
     return (
@@ -393,7 +138,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
           columnArrays={columnArrays}
           visibleItems={visibleItems}
           isRapidScrolling={isRapidScrolling}
-          onOpenLightbox={openLightbox}
+          onOpenLightbox={handleOpenLightbox}
         />
 
         <div ref={loadMoreRef} className="w-full h-4" />
@@ -421,8 +166,8 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
         currentIndex={currentIndex}
         totalCount={displayedData.length}
         onClose={closeLightbox}
-        onNext={nextItem}
-        onPrev={prevItem}
+        onNext={handleNextItem}
+        onPrev={handlePrevItem}
       />
     </section>
   );
