@@ -1,278 +1,122 @@
 #!/bin/bash
 
-# 邹韬奋人物数据清洗脚本
-# 用于从原始persons.json中提取和清洗关键信息，生成简化的JSON格式
+# ---
+# Script Goal: Clean and transform the raw persons.json data into a frontend-friendly format.
+# This script filters data to only include entries related to Zou Taofen (邹韬奋).
+# Filtering criteria: content contains "邹韬奋", "韬奋", or "恩润"
+# This script follows the Occam's Razor principle, keeping it simple with no complex dependencies.
+# ---
 
-# 脚本配置
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-INPUT_FILE="$SCRIPT_DIR/public/data/persons.json"
-OUTPUT_FILE="$SCRIPT_DIR/public/data/persons_clean.json"
-BACKUP_DIR="$SCRIPT_DIR/data_backup"
+set -e  # Exit on any error
 
-# 颜色输出配置
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+# --- Configuration ---
+# Using dirname ensures that paths are relative to the script's location
+BASE_PATH="$(dirname "$0")"
+INPUT_JSON_PATH="$BASE_PATH/frontend/public/data/persons.json"
+OUTPUT_JSON_PATH="$BASE_PATH/frontend/public/data/persons_clean.json"
 
-# 打印带颜色的消息
-print_message() {
-    local color=$1
-    local message=$2
-    echo -e "${color}${message}${NC}"
-}
+# --- Main Logic ---
 
-# 检查必要工具
-check_dependencies() {
-    print_message $BLUE "🔍 检查依赖工具..."
-    
-    # 检查jq
-    if ! command -v jq &> /dev/null; then
-        print_message $RED "❌ 未找到jq工具，请先安装："
-        print_message $YELLOW "  Ubuntu/Debian: sudo apt-get install jq"
-        print_message $YELLOW "  macOS: brew install jq"
-        print_message $YELLOW "  CentOS/RHEL: sudo yum install jq"
-        exit 1
-    fi
-    
-    print_message $GREEN "✅ jq工具已安装: $(jq --version)"
-}
+# 1. Check if input file exists
+echo "Reading source file: $INPUT_JSON_PATH"
+if [[ ! -f "$INPUT_JSON_PATH" ]]; then
+    echo "Error: Input file '$INPUT_JSON_PATH' does not exist!" >&2
+    exit 1
+fi
 
-# 检查输入文件
-check_input_file() {
-    print_message $BLUE "📁 检查输入文件..."
-    
-    if [[ ! -f "$INPUT_FILE" ]]; then
-        print_message $RED "❌ 输入文件不存在: $INPUT_FILE"
-        print_message $YELLOW "请确保persons.json文件在public/data/目录下"
-        exit 1
-    fi
-    
-    # 获取文件大小
-    local file_size=$(du -h "$INPUT_FILE" | cut -f1)
-    print_message $GREEN "✅ 输入文件存在: $INPUT_FILE ($file_size)"
-    
-    # 验证JSON格式
-    if ! jq empty "$INPUT_FILE" 2>/dev/null; then
-        print_message $RED "❌ 输入文件不是有效的JSON格式"
-        exit 1
-    fi
-    
-    print_message $GREEN "✅ JSON格式验证通过"
-}
+# 2. Ensure the output directory exists
+OUTPUT_DIR="$(dirname "$OUTPUT_JSON_PATH")"
+if [[ ! -d "$OUTPUT_DIR" ]]; then
+    echo "Output directory does not exist. Creating: $OUTPUT_DIR"
+    mkdir -p "$OUTPUT_DIR"
+fi
 
-# 创建备份
-create_backup() {
-    print_message $BLUE "💾 创建数据备份..."
-    
-    # 创建备份目录
-    mkdir -p "$BACKUP_DIR"
-    
-    # 备份原始文件（如果输出文件已存在）
-    if [[ -f "$OUTPUT_FILE" ]]; then
-        local timestamp=$(date "+%Y%m%d_%H%M%S")
-        local backup_file="$BACKUP_DIR/persons_clean_$timestamp.json"
-        cp "$OUTPUT_FILE" "$backup_file"
-        print_message $GREEN "✅ 已备份现有文件: $backup_file"
-    fi
-}
+# 3. Process the JSON data using pure Python (no external dependencies)
+echo "Processing data..."
 
-# 执行数据清洗
-run_cleaning() {
-    print_message $BLUE "🚀 开始执行数据清洗..."
-    echo "=================================================="
+python3 << PYTHON_EOF
+import json
+import re
+
+# Configuration
+input_json_path = "$INPUT_JSON_PATH"
+output_json_path = "$OUTPUT_JSON_PATH"
+
+print(f"Processing {input_json_path}")
+
+try:
+    # Read the source JSON file
+    with open(input_json_path, 'r', encoding='utf-8') as f:
+        json_data = json.load(f)
     
-    # 使用jq处理JSON，提取简化的字段结构
-    print_message $BLUE "📊 处理数据结构..."
+    # Extract the data array from the JSON structure
+    if isinstance(json_data, dict) and 'data' in json_data:
+        years_data = json_data['data']
+    elif isinstance(json_data, list):
+        years_data = json_data
+    else:
+        raise ValueError("Unexpected JSON structure - expected object with 'data' field")
     
-    # 检查输入数据结构
-    local data_type=$(jq -r 'type' "$INPUT_FILE")
-    print_message $BLUE "原始数据类型: $data_type"
+    print(f"Loaded {len(years_data)} year entries")
     
-    if [[ "$data_type" == "array" ]]; then
-        # 如果是数组，直接处理每个元素
-        jq '[.[] | {
-            id: (.id // (.序号 // (.index // (. | keys | .[0])))),
-            date: (.date // (.time // (.年份 // (.year // "")))),
-            content: (.content // (.description // (.desc // (.text // (.事件 // (.标题 // (.title // "")))))))
-        } | select(.id != null and .content != null and .content != "")]' "$INPUT_FILE" > "$OUTPUT_FILE"
-    elif [[ "$data_type" == "object" ]]; then
-        # 如果是对象，尝试提取events或data字段
-        if jq -e '.events' "$INPUT_FILE" &>/dev/null; then
-            jq '[.events[] | {
-                id: (.id // (.序号 // (.index // (. | keys | .[0])))),
-                date: (.date // (.time // (.年份 // (.year // "")))),
-                content: (.content // (.description // (.desc // (.text // (.事件 // (.标题 // (.title // "")))))))
-            } | select(.id != null and .content != null and .content != "")]' "$INPUT_FILE" > "$OUTPUT_FILE"
-        elif jq -e '.data' "$INPUT_FILE" &>/dev/null; then
-            jq '[.data[] | {
-                id: (.id // (.序号 // (.index // (. | keys | .[0])))),
-                date: (.date // (.time // (.年份 // (.year // "")))),
-                content: (.content // (.description // (.desc // (.text // (.事件 // (.标题 // (.title // "")))))))
-            } | select(.id != null and .content != null and .content != "")]' "$INPUT_FILE" > "$OUTPUT_FILE"
-        else
-            # 如果是单个对象，将其包装成数组
-            jq '[. | {
-                id: (.id // (.序号 // (.index // "1"))),
-                date: (.date // (.time // (.年份 // (.year // "")))),
-                content: (.content // (.description // (.desc // (.text // (.事件 // (.标题 // (.title // "")))))))
-            } | select(.id != null and .content != null and .content != "")]' "$INPUT_FILE" > "$OUTPUT_FILE"
-        fi
-    else
-        print_message $RED "❌ 不支持的数据类型: $data_type"
-        exit 1
-    fi
+    # Process each year's items
+    cleaned_data = []
     
-    if [[ $? -eq 0 ]]; then
-        print_message $GREEN "✅ 数据清洗完成！"
+    for year_entry in years_data:
+        if not isinstance(year_entry, dict) or 'items' not in year_entry:
+            continue
+            
+        year = year_entry.get('year', '')
+        items = year_entry.get('items', [])
         
-        # 显示输出文件信息
-        if [[ -f "$OUTPUT_FILE" ]]; then
-            local output_size=$(du -h "$OUTPUT_FILE" | cut -f1)
-            local record_count=$(jq 'length' "$OUTPUT_FILE")
-            print_message $GREEN "📄 输出文件: $OUTPUT_FILE ($output_size)"
-            print_message $GREEN "📊 处理结果: 共 $record_count 条记录"
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+                
+            # Extract ID
+            item_id = item.get('id', '')
             
-            # 显示前3条记录作为预览
-            print_message $BLUE "🔍 数据预览 (前3条):"
-            jq -r '.[:3][] | "  • ID: \(.id) | 时间: \(.date) | 内容: \(.content[:50])..."' "$OUTPUT_FILE" 2>/dev/null || echo "  预览生成失败"
-        fi
-    else
-        print_message $RED "❌ 数据清洗失败！"
-        exit 1
-    fi
-}
-
-# 验证输出数据
-validate_output() {
-    print_message $BLUE "🔍 验证输出数据..."
-    
-    if [[ ! -f "$OUTPUT_FILE" ]]; then
-        print_message $RED "❌ 输出文件不存在"
-        return 1
-    fi
-    
-    # 验证JSON格式
-    if jq empty "$OUTPUT_FILE" 2>/dev/null; then
-        print_message $GREEN "✅ JSON格式验证通过"
-    else
-        print_message $RED "❌ JSON格式验证失败"
-        return 1
-    fi
-    
-    # 验证数据结构
-    local is_array=$(jq -r 'type' "$OUTPUT_FILE")
-    if [[ "$is_array" != "array" ]]; then
-        print_message $RED "❌ 输出数据格式错误：应为数组"
-        return 1
-    fi
-    
-    local record_count=$(jq 'length' "$OUTPUT_FILE")
-    if [[ "$record_count" -eq 0 ]]; then
-        print_message $RED "❌ 输出数据为空"
-        return 1
-    fi
-    
-    # 检查前几条记录的字段完整性
-    local validation_failed=false
-    for i in {0..2}; do
-        if jq -e ".[$i]" "$OUTPUT_FILE" &>/dev/null; then
-            local has_id=$(jq -e ".[$i].id" "$OUTPUT_FILE" &>/dev/null && echo "true" || echo "false")
-            local has_content=$(jq -e ".[$i].content" "$OUTPUT_FILE" &>/dev/null && echo "true" || echo "false")
+            # Extract date with priority: redate > redater > year
+            date_value = ''
+            if item.get('redate'):
+                date_value = str(item['redate']).strip()
+            elif item.get('redater'):
+                date_value = str(item['redater']).strip()
+            elif year:
+                date_value = str(year)
             
-            if [[ "$has_id" != "true" ]] || [[ "$has_content" != "true" ]]; then
-                print_message $RED "❌ 记录$((i+1))缺少必要字段"
-                validation_failed=true
-            fi
-        fi
-    done
+            # Extract content from 'sub' field
+            content = str(item.get('sub', '')).strip()
+            
+            # Filter: Only include items related to Zou Taofen
+            # Check if content contains: 邹韬奋, 韬奋, or 恩润
+            is_taofen_related = any([
+                '邹韬奋' in content,
+                '韬奋' in content,
+                '恩润' in content
+            ])
+            
+            # Only include items with valid id, content, and Taofen-related content
+            if item_id and content and is_taofen_related:
+                clean_item = {
+                    'id': item_id,
+                    'date': date_value,
+                    'content': content
+                }
+                cleaned_data.append(clean_item)
     
-    if [[ "$validation_failed" == "true" ]]; then
-        return 1
-    fi
+    # Write the processed data to output file
+    with open(output_json_path, 'w', encoding='utf-8') as f:
+        json.dump(cleaned_data, f, ensure_ascii=False, indent=2)
     
-    print_message $GREEN "✅ 数据完整性验证通过"
-}
+    print(f"Processing complete. Total items processed: {len(cleaned_data)}")
+    print(f"Items filtered to include only Zou Taofen related content (邹韬奋/韬奋/恩润)")
+    print(f"Saved cleaned data to: {output_json_path}")
 
-# 显示使用帮助
-show_help() {
-    echo "邹韬奋人物数据清洗工具"
-    echo "=========================="
-    echo ""
-    echo "用法: $0 [选项]"
-    echo ""
-    echo "选项:"
-    echo "  -h, --help     显示此帮助信息"
-    echo "  -v, --verbose  显示详细输出"
-    echo "  --no-backup   不创建备份文件"
-    echo ""
-    echo "文件路径:"
-    echo "  输入文件: $INPUT_FILE"
-    echo "  输出文件: $OUTPUT_FILE"
-    echo "  备份目录: $BACKUP_DIR"
-    echo ""
-    echo "功能:"
-    echo "  • 从原始persons.json提取人物相关事件"
-    echo "  • 清洗和简化数据结构"
-    echo "  • 生成仅包含id、date、content三个字段的简化JSON"
-    echo "  • 适合前端直接使用的轻量级数据格式"
-    echo ""
-    echo "依赖:"
-    echo "  • jq - JSON处理工具"
-}
+except Exception as e:
+    print(f"Error: {e}")
+    exit(1)
 
-# 主函数
-main() {
-    local create_backup_flag=true
-    local verbose_flag=false
-    
-    # 解析命令行参数
-    while [[ $# -gt 0 ]]; do
-        case $1 in
-            -h|--help)
-                show_help
-                exit 0
-                ;;
-            -v|--verbose)
-                verbose_flag=true
-                shift
-                ;;
-            --no-backup)
-                create_backup_flag=false
-                shift
-                ;;
-            *)
-                print_message $RED "未知选项: $1"
-                print_message $YELLOW "使用 -h 或 --help 查看帮助"
-                exit 1
-                ;;
-        esac
-    done
-    
-    print_message $BLUE "📚 邹韬奋人物数据清洗工具"
-    echo "=================================================="
-    
-    # 执行清洗流程
-    check_dependencies
-    check_input_file
-    
-    if [[ "$create_backup_flag" == true ]]; then
-        create_backup
-    fi
-    
-    run_cleaning
-    validate_output
-    
-    echo "=================================================="
-    print_message $GREEN "🎉 数据清洗流程完成！"
-    print_message $BLUE "💡 清洗后的数据已保存到: $OUTPUT_FILE"
-    print_message $BLUE "💡 现在可以在React组件中使用这个文件了"
-}
+PYTHON_EOF
 
-# 错误处理
-set -e
-trap 'print_message $RED "❌ 脚本执行出错，请检查错误信息"; exit 1' ERR
-
-# 执行主函数
-main "$@"
+echo "Script completed successfully!"
