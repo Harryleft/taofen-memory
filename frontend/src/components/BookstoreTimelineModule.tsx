@@ -93,16 +93,7 @@ const generateCSV = (books: BookItem[]): string => {
   
   // 转换数据为CSV格式
   const csvContent = [
-    // 添加元数据注释
-    `# 韬奋·时光书影 数据导出`,
-    `# 导出时间：${new Date().toLocaleString('zh-CN')}`,
-    `# 数据范围：1900-1949年中国近代出版书籍`,
-    `# 总计：${books.length} 条记录`,
-    `# 引用格式：邹韬奋数字人文纪念馆. 韬奋·时光书影数据集[DB/OL]. ${new Date().toISOString().split('T')[0]}.`,
-    `#`,
-    // CSV表头
     headers.join(','),
-    // 数据行
     ...books.map(book => [
       `"${book.title.replace(/"/g, '""')}"`, // 处理书名中的引号
       `"${book.author.replace(/"/g, '""')}"`,
@@ -276,11 +267,14 @@ export default function TaofenHeritageModule({ className = '' }: TaofenHeritageM
   // UI状态
   const [visibleItems, setVisibleItems] = useState<Set<number>>(new Set());
   const [columns, setColumns] = useState(4);
+  const [isRapidScrolling, setIsRapidScrolling] = useState(false); // 快速滚动状态
   
   // Refs
   const observerRef = useRef<IntersectionObserver | null>(null);
   const masonryRef = useRef<HTMLDivElement>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
+  const lastScrollY = useRef(0);
+  const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
   
   // 页面大小常量
   const PAGE_SIZE = 30;
@@ -318,7 +312,7 @@ export default function TaofenHeritageModule({ className = '' }: TaofenHeritageM
       
       // 设置初始可见项目（首屏项目立即可见）
       setTimeout(() => {
-        const initialVisibleIds = new Set(firstPage.items.slice(0, 12).map(item => item.id));
+        const initialVisibleIds = new Set(firstPage.items.slice(0, 20).map(item => item.id)); // 增加首屏可见项目
         setVisibleItems(initialVisibleIds);
       }, 100);
       
@@ -379,7 +373,7 @@ export default function TaofenHeritageModule({ className = '' }: TaofenHeritageM
       // 不立即清空 visibleItems，让首屏项目立即可见
       // 使用 setTimeout 确保 DOM 更新后再设置可见性
       setTimeout(() => {
-        const initialVisibleIds = new Set(firstPage.items.slice(0, 12).map(item => item.id)); // 前12个项目立即可见
+        const initialVisibleIds = new Set(firstPage.items.slice(0, 20).map(item => item.id)); // 前20个项目立即可见
         setVisibleItems(initialVisibleIds);
       }, 100);
       
@@ -404,6 +398,59 @@ export default function TaofenHeritageModule({ className = '' }: TaofenHeritageM
     window.addEventListener('resize', updateColumns);
     return () => window.removeEventListener('resize', updateColumns);
   }, []);
+
+  // 快速滚动检测
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const scrollSpeed = Math.abs(currentScrollY - lastScrollY.current);
+      lastScrollY.current = currentScrollY;
+      
+      // 滚动速度大于30px表示快速滚动
+      if (scrollSpeed > 30) {
+        setIsRapidScrolling(true);
+        
+        // 快速滚动时，批量显示即将进入视口的项目
+        const viewportHeight = window.innerHeight;
+        const scrollTop = window.scrollY;
+        const triggerZone = scrollTop + viewportHeight + 400; // 提前400px
+        
+        // 获取所有卡片元素
+        const cardElements = document.querySelectorAll('[data-item-id]');
+        const newVisibleIds = new Set(visibleItems);
+        
+        cardElements.forEach((element) => {
+          const rect = element.getBoundingClientRect();
+          const elementTop = rect.top + scrollTop;
+          
+          if (elementTop < triggerZone) {
+            const itemId = parseInt(element.getAttribute('data-item-id') || '0');
+            newVisibleIds.add(itemId);
+          }
+        });
+        
+        setVisibleItems(newVisibleIds);
+      }
+      
+      // 清除之前的定时器
+      if (scrollTimeout.current) {
+        clearTimeout(scrollTimeout.current);
+      }
+      
+      // 设置新的定时器，滚动停止500ms后恢复正常状态
+      scrollTimeout.current = setTimeout(() => {
+        setIsRapidScrolling(false);
+      }, 500);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollTimeout.current) {
+        clearTimeout(scrollTimeout.current);
+      }
+    };
+  }, [visibleItems]);
 
   // 搜索/筛选变化时重新加载数据（跳过初始化时的触发）
   useEffect(() => {
@@ -436,7 +483,7 @@ export default function TaofenHeritageModule({ className = '' }: TaofenHeritageM
           });
         }
       },
-      { threshold: 0.1, rootMargin: '50px' }
+      { threshold: 0.1, rootMargin: '200px' } // 增大可见性检测范围
     );
 
     return () => {
@@ -459,7 +506,7 @@ export default function TaofenHeritageModule({ className = '' }: TaofenHeritageM
           loadMoreData();
         }
       },
-      { threshold: 1.0, rootMargin: '100px' } // 提前100px开始加载
+      { threshold: 1.0, rootMargin: '300px' } // 提前300px开始加载
     );
 
     // 延迟设置观察器，确保DOM已渲染
@@ -536,7 +583,7 @@ export default function TaofenHeritageModule({ className = '' }: TaofenHeritageM
           observerRef.current.observe(item);
         }
       });
-    }, 50);
+    }, 20); // 减少延迟时间
     
     return () => clearTimeout(timeoutId);
   }, [displayedData.length]); // 只在数据长度变化时重新观察
@@ -629,18 +676,17 @@ export default function TaofenHeritageModule({ className = '' }: TaofenHeritageM
           {/* CSV下载按钮 */}
           <button
             onClick={() => downloadCSV(allData)}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-lg hover:from-amber-700 hover:to-amber-800 focus:outline-none focus:ring-2 focus:ring-amber-500/50 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+            className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-gold/30 text-charcoal rounded-lg hover:bg-gold/5 hover:border-gold/60 focus:outline-none focus:ring-2 focus:ring-gold/30 transition-all duration-300 shadow-sm hover:shadow-md"
             style={{fontFamily: "'KaiTi', 'STKaiti', '华文楷体', serif"}}
             title="下载全部书籍数据为CSV文件"
           >
-            <Download size={18} />
+            <Download size={18} className="text-gold" />
             <span className="font-medium">导出数据</span>
-            <div className="absolute inset-0 bg-white/10 rounded-lg opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
           </button>
         </div>
 
         {/* 数据统计信息 */}
-        <div className="text-center mb-6">
+        {/* <div className="text-center mb-6">
           <p className="text-charcoal/60 text-sm" style={{fontFamily: "'SimSun', '宋体', 'NSimSun', serif"}}>
             当前显示 <span className="font-bold text-gold">{displayedData.length}</span> 本
             {totalCount !== displayedData.length && (
@@ -650,7 +696,7 @@ export default function TaofenHeritageModule({ className = '' }: TaofenHeritageM
               <span className="ml-2 text-amber-600">「{searchTerm}」</span>
             )}
           </p>
-        </div>
+        </div> */}
 
 {/* Masonry Grid */}
         <div ref={masonryRef} className="flex gap-5">
@@ -663,7 +709,7 @@ export default function TaofenHeritageModule({ className = '' }: TaofenHeritageM
                       <div
                         key={item.id}
                         data-item-id={item.id}
-                        className={`group cursor-pointer transform transition-all duration-700 ${
+                        className={`group cursor-pointer transform transition-all duration-${isRapidScrolling ? '300' : '700'} ${
                           visibleItems.has(item.id)
                             ? 'translate-y-0 opacity-100'
                             : 'translate-y-8 opacity-0'
