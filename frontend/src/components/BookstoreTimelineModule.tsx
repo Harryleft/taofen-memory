@@ -42,6 +42,50 @@ interface FilterOptions {
   searchTerm: string;
 }
 
+// 智能搜索关键词映射表
+const searchKeywordMap: Record<string, string[]> = {
+  '韬奋': ['邹韬奋', '韬奋'],
+  '生活书店': ['生活书店', '生活周刊社', '读书生活出版社', '读书生活社', '生活出版社', '新生活书店'],
+
+};
+
+// 通用模糊搜索函数
+const fuzzyMatch = (searchTerm: string, targetText: string): boolean => {
+  const lowerSearchTerm = searchTerm.toLowerCase();
+  const lowerTargetText = targetText.toLowerCase();
+  
+  // 直接匹配
+  if (lowerTargetText.includes(lowerSearchTerm)) {
+    return true;
+  }
+  
+  // 智能关键词映射匹配
+  const mappedKeywords = searchKeywordMap[searchTerm];
+  if (mappedKeywords) {
+    return mappedKeywords.some(keyword => 
+      lowerTargetText.includes(keyword.toLowerCase())
+    );
+  }
+  
+  // 分词匹配（对于多字搜索词）
+  if (searchTerm.length > 1) {
+    const chars = searchTerm.split('');
+    // 检查是否所有字符都在目标文本中按顺序出现
+    let lastIndex = -1;
+    const allCharsFound = chars.every(char => {
+      const index = lowerTargetText.indexOf(char, lastIndex + 1);
+      if (index > lastIndex) {
+        lastIndex = index;
+        return true;
+      }
+      return false;
+    });
+    if (allCharsFound) return true;
+  }
+  
+  return false;
+};
+
 // 全量数据缓存
 let allBooksCache: BookItem[] | null = null;
 
@@ -123,13 +167,11 @@ const loadBooksDataPaginated = async (
     filteredBooks = allBooks.filter(item => {
       const searchTerm = filters.searchTerm.toLowerCase();
       
-      // 增强搜索逻辑：检查标题、作者、出版社，以及特殊的生活书店系关键词
+      // 使用通用模糊搜索匹配
       const matchesSearch = !filters.searchTerm || 
-        item.title.toLowerCase().includes(searchTerm) ||
-        item.author.toLowerCase().includes(searchTerm) ||
-        item.publisher.toLowerCase().includes(searchTerm) ||
-        // 如果搜索"生活书店"相关词汇，包含所有生活书店系书籍
-        (searchTerm.includes('生活书店') || searchTerm.includes('韬奋') || (searchTerm.includes('生活') && item.category === '生活书店系'));
+        fuzzyMatch(filters.searchTerm, item.title) ||
+        fuzzyMatch(filters.searchTerm, item.author) ||
+        fuzzyMatch(filters.searchTerm, item.publisher);
       
       const matchesYear = filters.year === 'all' || item.year.toString() === filters.year;
       const matchesCategory = filters.category === 'all' || item.category === filters.category;
