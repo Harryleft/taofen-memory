@@ -586,7 +586,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
                           animationDelay: `${columnIndex * 100}ms`
                         }}
                       >
-                        <div className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-amber-200">
+                        <div className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-amber-200 relative">
                           <div className="relative overflow-hidden">
                             <img
                               src={item.image}
@@ -597,6 +597,23 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
                             />
                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
                               <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={32} />
+                            </div>
+                            
+                            {/* 专业年份标签 - 左下角 */}
+                            <div className="absolute bottom-3 left-3">
+                              <div className="relative">
+                                {/* 背景层 - 磨砂玻璃效果 */}
+                                <div className="absolute inset-0 bg-black/40 backdrop-blur-sm rounded-lg"></div>
+                                {/* 内容层 */}
+                                <div className="relative px-3 py-1.5 text-white">
+                                  <div className="flex items-center gap-1.5">
+                                    <div className="w-1 h-1 bg-gold rounded-full"></div>
+                                    <span className="text-xs font-medium tracking-wide">
+                                      {item.year}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
                           </div>
                           <div className="p-4 bg-amber-50">
