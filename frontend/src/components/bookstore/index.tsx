@@ -1,3 +1,14 @@
+/**
+ * 邹韬奋纪念网站 - 书店时间线模块
+ * 
+ * 主要功能：
+ * - 展示1900-1949年间的历史书籍
+ * - 支持按年份、出版社分类筛选
+ * - 实现瀑布流布局和无限滚动
+ * - 提供书籍详情灯箱预览
+ * - 支持CSV数据导出
+ */
+
 import { useState, useEffect, useMemo } from 'react';
 import { BookItem, FilterOptions } from '../../types/bookTypes';
 import { downloadCSV } from '../../utils/bookUtils';
@@ -12,21 +23,25 @@ import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
 import { useLightbox } from '../../hooks/useLightbox';
 import { useResponsiveColumns } from '../../hooks/useResponsiveColumns';
 
-const SEARCH_DEBOUNCE_DELAY = 300;
-const COLUMN_GAP = 20;
-const LOAD_MORE_INDICATOR_HEIGHT = 4;
+// UI常量配置
+const SEARCH_DEBOUNCE_DELAY = 300;  // 搜索防抖延迟(ms)
+const COLUMN_GAP = 20;              // 瀑布流列间距(px)
+const LOAD_MORE_INDICATOR_HEIGHT = 4; // 加载指示器高度(tailwind单位)
 
 interface BookstoreTimelineModuleProps {
   className?: string;
 }
 
 export default function BookstoreTimelineModule({ className = '' }: BookstoreTimelineModuleProps) {
+  // 筛选状态管理
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedYear, setSelectedYear] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   
+  // 构建筛选条件对象
   const filters: FilterOptions = { searchTerm, category: selectedCategory, year: selectedYear };
   
+  // 数据管理：书籍数据获取、分页、筛选
   const {
     allData,
     displayedData,
@@ -39,8 +54,10 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
     resetAndReload
   } = useBookData(filters);
   
+  // 响应式布局：根据屏幕宽度计算列数
   const { columns } = useResponsiveColumns();
   
+  // 无限滚动：可见性检测、性能优化
   const {
     visibleItems,
     isRapidScrolling,
@@ -54,6 +71,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
     displayedDataLength: displayedData.length
   });
   
+  // 灯箱控制：书籍详情预览、导航
   const {
     selectedItem,
     currentIndex,
@@ -63,23 +81,26 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
     prevItem
   } = useLightbox();
 
+  // 防抖处理：筛选条件变化时重新加载数据
   useEffect(() => {
     if (isInitialLoading) return;
     
     const debounceTimer = setTimeout(() => {
       resetAndReload(filters);
-      invalidateCache();
+      invalidateCache(); // 清除DOM元素缓存
     }, SEARCH_DEBOUNCE_DELAY);
 
     return () => clearTimeout(debounceTimer);
   }, [searchTerm, selectedCategory, selectedYear, isInitialLoading, resetAndReload, invalidateCache, filters]);
   
+  // 可见性初始化：数据加载完成后设置初始可见项目
   useEffect(() => {
     if (displayedData.length > 0) {
       setInitialVisibleItems(displayedData);
     }
   }, [displayedData, setInitialVisibleItems]);
 
+  // 瀑布流布局算法：将书籍分配到最短的列中
   const columnArrays = useMemo(() => {
     const arrays: BookItem[][] = Array.from({ length: columns }, () => []);
     const heights = new Array(columns).fill(0);
@@ -93,6 +114,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
     return arrays;
   }, [displayedData, columns]);
 
+  // 灯箱事件处理器
   const handleOpenLightbox = (item: BookItem) => {
     openLightbox(item, displayedData);
   };
@@ -105,6 +127,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
     prevItem(displayedData);
   };
 
+  // 初始加载状态渲染
   if (isInitialLoading) {
     return (
       <section className={`relative py-20 bg-white ${className}`}>
@@ -124,6 +147,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
       <div className="max-w-7xl mx-auto px-6">
         <BookstoreHeader />
         
+        {/* 筛选控件 */}
         <BookstoreFilters
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
@@ -136,6 +160,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
           onDownload={() => downloadCSV(allData)}
         />
 
+        {/* 书籍网格 - 瀑布流布局 */}
         <BookGrid
           columnArrays={columnArrays}
           visibleItems={visibleItems}
@@ -143,7 +168,10 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
           onOpenLightbox={handleOpenLightbox}
         />
 
+        {/* 无限滚动触发器 */}
         <div ref={loadMoreRef} className={`w-full h-${LOAD_MORE_INDICATOR_HEIGHT}`} />
+
+        {/* 加载更多指示器 */}
 
         {isLoading && hasMore && (
           <div className="text-center py-8">
@@ -154,6 +182,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
           </div>
         )}
 
+        {/* 空状态提示 */}
         {displayedData.length === 0 && !isInitialLoading && (
           <div className="text-center py-12">
             <div className="text-6xl mb-4">📚</div>
@@ -163,6 +192,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
         )}
       </div>
 
+      {/* 书籍详情灯箱 */}
       <BookLightbox
         selectedItem={selectedItem}
         currentIndex={currentIndex}
