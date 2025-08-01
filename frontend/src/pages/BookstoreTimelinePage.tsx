@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import BookstoreTimelineModule from '../components/BookstoreTimelineModule';
+import TaofenHeritageModule from '../components/BookstoreTimelineModule';
 
 function BookstoreTimelinePage() {
   return (
@@ -27,7 +27,7 @@ function BookstoreTimelinePage() {
 
       {/* Main Content */}
       <main>
-        <BookstoreTimelineModule />
+        <TaofenHeritageModule />
       </main>
 
       {/* Footer */}

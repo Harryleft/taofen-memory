@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, Filter, Calendar, ZoomIn, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Filter, Calendar, ZoomIn, X, ChevronLeft, ChevronRight, Download } from 'lucide-react';
 
 // 书籍数据结构
 interface BookData {
@@ -84,6 +84,53 @@ const fuzzyMatch = (searchTerm: string, targetText: string): boolean => {
   }
   
   return false;
+};
+
+// CSV生成和下载功能
+const generateCSV = (books: BookItem[]): string => {
+  // CSV表头
+  const headers = ['书名', '作者', '出版社', '出版年份', '分类', '书籍ID'];
+  
+  // 转换数据为CSV格式
+  const csvContent = [
+    // 添加元数据注释
+    `# 韬奋·时光书影 数据导出`,
+    `# 导出时间：${new Date().toLocaleString('zh-CN')}`,
+    `# 数据范围：1900-1949年中国近代出版书籍`,
+    `# 总计：${books.length} 条记录`,
+    `# 引用格式：邹韬奋数字人文纪念馆. 韬奋·时光书影数据集[DB/OL]. ${new Date().toISOString().split('T')[0]}.`,
+    `#`,
+    // CSV表头
+    headers.join(','),
+    // 数据行
+    ...books.map(book => [
+      `"${book.title.replace(/"/g, '""')}"`, // 处理书名中的引号
+      `"${book.author.replace(/"/g, '""')}"`,
+      `"${book.publisher.replace(/"/g, '""')}"`,
+      book.year,
+      `"${book.category}"`,
+      book.id
+    ].join(','))
+  ].join('\n');
+  
+  return csvContent;
+};
+
+const downloadCSV = (books: BookItem[]) => {
+  const csvContent = generateCSV(books);
+  const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' }); // 添加BOM以支持中文
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  
+  link.setAttribute('href', url);
+  link.setAttribute('download', `韬奋时光书影_${new Date().toISOString().split('T')[0]}.csv`);
+  link.style.visibility = 'hidden';
+  
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  URL.revokeObjectURL(url);
 };
 
 // 全量数据缓存
@@ -578,6 +625,31 @@ export default function TaofenHeritageModule({ className = '' }: TaofenHeritageM
               <option key={year} value={year.toString()}>{year}年</option>
             ))}
           </select>
+
+          {/* CSV下载按钮 */}
+          <button
+            onClick={() => downloadCSV(allData)}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-lg hover:from-amber-700 hover:to-amber-800 focus:outline-none focus:ring-2 focus:ring-amber-500/50 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+            style={{fontFamily: "'KaiTi', 'STKaiti', '华文楷体', serif"}}
+            title="下载全部书籍数据为CSV文件"
+          >
+            <Download size={18} />
+            <span className="font-medium">导出数据</span>
+            <div className="absolute inset-0 bg-white/10 rounded-lg opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+          </button>
+        </div>
+
+        {/* 数据统计信息 */}
+        <div className="text-center mb-6">
+          <p className="text-charcoal/60 text-sm" style={{fontFamily: "'SimSun', '宋体', 'NSimSun', serif"}}>
+            当前显示 <span className="font-bold text-gold">{displayedData.length}</span> 本
+            {totalCount !== displayedData.length && (
+              <span> / 共 <span className="font-bold text-charcoal">{totalCount}</span> 本</span>
+            )}
+            {searchTerm && (
+              <span className="ml-2 text-amber-600">「{searchTerm}」</span>
+            )}
+          </p>
         </div>
 
 {/* Masonry Grid */}
