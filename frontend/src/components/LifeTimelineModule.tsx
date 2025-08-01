@@ -1,6 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Calendar, MapPin, BookOpen, Users, Award, Heart } from 'lucide-react';
 
+interface PersonRecord {
+  id: number;
+  date: string;
+  content: string;
+}
+
 interface LifeEvent {
   id: number;
   year: number;
@@ -13,113 +19,58 @@ interface LifeEvent {
   details: string[];
 }
 
-const lifeEvents: LifeEvent[] = [
-  {
-    id: 1,
-    year: 1895,
-    date: '1895年11月5日',
-    title: '出生于福建永安',
-    description: '邹韬奋出生于一个书香门第，原名邹恩润',
-    location: '福建永安',
-    category: 'birth',
-    image: 'https://images.pexels.com/photos/1183266/pexels-photo-1183266.jpeg?auto=compress&cs=tinysrgb&w=600',
-    details: [
-      '父亲邹国珍是清朝举人，母亲陈氏出身书香世家',
-      '幼年即显露出对文字的敏感和兴趣',
-      '家庭环境为其后来的文化事业奠定基础'
-    ]
-  },
-  {
-    id: 2,
-    year: 1913,
-    date: '1913年9月',
-    title: '考入圣约翰大学',
-    description: '以优异成绩考入上海圣约翰大学文科',
-    location: '上海',
-    category: 'education',
-    image: 'https://images.pexels.com/photos/1370295/pexels-photo-1370295.jpeg?auto=compress&cs=tinysrgb&w=600',
-    details: [
-      '在校期间积极参与学生活动',
-      '开始接触西方进步思想',
-      '培养了国际化视野和现代教育理念'
-    ]
-  },
-  {
-    id: 3,
-    year: 1921,
-    date: '1921年7月',
-    title: '毕业并开始新闻生涯',
-    description: '获得文学学士学位，开始投身新闻事业',
-    location: '上海',
-    category: 'career',
-    image: 'https://images.pexels.com/photos/518543/pexels-photo-518543.jpeg?auto=compress&cs=tinysrgb&w=600',
-    details: [
-      '进入中华职业教育社工作',
-      '开始为《教育与职业》杂志撰稿',
-      '确立了教育救国的理想'
-    ]
-  },
-  {
-    id: 4,
-    year: 1926,
-    date: '1926年10月',
-    title: '创办《生活》周刊',
-    description: '创办并主编《生活》周刊，开始了辉煌的出版生涯',
-    location: '上海',
-    category: 'publication',
-    image: 'https://images.pexels.com/photos/1070945/pexels-photo-1070945.jpeg?auto=compress&cs=tinysrgb&w=600',
-    details: [
-      '提出"暗中摸索，努力向前"的办刊方针',
-      '关注社会现实，倡导进步思想',
-      '发行量迅速增长，影响力日益扩大'
-    ]
-  },
-  {
-    id: 5,
-    year: 1932,
-    date: '1932年7月',
-    title: '创立生活书店',
-    description: '建立了全国性的进步出版发行网络',
-    location: '上海',
-    category: 'publication',
-    image: 'https://images.pexels.com/photos/159832/shanghai-china-city-modern-159832.jpeg?auto=compress&cs=tinysrgb&w=600',
-    details: [
-      '建立覆盖全国的发行网络',
-      '出版大量进步书籍和刊物',
-      '成为中国现代出版业的重要力量'
-    ]
-  },
-  {
-    id: 6,
-    year: 1935,
-    date: '1935年2月',
-    title: '创办《大众生活》',
-    description: '创办《大众生活》周刊，继续传播进步思想',
-    location: '上海',
-    category: 'publication',
-    image: 'https://images.pexels.com/photos/1148820/pexels-photo-1148820.jpeg?auto=compress&cs=tinysrgb&w=600',
-    details: [
-      '面向更广泛的读者群体',
-      '关注抗日救亡运动',
-      '发行量创历史新高'
-    ]
-  },
-  {
-    id: 7,
-    year: 1944,
-    date: '1944年7月24日',
-    title: '逝世于上海',
-    description: '为中国的新闻出版事业奉献了一生',
-    location: '上海',
-    category: 'death',
-    image: 'https://images.pexels.com/photos/789555/pexels-photo-789555.jpeg?auto=compress&cs=tinysrgb&w=600',
-    details: [
-      '临终前仍关心国家前途和民族命运',
-      '留下丰富的文化遗产',
-      '被誉为"人民的新闻工作者"'
-    ]
+// 获取类别的函数
+const getEventCategory = (content: string, year: number): LifeEvent['category'] => {
+  if (year === 1895) return 'birth';
+  if (year === 1944 || content.includes('逝世') || content.includes('病逝') || content.includes('去世')) return 'death';
+  if (content.includes('学校') || content.includes('大学') || content.includes('毕业') || content.includes('入学') || content.includes('求学') || content.includes('圣约翰') || content.includes('南洋公学')) return 'education';
+  if (content.includes('《生活》') || content.includes('生活书店') || content.includes('出版') || content.includes('周刊') || content.includes('杂志') || content.includes('《大众生活》') || content.includes('编辑') || content.includes('创办')) return 'publication';
+  if (content.includes('工作') || content.includes('任职') || content.includes('主编') || content.includes('社长') || content.includes('职业教育') || content.includes('总经理')) return 'career';
+  return 'social';
+};
+
+// 获取位置的函数
+const getEventLocation = (content: string): string => {
+  const locations = ['上海', '福建', '北京', '南京', '广州', '天津', '武汉', '重庆', '香港', '江西', '南昌', '永安'];
+  for (const location of locations) {
+    if (content.includes(location)) return location;
   }
-];
+  return '上海'; // 默认位置
+};
+
+// 获取标题的函数
+const getEventTitle = (content: string, year: number): string => {
+  if (year === 1895) return '出生于福建永安';
+  if (year === 1944) return '逝世于上海';
+  
+  // 提取关键事件
+  if (content.includes('《生活》周刊') && content.includes('创办')) return '创办《生活》周刊';
+  if (content.includes('生活书店') && content.includes('创立')) return '创立生活书店';
+  if (content.includes('《大众生活》')) return '创办《大众生活》';
+  if (content.includes('职业教育') || content.includes('中华职业')) return '任职中华职业教育社';
+  if (content.includes('圣约翰大学')) return '考入圣约翰大学';
+  if (content.includes('南洋公学')) return '就读南洋公学';
+  if (content.includes('七君子')) return '七君子事件';
+  if (content.includes('救国会') || content.includes('救国运动')) return '参与救国运动';
+  if (content.includes('生活出版合作社')) return '成立生活出版合作社';
+  if (content.includes('《生活日报》')) return '筹办《生活日报》';
+  
+  // 默认使用前40个字符作为标题
+  return content.substring(0, 40).replace(/[。，；：]/g, '').trim();
+};
+
+// 获取默认图片的函数
+const getDefaultImage = (category: LifeEvent['category']): string => {
+  const images = {
+    birth: 'https://images.pexels.com/photos/1183266/pexels-photo-1183266.jpeg?auto=compress&cs=tinysrgb&w=600',
+    education: 'https://images.pexels.com/photos/1370295/pexels-photo-1370295.jpeg?auto=compress&cs=tinysrgb&w=600',
+    career: 'https://images.pexels.com/photos/518543/pexels-photo-518543.jpeg?auto=compress&cs=tinysrgb&w=600',
+    publication: 'https://images.pexels.com/photos/1070945/pexels-photo-1070945.jpeg?auto=compress&cs=tinysrgb&w=600',
+    social: 'https://images.pexels.com/photos/1148820/pexels-photo-1148820.jpeg?auto=compress&cs=tinysrgb&w=600',
+    death: 'https://images.pexels.com/photos/789555/pexels-photo-789555.jpeg?auto=compress&cs=tinysrgb&w=600'
+  };
+  return images[category];
+};
 
 const categoryIcons = {
   birth: Users,
@@ -146,9 +97,82 @@ interface LifeTimelineModuleProps {
 export default function LifeTimelineModule({ className = '' }: LifeTimelineModuleProps) {
   const [visibleEvents, setVisibleEvents] = useState<Set<number>>(new Set());
   const [selectedEvent, setSelectedEvent] = useState<LifeEvent | null>(null);
+  const [lifeEvents, setLifeEvents] = useState<LifeEvent[]>([]);
+  const [loading, setLoading] = useState(true);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
+  // 加载数据的useEffect
   useEffect(() => {
+    const loadPersonData = async () => {
+      try {
+        const response = await fetch('/data/persons_clean.json');
+        const data: PersonRecord[] = await response.json();
+        
+        // 筛选包含邹韬奋的记录
+        const taoFenRecords = data.filter(record => 
+          record.content.includes('邹韬奋') || record.content.includes('邹恩润')
+        );
+        
+        // 转换为生活事件
+        const lifeEvents: LifeEvent[] = [];
+        
+        taoFenRecords.forEach((record) => {
+          const dateObj = new Date(record.date);
+          const year = dateObj.getFullYear();
+          
+          // 只处理有效年份的数据
+          if (year >= 1895 && year <= 1944 && record.content.length > 30) {
+            const category = getEventCategory(record.content, year);
+            const title = getEventTitle(record.content, year);
+            const location = getEventLocation(record.content);
+            
+            // 格式化日期
+            const formattedDate = `${year}年${dateObj.getMonth() + 1}月${dateObj.getDate()}日`;
+            
+            lifeEvents.push({
+              id: record.id,
+              year,
+              date: formattedDate,
+              title,
+              description: record.content.substring(0, 120) + (record.content.length > 120 ? '...' : ''),
+              location,
+              category,
+              image: getDefaultImage(category),
+              details: [record.content]
+            });
+          }
+        });
+        
+        // 按年份排序
+        const sortedEvents = lifeEvents.sort((a, b) => a.year - b.year);
+        
+        setLifeEvents(sortedEvents);
+      } catch (error) {
+        console.error('加载人物数据失败:', error);
+        // 如果加载失败，使用默认数据
+        setLifeEvents([{
+          id: 1,
+          year: 1895,
+          date: '1895年11月5日',
+          title: '出生于福建永安',
+          description: '邹韬奋出生于一个书香门第，原名邹恩润',
+          location: '福建永安',
+          category: 'birth',
+          image: getDefaultImage('birth'),
+          details: ['原名恩润，乳名荫书', '祖籍江西省鹰潭市余江区', '出生于书香门第']
+        }]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadPersonData();
+  }, []);
+
+  // 观察器的useEffect
+  useEffect(() => {
+    if (lifeEvents.length === 0) return;
+    
     observerRef.current = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -165,12 +189,25 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
     eventElements.forEach(el => observerRef.current?.observe(el));
 
     return () => observerRef.current?.disconnect();
-  }, []);
+  }, [lifeEvents]);
 
   const IconComponent = (category: LifeEvent['category']) => {
     const Icon = categoryIcons[category];
     return <Icon size={24} />;
   };
+
+  if (loading) {
+    return (
+      <section className={`py-20 bg-cream ${className}`}>
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold mx-auto"></div>
+            <p className="mt-4 text-charcoal/70">正在加载邹韬奋先生的人生轨迹...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className={`py-20 bg-cream ${className}`}>
