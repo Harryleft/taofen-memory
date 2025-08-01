@@ -407,14 +407,6 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
           </div>
         )}
 
-        {!hasMore && displayedData.length > 0 && (
-          <div className="text-center py-8">
-            <p className="text-charcoal/50 text-sm" style={{fontFamily: "'SimSun', '宋体', 'NSimSun', serif"}}>
-              📚 已显示 {displayedData.length} 本书籍
-            </p>
-          </div>
-        )}
-
         {displayedData.length === 0 && !isInitialLoading && (
           <div className="text-center py-12">
             <div className="text-6xl mb-4">📚</div>
