@@ -53,6 +53,15 @@ function HomePage() {
                   );
                 })}
                 
+                {/* 完整时间线页面链接 */}
+                <Link
+                  to="/timeline"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 text-charcoal hover:bg-gold/10 hover:text-gold"
+                >
+                  <Clock size={18} />
+                  完整时间线
+                </Link>
+                
                 {/* 书店时间线页面链接 */}
                 <Link
                   to="/bookstore-timeline"

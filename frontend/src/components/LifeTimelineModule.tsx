@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Calendar, MapPin, BookOpen, Users, Award, Heart } from 'lucide-react';
+import { Calendar, MapPin, BookOpen, Users, Award, Heart, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface PersonRecord {
   id: number;
@@ -286,6 +287,20 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
               </div>
             ))}
           </div>
+        </div>
+
+        {/* 查看完整时间线按钮 */}
+        <div className="text-center mt-16">
+          <Link
+            to="/timeline"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-gold text-cream rounded-xl font-semibold text-lg hover:bg-gold/90 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+          >
+            查看完整时间线
+            <ArrowRight size={20} />
+          </Link>
+          <p className="text-charcoal/60 mt-4 text-sm">
+            探索邹韬奋先生完整的人生历程
+          </p>
         </div>
       </div>
 
