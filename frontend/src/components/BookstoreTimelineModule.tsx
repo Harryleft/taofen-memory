@@ -33,28 +33,78 @@ const loadBooksData = async (): Promise<BookItem[]> => {
   const booksData: BookData[] = await response.json();
   
   return booksData
-    .filter(book => book.image && book.publisher?.includes('生活书店') && book.year >= 1900 && book.year <= 1949)
-    .map(book => ({
-      id: book.id,
-      title: book.bookname,
-      year: book.year,
-      author: book.writer || '佚名',
-      publisher: book.publisher || '生活书店',
-      image: book.image,
-      category: '图书',
-      tags: [book.publisher?.includes('生活书店') ? '生活书店' : '其他', `${book.year}年代`],
-      dimensions: {
-        width: 200,
-        height: Math.floor(Math.random() * 100) + 250 // 随机高度模拟不同封面尺寸
+    .filter(book => book.image && book.year >= 1900 && book.year <= 1949) // 移除出版社限制，只保留年份和图片过滤
+    .map(book => {
+      // 智能分类书籍
+      let category = '图书';
+      let tags = [];
+      
+      // 根据出版社分类
+      if (book.publisher?.includes('生活书店')) {
+        category = '生活书店';
+        tags.push('生活书店');
+      } else if (book.publisher?.includes('商务印书馆')) {
+        category = '商务印书馆';
+        tags.push('商务印书馆');
+      } else if (book.publisher?.includes('中华书局')) {
+        category = '中华书局';
+        tags.push('中华书局');
+      } else if (book.publisher?.includes('开明书店')) {
+        category = '开明书店';
+        tags.push('开明书店');
+      } else if (book.publisher?.includes('世界书局')) {
+        category = '世界书局';
+        tags.push('世界书局');
+      } else {
+        category = '其他出版社';
+        tags.push('其他');
       }
-    }))
+      
+      // 添加年代标签
+      const decade = Math.floor(book.year / 10) * 10;
+      tags.push(`${decade}年代`);
+      
+      // 根据书名关键词添加主题标签
+      const title = book.bookname?.toLowerCase() || '';
+      if (title.includes('文学') || title.includes('小说') || title.includes('诗') || title.includes('散文')) {
+        tags.push('文学');
+      } else if (title.includes('政治') || title.includes('革命') || title.includes('主义')) {
+        tags.push('政治');
+      } else if (title.includes('教育') || title.includes('学校') || title.includes('教学')) {
+        tags.push('教育');
+      } else if (title.includes('科学') || title.includes('技术') || title.includes('工程')) {
+        tags.push('科技');
+      } else if (title.includes('历史') || title.includes('史')) {
+        tags.push('历史');
+      } else if (title.includes('哲学') || title.includes('思想')) {
+        tags.push('哲学');
+      }
+      
+      return {
+        id: book.id,
+        title: book.bookname,
+        year: book.year,
+        author: book.writer || '佚名',
+        publisher: book.publisher || '未知出版社',
+        image: book.image,
+        category,
+        tags: tags.slice(0, 3), // 最多保留3个标签
+        dimensions: {
+          width: 200,
+          height: Math.floor(Math.random() * 100) + 250 // 随机高度模拟不同封面尺寸
+        }
+      };
+    })
     .sort((a, b) => a.year - b.year); // 按年份排序保持时间连续性
 };
 
 const categoryColors = {
-  '图书': 'bg-gold',
-  '期刊': 'bg-blue-500',
-  '手册': 'bg-green-500'
+  '生活书店': 'bg-gold',
+  '商务印书馆': 'bg-blue-500',
+  '中华书局': 'bg-red-500',
+  '开明书店': 'bg-green-500',
+  '世界书局': 'bg-purple-500',
+  '其他出版社': 'bg-gray-500'
 };
 
 interface BookstoreTimelineModuleProps {
@@ -64,6 +114,7 @@ interface BookstoreTimelineModuleProps {
 export default function BookstoreTimelineModule({ className = '' }: BookstoreTimelineModuleProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedYear, setSelectedYear] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all'); // 新增出版社筛选
   const [selectedItem, setSelectedItem] = useState<BookItem | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [visibleItems, setVisibleItems] = useState<Set<number>>(new Set());
@@ -116,8 +167,9 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
                          item.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          item.publisher.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesYear = selectedYear === 'all' || item.year.toString() === selectedYear;
+    const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
     
-    return matchesSearch && matchesYear;
+    return matchesSearch && matchesYear && matchesCategory;
   });
 
   // 瀑布流布局计算
@@ -175,6 +227,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
   }, [filteredItems]);
 
   const uniqueYears = [...new Set(data.map(item => item.year))].sort();
+  const uniqueCategories = [...new Set(data.map(item => item.category))].sort();
   const yearRange = data.length > 0 
     ? `${Math.min(...data.map(d => d.year))}-${Math.max(...data.map(d => d.year))}`
     : '';
@@ -204,6 +257,17 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
               className="pl-10 pr-4 py-2 bg-white border border-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50 w-80"
             />
           </div>
+          
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="px-4 py-2 bg-white border border-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50"
+          >
+            <option value="all">全部出版社</option>
+            {uniqueCategories.map(category => (
+              <option key={category} value={category}>{category}</option>
+            ))}
+          </select>
           
           <select
             value={selectedYear}
@@ -260,7 +324,9 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
                         <span className="px-2 py-1 rounded-full text-xs text-white bg-gold">
                           {item.year}年
                         </span>
-                        <span className="text-xs text-charcoal/60">{item.category}</span>
+                        <span className={`px-2 py-1 rounded-full text-xs text-white ${categoryColors[item.category as keyof typeof categoryColors] || 'bg-gray-500'}`}>
+                          {item.category}
+                        </span>
                       </div>
                       <h3 className="font-bold text-charcoal mb-2 group-hover:text-gold transition-colors line-clamp-2">
                         {item.title}
@@ -339,7 +405,9 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
                   <span className="px-3 py-1 rounded-full text-sm text-white bg-gold">
                     {selectedItem.year}年
                   </span>
-                  <span className="text-gold font-bold">{selectedItem.category}</span>
+                  <span className={`px-3 py-1 rounded-full text-sm text-white ${categoryColors[selectedItem.category as keyof typeof categoryColors] || 'bg-gray-500'}`}>
+                    {selectedItem.category}
+                  </span>
                 </div>
                 
                 <h3 className="text-2xl font-bold text-charcoal mb-4 font-serif">
