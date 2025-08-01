@@ -16,10 +16,10 @@ function BookstoreTimelinePage() {
                 className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 text-charcoal hover:bg-gold/10 hover:text-gold"
               >
                 <ArrowLeft size={18} />
-                返回首页
+                返回
               </Link>
               <div className="h-6 w-px bg-gold/20"></div>
-              <h1 className="text-2xl font-bold text-charcoal">生活书店时间线</h1>
+              {/* <h1 className="text-2xl font-bold text-charcoal">韬奋·时光书影</h1> */}
             </div>
           </div>
         </div>

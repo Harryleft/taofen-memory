@@ -200,11 +200,11 @@ const categoryColors = {
   '其他出版社': 'bg-gray-500'
 };
 
-interface BookstoreTimelineModuleProps {
+interface TaofenHeritageModuleProps {
   className?: string;
 }
 
-export default function BookstoreTimelineModule({ className = '' }: BookstoreTimelineModuleProps) {
+export default function TaofenHeritageModule({ className = '' }: TaofenHeritageModuleProps) {
   // *** 懒加载版本 v2.0 - 2025-01-30 ***
   
   // 筛选状态
@@ -506,12 +506,18 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
       <section className={`relative py-20 bg-white ${className}`}>
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-5xl font-bold text-charcoal mb-6 font-serif">
-              远读山峦时间轴
+            <h2 className="text-5xl font-bold text-charcoal mb-6" style={{fontFamily: "'FangSong', 'STFangSong', '华文仿宋', serif"}}>
+              韬奋·时光书影
             </h2>
+            <p className="text-lg text-charcoal/70 mb-2" style={{fontFamily: "'KaiTi', 'STKaiti', '华文楷体', serif"}}>
+              探寻生活书店出版文化印记
+            </p>
+            {/* <p className="text-sm text-charcoal/50" style={{fontFamily: "'SimSun', '宋体', 'NSimSun', serif", letterSpacing: '0.05em'}}>
+              1900-1949年
+            </p> */}
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gold"></div>
-              <span className="ml-3 text-charcoal/60">正在加载书籍数据...</span>
+              <span className="ml-3 text-charcoal/60" style={{fontFamily: "'SimSun', '宋体', 'NSimSun', serif"}}>正在加载书籍数据...</span>
             </div>
           </div>
         </div>
@@ -524,9 +530,15 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-16">
-          <h2 className="text-5xl font-bold text-charcoal mb-6 font-serif">
-            远读山峦时间轴
+          <h2 className="text-5xl font-bold text-charcoal mb-6" style={{fontFamily: "'FangSong', 'STFangSong', '华文仿宋', serif"}}>
+            韬奋·时光书影
           </h2>
+          <p className="text-lg text-charcoal/70 mb-2" style={{fontFamily: "'KaiTi', 'STKaiti', '华文楷体', serif"}}>
+            探寻生活书店出版文化印记
+          </p>
+          {/* <p className="text-sm text-charcoal/50" style={{fontFamily: "'SimSun', '宋体', 'NSimSun', serif", letterSpacing: '0.05em'}}>
+            1900-1949年
+          </p> */}
         </div>
 
         {/* Filters */}
@@ -539,6 +551,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 pr-4 py-2 bg-white border border-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50 w-80"
+              style={{fontFamily: "'SimSun', '宋体', 'NSimSun', serif"}}
             />
           </div>
           
@@ -546,6 +559,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
             className="px-4 py-2 bg-white border border-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50"
+            style={{fontFamily: "'SimSun', '宋体', 'NSimSun', serif"}}
           >
             <option value="all">全部出版社</option>
             {uniqueCategories.map(category => (
@@ -557,6 +571,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
             value={selectedYear}
             onChange={(e) => setSelectedYear(e.target.value)}
             className="px-4 py-2 bg-white border border-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50"
+            style={{fontFamily: "'SimSun', '宋体', 'NSimSun', serif"}}
           >
             <option value="all">全部年份</option>
             {uniqueYears.map(year => (
@@ -617,13 +632,13 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
                             </div>
                           </div>
                           <div className="p-4 bg-amber-50">
-                            <h3 className="font-bold text-charcoal mb-2 group-hover:text-gold transition-colors line-clamp-2">
+                            <h3 className="font-bold text-charcoal mb-2 group-hover:text-gold transition-colors line-clamp-2" style={{fontFamily: "'KaiTi', 'STKaiti', '华文楷体', serif", letterSpacing: '0.02em'}}>
                               {item.title}
                             </h3>
-                            <p className="text-sm text-charcoal/70 mb-1">
+                            <p className="text-sm text-charcoal/70 mb-1" style={{fontFamily: "'SimSun', '宋体', 'NSimSun', serif"}}>
                               作者：{item.author}
                             </p>
-                            <p className="text-sm text-charcoal/70 mb-2">
+                            <p className="text-sm text-charcoal/70 mb-2" style={{fontFamily: "'SimSun', '宋体', 'NSimSun', serif"}}>
                               出版：{item.publisher}
                             </p>
                           </div>
@@ -636,7 +651,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
             })
           ) : (
             <div className="w-full text-center py-8">
-              <p className="text-charcoal/60">无数据可显示</p>
+              <p className="text-charcoal/60" style={{fontFamily: "'SimSun', '宋体', 'NSimSun', serif"}}>无数据可显示</p>
             </div>
           )}
         </div>
@@ -649,7 +664,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
           <div className="text-center py-8">
             <div className="flex items-center justify-center">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gold mr-3"></div>
-              <span className="text-charcoal/60">正在加载更多...</span>
+              <span className="text-charcoal/60" style={{fontFamily: "'SimSun', '宋体', 'NSimSun', serif"}}>正在加载更多...</span>
             </div>
           </div>
         )}
@@ -657,7 +672,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
         {/* No more data indicator */}
         {!hasMore && displayedData.length > 0 && (
           <div className="text-center py-8">
-            <p className="text-charcoal/50 text-sm">
+            <p className="text-charcoal/50 text-sm" style={{fontFamily: "'SimSun', '宋体', 'NSimSun', serif"}}>
               📚 已显示全部 {displayedData.length} 本书籍
             </p>
           </div>
@@ -667,8 +682,8 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
         {displayedData.length === 0 && !isInitialLoading && (
           <div className="text-center py-12">
             <div className="text-6xl mb-4">📚</div>
-            <h3 className="text-xl font-bold text-charcoal mb-2">未找到相关书籍</h3>
-            <p className="text-charcoal/60">请尝试调整搜索条件</p>
+            <h3 className="text-xl font-bold text-charcoal mb-2" style={{fontFamily: "'KaiTi', 'STKaiti', '华文楷体', serif"}}>未找到相关书籍</h3>
+            <p className="text-charcoal/60" style={{fontFamily: "'SimSun', '宋体', 'NSimSun', serif"}}>请尝试调整搜索条件</p>
           </div>
         )}
       </div>
@@ -712,23 +727,23 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
               
               {/* Details */}
               <div className="w-full lg:w-96 p-6 overflow-y-auto bg-white">
-                <h3 className="text-2xl font-bold text-charcoal mb-4 font-serif">
+                <h3 className="text-2xl font-bold text-charcoal mb-4" style={{fontFamily: "'KaiTi', 'STKaiti', '华文楷体', serif", letterSpacing: '0.02em'}}>
                   {selectedItem.title}
                 </h3>
                 
                 <div className="space-y-3 mb-6">
-                  <p className="text-charcoal/80">
+                  <p className="text-charcoal/80" style={{fontFamily: "'SimSun', '宋体', 'NSimSun', serif"}}>
                     <span className="font-semibold">作者：</span>{selectedItem.author}
                   </p>
-                  <p className="text-charcoal/80">
+                  <p className="text-charcoal/80" style={{fontFamily: "'SimSun', '宋体', 'NSimSun', serif"}}>
                     <span className="font-semibold">出版社：</span>{selectedItem.publisher}
                   </p>
-                  <p className="text-charcoal/80">
+                  <p className="text-charcoal/80" style={{fontFamily: "'SimSun', '宋体', 'NSimSun', serif"}}>
                     <span className="font-semibold">出版年份：</span>{selectedItem.year}年
                   </p>
                 </div>
                 
-                <div className="mt-4 text-sm text-charcoal/60 text-center">
+                <div className="mt-4 text-sm text-charcoal/60 text-center" style={{fontFamily: "'SimSun', '宋体', 'NSimSun', serif"}}>
                   {currentIndex + 1} / {displayedData.length}
                 </div>
               </div>
