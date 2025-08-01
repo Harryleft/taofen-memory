@@ -40,9 +40,14 @@ const loadBooksData = async (): Promise<BookItem[]> => {
       let tags = [];
       
       // 根据出版社分类
-      if (book.publisher?.includes('生活书店')) {
-        category = '生活书店';
-        tags.push('生活书店');
+      if (book.publisher?.includes('生活书店') || 
+          book.publisher?.includes('生活周刊社') ||
+          book.publisher?.includes('读书生活出版社') ||
+          book.publisher?.includes('读书生活社') ||
+          book.publisher?.includes('生活出版社') ||
+          book.publisher?.includes('新生活书店')) {
+        category = '生活书店系';
+        tags.push('生活书店系');
       } else if (book.publisher?.includes('商务印书馆')) {
         category = '商务印书馆';
         tags.push('商务印书馆');
@@ -99,7 +104,7 @@ const loadBooksData = async (): Promise<BookItem[]> => {
 };
 
 const categoryColors = {
-  '生活书店': 'bg-gold',
+  '生活书店系': 'bg-gold',
   '商务印书馆': 'bg-blue-500',
   '中华书局': 'bg-red-500',
   '开明书店': 'bg-green-500',
