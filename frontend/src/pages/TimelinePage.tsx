@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Calendar, MapPin, BookOpen, Users, Award, Heart } from 'lucide-react';
+import { MapPin, ChevronDown, ChevronRight } from 'lucide-react';
 
 // Timeline data interfaces (matching timeline.json structure)
 interface TimelineEventData {
@@ -17,100 +17,15 @@ interface CoreEvent {
 
 interface TimelineData extends Array<CoreEvent> {}
 
-// Converted timeline event for display
-interface TimelineEvent {
-  id: number;
-  year: number;
-  date: string;
-  title: string;
-  description: string;
-  location: string;
-  details: string[];
-}
-
-const getEventCategory = (description: string, year: number): string => {
-  const desc = description.toLowerCase();
-  
-  if (year <= 1900 || desc.includes('出生') || desc.includes('生于')) {
-    return 'birth';
-  }
-  
-  if (desc.includes('学校') || desc.includes('大学') || desc.includes('教育') || 
-      desc.includes('学习') || desc.includes('读书') || desc.includes('毕业')) {
-    return 'education';
-  }
-  
-  if (desc.includes('出版') || desc.includes('编辑') || desc.includes('书店') || 
-      desc.includes('杂志') || desc.includes('周刊') || desc.includes('生活书店')) {
-    return 'publication';
-  }
-  
-  if (desc.includes('救国') || desc.includes('抗日') || desc.includes('政治') || 
-      desc.includes('国民党') || desc.includes('七君子')) {
-    return 'political';
-  }
-  
-  if (desc.includes('社会') || desc.includes('组织') || desc.includes('团体') || 
-      desc.includes('活动') || desc.includes('运动')) {
-    return 'social';
-  }
-  
-  if (desc.includes('家庭') || desc.includes('结婚') || desc.includes('子女') || 
-      desc.includes('迁居') || desc.includes('居住')) {
-    return 'family';
-  }
-  
-  if (year >= 1944 || desc.includes('逝世') || desc.includes('病逝') || desc.includes('去世')) {
-    return 'death';
-  }
-  
-  return 'career';
-};
-
-const categoryIcons = {
-  birth: Users,
-  education: BookOpen,
-  career: Award,
-  publication: BookOpen,
-  social: Heart,
-  political: Users,
-  family: Heart,
-  death: Calendar
-};
-
-const categoryColors = {
-  birth: 'bg-blue-500',
-  education: 'bg-green-500',
-  career: 'bg-purple-500',
-  publication: 'bg-gold',
-  social: 'bg-pink-500',
-  political: 'bg-red-500',
-  family: 'bg-pink-400',
-  death: 'bg-gray-500'
-};
-
-const getDefaultImage = (category: string): string => {
-  const images = {
-    birth: 'https://images.pexels.com/photos/1183266/pexels-photo-1183266.jpeg?auto=compress&cs=tinysrgb&w=600',
-    education: 'https://images.pexels.com/photos/1370295/pexels-photo-1370295.jpeg?auto=compress&cs=tinysrgb&w=600',
-    career: 'https://images.pexels.com/photos/518543/pexels-photo-518543.jpeg?auto=compress&cs=tinysrgb&w=600',
-    publication: 'https://images.pexels.com/photos/1070945/pexels-photo-1070945.jpeg?auto=compress&cs=tinysrgb&w=600',
-    social: 'https://images.pexels.com/photos/1148820/pexels-photo-1148820.jpeg?auto=compress&cs=tinysrgb&w=600',
-    political: 'https://images.pexels.com/photos/1148820/pexels-photo-1148820.jpeg?auto=compress&cs=tinysrgb&w=600',
-    family: 'https://images.pexels.com/photos/1148820/pexels-photo-1148820.jpeg?auto=compress&cs=tinysrgb&w=600',
-    death: 'https://images.pexels.com/photos/789555/pexels-photo-789555.jpeg?auto=compress&cs=tinysrgb&w=600'
-  };
-  return images[category as keyof typeof images] || images.career;
-};
-
 export default function TimelinePage() {
+  const [timelineData, setTimelineData] = useState<TimelineData>([]);
+  const [expandedEvents, setExpandedEvents] = useState<Set<number>>(new Set());
   const [visibleEvents, setVisibleEvents] = useState<Set<number>>(new Set());
-  const [selectedEvent, setSelectedEvent] = useState<TimelineEvent | null>(null);
-  const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
+  // 加载时间线数据
   useEffect(() => {
     const loadTimelineData = async () => {
       try {
@@ -119,43 +34,8 @@ export default function TimelinePage() {
         if (!response.ok) {
           throw new Error(`Failed to fetch timeline data: ${response.status}`);
         }
-        const timelineData: TimelineData = await response.json();
-        
-        // Convert timeline data to timeline events
-        const events: TimelineEvent[] = [];
-        let eventId = 1;
-        
-        timelineData.forEach((coreEvent) => {
-          coreEvent.timeline.forEach((event) => {
-            // Skip background events for the timeline page
-            if (event.timespot) return;
-            
-            // Extract year from time string
-            const yearMatch = event.time.match(/(\d{4})/);
-            const year = yearMatch ? parseInt(yearMatch[1]) : 1900;
-            
-            // Create title from experience (first sentence)
-            const title = event.experience.split('。')[0];
-            
-            // Extract details (remaining sentences)
-            const sentences = event.experience.split('。').filter(s => s.trim().length > 0);
-            const details = sentences.length > 1 ? sentences.slice(1, 4).map(s => s.trim() + '。') : [];
-            
-            events.push({
-              id: eventId++,
-              year,
-              date: event.time,
-              title,
-              description: event.experience,
-              location: event.location || '未知',
-              details
-            });
-          });
-        });
-        
-        // Sort by year
-        events.sort((a, b) => a.year - b.year);
-        setTimelineEvents(events);
+        const data: TimelineData = await response.json();
+        setTimelineData(data);
       } catch (err) {
         console.error('加载时间线数据失败:', err);
         setError('加载数据失败，请稍后重试');
@@ -167,30 +47,49 @@ export default function TimelinePage() {
     loadTimelineData();
   }, []);
 
+  // 观察器设置
   useEffect(() => {
-    if (timelineEvents.length === 0) return;
+    if (timelineData.length === 0) return;
     
     observerRef.current = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const eventId = parseInt(entry.target.getAttribute('data-event-id') || '0');
-            setVisibleEvents(prev => new Set([...prev, eventId]));
+            const eventIndex = parseInt(entry.target.getAttribute('data-event-index') || '0');
+            setVisibleEvents(prev => new Set([...prev, eventIndex]));
           }
         });
       },
       { threshold: 0.3, rootMargin: '50px' }
     );
 
-    const eventElements = document.querySelectorAll('[data-event-id]');
+    const eventElements = document.querySelectorAll('[data-event-index]');
     eventElements.forEach(el => observerRef.current?.observe(el));
 
     return () => observerRef.current?.disconnect();
-  }, [timelineEvents]);
+  }, [timelineData]);
 
-  const IconComponent = (category: string) => {
-    const Icon = categoryIcons[category as keyof typeof categoryIcons] || Users;
-    return <Icon size={24} />;
+  // 切换展开状态
+  const toggleExpanded = (index: number) => {
+    setExpandedEvents(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(index)) {
+        newSet.delete(index);
+      } else {
+        newSet.add(index);
+      }
+      return newSet;
+    });
+  };
+
+  // 获取核心事件的年份
+  const getCoreEventYear = (coreEvent: CoreEvent): string => {
+    const firstEvent = coreEvent.timeline.find(event => !event.timespot);
+    if (firstEvent) {
+      const match = firstEvent.time.match(/(\d{4})/);
+      return match ? match[1] : '';
+    }
+    return '';
   };
 
   if (loading) {
@@ -228,126 +127,126 @@ export default function TimelinePage() {
           <p className="text-xl text-charcoal/70 max-w-3xl mx-auto leading-relaxed">
             追溯邹韬奋先生的人生轨迹，感受一位文化先驱的成长历程与时代担当
           </p>
+          <p className="text-sm text-charcoal/50 mt-4">
+            点击红色核心事件节点展开详细时间线
+          </p>
         </div>
 
         <div className="relative">
-          {/* Timeline Line */}
+          {/* Main Timeline Line */}
           <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-gold/30 via-gold to-gold/30"></div>
 
-          {/* Events */}
-          <div className="space-y-24">
-            {timelineEvents.map((event, index) => {
-              const category = getEventCategory(event.description, event.year);
-              return (
-                <div
-                  key={event.id}
-                  data-event-id={event.id}
-                  className={`relative flex items-center ${
-                    index % 2 === 0 ? 'justify-start' : 'justify-end'
-                  }`}
-                >
-                  {/* Event Card */}
+          {/* Core Events */}
+          <div className="space-y-32">
+            {timelineData.map((coreEvent, index) => (
+              <div
+                key={index}
+                data-event-index={index}
+                className={`relative transform transition-all duration-1000 ${
+                  visibleEvents.has(index)
+                    ? 'translate-y-0 opacity-100'
+                    : 'translate-y-8 opacity-0'
+                }`}
+              >
+                {/* Core Event Node */}
+                <div className="flex items-center justify-center">
                   <div
-                    className={`w-full max-w-lg transform transition-all duration-1000 ${
-                      visibleEvents.has(event.id)
-                        ? 'translate-y-0 opacity-100'
-                        : 'translate-y-8 opacity-0'
-                    } ${index % 2 === 0 ? 'pr-12' : 'pl-12'}`}
+                    onClick={() => toggleExpanded(index)}
+                    className="relative cursor-pointer group"
                   >
-                    <div 
-                      className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden cursor-pointer group"
-                      onClick={() => setSelectedEvent(event)}
-                    >
-                      <div className="aspect-w-16 aspect-h-9 overflow-hidden">
-                        <img
-                          src={getDefaultImage(category)}
-                          alt={event.title}
-                          className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-700"
-                        />
-                      </div>
-                      <div className="p-6">
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className={`p-2 rounded-full ${categoryColors[category as keyof typeof categoryColors] || 'bg-gray-500'} text-white`}>
-                            {IconComponent(category)}
-                          </div>
-                          <div>
-                            <div className="text-2xl font-bold text-gold">{event.year}</div>
-                            <div className="text-sm text-charcoal/60">{event.date}</div>
-                          </div>
-                        </div>
-                        <h3 className="text-xl font-bold text-charcoal mb-2 group-hover:text-gold transition-colors">
-                          {event.title}
-                        </h3>
-                        <p className="text-charcoal/70 mb-3">{event.description}</p>
-                        <div className="flex items-center text-sm text-charcoal/60">
-                          <MapPin size={16} className="mr-1" />
-                          {event.location}
-                        </div>
+                    {/* Core Event Circle - 红色 */}
+                    <div className="w-16 h-16 bg-red-500 rounded-full border-4 border-cream shadow-lg z-20 relative flex items-center justify-center hover:bg-red-600 transition-colors">
+                      <div className="text-white font-bold text-xs text-center leading-tight">
+                        {getCoreEventYear(coreEvent)}
                       </div>
                     </div>
-                  </div>
-
-                  {/* Timeline Node */}
-                  <div className="absolute left-1/2 transform -translate-x-1/2 w-6 h-6 bg-gold rounded-full border-4 border-cream shadow-lg z-10"></div>
-
-                  {/* Year Label */}
-                  <div className={`absolute left-1/2 transform -translate-x-1/2 ${
-                    index % 2 === 0 ? '-translate-x-20' : 'translate-x-20'
-                  } bg-gold text-cream px-3 py-1 rounded-full text-sm font-bold shadow-lg`}>
-                    {event.year}
+                    
+                    {/* Expand/Collapse Icon */}
+                    <div className="absolute -right-2 -top-2 w-6 h-6 bg-gold rounded-full flex items-center justify-center text-cream text-xs">
+                      {expandedEvents.has(index) ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+                    </div>
                   </div>
                 </div>
-              );
-            })}
+
+                {/* Core Event Title */}
+                <div className="text-center mt-4 mb-8">
+                  <h3 className="text-2xl font-bold text-charcoal font-serif">
+                    {coreEvent.core_event}
+                  </h3>
+                  <div className="text-gold font-semibold text-lg mt-1">
+                    {getCoreEventYear(coreEvent)}年
+                  </div>
+                </div>
+
+                {/* Expanded Timeline Details */}
+                {expandedEvents.has(index) && (
+                  <div className="mt-8 space-y-6">
+                    {coreEvent.timeline.map((event, eventIndex) => (
+                      <div
+                        key={eventIndex}
+                        className="relative"
+                      >
+                        {/* Event Item - 响应式布局：桌面端左图右文，移动端上图下文 */}
+                        <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-start">
+                          {/* 图片部分 */}
+                          {event.image && (
+                            <div className="flex-shrink-0 w-full md:w-32 h-48 md:h-32">
+                              <img
+                                src={event.image}
+                                alt={event.time}
+                                className="w-full h-full object-cover rounded-lg shadow-md"
+                              />
+                            </div>
+                          )}
+                          
+                          {/* 内容部分 */}
+                          <div className={`flex-1 rounded-xl shadow-md p-4 md:p-6 border-l-4 ${
+                            event.timespot 
+                              ? 'bg-gray-50 border-gray-400' // 背景故事 - 灰色
+                              : 'bg-red-50 border-red-400'   // 核心故事 - 红色
+                          }`}>
+                            {/* 时间和地点部分 - 上方 */}
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3 pb-3 border-b border-gray-200">
+                              <div className="flex items-center gap-3">
+                                <div className={`w-3 h-3 rounded-full ${
+                                  event.timespot ? 'bg-gray-400' : 'bg-red-500'
+                                }`}></div>
+                                <div className="font-bold text-charcoal text-lg">{event.time}</div>
+                                {event.timespot && (
+                                  <div className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full">
+                                    历史背景
+                                  </div>
+                                )}
+                              </div>
+                              
+                              {event.location && (
+                                <div className="flex items-center text-sm text-charcoal/60">
+                                  <MapPin size={14} className="mr-1" />
+                                  {event.location}
+                                </div>
+                              )}
+                            </div>
+                            
+                            {/* 文字内容部分 - 下方 */}
+                            <p className="text-charcoal/80 leading-relaxed">
+                              {event.experience}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Sub-timeline Node */}
+                        <div className={`absolute left-1/2 transform -translate-x-1/2 w-4 h-4 rounded-full border-2 border-cream shadow-md z-10 ${
+                          event.timespot ? 'bg-gray-400' : 'bg-red-500'
+                        }`}></div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </div>
-
-      {/* Event Detail Modal */}
-      {selectedEvent && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-          <div className="bg-cream rounded-2xl max-w-4xl max-h-[90vh] overflow-y-auto">
-            <div className="relative">
-              <img
-                src={getDefaultImage(getEventCategory(selectedEvent.description, selectedEvent.year))}
-                alt={selectedEvent.title}
-                className="w-full h-64 object-cover"
-              />
-              <button
-                onClick={() => setSelectedEvent(null)}
-                className="absolute top-4 right-4 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
-              >
-                ×
-              </button>
-            </div>
-            <div className="p-8">
-              <div className="flex items-center gap-4 mb-6">
-                <div className={`p-3 rounded-full ${categoryColors[getEventCategory(selectedEvent.description, selectedEvent.year) as keyof typeof categoryColors] || 'bg-gray-500'} text-white`}>
-                  {IconComponent(getEventCategory(selectedEvent.description, selectedEvent.year))}
-                </div>
-                <div>
-                  <div className="text-3xl font-bold text-gold">{selectedEvent.year}</div>
-                  <div className="text-charcoal/60">{selectedEvent.date}</div>
-                </div>
-              </div>
-              <h3 className="text-3xl font-bold text-charcoal mb-4 font-serif">
-                {selectedEvent.title}
-              </h3>
-              <p className="text-lg text-charcoal/80 mb-6 leading-relaxed">
-                {selectedEvent.description}
-              </p>
-              <div className="space-y-3">
-                {selectedEvent.details.map((detail, index) => (
-                  <div key={index} className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-gold rounded-full mt-2 flex-shrink-0"></div>
-                    <p className="text-charcoal/70">{detail}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
