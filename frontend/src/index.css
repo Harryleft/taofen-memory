@@ -69,6 +69,23 @@
   }
 }
 
+/* Fade In Animation for Timeline */
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.8s ease-out forwards;
+  opacity: 0;
+}
+
 .animate-float {
   animation: float 3s ease-in-out infinite;
 }
@@ -83,22 +100,22 @@
   animation-delay: 2s;
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar - Dark theme */
 ::-webkit-scrollbar {
   width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #FAF7F0;
+  background: #1e293b;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #B8860B;
+  background: #475569;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #996F0A;
+  background: #64748b;
 }
 
 /* Reduce motion for accessibility */
