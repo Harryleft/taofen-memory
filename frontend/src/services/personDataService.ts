@@ -59,7 +59,7 @@ const extractDetails = (description: string): string[] => {
 export const personDataService = {
   // 加载邹韬奋数据
   async loadZouTaofenData(): Promise<PersonData> {
-    const response = await fetch('/data/persons.json');
+    const response = await fetch('/data/persons_clean.json');
     if (!response.ok) {
       throw new Error(`Failed to fetch person data: ${response.status}`);
     }
