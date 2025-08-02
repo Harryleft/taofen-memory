@@ -1,7 +1,32 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Calendar, MapPin, BookOpen, Users, Award, Heart } from 'lucide-react';
-import { personDataService } from '../services/personDataService';
-import { PersonData, TimelineEvent } from '../types/personTypes';
+
+// Timeline data interfaces (matching timeline.json structure)
+interface TimelineEventData {
+  time: string;
+  experience: string;
+  image: string;
+  location: string;
+  timespot?: number; // 1 for background events
+}
+
+interface CoreEvent {
+  core_event: string;
+  timeline: TimelineEventData[];
+}
+
+interface TimelineData extends Array<CoreEvent> {}
+
+// Converted timeline event for display
+interface TimelineEvent {
+  id: number;
+  year: number;
+  date: string;
+  title: string;
+  description: string;
+  location: string;
+  details: string[];
+}
 
 const getEventCategory = (description: string, year: number): string => {
   const desc = description.toLowerCase();
@@ -90,8 +115,46 @@ export default function TimelinePage() {
     const loadTimelineData = async () => {
       try {
         setLoading(true);
-        const personData: PersonData = await personDataService.loadZouTaofenData();
-        const events = personDataService.convertToTimelineEvents(personData);
+        const response = await fetch('/data/timeline.json');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch timeline data: ${response.status}`);
+        }
+        const timelineData: TimelineData = await response.json();
+        
+        // Convert timeline data to timeline events
+        const events: TimelineEvent[] = [];
+        let eventId = 1;
+        
+        timelineData.forEach((coreEvent) => {
+          coreEvent.timeline.forEach((event) => {
+            // Skip background events for the timeline page
+            if (event.timespot) return;
+            
+            // Extract year from time string
+            const yearMatch = event.time.match(/(\d{4})/);
+            const year = yearMatch ? parseInt(yearMatch[1]) : 1900;
+            
+            // Create title from experience (first sentence)
+            const title = event.experience.split('。')[0];
+            
+            // Extract details (remaining sentences)
+            const sentences = event.experience.split('。').filter(s => s.trim().length > 0);
+            const details = sentences.length > 1 ? sentences.slice(1, 4).map(s => s.trim() + '。') : [];
+            
+            events.push({
+              id: eventId++,
+              year,
+              date: event.time,
+              title,
+              description: event.experience,
+              location: event.location || '未知',
+              details
+            });
+          });
+        });
+        
+        // Sort by year
+        events.sort((a, b) => a.year - b.year);
         setTimelineEvents(events);
       } catch (err) {
         console.error('加载时间线数据失败:', err);
