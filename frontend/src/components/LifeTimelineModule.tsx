@@ -42,33 +42,28 @@ interface TimelineItemProps {
 }
 
 const TimelineItem: React.FC<TimelineItemProps> = ({ event, index, isVisible }) => {
-  const isEven = index % 2 === 0;
-  
   return (
-    <div className={`timeline-item mb-20 transform transition-all duration-1000 ${
-      isVisible ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'
+    <div className={`timeline-item mb-16 transform transition-all duration-1000 ${
+      isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
     }`}>
       <div className="timeline-dot"></div>
       {/* Container for mobile padding */}
       <div className="pl-[45px] md:pl-0">
         {/* Flex container for desktop left-right layout */}
         <div className="md:flex justify-between items-start w-full">
-          {/* Left side - Image (alternates with text on desktop) */}
-          <div className={`md:w-5/12 ${
-            isEven ? 'md:order-1 md:text-right' : 'md:order-3 md:text-left'
-          }`}>
+          {/* Left side - Image (always on left) */}
+          <div className="md:w-5/12 md:text-right">
             {event.image && (
               <div className="relative group">
                 <img 
                   src={event.image}
                   alt={event.time}
-                  className="inline-block w-full max-w-md rounded-2xl shadow-2xl transition-transform duration-700 group-hover:scale-105"
+                  className="inline-block w-full max-w-sm rounded-lg shadow-md transition-transform duration-300 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 via-transparent to-transparent rounded-2xl"></div>
                 {/* Timeline indicator on image */}
                 <div className="absolute top-4 right-4">
                   <div className={`w-3 h-3 rounded-full border-2 border-white shadow-lg ${
-                    event.timespot ? 'bg-slate-400' : 'bg-blue-400'
+                    event.timespot ? 'bg-gray-400' : 'bg-gold'
                   }`}></div>
                 </div>
               </div>
@@ -76,22 +71,20 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, index, isVisible }) 
           </div>
           
           {/* Middle separator (desktop only) */}
-          <div className="hidden md:block w-2/12 md:order-2"></div>
+          <div className="hidden md:block w-2/12"></div>
           
-          {/* Right side - Text content (alternates with image) */}
-          <div className={`md:w-5/12 mt-6 md:mt-0 ${
-            isEven ? 'md:order-3' : 'md:order-1'
-          }`}>
-            <div className="space-y-4">
+          {/* Right side - Text content (always on right) */}
+          <div className="md:w-5/12 mt-4 md:mt-0">
+            <div className="space-y-3">
               {/* Date and location */}
               <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                <p className="text-sm text-blue-400 font-light tracking-widest uppercase">
+                <p className="text-sm text-gold font-semibold">
                   {event.time}
                 </p>
                 {event.location && (
                   <>
-                    <span className="hidden sm:block text-slate-600">•</span>
-                    <div className="flex items-center text-sm text-slate-400 font-light">
+                    <span className="hidden sm:block text-charcoal/40">•</span>
+                    <div className="flex items-center text-sm text-charcoal/60">
                       <MapPin size={12} className="mr-1" />
                       {event.location}
                     </div>
@@ -102,15 +95,15 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, index, isVisible }) 
               {/* Event type badge */}
               {event.timespot && (
                 <div className="inline-block">
-                  <span className="text-xs bg-slate-700/50 text-slate-300 px-3 py-1 rounded-full border border-slate-600/30">
-                    Background Event
+                  <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                    历史背景
                   </span>
                 </div>
               )}
               
               {/* Description */}
-              <div className="space-y-3">
-                <p className="text-slate-200 leading-relaxed font-light">
+              <div className="space-y-2">
+                <p className="text-charcoal/80 leading-relaxed">
                   {event.experience}
                 </p>
               </div>
@@ -191,15 +184,11 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
 
   if (loading) {
     return (
-      <section className={`py-24 bg-slate-900 min-h-screen ${className}`}>
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"></div>
-        <div className="relative z-10 max-w-7xl mx-auto px-6">
+      <section className={`py-20 bg-cream ${className}`}>
+        <div className="max-w-6xl mx-auto px-6">
           <div className="text-center">
-            <div className="relative">
-              <div className="w-16 h-16 border-2 border-slate-600 border-t-blue-400 rounded-full animate-spin mx-auto"></div>
-              <div className="absolute inset-0 w-16 h-16 border-2 border-transparent border-t-white/20 rounded-full animate-spin mx-auto"></div>
-            </div>
-            <p className="mt-8 text-slate-300 font-light tracking-wide">Loading timeline data...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold mx-auto"></div>
+            <p className="mt-4 text-charcoal/70">正在加载邹韬奋先生的人生轨迹...</p>
           </div>
         </div>
       </section>
@@ -207,7 +196,7 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
   }
 
   return (
-    <section className={`py-24 bg-slate-900 min-h-screen ${className}`}>
+    <section className={`py-20 bg-cream ${className}`}>
       {/* Custom timeline styles */}
       <style>{`
         .timeline-container {
@@ -220,7 +209,7 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
           bottom: 0;
           left: 50%;
           width: 2px;
-          background: linear-gradient(to bottom, transparent, #475569, transparent);
+          background: linear-gradient(to bottom, rgba(184, 134, 11, 0.3), #B8860B, rgba(184, 134, 11, 0.3));
           transform: translateX(-50%);
           z-index: 0;
         }
@@ -236,9 +225,9 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
           width: 16px;
           height: 16px;
           border-radius: 50%;
-          background: #60a5fa;
-          border: 3px solid #0f172a;
-          box-shadow: 0 0 20px rgba(96, 165, 250, 0.4);
+          background: #B8860B;
+          border: 3px solid #FAF7F0;
+          box-shadow: 0 0 15px rgba(184, 134, 11, 0.3);
           transform: translateX(-50%);
           z-index: 2;
         }
@@ -252,17 +241,13 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
         }
       `}</style>
       
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"></div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,_theme(colors.blue.900/0.3)_0%,_transparent_50%)] pointer-events-none"></div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,_theme(colors.slate.700/0.2)_0%,_transparent_50%)] pointer-events-none"></div>
-      
-      <div className="relative z-10 max-w-7xl mx-auto px-6">
-        <div className="text-center mb-20">
-          <h2 className="text-6xl font-light text-white mb-8 tracking-wide">Life Journey</h2>
-          <p className="text-xl text-slate-300 max-w-4xl mx-auto leading-relaxed font-light">
-            The pivotal moments that shaped a revolutionary mind
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <h2 className="text-5xl font-bold text-charcoal mb-6 font-serif">人生大事</h2>
+          <p className="text-xl text-charcoal/70 max-w-3xl mx-auto leading-relaxed">
+            追溯邹韬奋先生的人生轨迹，感受一位文化先驱的成长历程与时代担当
           </p>
-          <div className="w-24 h-px bg-gradient-to-r from-transparent via-white to-transparent mx-auto mt-8"></div>
+          <div className="w-24 h-px bg-gradient-to-r from-transparent via-gold to-transparent mx-auto mt-8"></div>
         </div>
 
         <div className="timeline-container">
@@ -281,16 +266,16 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
         </div>
 
         {/* 查看完整时间线按钮 */}
-        <div className="text-center mt-20">
+        <div className="text-center mt-16">
           <Link
             to="/timeline"
-            className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-slate-700 to-slate-600 text-white rounded-2xl font-light text-lg hover:from-slate-600 hover:to-slate-500 transition-all duration-500 shadow-2xl hover:shadow-blue-500/20 transform hover:-translate-y-1 border border-slate-600/50 backdrop-blur-sm"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-gold text-cream rounded-xl font-semibold text-lg hover:bg-gold/90 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
           >
-            <span className="tracking-wide">Explore Complete Timeline</span>
-            <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+            查看完整时间线
+            <ArrowRight size={20} />
           </Link>
-          <p className="text-slate-400 mt-6 text-sm font-light tracking-wide">
-            Discover the complete journey through time
+          <p className="text-charcoal/60 mt-4 text-sm">
+            探索邹韬奋先生完整的人生历程
           </p>
         </div>
       </div>
