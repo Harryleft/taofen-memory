@@ -212,16 +212,10 @@ export default function TimelinePage() {
                                   event.timespot ? 'bg-gray-400' : 'bg-red-500'
                                 }`}></div>
                                 <div className="font-bold text-charcoal text-lg">{event.time}</div>
-                                {event.timespot && (
-                                  <div className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full">
-                                    历史背景
-                                  </div>
-                                )}
                               </div>
                               
                               {event.location && (
-                                <div className="flex items-center text-sm text-charcoal/60">
-                                  <MapPin size={14} className="mr-1" />
+                                <div className="text-sm text-charcoal font-bold">
                                   {event.location}
                                 </div>
                               )}

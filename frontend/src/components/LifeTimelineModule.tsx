@@ -78,22 +78,13 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, index, isVisible }) 
                 {event.location && (
                   <>
                     <span className="hidden sm:block text-charcoal/40">•</span>
-                    <div className="flex items-center text-sm text-charcoal/60">
-                      <MapPin size={12} className="mr-1" />
+                    <div className="text-sm text-charcoal font-bold">
                       {event.location}
                     </div>
                   </>
                 )}
               </div>
               
-              {/* Event type badge */}
-              {event.timespot && (
-                <div className="inline-block">
-                  <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-                    历史背景
-                  </span>
-                </div>
-              )}
               
               {/* Description */}
               <div className="space-y-2">
