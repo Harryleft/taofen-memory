@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ChevronDown, Scroll } from 'lucide-react';
+import { ChevronDown, Scroll, Users } from 'lucide-react';
 import MasonryBackground from './MasonryBackground';
 
 export default function EnhancedHero() {
@@ -67,7 +67,7 @@ export default function EnhancedHero() {
             isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
             {/* Timeline Module */}
             <div 
               className="group relative bg-black/40 backdrop-blur-sm border border-gold/30 rounded-xl p-6 hover:bg-black/60 hover:border-gold/60 transition-all duration-500 cursor-pointer transform hover:scale-105 hover:shadow-2xl"
@@ -136,6 +136,29 @@ export default function EnhancedHero() {
                 </p>
                 <div className="flex items-center text-gold/80 group-hover:text-gold transition-colors duration-300">
                   <span className="text-sm font-medium">查看手稿</span>
+                  <ChevronDown className="ml-2 transform rotate-[-90deg] group-hover:translate-x-1 transition-transform duration-300" size={16} />
+                </div>
+              </div>
+            </div>
+
+            {/* Relationships Module */}
+            <div 
+              className="group relative bg-black/40 backdrop-blur-sm border border-gold/30 rounded-xl p-6 hover:bg-black/60 hover:border-gold/60 transition-all duration-500 cursor-pointer transform hover:scale-105 hover:shadow-2xl"
+              onClick={() => window.location.href = '/relationships'}
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-gold/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="relative z-10">
+                <div className="w-16 h-16 bg-gold/20 rounded-full flex items-center justify-center mb-4 group-hover:bg-gold/30 transition-colors duration-300">
+                  <Users className="text-gold" size={24} />
+                </div>
+                <h3 className="text-2xl font-bold text-cream mb-3 group-hover:text-gold transition-colors duration-300">
+                  人脉网络
+                </h3>
+                <p className="text-cream/80 leading-relaxed mb-4">
+                  探索邹韬奋先生的社会关系网络，了解他与各界人士的深厚情谊
+                </p>
+                <div className="flex items-center text-gold/80 group-hover:text-gold transition-colors duration-300">
+                  <span className="text-sm font-medium">查看关系图</span>
                   <ChevronDown className="ml-2 transform rotate-[-90deg] group-hover:translate-x-1 transition-transform duration-300" size={16} />
                 </div>
               </div>
