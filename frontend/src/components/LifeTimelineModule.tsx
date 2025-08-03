@@ -296,20 +296,6 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
           margin-bottom: 24px;
           z-index: 1;
         }
-        .core-event-title::before {
-          content: '';
-          position: absolute;
-          left: 50%;
-          top: 50%;
-          width: 20px;
-          height: 20px;
-          background: #B8860B;
-          border: 4px solid #FAF7F0;
-          border-radius: 50%;
-          transform: translate(-50%, -50%);
-          box-shadow: 0 0 20px rgba(184, 134, 11, 0.4);
-          z-index: 2;
-        }
         .first-event-clickable {
           position: relative;
           cursor: pointer;
@@ -496,11 +482,7 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
                 {isExpanded && (
                   <div className="space-y-6 animate-fadeIn mt-8">
                     <div className="text-center mb-6">
-                      <div className="inline-flex items-center gap-2 px-4 py-2 bg-gold/10 rounded-full">
-                        <div className="w-2 h-2 bg-gold rounded-full"></div>
-                        <p className="text-sm text-charcoal/70 font-medium">详细时间线</p>
-                        <div className="w-2 h-2 bg-gold rounded-full"></div>
-                      </div>
+                      <p className="text-sm text-charcoal/70 font-medium">详细时间线</p>
                     </div>
                     {coreEvent.timeline.slice(1).map((event, eventIndex) => (
                       <div 
