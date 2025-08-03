@@ -99,7 +99,7 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, index, isVisible }) 
 
 export default function LifeTimelineModule({ className = '' }: LifeTimelineModuleProps) {
   const [timelineData, setTimelineData] = useState<TimelineData>([]);
-  const [allEvents, setAllEvents] = useState<TimelineEvent[]>([]);
+  const [expandedCoreEvents, setExpandedCoreEvents] = useState<Set<number>>(new Set());
   const [visibleEvents, setVisibleEvents] = useState<Set<number>>(new Set());
   const [loading, setLoading] = useState(true);
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -111,19 +111,9 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
         const response = await fetch('/data/timeline.json');
         const data: TimelineData = await response.json();
         setTimelineData(data);
-        
-        // 展平所有事件为单一数组
-        const flatEvents: TimelineEvent[] = [];
-        data.forEach(coreEvent => {
-          coreEvent.timeline.forEach(event => {
-            flatEvents.push(event);
-          });
-        });
-        setAllEvents(flatEvents);
       } catch (error) {
         console.error('加载时间线数据失败:', error);
         setTimelineData([]);
-        setAllEvents([]);
       } finally {
         setLoading(false);
       }
@@ -134,7 +124,7 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
 
   // 观察器设置
   useEffect(() => {
-    if (allEvents.length === 0) return;
+    if (timelineData.length === 0) return;
     
     observerRef.current = new IntersectionObserver(
       (entries) => {
@@ -152,7 +142,20 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
     eventElements.forEach(el => observerRef.current?.observe(el));
 
     return () => observerRef.current?.disconnect();
-  }, [allEvents]);
+  }, [timelineData, expandedCoreEvents]);
+
+  // 切换核心事件展开状态
+  const toggleCoreEvent = (coreEventIndex: number) => {
+    setExpandedCoreEvents(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(coreEventIndex)) {
+        newSet.delete(coreEventIndex);
+      } else {
+        newSet.add(coreEventIndex);
+      }
+      return newSet;
+    });
+  };
 
   // 获取核心事件的年份
   const getCoreEventYear = (coreEvent: CoreEvent): string => {
@@ -217,6 +220,19 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
           background: #9CA3AF;
           box-shadow: 0 0 15px rgba(156, 163, 175, 0.3);
         }
+        .animate-fadeIn {
+          animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
         @media (max-width: 768px) {
           .timeline-container::before {
             left: 20px;
@@ -237,18 +253,98 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
         </div>
 
         <div className="timeline-container">
-          {allEvents.map((event, index) => (
-            <div 
-              key={index}
-              data-event-index={index}
-            >
-              <TimelineItem 
-                event={event} 
-                index={index} 
-                isVisible={visibleEvents.has(index)}
-              />
-            </div>
-          ))}
+          {timelineData.map((coreEvent, coreIndex) => {
+            const isExpanded = expandedCoreEvents.has(coreIndex);
+            const firstEvent = coreEvent.timeline[0]; // 每个timeline的第一个条目
+            
+            return (
+              <div key={coreIndex} className="mb-20">
+                {/* Core Event Title */}
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-bold text-charcoal font-serif mb-2">
+                    {coreEvent.core_event}
+                  </h3>
+                  <div className="text-gold font-semibold text-lg">
+                    {getCoreEventYear(coreEvent)}年
+                  </div>
+                </div>
+                
+                {/* First Event - Always Visible and Clickable */}
+                <div 
+                  data-event-index={`${coreIndex}-first`}
+                  className="cursor-pointer"
+                  onClick={() => toggleCoreEvent(coreIndex)}
+                >
+                  <div className="timeline-item mb-8 transform transition-all duration-300 hover:scale-[1.02]">
+                    <div className={`timeline-dot ${firstEvent.timespot ? 'timeline-dot-gray' : 'timeline-dot-gold'}`}></div>
+                    <div className="pl-[45px] md:pl-0">
+                      <div className="md:flex justify-between items-start w-full">
+                        {/* Left side - Image */}
+                        <div className="md:w-6/12 md:text-right md:pr-2">
+                          {firstEvent.image && (
+                            <div className="relative group">
+                              <img 
+                                src={firstEvent.image}
+                                alt=""
+                                className="inline-block w-full max-w-xs ml-auto rounded-lg shadow-md transition-transform duration-300 group-hover:scale-105"
+                              />
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Middle separator */}
+                        <div className="hidden md:block w-12"></div>
+                        
+                        {/* Right side - Text content */}
+                        <div className="md:w-6/12 mt-4 md:mt-0">
+                          <div className="space-y-2">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                              <p className="text-sm text-gold font-semibold">
+                                {firstEvent.time}
+                              </p>
+                              {firstEvent.location && (
+                                <div className="text-sm text-charcoal font-bold">
+                                  {firstEvent.location}
+                                </div>
+                              )}
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-charcoal/80 leading-relaxed">
+                                {firstEvent.experience}
+                              </p>
+                              {/* Click hint */}
+                              <p className="text-xs text-gold/70 italic mt-2">
+                                {isExpanded ? '点击收起详细内容' : '点击展开详细内容'}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Expanded Content - Rest of Timeline Events */}
+                {isExpanded && (
+                  <div className="space-y-6 animate-fadeIn">
+                    {coreEvent.timeline.slice(1).map((event, eventIndex) => (
+                      <div 
+                        key={`${coreIndex}-${eventIndex + 1}`}
+                        data-event-index={`${coreIndex}-${eventIndex + 1}`}
+                        className={`transform transition-all duration-500 delay-${eventIndex * 100}`}
+                      >
+                        <TimelineItem 
+                          event={event} 
+                          index={eventIndex + 1} 
+                          isVisible={true}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {/* 查看完整时间线按钮 */}
