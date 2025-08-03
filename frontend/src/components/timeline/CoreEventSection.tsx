@@ -46,9 +46,6 @@ const CoreEventSection: React.FC<CoreEventSectionProps> = ({ coreEvent, coreInde
 
       {isExpanded && (
         <div className="space-y-6 animate-fadeIn mt-8">
-          <div className="text-center mb-6">
-            <p className="text-sm text-charcoal/70 font-medium">详细时间线</p>
-          </div>
           {coreEvent.timeline.slice(1).map((event, eventIndex) => (
             <div
               key={`${coreIndex}-${eventIndex + 1}`}
