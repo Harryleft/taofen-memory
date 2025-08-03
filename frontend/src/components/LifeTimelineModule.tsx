@@ -76,12 +76,9 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, index, isVisible }) 
                   {event.time}
                 </p>
                 {event.location && (
-                  <>
-                    <span className="hidden sm:block text-charcoal/40">•</span>
-                    <div className="text-sm text-charcoal font-bold">
-                      {event.location}
-                    </div>
-                  </>
+                  <div className="text-sm text-charcoal font-bold">
+                    {event.location}
+                  </div>
                 )}
               </div>
               
