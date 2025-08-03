@@ -57,7 +57,7 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, index, isVisible }) 
               <div className="relative group">
                 <img 
                   src={event.image}
-                  alt={event.time}
+                  alt=""
                   className="inline-block w-full max-w-sm rounded-lg shadow-md transition-transform duration-300 group-hover:scale-105"
                 />
               </div>

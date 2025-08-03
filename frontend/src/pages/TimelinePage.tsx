@@ -193,7 +193,7 @@ export default function TimelinePage() {
                             <div className="flex-shrink-0 w-full md:w-32 h-48 md:h-32">
                               <img
                                 src={event.image}
-                                alt={event.time}
+                                alt=""
                                 className="w-full h-full object-cover rounded-lg shadow-md"
                               />
                             </div>
