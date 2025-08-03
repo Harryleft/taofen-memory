@@ -52,7 +52,7 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, index, isVisible }) 
         {/* Flex container for desktop left-right layout */}
         <div className="md:flex justify-between items-start w-full">
           {/* Left side - Image (always on left) */}
-          <div className="md:w-5/12 md:text-right md:pr-4">
+          <div className="md:w-6/12 md:text-right md:pr-2">
             {event.image && (
               <div className="relative group">
                 <img 
@@ -65,7 +65,7 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, index, isVisible }) 
           </div>
           
           {/* Middle separator (desktop only) */}
-          <div className="hidden md:block w-2/12"></div>
+          <div className="hidden md:block w-2"></div>
           
           {/* Right side - Text content (always on right) */}
           <div className="md:w-6/12 mt-4 md:mt-0">
