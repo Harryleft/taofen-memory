@@ -224,10 +224,19 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
           top: 0;
           bottom: 0;
           left: 50%;
-          width: 2px;
-          background: linear-gradient(to bottom, rgba(184, 134, 11, 0.3), #B8860B, rgba(184, 134, 11, 0.3));
+          width: 3px;
+          background: linear-gradient(to bottom, 
+            transparent 0%, 
+            rgba(184, 134, 11, 0.2) 10%, 
+            rgba(184, 134, 11, 0.6) 30%, 
+            #B8860B 50%, 
+            rgba(184, 134, 11, 0.6) 70%, 
+            rgba(184, 134, 11, 0.2) 90%, 
+            transparent 100%
+          );
           transform: translateX(-50%);
           z-index: 0;
+          border-radius: 2px;
         }
         .timeline-item {
           position: relative;
@@ -264,50 +273,86 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
             transform: translateY(0);
           }
         }
-        .core-event-card {
-          background: rgba(255, 255, 255, 0.8);
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(184, 134, 11, 0.2);
-          border-radius: 16px;
-          padding: 24px;
-          margin-bottom: 32px;
+        .core-event-section {
+          position: relative;
+          margin-bottom: 48px;
           transition: all 0.3s ease;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
-        .core-event-card:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-          border-color: rgba(184, 134, 11, 0.4);
+        .core-event-section::before {
+          content: '';
+          position: absolute;
+          left: 50%;
+          top: 0;
+          width: 4px;
+          height: 100%;
+          background: linear-gradient(to bottom, transparent, rgba(184, 134, 11, 0.3), transparent);
+          transform: translateX(-50%);
+          z-index: 0;
+        }
+        .core-event-title {
+          position: relative;
+          background: #FAF7F0;
+          padding: 20px 0;
+          margin-bottom: 24px;
+          z-index: 1;
+        }
+        .core-event-title::before {
+          content: '';
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          width: 20px;
+          height: 20px;
+          background: #B8860B;
+          border: 4px solid #FAF7F0;
+          border-radius: 50%;
+          transform: translate(-50%, -50%);
+          box-shadow: 0 0 20px rgba(184, 134, 11, 0.4);
+          z-index: 2;
         }
         .first-event-clickable {
           position: relative;
           cursor: pointer;
-          border-radius: 12px;
-          padding: 16px;
-          margin: -16px;
+          border-radius: 8px;
+          padding: 12px;
+          margin: -12px;
           transition: all 0.3s ease;
+          background: transparent;
         }
         .first-event-clickable:hover {
-          background: rgba(184, 134, 11, 0.05);
-          transform: translateX(8px);
+          background: rgba(184, 134, 11, 0.03);
+          transform: scale(1.02);
+        }
+        .first-event-clickable:hover .timeline-dot::before {
+          transform: translateX(-50%) scale(1.2);
+          box-shadow: 0 0 25px rgba(184, 134, 11, 0.5);
         }
         .expand-indicator {
           position: absolute;
           right: 16px;
           top: 50%;
           transform: translateY(-50%);
-          width: 24px;
-          height: 24px;
+          width: 28px;
+          height: 28px;
           border-radius: 50%;
-          background: rgba(184, 134, 11, 0.1);
+          background: linear-gradient(135deg, rgba(184, 134, 11, 0.1), rgba(184, 134, 11, 0.2));
           display: flex;
           align-items: center;
           justify-content: center;
-          transition: all 0.3s ease;
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          border: 1px solid rgba(184, 134, 11, 0.2);
         }
         .expand-indicator.expanded {
           transform: translateY(-50%) rotate(180deg);
-          background: rgba(184, 134, 11, 0.2);
+          background: linear-gradient(135deg, rgba(184, 134, 11, 0.2), rgba(184, 134, 11, 0.3));
+          border-color: rgba(184, 134, 11, 0.4);
+        }
+        .expand-indicator:hover {
+          transform: translateY(-50%) scale(1.1);
+          background: linear-gradient(135deg, rgba(184, 134, 11, 0.2), rgba(184, 134, 11, 0.3));
+        }
+        .expand-indicator.expanded:hover {
+          transform: translateY(-50%) rotate(180deg) scale(1.1);
         }
         .staggered-animation {
           animation: staggerIn 0.6s ease-out forwards;
@@ -327,10 +372,12 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
           .timeline-dot::before {
             left: 20px;
           }
-          .core-event-card {
-            margin: 0 -12px 24px -12px;
-            padding: 20px;
-            border-radius: 12px;
+          .core-event-section {
+            margin-bottom: 36px;
+          }
+          .core-event-title {
+            padding: 16px 0;
+            margin-bottom: 20px;
           }
           .first-event-clickable {
             margin: -12px;
@@ -373,16 +420,15 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
             const firstEvent = coreEvent.timeline[0]; // 每个timeline的第一个条目
             
             return (
-              <div key={coreIndex} className="core-event-card" data-core-event={coreIndex}>
+              <div key={coreIndex} className="core-event-section" data-core-event={coreIndex}>
                 {/* Core Event Title */}
-                <div className="text-center mb-6">
-                  <h3 className="text-3xl font-bold text-charcoal font-serif mb-3">
+                <div className="core-event-title text-center">
+                  <h3 className="text-3xl font-bold text-charcoal font-serif mb-2">
                     {coreEvent.core_event}
                   </h3>
-                  <div className="text-gold font-semibold text-xl">
+                  <div className="text-gold font-semibold text-lg">
                     {getCoreEventYear(coreEvent)}年
                   </div>
-                  <div className="w-16 h-px bg-gradient-to-r from-transparent via-gold to-transparent mx-auto mt-4"></div>
                 </div>
                 
                 {/* First Event - Always Visible and Clickable */}
@@ -448,9 +494,13 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
                 
                 {/* Expanded Content - Rest of Timeline Events */}
                 {isExpanded && (
-                  <div className="space-y-6 animate-fadeIn border-t border-gold/20 pt-6 mt-6">
-                    <div className="text-center mb-4">
-                      <p className="text-sm text-charcoal/60 font-medium">详细时间线</p>
+                  <div className="space-y-6 animate-fadeIn mt-8">
+                    <div className="text-center mb-6">
+                      <div className="inline-flex items-center gap-2 px-4 py-2 bg-gold/10 rounded-full">
+                        <div className="w-2 h-2 bg-gold rounded-full"></div>
+                        <p className="text-sm text-charcoal/70 font-medium">详细时间线</p>
+                        <div className="w-2 h-2 bg-gold rounded-full"></div>
+                      </div>
                     </div>
                     {coreEvent.timeline.slice(1).map((event, eventIndex) => (
                       <div 
