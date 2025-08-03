@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { BookOpen, Image, Clock, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import EnhancedHero from '../components/EnhancedHero';
-import LifeTimelineModule from '../components/LifeTimelineModule';
 import HandwritingModule from '../components/HandwritingModule';
 
 function HomePage() {
@@ -77,9 +76,6 @@ function HomePage() {
 
       {/* Main Content */}
       <main>
-        {/* Life Timeline Module */}
-        <LifeTimelineModule />
-
         {/* Handwriting Module */}
         <HandwritingModule />
       </main>
