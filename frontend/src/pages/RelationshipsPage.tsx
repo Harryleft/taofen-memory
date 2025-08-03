@@ -118,11 +118,11 @@ const mockPersons: Person[] = [
 ];
 
 const categories = [
-  { id: 'all', name: '全部关系', icon: Users, color: 'bg-blue-500' },
-  { id: 'family', name: '亲人家属', icon: Heart, color: 'bg-pink-500' },
-  { id: 'publishing', name: '新闻出版', icon: BookOpen, color: 'bg-green-500' },
-  { id: 'academic', name: '学术文化', icon: GraduationCap, color: 'bg-purple-500' },
-  { id: 'political', name: '政治社会', icon: Building, color: 'bg-orange-500' }
+  { id: 'all', name: '全部关系', icon: Users, color: 'bg-charcoal' },
+  { id: 'family', name: '亲人家属', icon: Heart, color: 'bg-seal' },
+  { id: 'publishing', name: '新闻出版', icon: BookOpen, color: 'bg-gold' },
+  { id: 'academic', name: '学术文化', icon: GraduationCap, color: 'bg-charcoal' },
+  { id: 'political', name: '政治社会', icon: Building, color: 'bg-seal' }
 ];
 
 export default function RelationshipsPage() {
@@ -139,9 +139,9 @@ export default function RelationshipsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-rose-100">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-pink-200 sticky top-0 z-40">
+      <div className="bg-cream/90 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="text-center">
             <h1 className="text-4xl font-bold text-gray-800 mb-2">邹韬奋人脉网络</h1>
@@ -174,87 +174,51 @@ export default function RelationshipsPage() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Network Visualization */}
-        <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-8 mb-8 shadow-xl">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+        <div className="bg-cream/30 rounded-3xl p-8 mb-8 shadow-xl border border-gray-200">
+          <h2 className="text-2xl font-bold text-charcoal mb-6 text-center">
             {selectedCategory === 'all' ? '完整关系网络' : categories.find(cat => cat.id === selectedCategory)?.name}
           </h2>
           
-          {/* Central Figure - 邹韬奋 */}
-          <div className="relative flex flex-col items-center">
-            {/* SVG for connection lines */}
-            <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{zIndex: 1}}>
-              {filteredPersons.map((person, index) => {
-                const totalPersons = filteredPersons.length;
-                const angle = (index * 2 * Math.PI) / totalPersons;
-                const radius = 200; // Distance from center
-                const centerX = '50%';
-                const centerY = '200px'; // Adjust based on central figure position
-                const endX = `calc(50% + ${Math.cos(angle) * radius}px)`;
-                const endY = `calc(200px + ${Math.sin(angle) * radius}px)`;
-                
-                return (
-                  <line
-                    key={`line-${person.id}`}
-                    x1={centerX}
-                    y1={centerY}
-                    x2={endX}
-                    y2={endY}
-                    stroke="white"
-                    strokeWidth="2"
-                    opacity="0.8"
-                  />
-                );
-              })}
-            </svg>
-            
-            <div className="relative mb-12" style={{zIndex: 2}}>
-              <div className="w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-2xl">
+          {/* Linear Layout */}
+          <div className="flex flex-col items-center w-full">
+            {/* Central Figure - 邹韬奋 */}
+            <div className="relative mb-12">
+              <div className="w-24 h-24 bg-gradient-to-br from-gold to-yellow-600 rounded-full flex items-center justify-center shadow-2xl">
                 <span className="text-white font-bold text-xl">邹韬奋</span>
               </div>
-              <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+              <div className="absolute -top-2 -right-2 w-6 h-6 bg-seal rounded-full flex items-center justify-center">
                 <span className="text-white text-xs font-bold">核心</span>
               </div>
             </div>
             
-            {/* People positioned in circle */}
-            <div className="relative w-full max-w-6xl h-96">
+            {/* People positioned vertically with connection lines */}
+            <div className="flex flex-col items-center w-full max-w-4xl space-y-12">
               {filteredPersons.map((person, index) => {
                 const categoryInfo = categories.find(cat => cat.id === person.category);
-                const totalPersons = filteredPersons.length;
-                const angle = (index * 2 * Math.PI) / totalPersons;
-                const radius = 200;
-                const x = Math.cos(angle) * radius;
-                const y = Math.sin(angle) * radius;
                 
                 return (
-                  <div 
-                    key={person.id} 
-                    className="absolute flex flex-col items-center group"
-                    style={{
-                      left: `calc(50% + ${x}px - 40px)`,
-                      top: `calc(50% + ${y}px - 40px)`,
-                      zIndex: 2
-                    }}
-                  >
-                    {/* Person Avatar */}
-                    <div 
-                      className={`w-20 h-20 ${categoryInfo?.color || 'bg-gray-500'} rounded-full flex items-center justify-center cursor-pointer transform transition-all duration-300 group-hover:scale-110 shadow-lg`}
-                      onClick={() => setSelectedPerson(person)}
-                    >
-                      <span className="text-white font-medium text-sm text-center px-2">
-                        {person.name}
-                      </span>
-                    </div>
+                  <div key={person.id} className="relative flex flex-col items-center w-full">
+                    {/* Connection Line */}
+                    <div className="w-0.5 h-12 bg-charcoal opacity-40 mb-4"></div>
                     
-                    {/* Person Info */}
-                    <div className="mt-3 text-center">
-                      <h3 className="font-semibold text-gray-800 text-sm">{person.name}</h3>
-                      <p className="text-xs text-gray-600 mt-1">{person.relationship}</p>
-                    </div>
-                    
-                    {/* Hover Details */}
-                    <div className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-white rounded-lg shadow-lg p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 w-48">
-                      <p className="text-sm text-gray-700">{person.description}</p>
+                    {/* Person Container */}
+                    <div className="flex items-center justify-center group w-full">
+                      {/* Person Avatar */}
+                      <div 
+                        className={`w-20 h-20 ${categoryInfo?.color || 'bg-gray-500'} rounded-full flex items-center justify-center cursor-pointer transform transition-all duration-300 group-hover:scale-110 shadow-lg`}
+                        onClick={() => setSelectedPerson(person)}
+                      >
+                        <span className="text-white font-medium text-sm text-center px-2">
+                          {person.name}
+                        </span>
+                      </div>
+                      
+                      {/* Person Info */}
+                      <div className="ml-6 text-left">
+                        <h3 className="font-semibold text-charcoal text-lg">{person.name}</h3>
+                        <p className="text-sm text-gray-600 mt-1">{person.relationship}</p>
+                        <p className="text-xs text-gray-500 mt-1 max-w-md">{person.description}</p>
+                      </div>
                     </div>
                   </div>
                 );
