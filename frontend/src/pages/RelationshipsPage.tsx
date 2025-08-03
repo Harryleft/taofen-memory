@@ -277,23 +277,15 @@ export default function RelationshipsPage() {
     return simulation;
   }, []);
 
-  // 计算布局边界
-  const calculateBounds = useCallback((nodes: TreeNode[]) => {
-    if (nodes.length === 0) return { width: 800, height: 600, minY: -300 };
-    
-    const xs = nodes.map(n => n.x);
-    const ys = nodes.map(n => n.y);
-    const minX = Math.min(...xs) - 100;
-    const maxX = Math.max(...xs) + 100;
-    const minY = Math.min(...ys) - 100;
-    const maxY = Math.max(...ys) + 100;
-    
+  // 使用固定的中心坐标系，避免动态边界计算导致的坐标偏移
+  const getFixedViewBox = () => {
     return {
-      width: Math.max(maxX - minX, 800),
-      height: Math.max(maxY - minY, 600),
-      minY
+      width: 1000,
+      height: 800,
+      centerX: 0,
+      centerY: 0
     };
-  }, []);
+  };
 
   // 初始化和更新布局
   useEffect(() => {
@@ -308,7 +300,7 @@ export default function RelationshipsPage() {
     };
   }, [filteredPersons, buildHybridNodes, initializeForceSimulation]);
 
-  const { width: treeWidth, height: treeHeight, minY } = calculateBounds(nodes);
+  const { width: treeWidth, height: treeHeight, centerX, centerY } = getFixedViewBox();
 
   // 节点拖拽处理
   const handleNodeDragStart = useCallback((node: TreeNode, e: React.MouseEvent) => {
@@ -416,7 +408,7 @@ export default function RelationshipsPage() {
               ref={svgRef}
               width="100%"
               height="100%"
-              viewBox={`${-treeWidth / 2} ${minY} ${treeWidth} ${treeHeight}`}
+              viewBox={`${-treeWidth / 2} ${-treeHeight / 2} ${treeWidth} ${treeHeight}`}
               className="cursor-grab active:cursor-grabbing"
               onDoubleClick={handleDoubleClick}
             >
@@ -463,42 +455,29 @@ export default function RelationshipsPage() {
                   const endX = node.x - (dx / distance) * radius;
                   const endY = node.y - (dy / distance) * radius;
                   
-                  // 家庭关系用直角连线，其他关系用直线
-                  if (node.level < 2) {
-                    const midY = (startY + endY) / 2;
-                    return (
-                      <g key={`line-${rootNode.person.id}-${node.person.id}`}>
-                        <polyline
-                          points={`${startX},${startY} ${startX},${midY} ${endX},${midY} ${endX},${endY}`}
-                          stroke="#FFFFFF"
-                          strokeWidth="3"
-                          fill="none"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          style={{
-                            filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))'
-                          }}
-                        />
-                      </g>
-                    );
-                  } else {
-                    return (
-                      <line
-                        key={`line-${rootNode.person.id}-${node.person.id}`}
-                        x1={startX}
-                        y1={startY}
-                        x2={endX}
-                        y2={endY}
+                  // 所有连线统一使用直角连线样式
+                  const midY = (startY + endY) / 2;
+                  const strokeWidth = node.level < 2 ? 3 : 2;
+                  const strokeOpacity = node.level < 2 ? 1 : 0.8;
+                  const strokeDasharray = node.level < 2 ? "none" : "5,5";
+                  
+                  return (
+                    <g key={`line-${rootNode.person.id}-${node.person.id}`}>
+                      <polyline
+                        points={`${startX},${startY} ${startX},${midY} ${endX},${midY} ${endX},${endY}`}
                         stroke="#FFFFFF"
-                        strokeWidth="2"
-                        strokeOpacity="0.6"
-                        strokeDasharray="5,5"
+                        strokeWidth={strokeWidth}
+                        strokeOpacity={strokeOpacity}
+                        strokeDasharray={strokeDasharray}
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                         style={{
-                          filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))'
+                          filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))'
                         }}
                       />
-                    );
-                  }
+                    </g>
+                  );
                 })}
               </g>
 
