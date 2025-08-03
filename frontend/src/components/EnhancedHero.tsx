@@ -16,10 +16,7 @@ export default function EnhancedHero() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const scrollToContent = () => {
-    const nextSection = document.querySelector('#main-content');
-    nextSection?.scrollIntoView({ behavior: 'smooth' });
-  };
+
 
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden">
@@ -122,7 +119,7 @@ export default function EnhancedHero() {
             {/* Handwriting Module */}
             <div 
               className="group relative bg-black/40 backdrop-blur-sm border border-gold/30 rounded-xl p-6 hover:bg-black/60 hover:border-gold/60 transition-all duration-500 cursor-pointer transform hover:scale-105 hover:shadow-2xl"
-              onClick={scrollToContent}
+              onClick={() => window.location.href = '/handwriting'}
             >
               <div className="absolute inset-0 bg-gradient-to-br from-gold/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="relative z-10">
@@ -146,24 +143,7 @@ export default function EnhancedHero() {
           </div>
         </div>
 
-        {/* Scroll Indicator */}
-        <div 
-          className={`transform transition-all duration-1000 delay-700 mt-16 ${
-            isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-          }`}
-        >
-          <div className="flex flex-col items-center">
-            <p className="text-cream/70 text-sm mb-4 font-medium tracking-wide">
-              向下滚动探索更多
-            </p>
-            <div 
-              className="animate-bounce cursor-pointer p-2 rounded-full hover:bg-white/10 transition-colors duration-300"
-              onClick={scrollToContent}
-            >
-              <ChevronDown className="text-gold" size={32} />
-            </div>
-          </div>
-        </div>
+
       </div>
 
       {/* Decorative Elements */}

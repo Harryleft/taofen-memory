@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { BookOpen, Image, Clock, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import EnhancedHero from '../components/EnhancedHero';
-import HandwritingModule from '../components/HandwritingModule';
+
 
 function HomePage() {
   const [activeSection, setActiveSection] = useState('overview');
@@ -76,8 +76,7 @@ function HomePage() {
 
       {/* Main Content */}
       <main>
-        {/* Handwriting Module */}
-        <HandwritingModule />
+
       </main>
 
       {/* Footer */}
