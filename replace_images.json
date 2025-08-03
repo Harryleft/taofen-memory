@@ -1,0 +1,30 @@
+{
+  "replacements": {
+    "public/data/images/timeline-image/eight-nation-alliance-war-1900.jpg": "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1000",
+    "public/data/images/timeline-image/jiangxi-ancestral-home-1908.jpg": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=1000",
+    "public/data/images/timeline-image/fuzhou-industrial-school-1910.jpg": "https://images.unsplash.com/photo-1576087637486-950d65dc5893?q=80&w=1000",
+    "public/data/images/timeline-image/xinhai-revolution-1911.jpg": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=1000",
+    "public/data/images/timeline-image/nanyang-public-school-shanghai.jpg": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000",
+    "public/data/images/timeline-image/may-fourth-movement-1919.jpg": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=1000",
+    "public/data/images/timeline-image/ccp-first-congress-shanghai-1921.jpg": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=1000",
+    "public/data/images/timeline-image/china-vocational-education-society-1922.jpg": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000",
+    "public/data/images/timeline-image/northern-expedition-1926.jpg": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=1000",
+    "public/data/images/timeline-image/life-weekly-office-lafeide-road.jpg": "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=1000",
+    "public/data/images/timeline-image/life-weekly-cover-1927.jpg": "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=1000",
+    "public/data/images/timeline-image/mukden-incident-1931.jpg": "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1000",
+    "public/data/images/timeline-image/life-weekly-fundraising-for-ma-zhanshan.jpg": "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=1000",
+    "public/data/images/timeline-image/january-28-incident-1932.jpg": "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1000",
+    "public/data/images/timeline-image/life-weekly-wounded-soldier-hospital.jpg": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?q=80&w=1000",
+    "public/data/images/timeline-image/china-league-for-civil-rights-founding.jpg": "https://images.unsplash.com/photo-1529258283598-8d6fe60b27f4?q=80&w=1000"
+  },
+  "empty_images": {
+    "education": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000",
+    "meeting": "https://images.unsplash.com/photo-1529258283598-8d6fe60b27f4?q=80&w=1000",
+    "writing": "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=1000",
+    "historical": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=1000",
+    "war": "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1000",
+    "travel": "https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=1000",
+    "hospital": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?q=80&w=1000",
+    "traditional": "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?q=80&w=1000"
+  }
+}

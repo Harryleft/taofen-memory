@@ -20,7 +20,24 @@
       "Bash(mv:*)",
       "WebFetch(domain:www.zoutaofen.com)",
       "Bash(npx tsc:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(sed:*)",
+      "Bash(-e 's|public/data/images/timeline-image/jiangxi-ancestral-home-1908.jpg|https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80\\&w=1000|g' )",
+      "Bash(-e 's|public/data/images/timeline-image/fuzhou-industrial-school-1910.jpg|https://images.unsplash.com/photo-1576087637486-950d65dc5893?q=80\\&w=1000|g' )",
+      "Bash(-e 's|public/data/images/timeline-image/xinhai-revolution-1911.jpg|https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80\\&w=1000|g' )",
+      "Bash(-e 's|public/data/images/timeline-image/nanyang-public-school-shanghai.jpg|https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80\\&w=1000|g' )",
+      "Bash(-e 's|public/data/images/timeline-image/may-fourth-movement-1919.jpg|https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80\\&w=1000|g' )",
+      "Bash(timeline.json)",
+      "Bash(-e 's|public/data/images/timeline-image/ccp-first-congress-shanghai-1921.jpg|https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80\\&w=1000|g' )",
+      "Bash(-e 's|public/data/images/timeline-image/china-vocational-education-society-1922.jpg|https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80\\&w=1000|g' )",
+      "Bash(-e 's|public/data/images/timeline-image/northern-expedition-1926.jpg|https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80\\&w=1000|g' )",
+      "Bash(-e 's|public/data/images/timeline-image/life-weekly-office-lafeide-road.jpg|https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80\\&w=1000|g' )",
+      "Bash(-e 's|public/data/images/timeline-image/life-weekly-cover-1927.jpg|https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80\\&w=1000|g' )",
+      "Bash(-e 's|public/data/images/timeline-image/ccp-first-congress-shanghai-1921.jpg|https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80\\&w=1000|g' )",
+      "Bash(-e 's|public/data/images/timeline-image/china-vocational-education-society-1922.jpg|https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80\\&w=1000|g' )",
+      "Bash(-e 's|public/data/images/timeline-image/northern-expedition-1926.jpg|https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80\\&w=1000|g' )",
+      "Bash(-e 's|public/data/images/timeline-image/life-weekly-office-lafeide-road.jpg|https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80\\&w=1000|g' )",
+      "Bash(-e 's|public/data/images/timeline-image/life-weekly-cover-1927.jpg|https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80\\&w=1000|g' )"
     ],
     "deny": []
   }

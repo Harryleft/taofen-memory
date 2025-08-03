@@ -60,12 +60,6 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, index, isVisible }) 
                   alt={event.time}
                   className="inline-block w-full max-w-sm rounded-lg shadow-md transition-transform duration-300 group-hover:scale-105"
                 />
-                {/* Timeline indicator on image */}
-                <div className="absolute top-4 right-4">
-                  <div className={`w-3 h-3 rounded-full border-2 border-white shadow-lg ${
-                    event.timespot ? 'bg-gray-400' : 'bg-gold'
-                  }`}></div>
-                </div>
               </div>
             )}
           </div>

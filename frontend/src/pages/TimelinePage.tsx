@@ -235,9 +235,6 @@ export default function TimelinePage() {
                         </div>
 
                         {/* Sub-timeline Node */}
-                        <div className={`absolute left-1/2 transform -translate-x-1/2 w-4 h-4 rounded-full border-2 border-cream shadow-md z-10 ${
-                          event.timespot ? 'bg-gray-400' : 'bg-red-500'
-                        }`}></div>
                       </div>
                     ))}
                   </div>
