@@ -52,13 +52,13 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, index, isVisible }) 
         {/* Flex container for desktop left-right layout */}
         <div className="md:flex justify-between items-start w-full">
           {/* Left side - Image (always on left) */}
-          <div className="md:w-4/12 md:text-right">
+          <div className="md:w-5/12 md:text-right md:pr-4">
             {event.image && (
               <div className="relative group">
                 <img 
                   src={event.image}
                   alt=""
-                  className="inline-block w-full max-w-sm rounded-lg shadow-md transition-transform duration-300 group-hover:scale-105"
+                  className="inline-block w-full max-w-xs ml-auto rounded-lg shadow-md transition-transform duration-300 group-hover:scale-105"
                 />
               </div>
             )}
