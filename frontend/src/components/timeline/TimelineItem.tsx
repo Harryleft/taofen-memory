@@ -35,7 +35,7 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, isFeatured }) => {
               <div className="relative group">
                 <img 
                   src={event.image}
-                  alt={event.experience} // Use experience as alt text
+                  alt=""
                   className={`inline-block w-full ml-auto rounded-lg transition-transform duration-300 group-hover:scale-105 ${imageClasses}`}
                 />
               </div>
