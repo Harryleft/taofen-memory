@@ -1,5 +1,6 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Users, Heart, BookOpen, GraduationCap, Building } from 'lucide-react';
+import * as d3 from 'd3';
 
 interface Person {
   id: string;
@@ -17,6 +18,10 @@ interface TreeNode {
   x: number;
   y: number;
   level: number;
+  vx?: number; // D3 force simulation velocity
+  vy?: number;
+  fx?: number; // Fixed position
+  fy?: number;
 }
 
 const mockPersons: Person[] = [
@@ -137,7 +142,10 @@ export default function RelationshipsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [zoomTransform, setZoomTransform] = useState({ x: 0, y: 0, k: 1 });
+  const [nodes, setNodes] = useState<TreeNode[]>([]);
   const svgRef = useRef<SVGSVGElement>(null);
+  const simulationRef = useRef<d3.Simulation<TreeNode, undefined> | null>(null);
 
   const filteredPersons = selectedCategory === 'all' 
     ? mockPersons 
@@ -159,158 +167,208 @@ export default function RelationshipsPage() {
     return colorMap[bgColor] || '#6B7280';
   };
 
-  // 构建家庭树结构
-  const buildFamilyTree = useCallback((persons: Person[]): TreeNode => {
-    // 邹韬奋作为根节点
+  // 构建混合布局节点数据
+  const buildHybridNodes = useCallback((persons: Person[]): TreeNode[] => {
+    const nodes: TreeNode[] = [];
+    
+    // 邹韬奋作为根节点，固定在中心
     const root: TreeNode = {
       person: { id: 'root', name: '邹韬奋', avatar: '', category: 'family', relationship: '核心', description: '文化先驱' },
       children: [],
       x: 0,
       y: 0,
-      level: 0
+      level: 0,
+      fx: 0, // 固定位置
+      fy: 0
     };
+    nodes.push(root);
 
-    // 按关系分层，确保每个person只出现在一个层级
+    // 按关系分类
     const familyPersons = persons.filter(p => p.category === 'family');
     const parents = familyPersons.filter(p => p.relationship.includes('母') || p.relationship.includes('父'));
     const spouse = familyPersons.filter(p => p.relationship.includes('妻') && !p.relationship.includes('母'));
     const children = familyPersons.filter(p => (p.relationship.includes('子') || p.relationship.includes('女')) && !p.relationship.includes('妻') && !p.relationship.includes('母'));
-    const otherFamily = familyPersons.filter(p => !parents.includes(p) && !spouse.includes(p) && !children.includes(p));
     const nonFamily = persons.filter(p => p.category !== 'family');
 
-    // 父母层（第-1层）
+    // 父母层（固定层级布局）
     parents.forEach((parent, index) => {
-      root.children.push({
+      nodes.push({
         person: parent,
         children: [],
-        x: 0,
-        y: 0,
-        level: -1
+        x: (index - (parents.length - 1) / 2) * 150,
+        y: -200,
+        level: -1,
+        fx: (index - (parents.length - 1) / 2) * 150, // 固定位置
+        fy: -200
       });
     });
 
-    // 配偶层（第0.5层，位于邹韬奋和子女之间）
+    // 配偶层（固定层级布局）
     spouse.forEach((s, index) => {
-      root.children.push({
+      nodes.push({
         person: s,
         children: [],
-        x: 0,
+        x: (index - (spouse.length - 1) / 2) * 150 + 100,
         y: 0,
-        level: 0.5
+        level: 0.5,
+        fx: (index - (spouse.length - 1) / 2) * 150 + 100,
+        fy: 0
       });
     });
 
-    // 子女层（第1层）
+    // 子女层（固定层级布局）
     children.forEach((child, index) => {
-      root.children.push({
+      nodes.push({
         person: child,
         children: [],
-        x: 0,
-        y: 0,
-        level: 1
+        x: (index - (children.length - 1) / 2) * 150,
+        y: 200,
+        level: 1,
+        fx: (index - (children.length - 1) / 2) * 150,
+        fy: 200
       });
     });
 
-    // 其他家庭成员（第1.5层）
-    otherFamily.forEach((other, index) => {
-      root.children.push({
-        person: other,
-        children: [],
-        x: 0,
-        y: 0,
-        level: 1.5
-      });
-    });
-
-    // 非家庭关系（第2层）
+    // 非家庭关系（自由布局，由D3力导向控制）
     nonFamily.forEach((other, index) => {
-      root.children.push({
+      const angle = (index / nonFamily.length) * 2 * Math.PI;
+      const radius = 300;
+      nodes.push({
         person: other,
         children: [],
-        x: 0,
-        y: 0,
+        x: Math.cos(angle) * radius,
+        y: Math.sin(angle) * radius,
         level: 2
+        // 不设置fx/fy，让D3自由布局
       });
     });
 
-    return root;
+    return nodes;
   }, []);
 
-  // 计算树形布局，返回整体边界，便于动态设置 viewBox
-  const calculateLayout = useCallback((tree: TreeNode): { tree: TreeNode; width: number; height: number; minY: number } => {
-    const nodeWidth = 120;
-    const nodeHeight = 120; // 圆形节点直径约105px，增加高度
-    const levelHeight = 200; // 增加层级间距
-    const minNodeSpacing = 30; // 增加节点间距
+  // 初始化D3力导向布局
+  const initializeForceSimulation = useCallback((nodes: TreeNode[]) => {
+    if (simulationRef.current) {
+      simulationRef.current.stop();
+    }
 
-    // 按层级分组
-    const levels: { [key: number]: TreeNode[] } = {};
-    const traverse = (node: TreeNode) => {
-      if (!levels[node.level]) levels[node.level] = [];
-      levels[node.level].push(node);
-      node.children.forEach(traverse);
+    // 创建连接关系（所有非家庭节点都连接到根节点）
+    const links = nodes
+      .filter(node => node.person.id !== 'root' && node.level === 2)
+      .map(node => ({ source: 'root', target: node.person.id }));
+
+    // 创建力导向模拟
+    const simulation = d3.forceSimulation(nodes)
+      .force('link', d3.forceLink(links).id((d: any) => d.person.id).distance(150).strength(0.3))
+      .force('charge', d3.forceManyBody().strength(-300).distanceMax(400))
+      .force('center', d3.forceCenter(0, 0))
+      .force('collision', d3.forceCollide().radius(60).strength(0.7))
+      .force('x', d3.forceX().strength(0.1))
+      .force('y', d3.forceY().strength(0.1))
+      .alphaDecay(0.02)
+      .velocityDecay(0.3);
+
+    // 监听模拟更新
+    simulation.on('tick', () => {
+      setNodes([...nodes]); // 触发重新渲染
+    });
+
+    simulationRef.current = simulation;
+    return simulation;
+  }, []);
+
+  // 计算布局边界
+  const calculateBounds = useCallback((nodes: TreeNode[]) => {
+    if (nodes.length === 0) return { width: 800, height: 600, minY: -300 };
+    
+    const xs = nodes.map(n => n.x);
+    const ys = nodes.map(n => n.y);
+    const minX = Math.min(...xs) - 100;
+    const maxX = Math.max(...xs) + 100;
+    const minY = Math.min(...ys) - 100;
+    const maxY = Math.max(...ys) + 100;
+    
+    return {
+      width: Math.max(maxX - minX, 800),
+      height: Math.max(maxY - minY, 600),
+      minY
     };
-    traverse(tree);
-
-    // 计算每层的布局
-    let maxWidth = 0;
-    Object.keys(levels).forEach(levelKey => {
-      const level = parseFloat(levelKey);
-      const nodes = levels[level];
-      const levelWidth = nodes.length * nodeWidth + (nodes.length - 1) * minNodeSpacing;
-      maxWidth = Math.max(maxWidth, levelWidth);
-
-      // 水平居中分布
-      const startX = -levelWidth / 2;
-      nodes.forEach((node, index) => {
-        node.x = startX + index * (nodeWidth + minNodeSpacing) + nodeWidth / 2;
-        node.y = level * levelHeight;
-      });
-    });
-
-    // 计算整体边界
-    const levelKeys = Object.keys(levels).map(l => parseFloat(l));
-    const minLevel = Math.min(...levelKeys);
-    const maxLevel = Math.max(...levelKeys);
-    const minY = minLevel * levelHeight;
-    const maxY = maxLevel * levelHeight;
-
-    const height = maxY - minY + nodeHeight; // 总高度
-    const width = maxWidth + nodeWidth;      // 总宽度
-
-    // 保证根节点居于视觉中心（y=0），不做其他偏移
-    tree.x = 0;
-    tree.y = 0;
-
-    return { tree, width, height, minY };
   }, []);
 
-  const tree = buildFamilyTree(filteredPersons);
-  const { tree: layoutTree, width: treeWidth, height: treeHeight, minY } = calculateLayout(tree);
+  // 初始化和更新布局
+  useEffect(() => {
+    const newNodes = buildHybridNodes(filteredPersons);
+    setNodes(newNodes);
+    initializeForceSimulation(newNodes);
+    
+    return () => {
+      if (simulationRef.current) {
+        simulationRef.current.stop();
+      }
+    };
+  }, [filteredPersons, buildHybridNodes, initializeForceSimulation]);
 
-  // 拖拽处理
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    const rect = svgRef.current?.getBoundingClientRect();
-    if (rect) {
-      setDragOffset({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
-      });
+  const { width: treeWidth, height: treeHeight, minY } = calculateBounds(nodes);
+
+  // 节点拖拽处理
+  const handleNodeDragStart = useCallback((node: TreeNode, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (simulationRef.current && node.level === 2) { // 只允许拖拽非家庭节点
+      simulationRef.current.alphaTarget(0.3).restart();
+      node.fx = node.x;
+      node.fy = node.y;
     }
   }, []);
 
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (e.buttons === 1) { // 左键按下
+  const handleNodeDrag = useCallback((node: TreeNode, e: React.MouseEvent) => {
+    if (node.level === 2 && node.fx !== undefined && node.fy !== undefined) {
       const rect = svgRef.current?.getBoundingClientRect();
       if (rect) {
-        const newX = e.clientX - rect.left - dragOffset.x;
-        const newY = e.clientY - rect.top - dragOffset.y;
-        if (svgRef.current) {
-          svgRef.current.style.transform = `translate(${newX}px, ${newY}px)`;
-        }
+        const transform = zoomTransform;
+        node.fx = (e.clientX - rect.left - rect.width / 2 - transform.x) / transform.k;
+        node.fy = (e.clientY - rect.top - rect.height / 2 - transform.y) / transform.k;
       }
     }
-  }, [dragOffset]);
+  }, [zoomTransform]);
+
+  const handleNodeDragEnd = useCallback((node: TreeNode) => {
+    if (simulationRef.current && node.level === 2) {
+      simulationRef.current.alphaTarget(0);
+      node.fx = null;
+      node.fy = null;
+    }
+  }, []);
+
+  // 缩放和平移处理
+  useEffect(() => {
+    if (!svgRef.current) return;
+
+    const zoom = d3.zoom<SVGSVGElement, unknown>()
+      .scaleExtent([0.1, 4])
+      .on('zoom', (event) => {
+        const { x, y, k } = event.transform;
+        setZoomTransform({ x, y, k });
+      });
+
+    d3.select(svgRef.current).call(zoom);
+
+    return () => {
+      d3.select(svgRef.current).on('.zoom', null);
+    };
+  }, []);
+
+  // 双击重置视图
+  const handleDoubleClick = useCallback(() => {
+    if (svgRef.current) {
+      d3.select(svgRef.current)
+        .transition()
+        .duration(750)
+        .call(
+          d3.zoom<SVGSVGElement, unknown>().transform,
+          d3.zoomIdentity
+        );
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">
@@ -353,16 +411,16 @@ export default function RelationshipsPage() {
             {selectedCategory === 'all' ? '完整关系网络' : categories.find(cat => cat.id === selectedCategory)?.name}
           </h2>
           
-          <div className="relative overflow-auto bg-gray-800 rounded-lg" style={{ height: '600px' }}>
+          <div className="relative overflow-hidden bg-gray-800 rounded-lg" style={{ height: '600px' }}>
             <svg
               ref={svgRef}
-              width={Math.max(treeWidth + 200, 800)}
-              height={Math.max(treeHeight + 200, 600)}
-              viewBox={`${-treeWidth / 2 - 100} ${minY - 100} ${treeWidth + 200} ${treeHeight + 200}`}
-              className="cursor-move"
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
+              width="100%"
+              height="100%"
+              viewBox={`${-treeWidth / 2} ${minY} ${treeWidth} ${treeHeight}`}
+              className="cursor-grab active:cursor-grabbing"
+              onDoubleClick={handleDoubleClick}
             >
+              <g transform={`translate(${zoomTransform.x}, ${zoomTransform.y}) scale(${zoomTransform.k})`}>
               {/* 渐变定义 */}
               <defs>
                 <radialGradient id="familyGradient" cx="50%" cy="50%" r="50%">
@@ -386,24 +444,34 @@ export default function RelationshipsPage() {
                   <stop offset="100%" stopColor="#D97706" />
                 </radialGradient>
               </defs>
-              {/* 渲染连接线 */}
-              {(() => {
-                const lines: JSX.Element[] = [];
-                const traverse = (node: TreeNode) => {
-                  node.children.forEach(child => {
-                    // 精确的直角折线连接 - 从圆形边缘开始
-                    const radius = 52.5;
-                    const startY = node.y + radius;
-                    const endY = child.y - radius;
+                {/* 渲染连接线 */}
+                {nodes.map(node => {
+                  if (node.person.id === 'root') return null;
+                  
+                  const rootNode = nodes.find(n => n.person.id === 'root');
+                  if (!rootNode) return null;
+                  
+                  const radius = 52.5;
+                  const dx = node.x - rootNode.x;
+                  const dy = node.y - rootNode.y;
+                  const distance = Math.sqrt(dx * dx + dy * dy);
+                  
+                  if (distance === 0) return null;
+                  
+                  const startX = rootNode.x + (dx / distance) * radius;
+                  const startY = rootNode.y + (dy / distance) * radius;
+                  const endX = node.x - (dx / distance) * radius;
+                  const endY = node.y - (dy / distance) * radius;
+                  
+                  // 家庭关系用直角连线，其他关系用直线
+                  if (node.level < 2) {
                     const midY = (startY + endY) / 2;
-                    
-                    lines.push(
-                      <g key={`line-group-${node.person.id}-${child.person.id}`}>
-                        {/* 主连接线 */}
+                    return (
+                      <g key={`line-${rootNode.person.id}-${node.person.id}`}>
                         <polyline
-                          points={`${node.x},${startY} ${node.x},${midY} ${child.x},${midY} ${child.x},${endY}`}
+                          points={`${startX},${startY} ${startX},${midY} ${endX},${midY} ${endX},${endY}`}
                           stroke="#FFFFFF"
-                          strokeWidth="5"
+                          strokeWidth="3"
                           fill="none"
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -413,18 +481,31 @@ export default function RelationshipsPage() {
                         />
                       </g>
                     );
-                    traverse(child);
-                  });
-                };
-                traverse(layoutTree);
-                return lines;
-              })()}
+                  } else {
+                    return (
+                      <line
+                        key={`line-${rootNode.person.id}-${node.person.id}`}
+                        x1={startX}
+                        y1={startY}
+                        x2={endX}
+                        y2={endY}
+                        stroke="#FFFFFF"
+                        strokeWidth="2"
+                        strokeOpacity="0.6"
+                        strokeDasharray="5,5"
+                        style={{
+                          filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))'
+                        }}
+                      />
+                    );
+                  }
+                })}
+              </g>
 
-              {/* 渲染节点 */}
-              {(() => {
-                const nodes: JSX.Element[] = [];
-                const traverse = (node: TreeNode) => {
+                {/* 渲染节点 */}
+                {nodes.map(node => {
                   const isRoot = node.person.id === 'root';
+                  const isDraggable = node.level === 2; // 只有非家庭成员可拖拽
                   
                   const getGradientId = (category: string, isRoot: boolean) => {
                     if (isRoot) return 'url(#rootGradient)';
@@ -437,8 +518,13 @@ export default function RelationshipsPage() {
                     }
                   };
                   
-                  nodes.push(
-                    <g key={`node-${node.person.id}-${node.level}`} transform={`translate(${node.x}, ${node.y})`}>
+                  return (
+                    <g 
+                      key={`node-${node.person.id}-${node.level}`} 
+                      transform={`translate(${node.x}, ${node.y})`}
+                      className={isDraggable ? "cursor-grab active:cursor-grabbing" : "cursor-pointer"}
+                      onMouseDown={isDraggable ? (e) => handleNodeDragStart(e, node) : undefined}
+                    >
                       {/* 主要圆形节点 */}
                       <circle
                          cx="0"
@@ -448,10 +534,10 @@ export default function RelationshipsPage() {
                          stroke="#FFFFFF"
                          strokeWidth="5"
                          strokeLinejoin="square"
-                         className="cursor-pointer hover:opacity-90 transition-all duration-300 ease-out hover:stroke-yellow-300"
+                         className="hover:opacity-90 transition-all duration-300 ease-out hover:stroke-yellow-300"
                          style={{
                            filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))',
-                           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                           transition: isDraggable ? 'none' : 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                          }}
                          onClick={() => !isRoot && setSelectedPerson(node.person)}
                        />
@@ -477,7 +563,8 @@ export default function RelationshipsPage() {
                         fontFamily="'Segoe UI', system-ui, sans-serif"
                         style={{
                           textShadow: '0 1px 2px rgba(0,0,0,0.5)',
-                          letterSpacing: '0.5px'
+                          letterSpacing: '0.5px',
+                          pointerEvents: 'none'
                         }}
                       >
                         {node.person.name}
@@ -493,19 +580,30 @@ export default function RelationshipsPage() {
                         fontWeight="500"
                         fontFamily="'Segoe UI', system-ui, sans-serif"
                         style={{
-                          textShadow: '0 1px 2px rgba(255,255,255,0.8)'
+                          textShadow: '0 1px 2px rgba(255,255,255,0.8)',
+                          pointerEvents: 'none'
                         }}
                       >
                         {node.person.relationship}
                       </text>
+                      
+                      {/* 可拖拽节点的提示图标 */}
+                      {isDraggable && (
+                        <circle
+                          cx="35"
+                          cy="35"
+                          r="6"
+                          fill="#10B981"
+                          stroke="#FFFFFF"
+                          strokeWidth="1"
+                          style={{
+                            filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+                          }}
+                        />
+                      )}
                     </g>
                   );
-                  
-                  node.children.forEach(traverse);
-                };
-                traverse(layoutTree);
-                return nodes;
-              })()}
+                })}
             </svg>
           </div>
         </div>
