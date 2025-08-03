@@ -69,7 +69,7 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, index, isVisible }) 
           
           {/* Right side - Text content (always on right) */}
           <div className="md:w-5/12 mt-4 md:mt-0">
-            <div className="space-y-3">
+            <div className="space-y-2">
               {/* Date and location */}
               <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                 <p className="text-sm text-gold font-semibold">
@@ -84,7 +84,7 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, index, isVisible }) 
               
               
               {/* Description */}
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <p className="text-charcoal/80 leading-relaxed">
                   {event.experience}
                 </p>
