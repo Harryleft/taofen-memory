@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { Users, Heart, BookOpen, GraduationCap, Building } from 'lucide-react';
 
 interface Person {
@@ -9,6 +9,14 @@ interface Person {
   relationship: string;
   description: string;
   connections?: string[]; // IDs of connected people
+}
+
+interface TreeNode {
+  person: Person;
+  children: TreeNode[];
+  x: number;
+  y: number;
+  level: number;
 }
 
 const mockPersons: Person[] = [
@@ -128,6 +136,8 @@ const categories = [
 export default function RelationshipsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const svgRef = useRef<SVGSVGElement>(null);
 
   const filteredPersons = selectedCategory === 'all' 
     ? mockPersons 
@@ -137,6 +147,163 @@ export default function RelationshipsPage() {
     const categoryInfo = categories.find(cat => cat.id === category);
     return categoryInfo?.color || 'bg-gray-500';
   };
+
+  const getCategoryColorHex = (category: string) => {
+    const colorMap: { [key: string]: string } = {
+      'bg-charcoal': '#2D3748',
+      'bg-seal': '#4A5568',
+      'bg-gold': '#D4AF37',
+      'bg-gray-500': '#6B7280'
+    };
+    const bgColor = getCategoryColor(category);
+    return colorMap[bgColor] || '#6B7280';
+  };
+
+  // 构建家庭树结构
+  const buildFamilyTree = useCallback((persons: Person[]): TreeNode => {
+    // 邹韬奋作为根节点
+    const root: TreeNode = {
+      person: { id: 'root', name: '邹韬奋', avatar: '', category: 'family', relationship: '核心', description: '文化先驱' },
+      children: [],
+      x: 0,
+      y: 0,
+      level: 0
+    };
+
+    // 按关系分层，确保每个person只出现在一个层级
+    const familyPersons = persons.filter(p => p.category === 'family');
+    const parents = familyPersons.filter(p => p.relationship.includes('母') || p.relationship.includes('父'));
+    const spouse = familyPersons.filter(p => p.relationship.includes('妻') && !p.relationship.includes('母'));
+    const children = familyPersons.filter(p => (p.relationship.includes('子') || p.relationship.includes('女')) && !p.relationship.includes('妻') && !p.relationship.includes('母'));
+    const otherFamily = familyPersons.filter(p => !parents.includes(p) && !spouse.includes(p) && !children.includes(p));
+    const nonFamily = persons.filter(p => p.category !== 'family');
+
+    // 父母层（第-1层）
+    parents.forEach((parent, index) => {
+      root.children.push({
+        person: parent,
+        children: [],
+        x: 0,
+        y: 0,
+        level: -1
+      });
+    });
+
+    // 配偶层（第0层，与邹韬奋同级）
+    spouse.forEach((s, index) => {
+      root.children.push({
+        person: s,
+        children: [],
+        x: 0,
+        y: 0,
+        level: 0
+      });
+    });
+
+    // 子女层（第1层）
+    children.forEach((child, index) => {
+      root.children.push({
+        person: child,
+        children: [],
+        x: 0,
+        y: 0,
+        level: 1
+      });
+    });
+
+    // 其他家庭成员（第1.5层）
+    otherFamily.forEach((other, index) => {
+      root.children.push({
+        person: other,
+        children: [],
+        x: 0,
+        y: 0,
+        level: 1.5
+      });
+    });
+
+    // 非家庭关系（第2层）
+    nonFamily.forEach((other, index) => {
+      root.children.push({
+        person: other,
+        children: [],
+        x: 0,
+        y: 0,
+        level: 2
+      });
+    });
+
+    return root;
+  }, []);
+
+  // 计算树形布局
+  const calculateLayout = useCallback((tree: TreeNode): { tree: TreeNode; width: number; height: number } => {
+    const nodeWidth = 120;
+    const nodeHeight = 120; // 圆形节点直径约105px，增加高度
+    const levelHeight = 180; // 增加层级间距
+    const minNodeSpacing = 30; // 增加节点间距
+
+    // 按层级分组
+    const levels: { [key: number]: TreeNode[] } = {};
+    const traverse = (node: TreeNode) => {
+      if (!levels[node.level]) levels[node.level] = [];
+      levels[node.level].push(node);
+      node.children.forEach(traverse);
+    };
+    traverse(tree);
+
+    // 计算每层的布局
+    let maxWidth = 0;
+    Object.keys(levels).forEach(levelKey => {
+      const level = parseInt(levelKey);
+      const nodes = levels[level];
+      const levelWidth = nodes.length * nodeWidth + (nodes.length - 1) * minNodeSpacing;
+      maxWidth = Math.max(maxWidth, levelWidth);
+
+      // 水平居中分布
+      const startX = -levelWidth / 2;
+      nodes.forEach((node, index) => {
+        node.x = startX + index * (nodeWidth + minNodeSpacing) + nodeWidth / 2;
+        node.y = level * levelHeight;
+      });
+    });
+
+    // 调整根节点位置
+    tree.x = 0;
+    tree.y = 0;
+
+    const height = Math.max(...Object.keys(levels).map(k => parseInt(k))) * levelHeight + nodeHeight;
+    const width = maxWidth + nodeWidth;
+
+    return { tree, width, height };
+  }, []);
+
+  const tree = buildFamilyTree(filteredPersons);
+  const { tree: layoutTree, width: treeWidth, height: treeHeight } = calculateLayout(tree);
+
+  // 拖拽处理
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    const rect = svgRef.current?.getBoundingClientRect();
+    if (rect) {
+      setDragOffset({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      });
+    }
+  }, []);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (e.buttons === 1) { // 左键按下
+      const rect = svgRef.current?.getBoundingClientRect();
+      if (rect) {
+        const newX = e.clientX - rect.left - dragOffset.x;
+        const newY = e.clientY - rect.top - dragOffset.y;
+        if (svgRef.current) {
+          svgRef.current.style.transform = `translate(${newX}px, ${newY}px)`;
+        }
+      }
+    }
+  }, [dragOffset]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -179,51 +346,110 @@ export default function RelationshipsPage() {
             {selectedCategory === 'all' ? '完整关系网络' : categories.find(cat => cat.id === selectedCategory)?.name}
           </h2>
           
-          {/* Linear Layout */}
-          <div className="flex flex-col items-center w-full">
-            {/* Central Figure - 邹韬奋 */}
-            <div className="relative mb-12">
-              <div className="w-24 h-24 bg-gradient-to-br from-gold to-yellow-600 rounded-full flex items-center justify-center shadow-2xl">
-                <span className="text-white font-bold text-xl">邹韬奋</span>
-              </div>
-              <div className="absolute -top-2 -right-2 w-6 h-6 bg-seal rounded-full flex items-center justify-center">
-                <span className="text-white text-xs font-bold">核心</span>
-              </div>
-            </div>
-            
-            {/* People positioned vertically with connection lines */}
-            <div className="flex flex-col items-center w-full max-w-4xl space-y-12">
-              {filteredPersons.map((person, index) => {
-                const categoryInfo = categories.find(cat => cat.id === person.category);
-                
-                return (
-                  <div key={person.id} className="relative flex flex-col items-center w-full">
-                    {/* Connection Line */}
-                    <div className="w-0.5 h-12 bg-charcoal opacity-40 mb-4"></div>
+          <div className="relative overflow-auto bg-white rounded-lg" style={{ height: '600px' }}>
+            <svg
+              ref={svgRef}
+              width={Math.max(treeWidth + 200, 800)}
+              height={Math.max(treeHeight + 200, 600)}
+              viewBox={`${-treeWidth/2 - 100} ${-150} ${treeWidth + 200} ${treeHeight + 300}`}
+              className="cursor-move"
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+            >
+              {/* 渲染连接线 */}
+              {(() => {
+                const lines: JSX.Element[] = [];
+                const traverse = (node: TreeNode) => {
+                  node.children.forEach(child => {
+                    // 直角折线连接 - 从圆形边缘开始
+                    const midY = (node.y + child.y) / 2;
+                    const pathData = `M ${node.x} ${node.y + 52.5} L ${node.x} ${midY} L ${child.x} ${midY} L ${child.x} ${child.y - 52.5}`;
                     
-                    {/* Person Container */}
-                    <div className="flex items-center justify-center group w-full">
-                      {/* Person Avatar */}
-                      <div 
-                        className={`w-20 h-20 ${categoryInfo?.color || 'bg-gray-500'} rounded-full flex items-center justify-center cursor-pointer transform transition-all duration-300 group-hover:scale-110 shadow-lg`}
-                        onClick={() => setSelectedPerson(person)}
-                      >
-                        <span className="text-white font-medium text-sm text-center px-2">
-                          {person.name}
-                        </span>
-                      </div>
+                    lines.push(
+                      <path
+                        key={`line-${node.person.id}-${child.person.id}`}
+                        d={pathData}
+                        stroke="#6B7280"
+                        strokeWidth="2"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    );
+                    traverse(child);
+                  });
+                };
+                traverse(layoutTree);
+                return lines;
+              })()}
+
+              {/* 渲染节点 */}
+              {(() => {
+                const nodes: JSX.Element[] = [];
+                const traverse = (node: TreeNode) => {
+                  const isRoot = node.person.id === 'root';
+                  
+                  nodes.push(
+                    <g key={`node-${node.person.id}-${node.level}`} transform={`translate(${node.x}, ${node.y})`}>
+                      {/* 主要圆形节点 */}
+                      <circle
+                        cx="0"
+                        cy="0"
+                        r="52.5"
+                        fill={isRoot ? '#D4AF37' : getCategoryColorHex(node.person.category)}
+                        stroke="#FFFFFF"
+                        strokeWidth="5"
+                        strokeLinejoin="square"
+                        className="cursor-pointer hover:opacity-80 transition-all duration-700 ease-out"
+                        style={{
+                          transition: 'stroke 0.8s cubic-bezier(0, 0.7, 0.4, 1)'
+                        }}
+                        onClick={() => !isRoot && setSelectedPerson(node.person)}
+                      />
                       
-                      {/* Person Info */}
-                      <div className="ml-6 text-left">
-                        <h3 className="font-semibold text-charcoal text-lg">{person.name}</h3>
-                        <p className="text-sm text-gray-600 mt-1">{person.relationship}</p>
-                        <p className="text-xs text-gray-500 mt-1 max-w-md">{person.description}</p>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                      {/* 姓名首字 */}
+                      <text
+                        x="0"
+                        y="-10"
+                        textAnchor="middle"
+                        fill="white"
+                        fontSize="16"
+                        fontWeight="bold"
+                      >
+                        {node.person.name.charAt(node.person.name.length - 1)}
+                      </text>
+                      
+                      {/* 姓名 */}
+                      <text
+                        x="0"
+                        y="10"
+                        textAnchor="middle"
+                        fill="white"
+                        fontSize="14"
+                        fontWeight="semibold"
+                      >
+                        {node.person.name}
+                      </text>
+                      
+                      {/* 关系 */}
+                      <text
+                        x="0"
+                        y="30"
+                        textAnchor="middle"
+                        fill="rgba(255, 255, 255, 0.8)"
+                        fontSize="12"
+                      >
+                        {node.person.relationship}
+                      </text>
+                    </g>
+                  );
+                  
+                  node.children.forEach(traverse);
+                };
+                traverse(layoutTree);
+                return nodes;
+              })()}
+            </svg>
           </div>
         </div>
         
