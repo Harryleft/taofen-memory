@@ -102,6 +102,7 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
   const [expandedCoreEvents, setExpandedCoreEvents] = useState<Set<number>>(new Set());
   const [visibleEvents, setVisibleEvents] = useState<Set<number>>(new Set());
   const [loading, setLoading] = useState(true);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   // 加载时间线数据
@@ -120,6 +121,19 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
     };
     
     loadTimelineData();
+  }, []);
+
+  // 滚动进度条
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = (scrollTop / docHeight) * 100;
+      setScrollProgress(Math.min(progress, 100));
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   // 观察器设置
@@ -155,6 +169,14 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
       }
       return newSet;
     });
+    
+    // 平滑滚动到核心事件位置
+    setTimeout(() => {
+      const element = document.querySelector(`[data-core-event="${coreEventIndex}"]`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
   };
 
   // 获取核心事件的年份
@@ -181,7 +203,16 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
   }
 
   return (
-    <section className={`py-20 bg-cream ${className}`}>
+    <>
+      {/* Progress Bar */}
+      <div className="timeline-progress">
+        <div 
+          className="timeline-progress-bar" 
+          style={{ width: `${scrollProgress}%` }}
+        ></div>
+      </div>
+      
+      <section className={`py-20 bg-cream ${className}`}>
       {/* Custom timeline styles */}
       <style>{`
         .timeline-container {
@@ -221,13 +252,69 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
           box-shadow: 0 0 15px rgba(156, 163, 175, 0.3);
         }
         .animate-fadeIn {
-          animation: fadeIn 0.5s ease-in-out;
+          animation: fadeIn 0.6s ease-out;
         }
         @keyframes fadeIn {
           from {
             opacity: 0;
-            transform: translateY(20px);
+            transform: translateY(30px);
           }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .core-event-card {
+          background: rgba(255, 255, 255, 0.8);
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(184, 134, 11, 0.2);
+          border-radius: 16px;
+          padding: 24px;
+          margin-bottom: 32px;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        .core-event-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+          border-color: rgba(184, 134, 11, 0.4);
+        }
+        .first-event-clickable {
+          position: relative;
+          cursor: pointer;
+          border-radius: 12px;
+          padding: 16px;
+          margin: -16px;
+          transition: all 0.3s ease;
+        }
+        .first-event-clickable:hover {
+          background: rgba(184, 134, 11, 0.05);
+          transform: translateX(8px);
+        }
+        .expand-indicator {
+          position: absolute;
+          right: 16px;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          background: rgba(184, 134, 11, 0.1);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.3s ease;
+        }
+        .expand-indicator.expanded {
+          transform: translateY(-50%) rotate(180deg);
+          background: rgba(184, 134, 11, 0.2);
+        }
+        .staggered-animation {
+          animation: staggerIn 0.6s ease-out forwards;
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        @keyframes staggerIn {
           to {
             opacity: 1;
             transform: translateY(0);
@@ -240,6 +327,34 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
           .timeline-dot::before {
             left: 20px;
           }
+          .core-event-card {
+            margin: 0 -12px 24px -12px;
+            padding: 20px;
+            border-radius: 12px;
+          }
+          .first-event-clickable {
+            margin: -12px;
+            padding: 12px;
+          }
+          .expand-indicator {
+            right: 12px;
+            width: 20px;
+            height: 20px;
+          }
+        }
+        .timeline-progress {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 3px;
+          background: rgba(184, 134, 11, 0.2);
+          z-index: 1000;
+        }
+        .timeline-progress-bar {
+          height: 100%;
+          background: linear-gradient(90deg, #B8860B, #DAA520);
+          transition: width 0.3s ease;
         }
       `}</style>
       
@@ -258,24 +373,25 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
             const firstEvent = coreEvent.timeline[0]; // 每个timeline的第一个条目
             
             return (
-              <div key={coreIndex} className="mb-20">
+              <div key={coreIndex} className="core-event-card" data-core-event={coreIndex}>
                 {/* Core Event Title */}
-                <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold text-charcoal font-serif mb-2">
+                <div className="text-center mb-6">
+                  <h3 className="text-3xl font-bold text-charcoal font-serif mb-3">
                     {coreEvent.core_event}
                   </h3>
-                  <div className="text-gold font-semibold text-lg">
+                  <div className="text-gold font-semibold text-xl">
                     {getCoreEventYear(coreEvent)}年
                   </div>
+                  <div className="w-16 h-px bg-gradient-to-r from-transparent via-gold to-transparent mx-auto mt-4"></div>
                 </div>
                 
                 {/* First Event - Always Visible and Clickable */}
                 <div 
                   data-event-index={`${coreIndex}-first`}
-                  className="cursor-pointer"
+                  className="first-event-clickable"
                   onClick={() => toggleCoreEvent(coreIndex)}
                 >
-                  <div className="timeline-item mb-8 transform transition-all duration-300 hover:scale-[1.02]">
+                  <div className="timeline-item mb-6">
                     <div className={`timeline-dot ${firstEvent.timespot ? 'timeline-dot-gray' : 'timeline-dot-gold'}`}></div>
                     <div className="pl-[45px] md:pl-0">
                       <div className="md:flex justify-between items-start w-full">
@@ -296,7 +412,7 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
                         <div className="hidden md:block w-12"></div>
                         
                         {/* Right side - Text content */}
-                        <div className="md:w-6/12 mt-4 md:mt-0">
+                        <div className="md:w-6/12 mt-4 md:mt-0 relative">
                           <div className="space-y-2">
                             <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                               <p className="text-sm text-gold font-semibold">
@@ -309,14 +425,20 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
                               )}
                             </div>
                             <div className="space-y-1">
-                              <p className="text-charcoal/80 leading-relaxed">
+                              <p className="text-charcoal/80 leading-relaxed pr-8">
                                 {firstEvent.experience}
                               </p>
                               {/* Click hint */}
                               <p className="text-xs text-gold/70 italic mt-2">
-                                {isExpanded ? '点击收起详细内容' : '点击展开详细内容'}
+                                {isExpanded ? '点击收起详细内容 ↑' : '点击展开详细内容 ↓'}
                               </p>
                             </div>
+                          </div>
+                          {/* Expand indicator */}
+                          <div className={`expand-indicator ${isExpanded ? 'expanded' : ''}`}>
+                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                              <path d="M3 4.5L6 7.5L9 4.5" stroke="#B8860B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
                           </div>
                         </div>
                       </div>
@@ -326,12 +448,16 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
                 
                 {/* Expanded Content - Rest of Timeline Events */}
                 {isExpanded && (
-                  <div className="space-y-6 animate-fadeIn">
+                  <div className="space-y-6 animate-fadeIn border-t border-gold/20 pt-6 mt-6">
+                    <div className="text-center mb-4">
+                      <p className="text-sm text-charcoal/60 font-medium">详细时间线</p>
+                    </div>
                     {coreEvent.timeline.slice(1).map((event, eventIndex) => (
                       <div 
                         key={`${coreIndex}-${eventIndex + 1}`}
                         data-event-index={`${coreIndex}-${eventIndex + 1}`}
-                        className={`transform transition-all duration-500 delay-${eventIndex * 100}`}
+                        className="staggered-animation"
+                        style={{ animationDelay: `${eventIndex * 0.1}s` }}
                       >
                         <TimelineItem 
                           event={event} 
@@ -362,5 +488,6 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
         </div>
       </div>
     </section>
+    </>
   );
 }
