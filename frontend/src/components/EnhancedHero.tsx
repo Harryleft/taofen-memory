@@ -34,14 +34,14 @@ export default function EnhancedHero() {
       <div className="absolute inset-0 bg-noise opacity-10" />
       
       {/* Content Container */}
-      <div className="relative z-10 text-center text-white max-w-5xl px-6">
+      <div className="relative z-10 text-center text-white max-w-7xl px-6">
         {/* Main Title */}
         <div 
-          className={`transform transition-all duration-1000 ${
+          className={`transform transition-all duration-1000 mb-16 ${
             isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}
         >
-          <h1 className="text-7xl md:text-9xl font-bold mb-6 leading-tight text-shadow-lg">
+          <h1 className="text-6xl md:text-8xl font-bold mb-6 leading-tight text-shadow-lg">
             <span className="inline-block transform hover:scale-105 transition-transform duration-300">
               邹
             </span>
@@ -52,59 +52,103 @@ export default function EnhancedHero() {
               奋
             </span>
           </h1>
-        </div>
-
-        {/* Subtitle */}
-        <div 
-          className={`transform transition-all duration-1000 delay-300 ${
-            isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-          }`}
-        >
+          
           <div className="flex items-center justify-center gap-4 mb-6">
             <div className="h-px bg-gold flex-1 max-w-20" />
             <Scroll className="text-gold" size={24} />
             <div className="h-px bg-gold flex-1 max-w-20" />
           </div>
           
-          <p className="text-xl md:text-3xl mb-8 text-cream/95 leading-relaxed font-serif">
+          <p className="text-xl md:text-2xl text-cream/95 leading-relaxed font-serif">
             新闻出版家 · 社会活动家 · 进步文化的先驱
           </p>
         </div>
 
-        {/* Description */}
+        {/* Narrative Modules Grid */}
         <div 
-          className={`transform transition-all duration-1000 delay-500 ${
+          className={`transform transition-all duration-1000 delay-300 ${
             isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}
         >
-          <p className="text-lg md:text-xl mb-12 text-cream/85 max-w-3xl mx-auto leading-relaxed">
-            探索一位杰出文化人士的思想历程，感受那个时代的文化脉动与社会变迁。
-            在历史的长河中，追寻进步思想的光芒。
-          </p>
-        </div>
-
-        {/* CTA Buttons */}
-        <div 
-          className={`transform transition-all duration-1000 delay-700 ${
-            isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-          }`}
-        >
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-            <button 
-              onClick={scrollToContent}
-              className="group bg-gold hover:bg-gold/90 text-cream px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {/* Timeline Module */}
+            <div 
+              className="group relative bg-black/40 backdrop-blur-sm border border-gold/30 rounded-xl p-6 hover:bg-black/60 hover:border-gold/60 transition-all duration-500 cursor-pointer transform hover:scale-105 hover:shadow-2xl"
+              onClick={() => window.location.href = '/timeline'}
             >
-              <span className="flex items-center gap-2">
-                开始探索
-                <ChevronDown className="group-hover:translate-y-1 transition-transform duration-300" size={20} />
-              </span>
-            </button>
+              <div className="absolute inset-0 bg-gradient-to-br from-gold/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="relative z-10">
+                <div className="w-16 h-16 bg-gold/20 rounded-full flex items-center justify-center mb-4 group-hover:bg-gold/30 transition-colors duration-300">
+                  <Scroll className="text-gold" size={24} />
+                </div>
+                <h3 className="text-2xl font-bold text-cream mb-3 group-hover:text-gold transition-colors duration-300">
+                  人生大事
+                </h3>
+                <p className="text-cream/80 leading-relaxed mb-4">
+                  追溯邹韬奋先生的人生轨迹，感受一位文化先驱的成长历程与时代担当
+                </p>
+                <div className="flex items-center text-gold/80 group-hover:text-gold transition-colors duration-300">
+                  <span className="text-sm font-medium">探索时间线</span>
+                  <ChevronDown className="ml-2 transform rotate-[-90deg] group-hover:translate-x-1 transition-transform duration-300" size={16} />
+                </div>
+              </div>
+            </div>
+
+            {/* Bookstore Module */}
+            <div 
+              className="group relative bg-black/40 backdrop-blur-sm border border-gold/30 rounded-xl p-6 hover:bg-black/60 hover:border-gold/60 transition-all duration-500 cursor-pointer transform hover:scale-105 hover:shadow-2xl"
+              onClick={() => window.location.href = '/bookstore-timeline'}
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-gold/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="relative z-10">
+                <div className="w-16 h-16 bg-gold/20 rounded-full flex items-center justify-center mb-4 group-hover:bg-gold/30 transition-colors duration-300">
+                  <svg className="w-6 h-6 text-gold" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-cream mb-3 group-hover:text-gold transition-colors duration-300">
+                  生活书店
+                </h3>
+                <p className="text-cream/80 leading-relaxed mb-4">
+                  探索生活书店的发展历程，了解进步出版事业的光辉足迹
+                </p>
+                <div className="flex items-center text-gold/80 group-hover:text-gold transition-colors duration-300">
+                  <span className="text-sm font-medium">查看出版物</span>
+                  <ChevronDown className="ml-2 transform rotate-[-90deg] group-hover:translate-x-1 transition-transform duration-300" size={16} />
+                </div>
+              </div>
+            </div>
+
+            {/* Handwriting Module */}
+            <div 
+              className="group relative bg-black/40 backdrop-blur-sm border border-gold/30 rounded-xl p-6 hover:bg-black/60 hover:border-gold/60 transition-all duration-500 cursor-pointer transform hover:scale-105 hover:shadow-2xl"
+              onClick={scrollToContent}
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-gold/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="relative z-10">
+                <div className="w-16 h-16 bg-gold/20 rounded-full flex items-center justify-center mb-4 group-hover:bg-gold/30 transition-colors duration-300">
+                  <svg className="w-6 h-6 text-gold" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-cream mb-3 group-hover:text-gold transition-colors duration-300">
+                  韬奋手迹
+                </h3>
+                <p className="text-cream/80 leading-relaxed mb-4">
+                  欣赏邹韬奋先生的珍贵手稿，感受文字背后的思想力量
+                </p>
+                <div className="flex items-center text-gold/80 group-hover:text-gold transition-colors duration-300">
+                  <span className="text-sm font-medium">查看手稿</span>
+                  <ChevronDown className="ml-2 transform rotate-[-90deg] group-hover:translate-x-1 transition-transform duration-300" size={16} />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Scroll Indicator */}
         <div 
-          className={`transform transition-all duration-1000 delay-1000 ${
+          className={`transform transition-all duration-1000 delay-700 mt-16 ${
             isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}
         >
