@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useTimelineData } from '../hooks/useTimelineData';
 import CoreEventSection from './timeline/CoreEventSection';
 import ProgressBar from './timeline/ProgressBar';
-import '../../styles/timeline.css';
+import '../styles/timeline.css';
 
 interface LifeTimelineModuleProps {
   className?: string;
