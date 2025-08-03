@@ -299,46 +299,65 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
         .first-event-clickable {
           position: relative;
           cursor: pointer;
-          border-radius: 8px;
-          padding: 12px;
-          margin: -12px;
-          transition: all 0.3s ease;
+          border-radius: 12px;
+          padding: 16px;
+          margin: -16px;
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
           background: transparent;
+          overflow: hidden;
+        }
+        .first-event-clickable::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 40px;
+          background: linear-gradient(to bottom, transparent, rgba(184, 134, 11, 0.08));
+          opacity: 0;
+          transition: opacity 0.3s ease;
+          pointer-events: none;
+        }
+        .first-event-clickable:not(.expanded)::after {
+          opacity: 1;
         }
         .first-event-clickable:hover {
-          background: rgba(184, 134, 11, 0.03);
-          transform: scale(1.02);
+          background: rgba(184, 134, 11, 0.05);
+          transform: scale(1.015);
+          box-shadow: 0 8px 32px rgba(184, 134, 11, 0.12);
         }
         .first-event-clickable:hover .timeline-dot::before {
-          transform: translateX(-50%) scale(1.2);
-          box-shadow: 0 0 25px rgba(184, 134, 11, 0.5);
+          transform: translateX(-50%) scale(1.3);
+          box-shadow: 0 0 30px rgba(184, 134, 11, 0.6);
         }
         .expand-indicator {
           position: absolute;
           right: 16px;
           top: 50%;
           transform: translateY(-50%);
-          width: 28px;
-          height: 28px;
+          width: 32px;
+          height: 32px;
           border-radius: 50%;
-          background: linear-gradient(135deg, rgba(184, 134, 11, 0.1), rgba(184, 134, 11, 0.2));
+          background: linear-gradient(135deg, rgba(184, 134, 11, 0.15), rgba(184, 134, 11, 0.25));
           display: flex;
           align-items: center;
           justify-content: center;
           transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-          border: 1px solid rgba(184, 134, 11, 0.2);
+          border: 2px solid rgba(184, 134, 11, 0.3);
+          backdrop-filter: blur(8px);
         }
         .expand-indicator.expanded {
           transform: translateY(-50%) rotate(180deg);
-          background: linear-gradient(135deg, rgba(184, 134, 11, 0.2), rgba(184, 134, 11, 0.3));
-          border-color: rgba(184, 134, 11, 0.4);
+          background: linear-gradient(135deg, rgba(184, 134, 11, 0.25), rgba(184, 134, 11, 0.35));
+          border-color: rgba(184, 134, 11, 0.5);
         }
         .expand-indicator:hover {
-          transform: translateY(-50%) scale(1.1);
-          background: linear-gradient(135deg, rgba(184, 134, 11, 0.2), rgba(184, 134, 11, 0.3));
+          transform: translateY(-50%) scale(1.15);
+          background: linear-gradient(135deg, rgba(184, 134, 11, 0.25), rgba(184, 134, 11, 0.35));
+          box-shadow: 0 4px 16px rgba(184, 134, 11, 0.3);
         }
         .expand-indicator.expanded:hover {
-          transform: translateY(-50%) rotate(180deg) scale(1.1);
+          transform: translateY(-50%) rotate(180deg) scale(1.15);
         }
         .staggered-animation {
           animation: staggerIn 0.6s ease-out forwards;
@@ -420,7 +439,7 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
                 {/* First Event - Always Visible and Clickable */}
                 <div 
                   data-event-index={`${coreIndex}-first`}
-                  className="first-event-clickable"
+                  className={`first-event-clickable ${isExpanded ? 'expanded' : ''}`}
                   onClick={() => toggleCoreEvent(coreIndex)}
                 >
                   <div className="timeline-item mb-6">
@@ -457,12 +476,8 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
                               )}
                             </div>
                             <div className="space-y-1">
-                              <p className="text-charcoal/80 leading-relaxed pr-8">
+                              <p className="text-charcoal/80 leading-relaxed pr-10">
                                 {firstEvent.experience}
-                              </p>
-                              {/* Click hint */}
-                              <p className="text-xs text-gold/70 italic mt-2">
-                                {isExpanded ? '点击收起详细内容 ↑' : '点击展开详细内容 ↓'}
                               </p>
                             </div>
                           </div>
