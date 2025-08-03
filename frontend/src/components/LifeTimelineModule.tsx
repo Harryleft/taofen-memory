@@ -346,21 +346,21 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
         }
         .expand-indicator {
           position: absolute;
-          right: 12px;
+          right: 20px;
           top: 50%;
           transform: translateY(-50%);
           width: 36px;
           height: 36px;
           border-radius: 50%;
-          background: linear-gradient(135deg, rgba(184, 134, 11, 0.2), rgba(184, 134, 11, 0.35));
+          background: linear-gradient(135deg, rgba(184, 134, 11, 0.25), rgba(184, 134, 11, 0.4));
           display: flex;
           align-items: center;
           justify-content: center;
           transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-          border: 2px solid rgba(184, 134, 11, 0.4);
+          border: 2px solid rgba(184, 134, 11, 0.5);
           backdrop-filter: blur(8px);
           z-index: 10;
-          box-shadow: 0 2px 8px rgba(184, 134, 11, 0.2);
+          box-shadow: 0 3px 12px rgba(184, 134, 11, 0.25);
         }
         .expand-indicator.expanded {
           transform: translateY(-50%) rotate(180deg);
