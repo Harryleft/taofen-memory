@@ -189,14 +189,14 @@ export default function RelationshipsPage() {
       });
     });
 
-    // 配偶层（第0层，与邹韬奋同级）
+    // 配偶层（第0.5层，位于邹韬奋和子女之间）
     spouse.forEach((s, index) => {
       root.children.push({
         person: s,
         children: [],
         x: 0,
         y: 0,
-        level: 0
+        level: 0.5
       });
     });
 
@@ -236,11 +236,11 @@ export default function RelationshipsPage() {
     return root;
   }, []);
 
-  // 计算树形布局
-  const calculateLayout = useCallback((tree: TreeNode): { tree: TreeNode; width: number; height: number } => {
+  // 计算树形布局，返回整体边界，便于动态设置 viewBox
+  const calculateLayout = useCallback((tree: TreeNode): { tree: TreeNode; width: number; height: number; minY: number } => {
     const nodeWidth = 120;
     const nodeHeight = 120; // 圆形节点直径约105px，增加高度
-    const levelHeight = 180; // 增加层级间距
+    const levelHeight = 200; // 增加层级间距
     const minNodeSpacing = 30; // 增加节点间距
 
     // 按层级分组
@@ -255,7 +255,7 @@ export default function RelationshipsPage() {
     // 计算每层的布局
     let maxWidth = 0;
     Object.keys(levels).forEach(levelKey => {
-      const level = parseInt(levelKey);
+      const level = parseFloat(levelKey);
       const nodes = levels[level];
       const levelWidth = nodes.length * nodeWidth + (nodes.length - 1) * minNodeSpacing;
       maxWidth = Math.max(maxWidth, levelWidth);
@@ -268,18 +268,25 @@ export default function RelationshipsPage() {
       });
     });
 
-    // 调整根节点位置
+    // 计算整体边界
+    const levelKeys = Object.keys(levels).map(l => parseFloat(l));
+    const minLevel = Math.min(...levelKeys);
+    const maxLevel = Math.max(...levelKeys);
+    const minY = minLevel * levelHeight;
+    const maxY = maxLevel * levelHeight;
+
+    const height = maxY - minY + nodeHeight; // 总高度
+    const width = maxWidth + nodeWidth;      // 总宽度
+
+    // 保证根节点居于视觉中心（y=0），不做其他偏移
     tree.x = 0;
     tree.y = 0;
 
-    const height = Math.max(...Object.keys(levels).map(k => parseInt(k))) * levelHeight + nodeHeight;
-    const width = maxWidth + nodeWidth;
-
-    return { tree, width, height };
+    return { tree, width, height, minY };
   }, []);
 
   const tree = buildFamilyTree(filteredPersons);
-  const { tree: layoutTree, width: treeWidth, height: treeHeight } = calculateLayout(tree);
+  const { tree: layoutTree, width: treeWidth, height: treeHeight, minY } = calculateLayout(tree);
 
   // 拖拽处理
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -346,35 +353,65 @@ export default function RelationshipsPage() {
             {selectedCategory === 'all' ? '完整关系网络' : categories.find(cat => cat.id === selectedCategory)?.name}
           </h2>
           
-          <div className="relative overflow-auto bg-white rounded-lg" style={{ height: '600px' }}>
+          <div className="relative overflow-auto bg-gray-800 rounded-lg" style={{ height: '600px' }}>
             <svg
               ref={svgRef}
               width={Math.max(treeWidth + 200, 800)}
               height={Math.max(treeHeight + 200, 600)}
-              viewBox={`${-treeWidth/2 - 100} ${-150} ${treeWidth + 200} ${treeHeight + 300}`}
+              viewBox={`${-treeWidth / 2 - 100} ${minY - 100} ${treeWidth + 200} ${treeHeight + 200}`}
               className="cursor-move"
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
             >
+              {/* 渐变定义 */}
+              <defs>
+                <radialGradient id="familyGradient" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#6B7280" />
+                  <stop offset="100%" stopColor="#374151" />
+                </radialGradient>
+                <radialGradient id="publishingGradient" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#F59E0B" />
+                  <stop offset="100%" stopColor="#D97706" />
+                </radialGradient>
+                <radialGradient id="academicGradient" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#374151" />
+                  <stop offset="100%" stopColor="#1F2937" />
+                </radialGradient>
+                <radialGradient id="politicalGradient" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#6B7280" />
+                  <stop offset="100%" stopColor="#4B5563" />
+                </radialGradient>
+                <radialGradient id="rootGradient" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#FCD34D" />
+                  <stop offset="100%" stopColor="#D97706" />
+                </radialGradient>
+              </defs>
               {/* 渲染连接线 */}
               {(() => {
                 const lines: JSX.Element[] = [];
                 const traverse = (node: TreeNode) => {
                   node.children.forEach(child => {
-                    // 直角折线连接 - 从圆形边缘开始
-                    const midY = (node.y + child.y) / 2;
-                    const pathData = `M ${node.x} ${node.y + 52.5} L ${node.x} ${midY} L ${child.x} ${midY} L ${child.x} ${child.y - 52.5}`;
+                    // 精确的直角折线连接 - 从圆形边缘开始
+                    const radius = 52.5;
+                    const startY = node.y + radius;
+                    const endY = child.y - radius;
+                    const midY = (startY + endY) / 2;
                     
                     lines.push(
-                      <path
-                        key={`line-${node.person.id}-${child.person.id}`}
-                        d={pathData}
-                        stroke="#6B7280"
-                        strokeWidth="2"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
+                      <g key={`line-group-${node.person.id}-${child.person.id}`}>
+                        {/* 主连接线 */}
+                        <polyline
+                          points={`${node.x},${startY} ${node.x},${midY} ${child.x},${midY} ${child.x},${endY}`}
+                          stroke="#FFFFFF"
+                          strokeWidth="5"
+                          fill="none"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          style={{
+                            filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))'
+                          }}
+                        />
+                      </g>
                     );
                     traverse(child);
                   });
@@ -389,55 +426,75 @@ export default function RelationshipsPage() {
                 const traverse = (node: TreeNode) => {
                   const isRoot = node.person.id === 'root';
                   
+                  const getGradientId = (category: string, isRoot: boolean) => {
+                    if (isRoot) return 'url(#rootGradient)';
+                    switch (category) {
+                      case 'family': return 'url(#familyGradient)';
+                      case 'publishing': return 'url(#publishingGradient)';
+                      case 'academic': return 'url(#academicGradient)';
+                      case 'political': return 'url(#politicalGradient)';
+                      default: return 'url(#familyGradient)';
+                    }
+                  };
+                  
                   nodes.push(
                     <g key={`node-${node.person.id}-${node.level}`} transform={`translate(${node.x}, ${node.y})`}>
                       {/* 主要圆形节点 */}
                       <circle
-                        cx="0"
-                        cy="0"
-                        r="52.5"
-                        fill={isRoot ? '#D4AF37' : getCategoryColorHex(node.person.category)}
-                        stroke="#FFFFFF"
-                        strokeWidth="5"
-                        strokeLinejoin="square"
-                        className="cursor-pointer hover:opacity-80 transition-all duration-700 ease-out"
-                        style={{
-                          transition: 'stroke 0.8s cubic-bezier(0, 0.7, 0.4, 1)'
-                        }}
-                        onClick={() => !isRoot && setSelectedPerson(node.person)}
-                      />
-                      
-                      {/* 姓名首字 */}
-                      <text
-                        x="0"
-                        y="-10"
-                        textAnchor="middle"
-                        fill="white"
-                        fontSize="16"
-                        fontWeight="bold"
-                      >
-                        {node.person.name.charAt(node.person.name.length - 1)}
-                      </text>
+                         cx="0"
+                         cy="0"
+                         r="52.5"
+                         fill={getGradientId(node.person.category, isRoot)}
+                         stroke="#FFFFFF"
+                         strokeWidth="5"
+                         strokeLinejoin="square"
+                         className="cursor-pointer hover:opacity-90 transition-all duration-300 ease-out hover:stroke-yellow-300"
+                         style={{
+                           filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))',
+                           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                         }}
+                         onClick={() => !isRoot && setSelectedPerson(node.person)}
+                       />
+                      {/* 混合模式覆盖层 */}
+                      <circle
+                         cx="0"
+                         cy="0"
+                         r="52.5"
+                         fill={isRoot ? '#D4AF37' : getCategoryColorHex(node.person.category)}
+                         fillOpacity="0.15"
+                         style={{ mixBlendMode: 'multiply' }}
+                         pointerEvents="none"
+                       />
                       
                       {/* 姓名 */}
                       <text
                         x="0"
-                        y="10"
+                        y="5"
                         textAnchor="middle"
-                        fill="white"
-                        fontSize="14"
-                        fontWeight="semibold"
+                        fill="#FFFFFF"
+                        fontSize="16"
+                        fontWeight="600"
+                        fontFamily="'Segoe UI', system-ui, sans-serif"
+                        style={{
+                          textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+                          letterSpacing: '0.5px'
+                        }}
                       >
                         {node.person.name}
                       </text>
                       
-                      {/* 关系 */}
+                      {/* 关系标签 */}
                       <text
                         x="0"
-                        y="30"
+                        y="78"
                         textAnchor="middle"
-                        fill="rgba(255, 255, 255, 0.8)"
-                        fontSize="12"
+                        fill="#E6394E"
+                        fontSize="14"
+                        fontWeight="500"
+                        fontFamily="'Segoe UI', system-ui, sans-serif"
+                        style={{
+                          textShadow: '0 1px 2px rgba(255,255,255,0.8)'
+                        }}
                       >
                         {node.person.relationship}
                       </text>
