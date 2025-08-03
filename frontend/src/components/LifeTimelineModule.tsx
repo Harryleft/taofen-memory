@@ -179,15 +179,7 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
     }, 100);
   };
 
-  // 获取核心事件的年份
-  const getCoreEventYear = (coreEvent: CoreEvent): string => {
-    const firstEvent = coreEvent.timeline.find(event => !event.timespot);
-    if (firstEvent) {
-      const match = firstEvent.time.match(/(\d{4})/);
-      return match ? match[1] : '';
-    }
-    return '';
-  };
+
 
   if (loading) {
     return (
@@ -477,9 +469,6 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
                   <h3 className="text-3xl font-bold text-charcoal font-serif mb-2">
                     {coreEvent.core_event}
                   </h3>
-                  <div className="text-gold font-semibold text-lg">
-                    {getCoreEventYear(coreEvent)}年
-                  </div>
                 </div>
                 
                 {/* First Event - Always Visible and Clickable */}
