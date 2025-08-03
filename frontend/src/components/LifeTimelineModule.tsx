@@ -46,7 +46,7 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, index, isVisible }) 
     <div className={`timeline-item mb-16 transform transition-all duration-1000 ${
       isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
     }`}>
-      <div className="timeline-dot"></div>
+      <div className={`timeline-dot ${event.timespot ? 'timeline-dot-gray' : 'timeline-dot-gold'}`}></div>
       {/* Container for mobile padding */}
       <div className="pl-[45px] md:pl-0">
         {/* Flex container for desktop left-right layout */}
@@ -224,6 +224,10 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
           box-shadow: 0 0 15px rgba(184, 134, 11, 0.3);
           transform: translateX(-50%);
           z-index: 2;
+        }
+        .timeline-dot-gray::before {
+          background: #9CA3AF;
+          box-shadow: 0 0 15px rgba(156, 163, 175, 0.3);
         }
         @media (max-width: 768px) {
           .timeline-container::before {
