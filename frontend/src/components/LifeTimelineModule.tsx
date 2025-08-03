@@ -65,7 +65,7 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, index, isVisible }) 
           </div>
           
           {/* Middle separator (desktop only) */}
-          <div className="hidden md:block w-2"></div>
+          <div className="hidden md:block w-12"></div>
           
           {/* Right side - Text content (always on right) */}
           <div className="md:w-6/12 mt-4 md:mt-0">
