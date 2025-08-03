@@ -181,7 +181,33 @@ export default function RelationshipsPage() {
           
           {/* Central Figure - 邹韬奋 */}
           <div className="relative flex flex-col items-center">
-            <div className="relative mb-12">
+            {/* SVG for connection lines */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{zIndex: 1}}>
+              {filteredPersons.map((person, index) => {
+                const totalPersons = filteredPersons.length;
+                const angle = (index * 2 * Math.PI) / totalPersons;
+                const radius = 200; // Distance from center
+                const centerX = '50%';
+                const centerY = '200px'; // Adjust based on central figure position
+                const endX = `calc(50% + ${Math.cos(angle) * radius}px)`;
+                const endY = `calc(200px + ${Math.sin(angle) * radius}px)`;
+                
+                return (
+                  <line
+                    key={`line-${person.id}`}
+                    x1={centerX}
+                    y1={centerY}
+                    x2={endX}
+                    y2={endY}
+                    stroke="white"
+                    strokeWidth="2"
+                    opacity="0.8"
+                  />
+                );
+              })}
+            </svg>
+            
+            <div className="relative mb-12" style={{zIndex: 2}}>
               <div className="w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-2xl">
                 <span className="text-white font-bold text-xl">邹韬奋</span>
               </div>
@@ -190,15 +216,26 @@ export default function RelationshipsPage() {
               </div>
             </div>
             
-            {/* Connection Lines and People */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 w-full max-w-6xl">
+            {/* People positioned in circle */}
+            <div className="relative w-full max-w-6xl h-96">
               {filteredPersons.map((person, index) => {
                 const categoryInfo = categories.find(cat => cat.id === person.category);
+                const totalPersons = filteredPersons.length;
+                const angle = (index * 2 * Math.PI) / totalPersons;
+                const radius = 200;
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+                
                 return (
-                  <div key={person.id} className="relative flex flex-col items-center group">
-                    {/* Connection Line */}
-                    <div className="absolute top-0 left-1/2 w-px h-8 bg-gray-300 transform -translate-x-1/2 -translate-y-8"></div>
-                    
+                  <div 
+                    key={person.id} 
+                    className="absolute flex flex-col items-center group"
+                    style={{
+                      left: `calc(50% + ${x}px - 40px)`,
+                      top: `calc(50% + ${y}px - 40px)`,
+                      zIndex: 2
+                    }}
+                  >
                     {/* Person Avatar */}
                     <div 
                       className={`w-20 h-20 ${categoryInfo?.color || 'bg-gray-500'} rounded-full flex items-center justify-center cursor-pointer transform transition-all duration-300 group-hover:scale-110 shadow-lg`}
