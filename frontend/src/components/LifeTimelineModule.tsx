@@ -65,10 +65,10 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, index, isVisible }) 
           </div>
           
           {/* Middle separator (desktop only) */}
-          <div className="hidden md:block w-2/12"></div>
+          <div className="hidden md:block w-1/12"></div>
           
           {/* Right side - Text content (always on right) */}
-          <div className="md:w-5/12 mt-4 md:mt-0">
+          <div className="md:w-6/12 mt-4 md:mt-0">
             <div className="space-y-2">
               {/* Date and location */}
               <div className="flex flex-col sm:flex-row sm:items-center gap-2">
