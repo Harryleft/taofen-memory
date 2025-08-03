@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { BookOpen, Image, Clock, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import EnhancedHero from '../components/EnhancedHero';
-import PublicationsGallery from '../components/PublicationsGallery';
 import LifeTimelineModule from '../components/LifeTimelineModule';
 import HandwritingModule from '../components/HandwritingModule';
 
@@ -78,9 +77,6 @@ function HomePage() {
 
       {/* Main Content */}
       <main>
-        {/* Publications Gallery */}
-        <PublicationsGallery />
-
         {/* Life Timeline Module */}
         <LifeTimelineModule />
 
