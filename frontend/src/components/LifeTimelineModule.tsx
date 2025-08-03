@@ -344,37 +344,7 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
           transform: translateX(-50%) scale(1.3);
           box-shadow: 0 0 30px rgba(184, 134, 11, 0.6);
         }
-        .expand-indicator {
-          position: absolute;
-          right: 20px;
-          top: 50%;
-          transform: translateY(-50%);
-          width: 36px;
-          height: 36px;
-          border-radius: 50%;
-          background: linear-gradient(135deg, rgba(184, 134, 11, 0.25), rgba(184, 134, 11, 0.4));
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-          border: 2px solid rgba(184, 134, 11, 0.5);
-          backdrop-filter: blur(8px);
-          z-index: 10;
-          box-shadow: 0 3px 12px rgba(184, 134, 11, 0.25);
-        }
-        .expand-indicator.expanded {
-          transform: translateY(-50%) rotate(180deg);
-          background: linear-gradient(135deg, rgba(184, 134, 11, 0.25), rgba(184, 134, 11, 0.35));
-          border-color: rgba(184, 134, 11, 0.5);
-        }
-        .expand-indicator:hover {
-          transform: translateY(-50%) scale(1.15);
-          background: linear-gradient(135deg, rgba(184, 134, 11, 0.25), rgba(184, 134, 11, 0.35));
-          box-shadow: 0 4px 16px rgba(184, 134, 11, 0.3);
-        }
-        .expand-indicator.expanded:hover {
-          transform: translateY(-50%) rotate(180deg) scale(1.15);
-        }
+
         .staggered-animation {
           animation: staggerIn 0.6s ease-out forwards;
           opacity: 0;
@@ -517,17 +487,12 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
                               )}
                             </div>
                             <div className="space-y-1">
-                              <p className="text-charcoal/80 leading-relaxed pr-10">
+                              <p className="text-charcoal/80 leading-relaxed">
                                 {firstEvent.experience}
                               </p>
                             </div>
                           </div>
-                          {/* Expand indicator */}
-                          <div className={`expand-indicator ${isExpanded ? 'expanded' : ''}`}>
-                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                              <path d="M3 4.5L6 7.5L9 4.5" stroke="#B8860B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                          </div>
+
                         </div>
                       </div>
                     </div>
