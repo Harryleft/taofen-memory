@@ -326,10 +326,7 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
           font-weight: 500 !important;
         }
         .first-event-clickable .timeline-dot::before {
-          width: 20px !important;
-          height: 20px !important;
-          border-width: 4px !important;
-          box-shadow: 0 0 25px rgba(184, 134, 11, 0.5) !important;
+          display: none !important;
         }
         .first-event-clickable::after {
           content: '';
