@@ -306,6 +306,31 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
           background: transparent;
           overflow: hidden;
         }
+        /* 核心事件第一个条目的特殊样式 - 更大的字体和图片 */
+        .first-event-clickable .timeline-item {
+          transform: scale(1.1);
+          margin-bottom: 32px;
+        }
+        .first-event-clickable img {
+          max-width: 420px !important;
+          transform: scale(1.15);
+          box-shadow: 0 12px 40px rgba(184, 134, 11, 0.25);
+        }
+        .first-event-clickable .text-sm {
+          font-size: 1rem !important;
+          font-weight: 600 !important;
+        }
+        .first-event-clickable .text-charcoal\/80 {
+          font-size: 1.125rem !important;
+          line-height: 1.75 !important;
+          font-weight: 500 !important;
+        }
+        .first-event-clickable .timeline-dot::before {
+          width: 20px !important;
+          height: 20px !important;
+          border-width: 4px !important;
+          box-shadow: 0 0 25px rgba(184, 134, 11, 0.5) !important;
+        }
         .first-event-clickable::after {
           content: '';
           position: absolute;
@@ -369,6 +394,30 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
             opacity: 1;
             transform: translateY(0);
           }
+        }
+        /* 展开内容中的普通事件样式保持较小 */
+        .space-y-6 .timeline-item {
+          transform: scale(0.95);
+        }
+        .space-y-6 .timeline-item img {
+          max-width: 280px !important;
+          transform: scale(0.85) !important;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+        }
+        .space-y-6 .timeline-item .text-sm {
+          font-size: 0.8rem !important;
+          font-weight: 500 !important;
+        }
+        .space-y-6 .timeline-item .text-charcoal\/80 {
+          font-size: 0.9rem !important;
+          line-height: 1.5 !important;
+          font-weight: 400 !important;
+        }
+        .space-y-6 .timeline-item .timeline-dot::before {
+          width: 12px !important;
+          height: 12px !important;
+          border-width: 2px !important;
+          box-shadow: 0 0 10px rgba(184, 134, 11, 0.2) !important;
         }
         @media (max-width: 768px) {
           .timeline-container::before {
