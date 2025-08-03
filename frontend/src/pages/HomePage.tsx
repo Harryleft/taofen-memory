@@ -1,78 +1,14 @@
-import React, { useState } from 'react';
-import { BookOpen, Image, Clock, MapPin } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import React from 'react';
 import EnhancedHero from '../components/EnhancedHero';
 
-
 function HomePage() {
-  const [activeSection, setActiveSection] = useState('overview');
-
-  const navigationItems = [
-    { id: 'overview', label: '总览', icon: BookOpen },
-    { id: 'timeline', label: '人生大事', icon: Clock },
-    { id: 'handwriting', label: '韬奋手迹', icon: Image }
-  ];
-
-  const scrollToSection = (sectionId: string) => {
-    setActiveSection(sectionId);
-    const element = document.getElementById(sectionId);
-    element?.scrollIntoView({ behavior: 'smooth' });
-  };
 
   return (
     <div className="min-h-screen bg-cream">
       {/* Enhanced Hero Section */}
       <EnhancedHero />
 
-      {/* Navigation */}
-      <nav id="main-content" className="sticky top-0 bg-cream/95 backdrop-blur-sm border-b border-gold/20 z-40">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-8">
-              <h2 className="text-2xl font-bold text-charcoal">数字人文纪念馆</h2>
-              
-              {/* Navigation Menu */}
-              <div className="hidden md:flex items-center gap-6">
-                {navigationItems.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => scrollToSection(item.id)}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 ${
-                        activeSection === item.id
-                          ? 'bg-gold text-cream'
-                          : 'text-charcoal hover:bg-gold/10 hover:text-gold'
-                      }`}
-                    >
-                      <Icon size={18} />
-                      {item.label}
-                    </button>
-                  );
-                })}
-                
-                {/* 完整时间线页面链接 */}
-                <Link
-                  to="/timeline"
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 text-charcoal hover:bg-gold/10 hover:text-gold"
-                >
-                  <Clock size={18} />
-                  完整时间线
-                </Link>
-                
-                {/* 书店时间线页面链接 */}
-                <Link
-                  to="/bookstore-timeline"
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 text-charcoal hover:bg-gold/10 hover:text-gold"
-                >
-                  <MapPin size={18} />
-                  生活书店
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </nav>
+
 
       {/* Main Content */}
       <main>
