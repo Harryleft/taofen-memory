@@ -346,11 +346,11 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
         }
         .expand-indicator {
           position: absolute;
-          right: 16px;
+          right: 8px;
           top: 50%;
           transform: translateY(-50%);
-          width: 32px;
-          height: 32px;
+          width: 28px;
+          height: 28px;
           border-radius: 50%;
           background: linear-gradient(135deg, rgba(184, 134, 11, 0.15), rgba(184, 134, 11, 0.25));
           display: flex;
@@ -359,6 +359,7 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
           transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
           border: 2px solid rgba(184, 134, 11, 0.3);
           backdrop-filter: blur(8px);
+          z-index: 10;
         }
         .expand-indicator.expanded {
           transform: translateY(-50%) rotate(180deg);
@@ -427,9 +428,13 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
             padding: 12px;
           }
           .expand-indicator {
-            right: 12px;
-            width: 20px;
-            height: 20px;
+            right: 4px;
+            width: 24px;
+            height: 24px;
+          }
+          .expand-indicator svg {
+            width: 10px;
+            height: 10px;
           }
         }
         .timeline-progress {
