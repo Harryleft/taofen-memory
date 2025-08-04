@@ -150,38 +150,117 @@ export default function RelationshipsPage() {
       
       {/* Person Detail Modal */}
       {selectedPerson && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full">
-            <div className="text-center">
-              {selectedPerson.img ? (
-                <img 
-                  src={selectedPerson.img} 
-                  alt={selectedPerson.name}
-                  className="w-20 h-20 rounded-full mx-auto mb-4 object-cover border-4 border-gray-200"
-                />
-              ) : (
-                <div className={`w-20 h-20 ${getCategoryColor(selectedPerson.category)} rounded-full flex items-center justify-center mx-auto mb-4`}>
-                  <span className="text-white font-medium">{selectedPerson.name}</span>
-                </div>
-              )}
-              <h2 className="text-xl font-bold text-gray-800 mb-2">{selectedPerson.name}</h2>
-              <p className="text-gray-600 mb-4">{selectedPerson.category}</p>
-              <p className="text-gray-700 mb-6">{selectedPerson.desc}</p>
-              {selectedPerson.sources && selectedPerson.sources.length > 0 && (
-                <div className="mb-4">
-                  <h3 className="text-sm font-semibold text-gray-600 mb-2">相关资料：</h3>
-                  <ul className="text-sm text-gray-500 space-y-1">
-                    {selectedPerson.sources.map((source, index) => (
-                      <li key={index}>{source}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="relative bg-gradient-to-br from-cream/50 to-gold/20 rounded-t-3xl p-8 text-center">
               <button 
                 onClick={() => setSelectedPerson(null)}
-                className="bg-pink-500 text-white px-6 py-2 rounded-full hover:bg-pink-600 transition-colors"
+                className="absolute top-4 right-4 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110"
               >
-                关闭
+                <span className="text-gray-600 text-lg leading-none">×</span>
+              </button>
+              
+              {selectedPerson.img ? (
+                <div className="relative inline-block">
+                  <img 
+                    src={selectedPerson.img} 
+                    alt={selectedPerson.name}
+                    className="w-24 h-24 rounded-full mx-auto object-cover border-4 border-white shadow-lg"
+                  />
+                  <div className={`absolute -bottom-2 -right-2 w-8 h-8 ${getCategoryColor(selectedPerson.category)} rounded-full border-3 border-white flex items-center justify-center`}>
+                    {categories.find(cat => cat.id === selectedPerson.category)?.icon && 
+                      React.createElement(categories.find(cat => cat.id === selectedPerson.category)!.icon, { size: 16, className: "text-white" })
+                    }
+                  </div>
+                </div>
+              ) : (
+                <div className={`w-24 h-24 ${getCategoryColor(selectedPerson.category)} rounded-full flex items-center justify-center mx-auto shadow-lg`}>
+                  <span className="text-white font-bold text-2xl">{selectedPerson.name.charAt(0)}</span>
+                </div>
+              )}
+              
+              <h2 className="text-2xl font-bold text-charcoal mt-4 mb-2">{selectedPerson.name}</h2>
+              <div className={`inline-block px-4 py-1 rounded-full text-sm font-medium text-white ${getCategoryColor(selectedPerson.category)}`}>
+                {selectedPerson.category}
+              </div>
+            </div>
+            
+            {/* Content */}
+            <div className="p-8">
+              {/* Description */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-charcoal mb-3 flex items-center gap-2">
+                  <BookOpen size={18} className="text-gold" />
+                  人物简介
+                </h3>
+                <p className="text-gray-700 leading-relaxed bg-gray-50 rounded-xl p-4">{selectedPerson.desc}</p>
+              </div>
+              
+              {/* Sources */}
+              {selectedPerson.sources && selectedPerson.sources.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-charcoal mb-3 flex items-center gap-2">
+                    <BookOpen size={18} className="text-gold" />
+                    相关资料
+                  </h3>
+                  <div className="space-y-2">
+                    {selectedPerson.sources.map((source, index) => {
+                      const hasLink = selectedPerson.link && selectedPerson.link[index];
+                      return (
+                        <div key={index} className="bg-gray-50 rounded-lg p-3 hover:bg-gray-100 transition-colors">
+                          {hasLink ? (
+                            <a 
+                              href={selectedPerson.link[index]} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="flex items-center justify-between text-gray-700 hover:text-gold transition-colors group"
+                            >
+                              <span className="flex-1">{source}</span>
+                              <ExternalLink size={16} className="text-gray-400 group-hover:text-gold ml-2" />
+                            </a>
+                          ) : (
+                            <span className="text-gray-700">{source}</span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+              
+              {/* Links */}
+              {selectedPerson.link && selectedPerson.link.length > 0 && selectedPerson.link.some(link => link && !selectedPerson.sources.includes(link)) && (
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-charcoal mb-3 flex items-center gap-2">
+                    <ExternalLink size={18} className="text-gold" />
+                    相关链接
+                  </h3>
+                  <div className="space-y-2">
+                    {selectedPerson.link.filter(link => link && !selectedPerson.sources.includes(link)).map((link, index) => (
+                      <a 
+                        key={index}
+                        href={link} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-gold hover:text-gold/80 transition-colors bg-gold/10 rounded-lg p-3 hover:bg-gold/20"
+                      >
+                        <ExternalLink size={16} />
+                        <span className="truncate">{link}</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {/* Footer */}
+            <div className="px-8 pb-8">
+              <button 
+                onClick={() => setSelectedPerson(null)}
+                className="w-full bg-gradient-to-r from-gold to-gold/80 text-white py-3 rounded-xl font-medium hover:from-gold/90 hover:to-gold/70 transition-all duration-200 shadow-lg hover:shadow-xl"
+              >
+                关闭详情
               </button>
             </div>
           </div>
