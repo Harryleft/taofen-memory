@@ -123,25 +123,6 @@ export default function RelationshipsPage() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-12">
-        {/* 邹韬奋中心卡片 */}
-        {/* <div className="bg-gradient-to-br from-gold/20 to-cream/30 rounded-2xl p-10 mb-8 shadow-xl border border-gold/30">
-          <div className="flex flex-col md:flex-row items-center gap-8">
-            <div className="flex-shrink-0">
-              <div className="relative">
-                <img
-                  src={taofen.img}
-                  alt={taofen.name}
-                  className="w-32 h-32 rounded-full object-cover border-4 border-gold shadow-lg"
-                />
-              </div>
-            </div>
-            <div className="flex-1 text-center md:text-left">
-              <h2 className="text-4xl font-bold text-charcoal mb-2">{taofen.name}</h2>
-              <p className="text-xl text-gray-600 mb-4">{taofen.desc}</p>
-            </div>
-          </div>
-        </div> */}
-
         {/* 人物关系瀑布流 */}
         <div className="bg-cream/30 rounded-3xl p-8 shadow-xl border border-gray-200">
           <h2 className="text-2xl font-bold text-charcoal mb-6 text-center">
