@@ -180,13 +180,6 @@ export default function RelationshipsPage() {
                     <div className={`px-3 py-1 rounded-full text-xs font-medium text-white ${getCategoryColor(person.category)}`}>
                       {person.category}
                     </div>
-                    
-                    {/* 资料来源数量 */}
-                    {person.sources.length > 0 && (
-                      <div className="mt-3 text-xs text-gray-400">
-                        {person.sources.length} 个资料来源
-                      </div>
-                    )}
                   </div>
                 </div>
               );
