@@ -40,12 +40,10 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
     return Math.max(MIN_COLUMNS, Math.min(MAX_COLUMNS, possibleColumns));
   }, []);
   
-  // 估算卡片高度（基于内容长度）
+  // 估算卡片高度（统一高度，不再基于内容长度）
   const estimateCardHeight = useCallback((person: Person) => {
-    const baseHeight = 280; // 基础高度
-    const descLines = Math.ceil(person.desc.length / 40); // 估算描述行数
-    const sourceHeight = person.sources.length > 0 ? 30 : 0; // 资料来源高度
-    return baseHeight + (descLines - 2) * 20 + sourceHeight;
+    const baseHeight = 200; // 统一基础高度
+    return baseHeight;
   }, []);
   
   // 瀑布流布局算法
@@ -182,22 +180,10 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
                   {person.name}
                 </h3>
                 
-                {/* 关系描述 */}
-                <p className="text-sm text-gray-600 mb-3 leading-relaxed">
-                  {person.desc}
-                </p>
-                
                 {/* 分类标签 */}
-                <div className={`px-3 py-1 rounded-full text-xs font-medium text-white ${getCategoryColor(person.category)} mb-2`}>
+                <div className={`px-3 py-1 rounded-full text-xs font-medium text-white ${getCategoryColor(person.category)}`}>
                   {person.category}
                 </div>
-                
-                {/* 资料来源数量 */}
-                {person.sources.length > 0 && (
-                  <div className="text-xs text-gray-400">
-                    {person.sources.length} 个资料来源
-                  </div>
-                )}
               </div>
             </div>
           );
