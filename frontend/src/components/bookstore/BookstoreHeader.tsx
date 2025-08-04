@@ -1,11 +1,12 @@
 import React from 'react';
+import { BOOKSTORE_FONTS, BOOKSTORE_STYLES } from '../../styles/bookstore';
 
 const BookstoreHeader = () => (
-  <div className="text-center mb-16">
-    <h2 className="text-5xl font-bold text-charcoal mb-6" style={{ fontFamily: "'FangSong', 'STFangSong', '华文仿宋', serif" }}>
+  <div className={BOOKSTORE_STYLES.header.container}>
+    <h2 className={BOOKSTORE_STYLES.header.title} style={{ fontFamily: BOOKSTORE_FONTS.fangsong }}>
       韬奋·时光书影
     </h2>
-    <p className="text-lg text-charcoal/70 mb-2" style={{ fontFamily: "'KaiTi', 'STKaiti', '华文楷体', serif" }}>
+    <p className={BOOKSTORE_STYLES.header.subtitle} style={{ fontFamily: BOOKSTORE_FONTS.kai }}>
       探寻生活书店出版文化印记
     </p>
   </div>

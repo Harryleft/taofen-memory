@@ -16,16 +16,17 @@ import BookstoreHeader from './BookstoreHeader';
 import BookstoreFilters from './BookstoreFilters';
 import BookGrid from './BookGrid';
 import BookLightbox from './BookLightbox';
+import { BOOKSTORE_CONSTANTS, BOOKSTORE_STYLES, BOOKSTORE_FONTS } from '../../styles/bookstore';
 
 import { useBookData } from '../../hooks/useBookData';
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
 import { useLightbox } from '../../hooks/useLightbox';
 import { useResponsiveColumns } from '../../hooks/useResponsiveColumns';
 
-// UI常量配置
-const SEARCH_DEBOUNCE_DELAY = 300;   // 搜索防抖延迟(ms)
-const COLUMN_GAP = 20;               // 瀑布流列间距(px)
-const LOAD_MORE_INDICATOR_HEIGHT = 4; // 加载指示器高度(tailwind单位)
+// 使用配置常量
+const SEARCH_DEBOUNCE_DELAY = BOOKSTORE_CONSTANTS.searchDebounceDelay;
+const COLUMN_GAP = BOOKSTORE_CONSTANTS.columnGap;
+const LOAD_MORE_INDICATOR_HEIGHT = BOOKSTORE_CONSTANTS.loadMoreIndicatorHeight;
 
 interface BookstoreTimelineModuleProps {
   className?: string;
@@ -145,9 +146,9 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
       <section className={`relative py-20 bg-white ${className}`}>
         <div className="max-w-7xl mx-auto px-6">
           <BookstoreHeader />
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gold"></div>
-            <span className="ml-3 text-charcoal/60" style={{fontFamily: "'SimSun', '宋体', 'NSimSun', serif"}}>正在加载书籍数据...</span>
+          <div className={BOOKSTORE_STYLES.loading.container}>
+            <div className={BOOKSTORE_STYLES.loading.spinner}></div>
+            <span className={BOOKSTORE_STYLES.loading.text} style={{fontFamily: BOOKSTORE_FONTS.song}}>正在加载书籍数据...</span>
           </div>
         </div>
       </section>
@@ -188,10 +189,10 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
 
             {/* 加载更多指示器 */}
             {isLoading && (
-              <div className="text-center py-8">
-                <div className="flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gold mr-3"></div>
-                  <span className="text-charcoal/60" style={{fontFamily: "'SimSun', '宋体', 'NSimSun', serif"}}>正在加载更多...</span>
+              <div className={BOOKSTORE_STYLES.loading.loadMore.container}>
+                 <div className={BOOKSTORE_STYLES.loading.loadMore.wrapper}>
+                   <div className={BOOKSTORE_STYLES.loading.loadMore.spinner}></div>
+                   <span className={BOOKSTORE_STYLES.loading.loadMore.text} style={{fontFamily: BOOKSTORE_FONTS.song}}>正在加载更多...</span>
                 </div>
               </div>
             )}

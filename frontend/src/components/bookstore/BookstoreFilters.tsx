@@ -1,5 +1,6 @@
 import React from 'react';
 import { Search, Download } from 'lucide-react';
+import { BOOKSTORE_FONTS, BOOKSTORE_STYLES } from '../../styles/bookstore';
 
 interface BookstoreFiltersProps {
   searchTerm: string;
@@ -24,16 +25,16 @@ const BookstoreFilters: React.FC<BookstoreFiltersProps> = ({
   uniqueYears,
   onDownload,
 }) => (
-  <div className="flex flex-wrap gap-4 mb-8 justify-center">
-    <div className="relative">
-      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-charcoal/60" size={20} />
+  <div className={BOOKSTORE_STYLES.filters.container}>
+    <div className={BOOKSTORE_STYLES.filters.searchInput.container}>
+      <Search className={BOOKSTORE_STYLES.filters.searchInput.icon} size={20} />
       <input
         type="text"
         placeholder="搜索书籍、作者、出版社..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="pl-10 pr-4 py-2 bg-white border border-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50 w-80"
-        style={{ fontFamily: "'SimSun', '宋体', 'NSimSun', serif" }}
+        className={BOOKSTORE_STYLES.filters.searchInput.input}
+        style={{ fontFamily: BOOKSTORE_FONTS.song }}
       />
     </div>
     
@@ -41,8 +42,8 @@ const BookstoreFilters: React.FC<BookstoreFiltersProps> = ({
     <select
       value={selectedYear}
       onChange={(e) => setSelectedYear(e.target.value)}
-      className="px-4 py-2 bg-white border border-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50"
-      style={{ fontFamily: "'SimSun', '宋体', 'NSimSun', serif" }}
+      className={BOOKSTORE_STYLES.filters.select}
+      style={{ fontFamily: BOOKSTORE_FONTS.song }}
     >
       <option value="all">全部年份</option>
       {uniqueYears.map(year => (
@@ -52,8 +53,8 @@ const BookstoreFilters: React.FC<BookstoreFiltersProps> = ({
 
     <button
       onClick={onDownload}
-      className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-gold/30 text-charcoal rounded-lg hover:bg-gold/5 hover:border-gold/60 focus:outline-none focus:ring-2 focus:ring-gold/30 transition-all duration-300 shadow-sm hover:shadow-md"
-      style={{ fontFamily: "'KaiTi', 'STKaiti', '华文楷体', serif" }}
+      className={BOOKSTORE_STYLES.filters.downloadButton}
+      style={{ fontFamily: BOOKSTORE_FONTS.kai }}
       title="下载全部书籍数据为CSV文件"
     >
       <Download size={18} className="text-gold" />

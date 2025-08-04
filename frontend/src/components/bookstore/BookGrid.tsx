@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { BookItem } from '../../types/bookTypes';
 import BookCard from './BookCard';
+import { BOOKSTORE_STYLES, BOOKSTORE_FONTS } from '../../styles/bookstore';
 
 // 添加调试常量
 const DEBUG = true;
@@ -51,15 +52,15 @@ const BookGrid: React.FC<BookGridProps> = ({
   if (columnArrays.length === 0) {
     return (
       <div className="w-full text-center py-8">
-        <p className="text-charcoal/60" style={{ fontFamily: "'SimSun', '宋体', 'NSimSun', serif" }}>无数据可显示</p>
+        <p className="text-charcoal/60" style={{ fontFamily: BOOKSTORE_FONTS.song }}>无数据可显示</p>
       </div>
     );
   }
 
   return (
-    <div className="flex gap-5">
+    <div className={BOOKSTORE_STYLES.grid.container}>
       {columnArrays.map((column, columnIndex) => (
-        <div key={columnIndex} className="flex-1 flex flex-col gap-5">
+        <div key={columnIndex} className={BOOKSTORE_STYLES.grid.column}>
           {column.map((item) => {
             const isVisible = visibleItems.has(item.id);
             return (
@@ -67,7 +68,6 @@ const BookGrid: React.FC<BookGridProps> = ({
                 key={item.id}
                 item={item}
                 isVisible={isVisible}
-                //【修改】移除 isRapidScrolling prop
                 columnIndex={columnIndex}
                 onOpenLightbox={onOpenLightbox}
               />
