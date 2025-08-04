@@ -21,14 +21,14 @@ const MASONRY_CONFIG = {
   layout: {
     CARD_WIDTH: 100,
     GAP: 5, // 基础间距，实际使用时会添加随机变化
-    GAP_MIN: 8, // 最小随机间距
-    GAP_MAX: 15, // 最大随机间距
+     GAP_MIN: 5, // 最小随机间距（减少以降低累积效应）
+     GAP_MAX: 10, // 最大随机间距（减少以降低累积效应）
     MIN_COLUMNS: 1,
     MAX_COLUMNS: 4,
     BASE_HEIGHT: 280, // 基础高度，会根据内容动态调整
-    HEIGHT_PER_CHAR: 1.2, // 每个字符增加的高度
-    MIN_HEIGHT: 250, // 最小卡片高度
-    MAX_HEIGHT: 400 // 最大卡片高度
+     HEIGHT_PER_CHAR: 0.8, // 每个字符增加的高度（降低以减少空白）
+     MIN_HEIGHT: 250, // 最小卡片高度
+     MAX_HEIGHT: 350 // 最大卡片高度（降低以减少过度估算）
   },
   lazyLoad: {
     INITIAL_ITEMS: 20,
