@@ -164,7 +164,7 @@ export default function RelationshipsPage() {
                   <img 
                     src={selectedPerson.img} 
                     alt={selectedPerson.name}
-                    className="w-24 h-24 rounded-full mx-auto object-cover border-4 border-white shadow-lg"
+                    className="w-20 h-20 rounded-full mx-auto object-cover border-4 border-white shadow-lg"
                   />
                   <div className={`absolute -bottom-2 -right-2 w-8 h-8 ${getCategoryColor(selectedPerson.category)} rounded-full border-3 border-white flex items-center justify-center`}>
                     {categories.find(cat => cat.id === selectedPerson.category)?.icon && 
