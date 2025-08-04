@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 const SCROLL_SPEED_THRESHOLD = 30;
-const SCROLL_RESET_DELAY = 500;
+const SCROLL_RESET_DELAY = 1500; // 增加延迟时间，减少频繁状态切换
 const INITIAL_VISIBLE_COUNT = 20;
 const VISIBILITY_DELAY = 100;
 const OBSERVER_DELAY = 20;
@@ -137,7 +137,10 @@ export const useInfiniteScroll = ({
       
       if (scrollSpeed > SCROLL_SPEED_THRESHOLD) {
         logDebug('检测到快速滚动', scrollSpeed);
-        setIsRapidScrolling(true);
+        // 防抖：只有在当前不是快速滚动状态时才设置为true
+        if (!isRapidScrolling) {
+          setIsRapidScrolling(true);
+        }
         const viewportHeight = window.innerHeight;
         const scrollTop = window.scrollY;
         const triggerZone = scrollTop + viewportHeight + 400;
@@ -163,12 +166,18 @@ export const useInfiniteScroll = ({
         updateVisibleItems(newVisibleIds);
       }
       
-      if (timersRef.current.scroll) clearTimeout(timersRef.current.scroll);
+      // 清除之前的重置定时器
+      if (timersRef.current.scroll) {
+        clearTimeout(timersRef.current.scroll);
+      }
       
-      timersRef.current.scroll = setTimeout(() => {
-        logDebug('重置快速滚动状态');
-        setIsRapidScrolling(false);
-      }, SCROLL_RESET_DELAY);
+      // 设置新的重置定时器，只有在当前是快速滚动状态时才需要重置
+      if (isRapidScrolling || scrollSpeed > SCROLL_SPEED_THRESHOLD) {
+        timersRef.current.scroll = setTimeout(() => {
+          logDebug('重置快速滚动状态');
+          setIsRapidScrolling(false);
+        }, SCROLL_RESET_DELAY);
+      }
     };
 
     logDebug('添加滚动事件监听器');
