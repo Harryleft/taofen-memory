@@ -3,10 +3,7 @@ import { Users, Heart, BookOpen, GraduationCap, Building } from 'lucide-react';
 import MasonryGrid from '../components/MasonryGrid';
 import PersonDetailModal from '../components/PersonDetailModal';
 import { Person } from '../types/Person';
-
-interface RelationshipsData {
-  persons: Person[];
-}
+import { useRelationshipsData } from '../hooks/useRelationshipsData';
 
 // 关系页面配置常量
 const RELATIONSHIPS_CONFIG = {
@@ -96,26 +93,7 @@ const categories = [
 export default function RelationshipsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
-  const [persons, setPersons] = useState<Person[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  // 加载真实数据
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const response = await fetch('/data/relationships.json');
-        const data: RelationshipsData = await response.json();
-        // 过滤掉邹韬奋本人，只保留其他人物
-        const filteredPersons = data.persons.filter(person => person.id !== RELATIONSHIPS_CONFIG.person.TAOFEN_ID);
-        setPersons(filteredPersons);
-        setLoading(false);
-      } catch (error) {
-        console.error('Failed to load relationships data:', error);
-        setLoading(false);
-      }
-    };
-    loadData();
-  }, []);
+  const { persons, loading, error } = useRelationshipsData();
 
   // ESC键关闭详情卡片
   useEffect(() => {
@@ -150,6 +128,17 @@ export default function RelationshipsPage() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-charcoal mx-auto mb-4"></div>
           <p className="text-gray-600">加载中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center text-red-500">
+          <p>数据加载失败，请稍后重试。</p>
+          <p className="text-sm text-gray-500">{error.message}</p>
         </div>
       </div>
     );
