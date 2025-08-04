@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, ExternalLink } from 'lucide-react';
+import { BookOpen, ExternalLink, FileText } from 'lucide-react';
 import { Person } from '../types/Person';
 
 // 人物详情模态框配置常量
