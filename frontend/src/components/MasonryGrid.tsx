@@ -67,8 +67,8 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
   const estimateCardHeight = useCallback((person: Person) => {
     let height = MASONRY_CONFIG.layout.BASE_HEIGHT;
 
-    if (person.desc) {
-      const descLength = person.desc.length;
+    if (person.description) {
+      const descLength = person.description.length;
       const additionalHeight = Math.min(
         descLength * MASONRY_CONFIG.layout.HEIGHT_PER_CHAR,
         MASONRY_CONFIG.layout.MAX_HEIGHT - MASONRY_CONFIG.layout.BASE_HEIGHT
@@ -287,11 +287,11 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
                   {person.name}
                 </h3>
 
-                {person.desc && (
+                {person.description && (
                   <p className={masonryStyles.card.description}>
-                    {person.desc.length > MASONRY_CONFIG.ui.DESC_MAX_LENGTH
-                      ? `${person.desc.substring(0, MASONRY_CONFIG.ui.DESC_MAX_LENGTH)}...`
-                      : person.desc
+                    {person.description.length > MASONRY_CONFIG.ui.DESC_MAX_LENGTH
+                      ? `${person.description.substring(0, MASONRY_CONFIG.ui.DESC_MAX_LENGTH)}...`
+                      : person.description
                     }
                   </p>
                 )}
