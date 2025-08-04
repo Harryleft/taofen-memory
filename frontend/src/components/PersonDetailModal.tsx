@@ -35,7 +35,7 @@ const MODAL_CONFIG = {
   },
   layout: {
     zIndex: {
-      MODAL: 50
+      MODAL: 9999
     },
     opacity: {
       MODAL_BACKDROP: 60,
