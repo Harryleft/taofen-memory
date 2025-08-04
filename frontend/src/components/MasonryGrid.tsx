@@ -15,6 +15,26 @@ interface MasonryItem {
   top: number;
 }
 
+// 配置常量
+const MASONRY_CONFIG = {
+  layout: {
+    CARD_WIDTH: 150,
+    GAP: 5,
+    MIN_COLUMNS: 1,
+    MAX_COLUMNS: 5,
+    BASE_HEIGHT: 180
+  },
+  lazyLoad: {
+    INITIAL_ITEMS: 20,
+    LOAD_THRESHOLD: 200,
+    ITEMS_PER_LOAD: 10,
+    LOAD_DELAY: 300
+  },
+  ui: {
+    ICON_SIZE: 12
+  }
+};
+
 const MasonryGrid: React.FC<MasonryGridProps> = ({ 
   items, 
   onItemClick, 
@@ -24,26 +44,19 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [masonryItems, setMasonryItems] = useState<MasonryItem[]>([]);
   const [containerWidth, setContainerWidth] = useState(0);
-  const [visibleItems, setVisibleItems] = useState<number>(20); // 懒加载初始数量
+  const [visibleItems, setVisibleItems] = useState<number>(MASONRY_CONFIG.lazyLoad.INITIAL_ITEMS);
   const [isLoading, setIsLoading] = useState(false);
-  
-  // 卡片基础配置（纵向长方形）
-  const CARD_WIDTH = 220; // 减小宽度
-  const GAP = 16; // 减少间距，让布局更紧凑
-  const MIN_COLUMNS = 1;
-  const MAX_COLUMNS = 6; // 增加最大列数以适应更窄的卡片
   
   // 计算列数
   const getColumnCount = useCallback((width: number) => {
-    const availableWidth = width - GAP;
-    const possibleColumns = Math.floor(availableWidth / (CARD_WIDTH + GAP));
-    return Math.max(MIN_COLUMNS, Math.min(MAX_COLUMNS, possibleColumns));
+    const availableWidth = width - MASONRY_CONFIG.layout.GAP;
+    const possibleColumns = Math.floor(availableWidth / (MASONRY_CONFIG.layout.CARD_WIDTH + MASONRY_CONFIG.layout.GAP));
+    return Math.max(MASONRY_CONFIG.layout.MIN_COLUMNS, Math.min(MASONRY_CONFIG.layout.MAX_COLUMNS, possibleColumns));
   }, []);
   
   // 估算卡片高度（纵向长方形，高度大于宽度）
   const estimateCardHeight = useCallback((person: Person) => {
-    const baseHeight = 280; // 增加高度，形成纵向长方形
-    return baseHeight;
+    return MASONRY_CONFIG.layout.BASE_HEIGHT;
   }, []);
   
   // 瀑布流布局算法
@@ -65,7 +78,7 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
       });
       
       // 更新列高度
-      columnHeights[shortestColumnIndex] += estimatedHeight + GAP;
+      columnHeights[shortestColumnIndex] += estimatedHeight + MASONRY_CONFIG.layout.GAP;
     });
     
     return layoutItems;
@@ -101,13 +114,13 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
     const windowHeight = window.innerHeight;
     const documentHeight = document.documentElement.scrollHeight;
     
-    // 当滚动到距离底部200px时加载更多
-    if (scrollTop + windowHeight >= documentHeight - 200) {
+    // 当滚动到距离底部时加载更多
+    if (scrollTop + windowHeight >= documentHeight - MASONRY_CONFIG.lazyLoad.LOAD_THRESHOLD) {
       setIsLoading(true);
       setTimeout(() => {
-        setVisibleItems(prev => Math.min(prev + 10, items.length));
+        setVisibleItems(prev => Math.min(prev + MASONRY_CONFIG.lazyLoad.ITEMS_PER_LOAD, items.length));
         setIsLoading(false);
-      }, 300);
+      }, MASONRY_CONFIG.lazyLoad.LOAD_DELAY);
     }
   }, [isLoading, visibleItems, items.length]);
   
@@ -118,13 +131,13 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
   
   // 计算容器高度
   const containerHeight = masonryItems.length > 0 
-    ? Math.max(...masonryItems.map(item => item.top + item.height)) + GAP
+    ? Math.max(...masonryItems.map(item => item.top + item.height)) + MASONRY_CONFIG.layout.GAP
     : 0;
   
   const columnCount = getColumnCount(containerWidth);
   const columnWidth = containerWidth > 0 
-    ? (containerWidth - GAP * (columnCount + 1)) / columnCount 
-    : CARD_WIDTH;
+    ? (containerWidth - MASONRY_CONFIG.layout.GAP * (columnCount + 1)) / columnCount 
+    : MASONRY_CONFIG.layout.CARD_WIDTH;
   
   return (
     <div className="w-full">
@@ -138,7 +151,7 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
           const categoryInfo = categories.find(cat => cat.id === person.category);
           const Icon = categoryInfo?.icon;
           
-          const left = GAP + column * (columnWidth + GAP);
+          const left = MASONRY_CONFIG.layout.GAP + column * (columnWidth + MASONRY_CONFIG.layout.GAP);
           
           return (
             <div
@@ -191,7 +204,7 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
                   {/* 分类图标 */}
                   {Icon && (
                     <div className={`absolute -bottom-1 -right-1 ${getCategoryColor(person.category)} rounded-full p-1.5 border-2 border-white shadow-md`}>
-                      <Icon size={12} className="text-white" />
+                      <Icon size={MASONRY_CONFIG.ui.ICON_SIZE} className="text-white" />
                     </div>
                   )}
                 </div>
