@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Heart, BookOpen, GraduationCap, Building, ExternalLink } from 'lucide-react';
+import { Users, Heart, BookOpen, GraduationCap, Building, ExternalLink, Share } from 'lucide-react';
 import MasonryGrid from '../components/MasonryGrid';
 import { Person } from '../types/Person';
 
@@ -218,7 +218,7 @@ export default function RelationshipsPage() {
               {selectedPerson.sources && selectedPerson.sources.length > 0 && (
                 <div className="mb-6">
                   <h3 className="text-lg font-semibold text-charcoal mb-3 flex items-center gap-2">
-                    <BookOpen size={18} className="text-gold" />
+                    <Share size={18} className="text-gold" />
                     相关资料
                   </h3>
                   <div className="space-y-2">
