@@ -179,26 +179,19 @@ export default function RelationshipsPage() {
       {/* Main Content */}
       <div className={`max-w-7xl mx-auto px-${RELATIONSHIPS_CONFIG.ui.spacing.LARGE} py-${RELATIONSHIPS_CONFIG.ui.spacing.XXLARGE}`}>
         {/* 人物关系瀑布流 */}
-        <div className={`bg-cream/${RELATIONSHIPS_CONFIG.layout.opacity.CONTENT_BG} rounded-3xl p-${RELATIONSHIPS_CONFIG.ui.spacing.XLARGE} shadow-xl border border-gray-200`}>
-          {/* <h2 className={`text-2xl font-bold text-charcoal mb-${RELATIONSHIPS_CONFIG.ui.spacing.LARGE} text-center`}> */}
-            {/* {selectedCategory === 'all' ? '全部关系人物' : categories.find(cat => cat.id === selectedCategory)?.name} */}
-            {/* <span className="text-lg font-normal text-gray-500 ml-2">({filteredPersons.length}人)</span> */}
-          {/* </h2> */}
-          
-          {filteredPersons.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="text-gray-400 text-lg mb-2">暂无相关人物</div>
-              <div className="text-gray-500 text-sm">请尝试选择其他分类</div>
-            </div>
-          ) : (
-            <MasonryGrid
-              items={filteredPersons}
-              onItemClick={setSelectedPerson}
-              getCategoryColor={getCategoryColor}
-              categories={categories}
-            />
-          )}
-        </div>
+        {filteredPersons.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="text-gray-400 text-lg mb-2">暂无相关人物</div>
+            <div className="text-gray-500 text-sm">请尝试选择其他分类</div>
+          </div>
+        ) : (
+          <MasonryGrid
+            items={filteredPersons}
+            onItemClick={setSelectedPerson}
+            getCategoryColor={getCategoryColor}
+            categories={categories}
+          />
+        )}
       </div>
       
       {/* Person Detail Modal */}
