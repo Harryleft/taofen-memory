@@ -21,9 +21,15 @@ export function useRelationshipsData() {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data: RelationshipsData = await response.json();
+        const rawData = await response.json();
+        // 转换数据格式，将原始数据转换为组件期望的格式
+        const transformedPersons: Person[] = rawData.persons.map((rawPerson: any) => ({
+          ...rawPerson,
+          description: rawPerson.desc, // 将desc转换为description
+          sources: rawPerson.sources.map((source: string) => ({ title: source })) // 将字符串数组转换为对象数组
+        }));
         // 过滤掉邹韬奋本人，只保留其他人脉关系
-        const filteredPersons = data.persons.filter(person => person.id !== TAOFEN_ID);
+        const filteredPersons = transformedPersons.filter(person => person.id !== TAOFEN_ID);
         setPersons(filteredPersons);
       } catch (e) {
         if (e instanceof Error) {

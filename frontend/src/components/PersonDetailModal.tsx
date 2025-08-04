@@ -11,11 +11,12 @@ import {
 
 interface PersonDetailModalProps {
   person: Person | null;
+  isOpen: boolean;
   onClose: () => void;
 }
 
-const PersonDetailModal: React.FC<PersonDetailModalProps> = ({ person, onClose }) => {
-  if (!person) return null;
+const PersonDetailModal: React.FC<PersonDetailModalProps> = ({ person, isOpen, onClose }) => {
+  if (!person || !isOpen) return null;
 
   // 处理ESC键关闭
   React.useEffect(() => {
