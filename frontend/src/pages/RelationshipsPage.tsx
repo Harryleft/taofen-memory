@@ -1,15 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Heart, BookOpen, GraduationCap, Building, ExternalLink } from 'lucide-react';
-
-interface Person {
-  id: number;
-  name: string;
-  category: string;
-  img: string;
-  desc: string;
-  sources: string[];
-  link: string[];
-}
+import MasonryGrid from '../components/MasonryGrid';
+import { Person } from '../types/Person';
 
 interface RelationshipsData {
   persons: Person[];
@@ -133,64 +125,25 @@ export default function RelationshipsPage() {
           </div>
         </div>
 
-        {/* 人物关系卡片网格 */}
-        <div className="bg-cream/30 rounded-3xl p-8 shadow-xl border border-gray-200">          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredPersons.map((person) => {
-              const categoryInfo = categories.find(cat => cat.id === person.category);
-              const Icon = categoryInfo?.icon || Users;
-              
-              return (
-                <div
-                  key={person.id}
-                  className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100 hover:border-gray-200 group"
-                  onClick={() => setSelectedPerson(person)}
-                >
-                  <div className="flex flex-col items-center text-center">
-                    {/* 头像或占位符 */}
-                    <div className="relative mb-4">
-                      {person.img ? (
-                        <img
-                          src={person.img}
-                          alt={person.name}
-                          className="w-20 h-20 rounded-full object-cover border-2 border-gray-200 group-hover:border-gray-300 transition-colors"
-                        />
-                      ) : (
-                        <div className={`w-20 h-20 rounded-full ${getCategoryColor(person.category)} flex items-center justify-center text-white text-2xl font-bold`}>
-                          {person.name.charAt(0)}
-                        </div>
-                      )}
-                      {/* 分类图标 */}
-                      <div className={`absolute -bottom-1 -right-1 ${getCategoryColor(person.category)} rounded-full p-2 border-2 border-white`}>
-                        <Icon size={16} className="text-white" />
-                      </div>
-                    </div>
-                    
-                    {/* 姓名 */}
-                    <h3 className="text-lg font-semibold text-charcoal mb-2 group-hover:text-gold transition-colors">
-                      {person.name}
-                    </h3>
-                    
-                    {/* 关系描述 */}
-                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                      {person.desc}
-                    </p>
-                    
-                    {/* 分类标签 */}
-                    <div className={`px-3 py-1 rounded-full text-xs font-medium text-white ${getCategoryColor(person.category)}`}>
-                      {person.category}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+        {/* 人物关系瀑布流 */}
+        <div className="bg-cream/30 rounded-3xl p-8 shadow-xl border border-gray-200">
+          <h2 className="text-2xl font-bold text-charcoal mb-6 text-center">
+            {selectedCategory === 'all' ? '全部关系人物' : categories.find(cat => cat.id === selectedCategory)?.name}
+            <span className="text-lg font-normal text-gray-500 ml-2">({filteredPersons.length}人)</span>
+          </h2>
           
-          {filteredPersons.length === 0 && (
+          {filteredPersons.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-gray-400 text-lg mb-2">暂无相关人物</div>
               <div className="text-gray-500 text-sm">请尝试选择其他分类</div>
             </div>
+          ) : (
+            <MasonryGrid
+              items={filteredPersons}
+              onItemClick={setSelectedPerson}
+              getCategoryColor={getCategoryColor}
+              categories={categories}
+            />
           )}
         </div>
       </div>
