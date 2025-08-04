@@ -143,7 +143,7 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
           return (
             <div
               key={`${person.id}-${index}`}
-              className="absolute bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100 hover:border-gray-200 group"
+              className="absolute bg-gradient-to-br from-cream to-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border border-gold/10 hover:border-gold/20 group hover:bg-gradient-to-br hover:from-gold/5 hover:to-cream"
               style={{
                 left: `${left}px`,
                 top: `${top}px`,
