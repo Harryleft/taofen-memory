@@ -39,6 +39,23 @@ export default function RelationshipsPage() {
     loadData();
   }, []);
 
+  // ESC键关闭详情卡片
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && selectedPerson) {
+        setSelectedPerson(null);
+      }
+    };
+
+    if (selectedPerson) {
+      document.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedPerson]);
+
   // 过滤后的人物列表
   const filteredPersons = selectedCategory === 'all' 
     ? persons 
@@ -194,7 +211,7 @@ export default function RelationshipsPage() {
                   <BookOpen size={18} className="text-gold" />
                   人物简介
                 </h3>
-                <p className="text-gray-700 leading-relaxed bg-gray-50 rounded-xl p-4">{selectedPerson.desc}</p>
+                <p className="text-gray-700 leading-relaxed bg-gray-50 rounded-xl p-2">{selectedPerson.desc}</p>
               </div>
               
               {/* Sources */}
@@ -227,42 +244,10 @@ export default function RelationshipsPage() {
                     })}
                   </div>
                 </div>
-              )}
+              )}             
               
-              {/* Links */}
-              {selectedPerson.link && selectedPerson.link.length > 0 && selectedPerson.link.some(link => link && !selectedPerson.sources.includes(link)) && (
-                <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-charcoal mb-3 flex items-center gap-2">
-                    <ExternalLink size={18} className="text-gold" />
-                    相关链接
-                  </h3>
-                  <div className="space-y-2">
-                    {selectedPerson.link.filter(link => link && !selectedPerson.sources.includes(link)).map((link, index) => (
-                      <a 
-                        key={index}
-                        href={link} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-gold hover:text-gold/80 transition-colors bg-gold/10 rounded-lg p-3 hover:bg-gold/20"
-                      >
-                        <ExternalLink size={16} />
-                        <span className="truncate">{link}</span>
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+            </div>           
             
-            {/* Footer */}
-            <div className="px-8 pb-8">
-              <button 
-                onClick={() => setSelectedPerson(null)}
-                className="w-full bg-gradient-to-r from-gold to-gold/80 text-white py-3 rounded-xl font-medium hover:from-gold/90 hover:to-gold/70 transition-all duration-200 shadow-lg hover:shadow-xl"
-              >
-                关闭详情
-              </button>
-            </div>
           </div>
         </div>
       )}
