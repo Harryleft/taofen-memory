@@ -1,6 +1,5 @@
 import React from 'react';
 import { Search, Download } from 'lucide-react';
-import { BookItem } from '../../types/bookTypes';
 
 interface BookstoreFiltersProps {
   searchTerm: string;
@@ -38,17 +37,6 @@ const BookstoreFilters: React.FC<BookstoreFiltersProps> = ({
       />
     </div>
     
-    <select
-      value={selectedCategory}
-      onChange={(e) => setSelectedCategory(e.target.value)}
-      className="px-4 py-2 bg-white border border-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50"
-      style={{ fontFamily: "'SimSun', '宋体', 'NSimSun', serif" }}
-    >
-      <option value="all">全部出版社</option>
-      {uniqueCategories.map(category => (
-        <option key={category} value={category}>{category}</option>
-      ))}
-    </select>
     
     <select
       value={selectedYear}
