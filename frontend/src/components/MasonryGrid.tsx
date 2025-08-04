@@ -31,7 +31,8 @@ const MASONRY_CONFIG = {
     LOAD_DELAY: 300
   },
   ui: {
-    ICON_SIZE: 12
+    ICON_SIZE: 12,
+    DESC_MAX_LENGTH: 50 // 人物简介最大显示字符数
   },
   avatar: {
     // 头像外层容器尺寸 - 从w-16 h-16 (64px)优化为更平衡的尺寸
@@ -220,6 +221,16 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
                 <h3 className="text-lg font-semibold text-charcoal mb-1.5 group-hover:text-gold transition-colors">
                   {person.name}
                 </h3>
+                
+                {/* 人物简介 - 截取前50个字符 */}
+                {person.desc && (
+                  <p className="text-sm text-gray-600 mb-2 px-2 leading-relaxed">
+                    {person.desc.length > MASONRY_CONFIG.ui.DESC_MAX_LENGTH 
+                      ? `${person.desc.substring(0, MASONRY_CONFIG.ui.DESC_MAX_LENGTH)}...` 
+                      : person.desc
+                    }
+                  </p>
+                )}
                 
                 {/* 分类标签 */}
                 <div className={`px-3 py-1 rounded-full text-xs font-medium text-white ${getCategoryColor(person.category)}`}>
