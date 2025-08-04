@@ -10,48 +10,41 @@ const logDebug = (message: string, data?: any) => {
   }
 };
 
+//【修改】从 Props 中移除 isRapidScrolling
 interface BookGridProps {
   columnArrays: BookItem[][];
   visibleItems: Set<number>;
-  isRapidScrolling: boolean;
   onOpenLightbox: (item: BookItem) => void;
 }
 
 const BookGrid: React.FC<BookGridProps> = ({
   columnArrays,
   visibleItems,
-  isRapidScrolling,
   onOpenLightbox
 }) => {
-  // 添加渲染计数器，用于调试
   const renderCountRef = useRef(0);
-  // 添加上一次可见项目集合大小引用，用于比较
   const prevVisibleSizeRef = useRef(visibleItems.size);
-  
-  // 组件渲染时增加计数器
   renderCountRef.current += 1;
   
-  // 添加调试信息，记录可见项目的变化
+  //【修改】简化调试日志，移除 isRapidScrolling
   useEffect(() => {
     const visibleSizeChanged = prevVisibleSizeRef.current !== visibleItems.size;
     if (visibleSizeChanged) {
       logDebug('可见项目集合更新', {
         visibleCount: visibleItems.size,
         prevVisibleCount: prevVisibleSizeRef.current,
-        isRapidScrolling,
         renderCount: renderCountRef.current
       });
       prevVisibleSizeRef.current = visibleItems.size;
     }
-  }, [visibleItems, isRapidScrolling]);
+  }, [visibleItems]);
   
-  // 记录组件渲染
+  //【修改】简化渲染日志
   if (DEBUG) {
     console.log(`[BookGrid] 渲染网格`, { 
       renderCount: renderCountRef.current,
       columnCount: columnArrays.length,
-      visibleCount: visibleItems.size,
-      isRapidScrolling
+      visibleCount: visibleItems.size
     });
   }
 
@@ -74,7 +67,7 @@ const BookGrid: React.FC<BookGridProps> = ({
                 key={item.id}
                 item={item}
                 isVisible={isVisible}
-                isRapidScrolling={isRapidScrolling}
+                //【修改】移除 isRapidScrolling prop
                 columnIndex={columnIndex}
                 onOpenLightbox={onOpenLightbox}
               />
@@ -86,29 +79,22 @@ const BookGrid: React.FC<BookGridProps> = ({
   );
 };
 
-// 使用 React.memo 包装组件，添加自定义比较函数以减少不必要的重新渲染
-export default React.memo(BookGrid, (prevProps, nextProps) => {
-  // 检查是否需要重新渲染
-  const shouldRerender = (
-    // 检查列数组是否相同
-    prevProps.columnArrays.length !== nextProps.columnArrays.length ||
-    // 检查快速滚动状态是否相同
-    prevProps.isRapidScrolling !== nextProps.isRapidScrolling ||
-    // 检查可见项目集合是否相同
-    prevProps.visibleItems.size !== nextProps.visibleItems.size
-  );
-  
-  // 添加更详细的调试日志
-  if (DEBUG && shouldRerender) {
-    console.log(`[BookGrid] 组件将重新渲染`, {
-      columnLengthChanged: prevProps.columnArrays.length !== nextProps.columnArrays.length,
-      rapidScrollingChanged: prevProps.isRapidScrolling !== nextProps.isRapidScrolling,
-      visibleSizeChanged: prevProps.visibleItems.size !== nextProps.visibleItems.size,
-      prevVisibleSize: prevProps.visibleItems.size,
-      nextVisibleSize: nextProps.visibleItems.size
-    });
+// 【修改】优化 React.memo 的比较函数
+const areEqual = (prevProps: BookGridProps, nextProps: BookGridProps) => {
+  // 1. 如果列数组的引用没有变，那么数据就没有变，瀑布流结构不变
+  if (prevProps.columnArrays !== nextProps.columnArrays) {
+    return false;
+  }
+  // 2. 如果可见项的引用没有变，那么可见性就没有变
+  if (prevProps.visibleItems !== nextProps.visibleItems) {
+    return false;
+  }
+  // 3. 如果打开灯箱的函数句柄变了（通常不应该），则需要重渲染
+  if (prevProps.onOpenLightbox !== nextProps.onOpenLightbox) {
+    return false;
   }
   
-  // 返回是否相等（不需要重新渲染）
-  return !shouldRerender;
-});
+  // 如果以上都没有变化，则跳过重渲染
+  return true;
+};
+export default React.memo(BookGrid, areEqual);
