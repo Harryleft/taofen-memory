@@ -9,7 +9,7 @@
  * - 支持CSV数据导出
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { BookItem, FilterOptions } from '../../types/bookTypes';
 import { downloadCSV } from '../../utils/bookUtils';
 
@@ -22,6 +22,14 @@ import { useBookData } from '../../hooks/useBookData';
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
 import { useLightbox } from '../../hooks/useLightbox';
 import { useResponsiveColumns } from '../../hooks/useResponsiveColumns';
+
+// 添加调试常量
+const DEBUG = true;
+const logDebug = (message: string, data?: any) => {
+  if (DEBUG) {
+    console.log(`[BookstoreModule] ${message}`, data || '');
+  }
+};
 
 // UI常量配置
 const SEARCH_DEBOUNCE_DELAY = 300;  // 搜索防抖延迟(ms)
@@ -57,6 +65,12 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
   // 响应式布局：根据屏幕宽度计算列数
   const { columns } = useResponsiveColumns();
   
+  // 优化加载更多函数，使用 useCallback 包装
+  const handleLoadMore = useCallback(() => {
+    logDebug('触发加载更多数据');
+    loadMoreData();
+  }, [loadMoreData]);
+  
   // 无限滚动：可见性检测、性能优化
   const {
     visibleItems,
@@ -67,7 +81,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
   } = useInfiniteScroll({
     hasMore,
     isLoading,
-    onLoadMore: loadMoreData,
+    onLoadMore: handleLoadMore,
     displayedDataLength: displayedData.length
   });
   
@@ -85,23 +99,27 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
   useEffect(() => {
     if (isInitialLoading) return;
     
+    logDebug('筛选条件变化，准备重新加载数据', { searchTerm, selectedCategory, selectedYear });
     const debounceTimer = setTimeout(() => {
-      resetAndReload(filters);
+      resetAndReload({ searchTerm, category: selectedCategory, year: selectedYear });
       invalidateCache(); // 清除DOM元素缓存
+      logDebug('重新加载数据并清除缓存');
     }, SEARCH_DEBOUNCE_DELAY);
 
     return () => clearTimeout(debounceTimer);
-  }, [searchTerm, selectedCategory, selectedYear, isInitialLoading, resetAndReload, invalidateCache, filters]);
+  }, [searchTerm, selectedCategory, selectedYear, isInitialLoading, resetAndReload, invalidateCache]);
   
   // 可见性初始化：数据加载完成后设置初始可见项目
   useEffect(() => {
     if (displayedData.length > 0) {
+      logDebug('设置初始可见项目', { count: displayedData.length });
       setInitialVisibleItems(displayedData);
     }
   }, [displayedData, setInitialVisibleItems]);
 
   // 瀑布流布局算法：将书籍分配到最短的列中
   const columnArrays = useMemo(() => {
+    logDebug('重新计算瀑布流布局', { columns, itemCount: displayedData.length });
     const arrays: BookItem[][] = Array.from({ length: columns }, () => []);
     const heights = new Array(columns).fill(0);
 
@@ -115,17 +133,20 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
   }, [displayedData, columns]);
 
   // 灯箱事件处理器
-  const handleOpenLightbox = (item: BookItem) => {
+  const handleOpenLightbox = useCallback((item: BookItem) => {
+    logDebug('打开灯箱预览', { itemId: item.id, title: item.title });
     openLightbox(item, displayedData);
-  };
+  }, [displayedData, openLightbox]);
   
-  const handleNextItem = () => {
+  const handleNextItem = useCallback(() => {
+    logDebug('灯箱导航：下一项');
     nextItem(displayedData);
-  };
+  }, [displayedData, nextItem]);
   
-  const handlePrevItem = () => {
+  const handlePrevItem = useCallback(() => {
+    logDebug('灯箱导航：上一项');
     prevItem(displayedData);
-  };
+  }, [displayedData, prevItem]);
 
   // 初始加载状态渲染
   if (isInitialLoading) {
@@ -169,10 +190,13 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
         />
 
         {/* 无限滚动触发器 */}
-        <div ref={loadMoreRef} className={`w-full h-${LOAD_MORE_INDICATOR_HEIGHT}`} />
+        <div 
+          ref={loadMoreRef} 
+          className={`w-full h-${LOAD_MORE_INDICATOR_HEIGHT}`} 
+          data-testid="load-more-trigger"
+        />
 
         {/* 加载更多指示器 */}
-
         {isLoading && hasMore && (
           <div className="text-center py-8">
             <div className="flex items-center justify-center">
