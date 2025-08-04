@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Heart, BookOpen, GraduationCap, Building, ExternalLink, Share } from 'lucide-react';
+import { Users, Heart, BookOpen, GraduationCap, Building, ExternalLink} from 'lucide-react';
 import MasonryGrid from '../components/MasonryGrid';
 import { Person } from '../types/Person';
 
@@ -124,7 +124,7 @@ export default function RelationshipsPage() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-12">
         {/* 邹韬奋中心卡片 */}
-        <div className="bg-gradient-to-br from-gold/20 to-cream/30 rounded-2xl p-10 mb-8 shadow-xl border border-gold/30">
+        {/* <div className="bg-gradient-to-br from-gold/20 to-cream/30 rounded-2xl p-10 mb-8 shadow-xl border border-gold/30">
           <div className="flex flex-col md:flex-row items-center gap-8">
             <div className="flex-shrink-0">
               <div className="relative">
@@ -140,7 +140,7 @@ export default function RelationshipsPage() {
               <p className="text-xl text-gray-600 mb-4">{taofen.desc}</p>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* 人物关系瀑布流 */}
         <div className="bg-cream/30 rounded-3xl p-8 shadow-xl border border-gray-200">
@@ -218,7 +218,7 @@ export default function RelationshipsPage() {
               {selectedPerson.sources && selectedPerson.sources.length > 0 && (
                 <div className="mb-6">
                   <h3 className="text-lg font-semibold text-charcoal mb-3 flex items-center gap-2">
-                    <Share size={18} className="text-gold" />
+                    <ExternalLink size={18} className="text-gold" />
                     相关资料
                   </h3>
                   <div className="space-y-2">
