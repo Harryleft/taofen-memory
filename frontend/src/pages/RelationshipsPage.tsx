@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Heart, BookOpen, GraduationCap, Building, ExternalLink} from 'lucide-react';
+import { Users, Heart, BookOpen, GraduationCap, Building } from 'lucide-react';
 import MasonryGrid from '../components/MasonryGrid';
+import PersonDetailModal from '../components/PersonDetailModal';
 import { Person } from '../types/Person';
 
 interface RelationshipsData {
@@ -212,91 +213,10 @@ export default function RelationshipsPage() {
       </div>
       
       {/* Person Detail Modal */}
-      {selectedPerson && (
-        <div className={`fixed inset-0 bg-black/${RELATIONSHIPS_CONFIG.layout.opacity.MODAL_BACKDROP} backdrop-blur-sm flex items-center justify-center z-${RELATIONSHIPS_CONFIG.layout.zIndex.MODAL} p-${RELATIONSHIPS_CONFIG.ui.spacing.MEDIUM}`}>
-          <div className={`bg-white rounded-3xl shadow-2xl max-w-lg w-full max-h-[${RELATIONSHIPS_CONFIG.layout.viewport.MODAL_MAX_HEIGHT}vh] overflow-y-auto`}>
-            {/* Header */}
-            <div className={`relative bg-gradient-to-br from-cream/${RELATIONSHIPS_CONFIG.layout.opacity.GRADIENT_START} to-gold/${RELATIONSHIPS_CONFIG.layout.opacity.GRADIENT_END} rounded-t-3xl p-${RELATIONSHIPS_CONFIG.ui.spacing.XLARGE} text-center`}>
-              <button 
-                onClick={() => setSelectedPerson(null)}
-                className={`absolute top-${RELATIONSHIPS_CONFIG.ui.positioning.BUTTON_POSITION} right-${RELATIONSHIPS_CONFIG.ui.positioning.BUTTON_POSITION} w-${RELATIONSHIPS_CONFIG.ui.avatarSizes.CATEGORY_BADGE} h-${RELATIONSHIPS_CONFIG.ui.avatarSizes.CATEGORY_BADGE} bg-white/${RELATIONSHIPS_CONFIG.layout.opacity.BUTTON_BG} hover:bg-white rounded-full flex items-center justify-center transition-all duration-${RELATIONSHIPS_CONFIG.animation.HOVER_DURATION} hover:scale-${RELATIONSHIPS_CONFIG.animation.HOVER_SCALE}`}
-              >
-                <span className="text-gray-600 text-lg leading-none">×</span>
-              </button>
-              
-              {selectedPerson.img ? (
-                <div className="relative inline-block">
-                  <img 
-                    src={selectedPerson.img} 
-                    alt={selectedPerson.name}
-                    className={`w-${RELATIONSHIPS_CONFIG.ui.avatarSizes.DETAIL_AVATAR} h-${RELATIONSHIPS_CONFIG.ui.avatarSizes.DETAIL_AVATAR} rounded-full mx-auto object-cover border-${RELATIONSHIPS_CONFIG.ui.borders.AVATAR_BORDER} border-white shadow-lg`}
-                  />
-                  <div className={`absolute -bottom-${RELATIONSHIPS_CONFIG.ui.positioning.BADGE_OFFSET} -right-${RELATIONSHIPS_CONFIG.ui.positioning.BADGE_OFFSET} w-${RELATIONSHIPS_CONFIG.ui.avatarSizes.CATEGORY_BADGE} h-${RELATIONSHIPS_CONFIG.ui.avatarSizes.CATEGORY_BADGE} ${getCategoryColor(selectedPerson.category)} rounded-full border-${RELATIONSHIPS_CONFIG.ui.borders.BADGE_BORDER} border-white flex items-center justify-center`}>
-                    {categories.find(cat => cat.id === selectedPerson.category)?.icon && 
-                      React.createElement(categories.find(cat => cat.id === selectedPerson.category)!.icon, { size: RELATIONSHIPS_CONFIG.ui.iconSizes.CATEGORY_BADGE, className: "text-white" })
-                    }
-                  </div>
-                </div>
-              ) : (
-                <div className={`w-${RELATIONSHIPS_CONFIG.ui.avatarSizes.PLACEHOLDER_AVATAR} h-${RELATIONSHIPS_CONFIG.ui.avatarSizes.PLACEHOLDER_AVATAR} ${getCategoryColor(selectedPerson.category)} rounded-full flex items-center justify-center mx-auto shadow-lg`}>
-                  <span className="text-white font-bold text-2xl">{selectedPerson.name.charAt(0)}</span>
-                </div>
-              )}
-              
-              <h2 className={`text-2xl font-bold text-charcoal mt-${RELATIONSHIPS_CONFIG.ui.spacing.MEDIUM} mb-${RELATIONSHIPS_CONFIG.ui.spacing.SMALL}`}>{selectedPerson.name}</h2>
-              <div className={`inline-block px-${RELATIONSHIPS_CONFIG.ui.spacing.MEDIUM} py-1 rounded-full text-sm font-medium text-white ${getCategoryColor(selectedPerson.category)}`}>
-                {selectedPerson.category}
-              </div>
-            </div>
-            
-            {/* Content */}
-            <div className={`p-${RELATIONSHIPS_CONFIG.ui.spacing.XLARGE}`}>
-              {/* Description */}
-              <div className={`mb-${RELATIONSHIPS_CONFIG.ui.spacing.LARGE}`}>
-                <h3 className={`text-lg font-semibold text-charcoal mb-${RELATIONSHIPS_CONFIG.ui.spacing.SMALL} flex items-center gap-${RELATIONSHIPS_CONFIG.ui.spacing.SMALL}`}>
-                  <BookOpen size={RELATIONSHIPS_CONFIG.ui.iconSizes.DETAIL_SECTION} className="text-gold" />
-                  人物简介
-                </h3>
-                <p className={`text-gray-700 leading-relaxed bg-gray-50 rounded-xl p-${RELATIONSHIPS_CONFIG.ui.spacing.MEDIUM} indent-8`}>{selectedPerson.desc}</p>
-              </div>
-              
-              {/* Sources */}
-              {selectedPerson.sources && selectedPerson.sources.length > 0 && (
-                <div className={`mb-${RELATIONSHIPS_CONFIG.ui.spacing.LARGE}`}>
-                  <h3 className={`text-lg font-semibold text-charcoal mb-${RELATIONSHIPS_CONFIG.ui.spacing.SMALL} flex items-center gap-${RELATIONSHIPS_CONFIG.ui.spacing.SMALL}`}>
-                    <ExternalLink size={RELATIONSHIPS_CONFIG.ui.iconSizes.DETAIL_SECTION} className="text-gold" />
-                    相关资料
-                  </h3>
-                  <div className={`space-y-${RELATIONSHIPS_CONFIG.ui.spacing.SMALL}`}>
-                    {selectedPerson.sources.map((source, index) => {
-                      const hasLink = selectedPerson.link && selectedPerson.link[index];
-                      return (
-                        <div key={index} className={`bg-gray-50 rounded-lg p-${RELATIONSHIPS_CONFIG.ui.spacing.MEDIUM} hover:bg-gray-100 transition-colors`}>
-                          {hasLink ? (
-                            <a 
-                              href={selectedPerson.link[index]} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="flex items-center justify-between text-gray-700 hover:text-gold transition-colors group"
-                            >
-                              <span className="flex-1">{source}</span>
-                              <ExternalLink size={RELATIONSHIPS_CONFIG.ui.iconSizes.CATEGORY_BADGE} className={`text-gray-400 group-hover:text-gold ml-${RELATIONSHIPS_CONFIG.ui.spacing.SMALL}`} />
-                            </a>
-                          ) : (
-                            <span className="text-gray-700">{source}</span>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}             
-              
-            </div>           
-            
-          </div>
-        </div>
-      )}
+      <PersonDetailModal 
+        person={selectedPerson}
+        onClose={() => setSelectedPerson(null)}
+      />
     </div>
   );
 }

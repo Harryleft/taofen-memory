@@ -1,4 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { personMatcher } from '../../utils/personMatcher';
+import PersonDetailModal from '../PersonDetailModal';
+import { Person } from '../../types/Person';
 
 interface TimelineEvent {
   time: string;
@@ -14,6 +17,23 @@ interface TimelineItemProps {
 }
 
 const TimelineItem: React.FC<TimelineItemProps> = ({ event, isFeatured }) => {
+  const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
+  const [isPersonDataLoaded, setIsPersonDataLoaded] = useState(false);
+
+  // 初始化人物数据
+  useEffect(() => {
+    const loadPersonData = async () => {
+      try {
+        await personMatcher.loadPersons();
+        setIsPersonDataLoaded(true);
+      } catch (error) {
+        console.error('Failed to load person data:', error);
+      }
+    };
+    
+    loadPersonData();
+  }, []);
+
   const containerClasses = isFeatured
     ? 'transform scale(1.1) mb-8'
     : 'transform scale(0.95)';
@@ -24,6 +44,63 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, isFeatured }) => {
 
   const timeTextClasses = isFeatured ? 'text-base font-semibold' : 'text-sm font-medium';
   const experienceTextClasses = isFeatured ? 'text-lg leading-relaxed font-medium' : 'text-base';
+
+  // 处理人物姓名点击
+  const handlePersonClick = (person: Person) => {
+    setSelectedPerson(person);
+  };
+
+  // 渲染带有人物链接的文本
+  const renderTextWithPersonLinks = (text: string) => {
+    if (!isPersonDataLoaded) {
+      return <span>{text}</span>;
+    }
+
+    const personMatches = personMatcher.extractPersonsFromText(text, 2);
+    
+    if (personMatches.length === 0) {
+      return <span>{text}</span>;
+    }
+
+    const elements: React.ReactNode[] = [];
+    let lastIndex = 0;
+
+    personMatches.forEach((match, index) => {
+      // 添加匹配前的文本
+      if (match.startIndex > lastIndex) {
+        elements.push(
+          <span key={`text-${index}`}>
+            {text.substring(lastIndex, match.startIndex)}
+          </span>
+        );
+      }
+
+      // 添加人物链接
+      elements.push(
+        <button
+          key={`person-${index}`}
+          onClick={() => handlePersonClick(match.person)}
+          className="text-gold underline hover:text-gold/80 transition-colors duration-200 font-medium"
+          title={`点击查看${match.person.name}的详细信息`}
+        >
+          {match.name}
+        </button>
+      );
+
+      lastIndex = match.endIndex;
+    });
+
+    // 添加剩余的文本
+    if (lastIndex < text.length) {
+      elements.push(
+        <span key="text-end">
+          {text.substring(lastIndex)}
+        </span>
+      );
+    }
+
+    return <>{elements}</>;
+  };
 
   return (
     <div className={`timeline-item ${containerClasses}`}>
@@ -59,13 +136,19 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, isFeatured }) => {
               
               <div className="space-y-1">
                 <p className={`text-charcoal/80 ${experienceTextClasses}`}>
-                  {event.experience}
+                  {renderTextWithPersonLinks(event.experience)}
                 </p>
               </div>
             </div>
           </div>
         </div>
       </div>
+      
+      {/* Person Detail Modal */}
+      <PersonDetailModal 
+        person={selectedPerson}
+        onClose={() => setSelectedPerson(null)}
+      />
     </div>
   );
 };
