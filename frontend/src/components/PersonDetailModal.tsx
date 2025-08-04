@@ -3,59 +3,59 @@ import { BookOpen, ExternalLink, FileText } from 'lucide-react';
 import { Person } from '../types/Person';
 
 // 人物详情模态框配置常量
-const MODAL_CONFIG = {
-  ui: {
-    iconSizes: {
-      DETAIL_SECTION: 18,
-      CATEGORY_BADGE: 16
-    },
-    avatarSizes: {
-      DETAIL_AVATAR: 20,
-      PLACEHOLDER_AVATAR: 20,
-      CATEGORY_BADGE: 8
-    },
-    spacing: {
-      SMALL: 2,
-      MEDIUM: 4,
-      LARGE: 6,
-      XLARGE: 8
-    },
-    borders: {
-      AVATAR_BORDER: 2,
-      BADGE_BORDER: 3
-    },
-    positioning: {
-      BADGE_OFFSET: 2,
-      BUTTON_POSITION: 4
-    }
-  },
-  animation: {
-    HOVER_DURATION: 200,
-    HOVER_SCALE: 110
-  },
-  layout: {
-    zIndex: {
-      MODAL: 9999
-    },
-    opacity: {
-      MODAL_BACKDROP: 60,
-      BUTTON_BG: 80,
-      GRADIENT_START: 50,
-      GRADIENT_END: 20
-    },
-    viewport: {
-      MODAL_MAX_HEIGHT: 90
-    }
-  }
-};
+// const MODAL_CONFIG = {
+//   ui: {
+//     iconSizes: {
+//       DETAIL_SECTION: 18,
+//       CATEGORY_BADGE: 16
+//     },
+//     avatarSizes: {
+//       DETAIL_AVATAR: 20,
+//       PLACEHOLDER_AVATAR: 20,
+//       CATEGORY_BADGE: 8
+//     },
+//     spacing: {
+//       SMALL: 2,
+//       MEDIUM: 4,
+//       LARGE: 6,
+//       XLARGE: 8
+//     },
+//     borders: {
+//       AVATAR_BORDER: 2,
+//       BADGE_BORDER: 3
+//     },
+//     positioning: {
+//       BADGE_OFFSET: 2,
+//       BUTTON_POSITION: 4
+//     }
+//   },
+//   animation: {
+//     HOVER_DURATION: 200,
+//     HOVER_SCALE: 110
+//   },
+//   layout: {
+//     zIndex: {
+//       MODAL: 9999
+//     },
+//     opacity: {
+//       MODAL_BACKDROP: 60,
+//       BUTTON_BG: 80,
+//       GRADIENT_START: 50,
+//       GRADIENT_END: 20
+//     },
+//     viewport: {
+//       MODAL_MAX_HEIGHT: 90
+//     }
+//   }
+// };
 
 // 分类配置
-const categories = [
-  { id: '亲人家属', color: 'bg-warm-rose' },
-  { id: '新闻出版', color: 'bg-gold' },
-  { id: '学术文化', color: 'bg-heritage-blue' },
-  { id: '政治社会', color: 'bg-sage-green' }
-];
+// const categories = [
+//   { id: '亲人家属', color: 'bg-warm-rose' },
+//   { id: '新闻出版', color: 'bg-gold' },
+//   { id: '学术文化', color: 'bg-heritage-blue' },
+//   { id: '政治社会', color: 'bg-sage-green' }
+// ];
 
 interface PersonDetailModalProps {
   person: Person | null;
@@ -65,20 +65,20 @@ interface PersonDetailModalProps {
 const PersonDetailModal: React.FC<PersonDetailModalProps> = ({ person, onClose }) => {
   if (!person) return null;
 
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case '亲人家属':
-        return 'bg-warm-rose';
-      case '新闻出版':
-        return 'bg-gold';
-      case '学术文化':
-        return 'bg-heritage-blue';
-      case '政治社会':
-        return 'bg-sage-green';
-      default:
-        return 'bg-gray-500';
-    }
-  };
+  // const getCategoryColor = (category: string) => {
+  //   switch (category) {
+  //     case '亲人家属':
+  //       return 'bg-warm-rose';
+  //     case '新闻出版':
+  //       return 'bg-gold';
+  //     case '学术文化':
+  //       return 'bg-heritage-blue';
+  //     case '政治社会':
+  //       return 'bg-sage-green';
+  //     default:
+  //       return 'bg-gray-500';
+  //   }
+  // };
 
   // 处理ESC键关闭
   React.useEffect(() => {

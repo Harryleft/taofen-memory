@@ -180,10 +180,10 @@ export default function RelationshipsPage() {
       <div className={`max-w-7xl mx-auto px-${RELATIONSHIPS_CONFIG.ui.spacing.LARGE} py-${RELATIONSHIPS_CONFIG.ui.spacing.XXLARGE}`}>
         {/* 人物关系瀑布流 */}
         <div className={`bg-cream/${RELATIONSHIPS_CONFIG.layout.opacity.CONTENT_BG} rounded-3xl p-${RELATIONSHIPS_CONFIG.ui.spacing.XLARGE} shadow-xl border border-gray-200`}>
-          <h2 className={`text-2xl font-bold text-charcoal mb-${RELATIONSHIPS_CONFIG.ui.spacing.LARGE} text-center`}>
-            {selectedCategory === 'all' ? '全部关系人物' : categories.find(cat => cat.id === selectedCategory)?.name}
-            <span className="text-lg font-normal text-gray-500 ml-2">({filteredPersons.length}人)</span>
-          </h2>
+          {/* <h2 className={`text-2xl font-bold text-charcoal mb-${RELATIONSHIPS_CONFIG.ui.spacing.LARGE} text-center`}> */}
+            {/* {selectedCategory === 'all' ? '全部关系人物' : categories.find(cat => cat.id === selectedCategory)?.name} */}
+            {/* <span className="text-lg font-normal text-gray-500 ml-2">({filteredPersons.length}人)</span> */}
+          {/* </h2> */}
           
           {filteredPersons.length === 0 ? (
             <div className="text-center py-12">
