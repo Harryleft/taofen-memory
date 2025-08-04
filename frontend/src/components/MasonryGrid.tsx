@@ -32,6 +32,24 @@ const MASONRY_CONFIG = {
   },
   ui: {
     ICON_SIZE: 12
+  },
+  avatar: {
+    // 头像外层容器尺寸 - 从w-16 h-16 (64px)优化为更平衡的尺寸
+    CONTAINER_SIZE: 'w-15 h-15', // 60px，减少整体尺寸但保持视觉平衡
+    // 头像内层尺寸 - 相应调整以保持比例
+    INNER_SIZE: 'w-11 h-11', // 44px，保持合适的内容显示区域
+    // 边框宽度 - 从border-2 (8px)减少到border-1 (4px)
+    BORDER_WIDTH: 'border-1', // 4px，减少空白区域
+    // 分类图标容器
+    CATEGORY_ICON: {
+      SIZE: 'p-1', // 从p-1.5减少到p-1，与整体缩小保持一致
+      BORDER: 'border-1', // 与头像边框保持一致
+      POSITION: '-bottom-0.5 -right-0.5' // 微调位置以适应新尺寸
+    },
+    // 字体大小调整
+    FONT_SIZE: 'text-sm', // 从text-base减少，适配较小的头像尺寸
+    // 阴影效果
+    SHADOW: 'shadow-sm' // 从shadow-md减少，避免视觉过重
   }
 };
 
@@ -170,40 +188,29 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
                 <div className="relative mb-3">
                   {person.img ? (
                     <div className="relative">
-                      {/* 
-                        外层圆圈优化建议：
-                        1. 尺寸调整：w-20 h-20 (80px) → w-16 h-16 (64px) 或 w-18 h-18 (72px)
-                        2. 边框优化：border-3 (12px) → border-2 (8px) 或 border-1 (4px)
-                        3. 内部头像：w-18 h-18 → w-12 h-12 或 w-14 h-14 保持比例
-                        4. 阴影调整：shadow-lg → shadow-md 减少视觉重量
-                      */}
-                      <div className="w-16 h-16 rounded-full bg-white group-hover:bg-gold/20 border-2 border-white group-hover:border-gold/30 transition-all duration-300 flex items-center justify-center shadow-md">
+                      {/* 头像外层容器 - 使用配置常量管理尺寸和样式 */}
+                      <div className={`${MASONRY_CONFIG.avatar.CONTAINER_SIZE} rounded-full bg-white group-hover:bg-gold/20 ${MASONRY_CONFIG.avatar.BORDER_WIDTH} border-white group-hover:border-gold/30 transition-all duration-300 flex items-center justify-center ${MASONRY_CONFIG.avatar.SHADOW}`}>
                         <img
                           src={person.img}
                           alt={person.name}
-                          className="w-12 h-12 rounded-full object-cover"
+                          className={`${MASONRY_CONFIG.avatar.INNER_SIZE} rounded-full object-cover`}
                           loading="lazy"
                         />
                       </div>
                     </div>
                   ) : (
                     <div className="relative">
-                      {/* 
-                        无头像占位符优化建议：
-                        1. 外层圆圈：与有头像版本保持一致的尺寸调整
-                        2. 内层圆圈：相应缩小以保持视觉平衡
-                        3. 字体大小：text-lg → text-base 或 text-sm 适配小尺寸
-                      */}
-                      <div className="w-16 h-16 rounded-full bg-white group-hover:bg-gold/20 border-2 border-white group-hover:border-gold/30 transition-all duration-300 flex items-center justify-center shadow-md">
-                        <div className={`w-12 h-12 rounded-full ${getCategoryColor(person.category)} flex items-center justify-center text-white text-base font-bold`}>
+                      {/* 无头像占位符 - 使用配置常量保持与有头像版本的一致性 */}
+                      <div className={`${MASONRY_CONFIG.avatar.CONTAINER_SIZE} rounded-full bg-white group-hover:bg-gold/20 ${MASONRY_CONFIG.avatar.BORDER_WIDTH} border-white group-hover:border-gold/30 transition-all duration-300 flex items-center justify-center ${MASONRY_CONFIG.avatar.SHADOW}`}>
+                        <div className={`${MASONRY_CONFIG.avatar.INNER_SIZE} rounded-full ${getCategoryColor(person.category)} flex items-center justify-center text-white ${MASONRY_CONFIG.avatar.FONT_SIZE} font-bold`}>
                           {person.name.charAt(0)}
                         </div>
                       </div>
                     </div>
                   )}
-                  {/* 分类图标 */}
+                  {/* 分类图标 - 使用配置常量管理位置、尺寸和样式 */}
                   {Icon && (
-                    <div className={`absolute -bottom-1 -right-1 ${getCategoryColor(person.category)} rounded-full p-1.5 border-2 border-white shadow-md`}>
+                    <div className={`absolute ${MASONRY_CONFIG.avatar.CATEGORY_ICON.POSITION} ${getCategoryColor(person.category)} rounded-full ${MASONRY_CONFIG.avatar.CATEGORY_ICON.SIZE} ${MASONRY_CONFIG.avatar.CATEGORY_ICON.BORDER} border-white ${MASONRY_CONFIG.avatar.SHADOW}`}>
                       <Icon size={MASONRY_CONFIG.ui.ICON_SIZE} className="text-white" />
                     </div>
                   )}
