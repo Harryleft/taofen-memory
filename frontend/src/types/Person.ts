@@ -1,9 +1,14 @@
+export interface Source {
+  title: string;
+  url?: string;
+}
+
 export interface Person {
   id: number;
   name: string;
   category: string;
   img: string;
-  desc: string;
-  sources: string[];
+  description: string;
+  sources: Source[];
   link: string[];
 }
