@@ -30,10 +30,19 @@ if [[ ! -d "$OUTPUT_DIR" ]]; then
     mkdir -p "$OUTPUT_DIR"
 fi
 
-# 3. Process the JSON data using pure Python (no external dependencies)
-echo "Processing data..."
+# 3. 选择可用的 Python 解释器
+if command -v python &>/dev/null; then
+    PYTHON_CMD="python"
+elif command -v python3 &>/dev/null; then
+    PYTHON_CMD="python3"
+else
+    echo "Error: Python interpreter not found!" >&2
+    exit 1
+fi
 
-python3 << PYTHON_EOF
+echo "Processing data using $PYTHON_CMD ..."
+
+$PYTHON_CMD << PYTHON_EOF
 import json
 import re
 
@@ -91,21 +100,31 @@ try:
             }
             cleaned_persons.append(clean_person)
     
+    # Create a set of valid person IDs for validation
+    valid_person_ids = {str(person['id']) for person in cleaned_persons}
+    print(f"Valid person IDs: {sorted(list(valid_person_ids))[:10]}...")  # Show first 10 IDs
+    
     # Process relationship links
     cleaned_relationships = []
+    invalid_count = 0
     
     for link in links_data:
         if not isinstance(link, dict):
             continue
             
         # Extract required fields
-        source = link.get('source', '').strip()
-        target = link.get('target', '').strip()
+        source = str(link.get('source', '')).strip()
+        target = str(link.get('target', '')).strip()
         category = link.get('category', '').strip()
         name = link.get('name', '').strip()
         
-        # Only include links with valid source and target
-        if source and target:
+        # Only include links with valid source/target that存在并且 source 不能为 "0"
+        if (source and target and 
+            source != "0" and
+            source in valid_person_ids and 
+            target in valid_person_ids and
+            source != target):  # Avoid self-references
+            
             clean_relationship = {
                 'source': source,
                 'target': target,
@@ -113,6 +132,12 @@ try:
                 'name': name if name else category  # Use category as name if name is empty
             }
             cleaned_relationships.append(clean_relationship)
+        else:
+            invalid_count += 1
+            if invalid_count <= 5:  # Show first 5 invalid relationships
+                print(f"Invalid relationship: source={source}, target={target}, source_valid={source in valid_person_ids}, target_valid={target in valid_person_ids}")
+    
+    print(f"Filtered relationships: {len(cleaned_relationships)} valid out of {len(links_data)} total ({invalid_count} invalid)")
     
     # Create final output structure
     output_data = {

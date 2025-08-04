@@ -326,8 +326,8 @@ export default function RelationshipsPage() {
   const handleNodeDragEnd = useCallback((node: TreeNode) => {
     if (simulationRef.current && node.level === 2) {
       simulationRef.current.alphaTarget(0);
-      node.fx = null;
-      node.fy = null;
+      node.fx = undefined;
+      node.fy = undefined;
     }
   }, []);
 
@@ -502,7 +502,7 @@ export default function RelationshipsPage() {
                       key={`node-${node.person.id}-${node.level}`} 
                       transform={`translate(${node.x}, ${node.y})`}
                       className={isDraggable ? "cursor-grab active:cursor-grabbing" : "cursor-pointer"}
-                      onMouseDown={isDraggable ? (e) => handleNodeDragStart(e, node) : undefined}
+                      onMouseDown={isDraggable ? (e) => handleNodeDragStart(node, e) : undefined}
                     >
                       {/* 主要圆形节点 */}
                       <circle
@@ -512,7 +512,7 @@ export default function RelationshipsPage() {
                          fill={getGradientId(node.person.category, isRoot)}
                          stroke="#FFFFFF"
                          strokeWidth="5"
-                         strokeLinejoin="square"
+                         strokeLinejoin="miter"
                          className="hover:opacity-90 transition-all duration-300 ease-out hover:stroke-yellow-300"
                          style={{
                            filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))',

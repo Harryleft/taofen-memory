@@ -258,52 +258,31 @@ class WikipediaEnricher:
         """从上海图书馆数据中提取有用信息"""
         result = {}
         
-        # 提取描述信息和来源
-        biography_parsed = False
+        # 提取描述信息
         if 'briefBiography' in sh_data and sh_data['briefBiography']:
             biography = sh_data['briefBiography'].strip()
             # 清理描述文本
             biography = re.sub(r'\s+', ' ', biography)
             
-            # 使用正则表达式提取来源信息
-            sources = []
+            # 移除所有来源标注信息
             # 匹配（来源：《书名》）格式
-            source_pattern = r'（来源：《([^》]+)》）'
-            matches = re.findall(source_pattern, biography)
-            for match in matches:
-                sources.append(f'《{match}》')
-                # 从描述中移除来源信息
-                biography = re.sub(r'（来源：《' + re.escape(match) + r'》）', '', biography)
-            
+            biography = re.sub(r'（来源：《[^》]+》）', '', biography)
             # 匹配其他可能的来源格式
-            other_source_pattern = r'（来源：([^）]+)）'
-            other_matches = re.findall(other_source_pattern, biography)
-            for match in other_matches:
-                if not match.startswith('《'):
-                    sources.append(match)
-                    biography = re.sub(r'（来源：' + re.escape(match) + r'）', '', biography)
+            biography = re.sub(r'（来源：[^）]+）', '', biography)
             
             # 清理描述文本
             biography = re.sub(r'\s+', ' ', biography).strip()
             
-            # 如果成功解析到描述内容，标记为已解析
+            # 如果成功解析到描述内容
             if biography:
                 result['desc'] = biography
-                biography_parsed = True
-                
-                # 如果找到了来源，添加到结果中
-                if sources:
-                    result['sources'] = sources
         
         # 提取链接信息（改为数组格式）
         if 'uri' in sh_data and sh_data['uri']:
             result['links'] = [sh_data['uri']]
         
-        # 只有在briefBiography字段解析失败时，才添加"上海图书馆人名规范库"作为来源
-        if not biography_parsed:
-            if 'sources' not in result:
-                result['sources'] = []
-            result['sources'].append('上海图书馆人名规范库')
+        # 统一添加"上海图书馆人名规范库"作为来源标识
+        result['sources'] = ['上海图书馆人名规范库']
         
         return result
     
@@ -364,11 +343,6 @@ class WikipediaEnricher:
                             person['sources'].append(source)
                             got_sh_data = True
                             print(f"  添加来源: {source}")
-                
-                # 只有在成功获取到数据时才添加上海图书馆作为来源标识
-                if got_sh_data and '上海图书馆' not in person['sources']:
-                    person['sources'].append('上海图书馆')
-                    print(f"  添加来源标识: 上海图书馆")
             else:
                 print(f"  上海图书馆数据解析失败")
         else:
