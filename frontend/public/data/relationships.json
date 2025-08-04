@@ -81,8 +81,10 @@
       "id": 11,
       "name": "邓飞黄",
       "category": "新闻出版",
-      "img": "",
-      "desc": "Category: 新闻出版"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/%E9%84%A7%E9%A3%9B%E9%BB%83.jpg/330px-%E9%84%A7%E9%A3%9B%E9%BB%83.jpg",
+      "desc": "鄧飛黃（1895年11月13日—1953年），原名聲坦，字道貞，號子航。湖南省桂東縣人。民國37年（1948年）在湖南省第三選區當選第一屆立法委員。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E9%84%A7%E9%A3%9B%E9%BB%83"
     },
     {
       "id": 12,
@@ -102,8 +104,10 @@
       "id": 14,
       "name": "樊仲云",
       "category": "新闻出版",
-      "img": "",
-      "desc": "Category: 新闻出版"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/%E6%A8%8A%E5%A2%9E%E7%A5%A5.jpg/330px-%E6%A8%8A%E5%A2%9E%E7%A5%A5.jpg",
+      "desc": "樊增祥（1846年—1931年），字嘉父，號雲門，一號樊山，別署天琴老人，湖北省恩施六角亭西正街梓潼巷人，清代官員，文學家。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E6%A8%8A%E5%A2%9E%E7%A5%A5"
     },
     {
       "id": 15,
@@ -236,7 +240,9 @@
       "name": "黄宝珣",
       "category": "新闻出版",
       "img": "/public/data/images/relationships/20221107034728_LV.jpg",
-      "desc": "Category: 新闻出版"
+      "desc": "宝珣（1815年—1878年），字东山，室名味經書屋，，马佳氏，满洲镶黄旗人，清朝政治人物。道光丁酉科舉人，辛丑科進士。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E5%AF%B6%E7%8F%A3"
     },
     {
       "id": 34,
@@ -452,8 +458,10 @@
       "id": 64,
       "name": "马国亮",
       "category": "新闻出版",
-      "img": "",
-      "desc": "Category: 新闻出版"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Ma%2C_kuo-bi-2.jpg/330px-Ma%2C_kuo-bi-2.jpg",
+      "desc": "馬國弼，台灣諧星、演員、主持人，本名鄭盛元，原藝名馬國畢，亦曾是主持人吳宗憲旗下「憲憲家族」成員。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E9%A6%AC%E5%9C%8B%E5%BC%BC"
     },
     {
       "id": 65,
@@ -501,8 +509,10 @@
       "id": 71,
       "name": "黄衣青",
       "category": "新闻出版",
-      "img": "",
-      "desc": "Category: 新闻出版"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Thalassoma_lutescens_2.jpg/330px-Thalassoma_lutescens_2.jpg",
+      "desc": "黃衣錦魚，又稱黃衣葉鯛、胸斑錦魚，俗名四齒、礫仔、青花龍、黃衣、紫衣、貓仔魚、青汕冷為輻鰭魚綱鱸形目隆頭魚亞目隆頭魚科的其中一種。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E9%BB%83%E8%A1%A3%E9%8C%A6%E9%AD%9A"
     },
     {
       "id": 72,
@@ -739,8 +749,10 @@
       "id": 105,
       "name": "韦悫",
       "category": "新闻出版",
-      "img": "",
-      "desc": "Category: 新闻出版"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/b/b2/%E9%9F%8B%E6%84%A8.jpg",
+      "desc": "韦悫（1896年9月15日—1976年11月25日），原名乃坤，号捧丹，笔名普天，广东香山县翠微乡 人，中国教育家。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E9%9F%8B%E6%84%A8"
     },
     {
       "id": 106,
@@ -873,7 +885,9 @@
       "name": "叶灵凤",
       "category": "新闻出版",
       "img": "",
-      "desc": "Category: 新闻出版"
+      "desc": "葉靈鳳（1905年5月12日—1975年11月23日），原名蘊璞。江蘇南京人。中國現代作家。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E8%91%89%E9%9D%88%E9%B3%B3"
     },
     {
       "id": 125,
@@ -964,7 +978,9 @@
       "name": "张竹平",
       "category": "新闻出版",
       "img": "",
-      "desc": "Category: 新闻出版"
+      "desc": "張師度（？年—？年），字竹平，號性全，河南汝宁府汝阳县人。明末政治人物。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E5%BC%B5%E5%B8%AB%E5%BA%A6"
     },
     {
       "id": 138,
@@ -1236,15 +1252,19 @@
       "id": 176,
       "name": "葛怀诚",
       "category": "学术文化",
-      "img": "",
-      "desc": "Category: 学术文化"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/2008TIBE_Day5_Hall1_ThemeSquare_Hwai-min_Lin.jpg/330px-2008TIBE_Day5_Hall1_ThemeSquare_Hwai-min_Lin.jpg",
+      "desc": "林懷民，是一名台灣編舞家及作家，為現代舞職業舞團雲門舞集創辦人，自該團創立後長期擔任藝術總監直至退休。林懷民為國立政治大學新聞學士、愛荷華大學藝術創作碩士。2005年獲評為當年《時代雜誌》的亞洲英雄榜。2006年獲選為Discovery頻道《台灣人物誌》的6名主角之一。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E6%9E%97%E6%87%B7%E6%B0%91"
     },
     {
       "id": 177,
       "name": "马鉴",
       "category": "学术文化",
       "img": "",
-      "desc": "Category: 学术文化"
+      "desc": "馬鑑（1883年—1959年），字季明，浙江省鄞县（今宁波市鄞州区）人，文史學者，香港中文大學前校長馬臨之父，曾任香港大學中文系教授兼系主任。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E9%A6%AC%E9%91%91"
     },
     {
       "id": 178,
@@ -1314,7 +1334,9 @@
       "name": "张荣祖",
       "category": "学术文化",
       "img": "",
-      "desc": "Category: 学术文化"
+      "desc": "張祖榮可以指： 張祖榮 (清朝) 張祖榮 (澳門)",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E5%BC%B5%E7%A5%96%E6%A6%AE"
     },
     {
       "id": 188,
@@ -1775,8 +1797,10 @@
       "id": 253,
       "name": "诸青来",
       "category": "学术文化",
-      "img": "",
-      "desc": "Category: 学术文化"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Zhu_Qinglai.JPG/330px-Zhu_Qinglai.JPG",
+      "desc": "諸翔（1880年—？），字青來，室名求是齋，江蘇省上海縣人，宣統二年工科進士，曾留學日本東京高等工業學校，国家社会党党员。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E8%AB%B8%E7%BF%94"
     },
     {
       "id": 254,
@@ -1803,8 +1827,10 @@
       "id": 257,
       "name": "陈不雷",
       "category": "政治社会",
-      "img": "",
-      "desc": "Category: 政治社会"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/%E8%B6%85%E7%B4%9A%E5%A4%9C%E7%B8%BD%E6%9C%83_%E9%99%B3%E9%9B%B7_20151025.jpg/330px-%E8%B6%85%E7%B4%9A%E5%A4%9C%E7%B8%BD%E6%9C%83_%E9%99%B3%E9%9B%B7_20151025.jpg",
+      "desc": "陳雷，本名陳武雄，出生於臺灣彰化縣大城鄉西港村，台灣男歌手。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E9%99%B3%E9%9B%B7%20%28%E6%AD%8C%E6%89%8B%29"
     },
     {
       "id": 258,
@@ -1859,8 +1885,10 @@
       "id": 265,
       "name": "蔡香泉（蔡劲军）",
       "category": "政治社会",
-      "img": "",
-      "desc": "Category: 政治社会"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/8/83/%E8%94%A1%E7%BF%B9.gif",
+      "desc": "蔡翹（1897年10月11日—1990年7月29日），字卓夫，乳名義忠，譜名綱正，男，广东揭阳人，中国生理學家。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E8%94%A1%E7%BF%B9"
     },
     {
       "id": 266,
@@ -1936,8 +1964,10 @@
       "id": 276,
       "name": "陈铭枢",
       "category": "政治社会",
-      "img": "",
-      "desc": "Category: 政治社会"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/%E9%99%88%E9%93%AD%E6%9E%A2.jpg/330px-%E9%99%88%E9%93%AD%E6%9E%A2.jpg",
+      "desc": "陳銘樞（1889年12月4日—1965年5月15日），字真如，男，廣東合浦（今属广西）客家人，中华民国二級上将，民革的创始人之一。曾任代理国民政府行政院院长，国民政府行政院副院长，国民政府交通部长，国民革命军第十一军军长，国民革命军总政治部主任，广东省政府主席，京沪卫戍总司令官，兼代理淞沪警备司令，国民革命军右翼集团军总司令。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E9%99%B3%E9%8A%98%E6%A8%9E"
     },
     {
       "id": 277,
@@ -1957,8 +1987,10 @@
       "id": 279,
       "name": "陈锡林",
       "category": "政治社会",
-      "img": "",
-      "desc": "Category: 政治社会"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Lin_Hsi-yao.jpg/330px-Lin_Hsi-yao.jpg",
+      "desc": "林錫耀，臺灣宜蘭縣人，民主進步黨籍政治人物，現任新境界文教基金會副董事長兼民進黨選舉對策委員會召集人。曾任《噶瑪蘭週刊》主編、宜蘭縣政府環境保護局局長、臺北縣代理縣長、行政院政務委員兼臺灣省政府主席、游錫堃參選新北市市長選舉總幹事、行政院副院長、民主進步黨秘書長、新北市長候選人林佳龍競總主委、2022年民進黨選戰宜花東總督導。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E6%9E%97%E9%8C%AB%E8%80%80"
     },
     {
       "id": 280,
@@ -1992,8 +2024,10 @@
       "id": 284,
       "name": "邓飞黄",
       "category": "政治社会",
-      "img": "",
-      "desc": "Category: 政治社会"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/%E9%84%A7%E9%A3%9B%E9%BB%83.jpg/330px-%E9%84%A7%E9%A3%9B%E9%BB%83.jpg",
+      "desc": "鄧飛黃（1895年11月13日—1953年），原名聲坦，字道貞，號子航。湖南省桂東縣人。民國37年（1948年）在湖南省第三選區當選第一屆立法委員。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E9%84%A7%E9%A3%9B%E9%BB%83"
     },
     {
       "id": 285,
@@ -2048,8 +2082,10 @@
       "id": 292,
       "name": "樊仲云",
       "category": "政治社会",
-      "img": "",
-      "desc": "Category: 政治社会"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/%E6%A8%8A%E5%A2%9E%E7%A5%A5.jpg/330px-%E6%A8%8A%E5%A2%9E%E7%A5%A5.jpg",
+      "desc": "樊增祥（1846年—1931年），字嘉父，號雲門，一號樊山，別署天琴老人，湖北省恩施六角亭西正街梓潼巷人，清代官員，文學家。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E6%A8%8A%E5%A2%9E%E7%A5%A5"
     },
     {
       "id": 293,
@@ -2315,7 +2351,9 @@
       "name": "李复黄",
       "category": "政治社会",
       "img": "",
-      "desc": "Category: 政治社会"
+      "desc": "黄复康（1902年—1981年），男，福建龙岩人，中国实业家、社会活动家，曾任致公党中央常委，第五届全国人大代表。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E9%BB%84%E5%A4%8D%E5%BA%B7"
     },
     {
       "id": 331,
@@ -2552,8 +2590,10 @@
       "id": 364,
       "name": "赵朴初",
       "category": "政治社会",
-      "img": "",
-      "desc": "Category: 政治社会"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/%E6%97%A9%E5%B9%B4%E7%9A%84%E8%B5%B5%E6%9C%B4%E5%88%9D.jpg/330px-%E6%97%A9%E5%B9%B4%E7%9A%84%E8%B5%B5%E6%9C%B4%E5%88%9D.jpg",
+      "desc": "趙樸初（1907年11月5日—2000年5月21日），譜名榮續，字樸初，以字行，别署開翁，齋名無盡意齋，安徽太湖人，中华人民共和国政治人物，原副国级领导人。中国佛教领袖、作家、诗人、书法家、社会活动家，佛教界尊称趙樸老、樸老。曾担任中国人民政治协商会议第九届全国委员会副主席、中国民主促进会中央委员会名誉主席、中国佛教协会会长。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E8%B6%99%E6%A8%B8%E5%88%9D"
     },
     {
       "id": 365,
@@ -2650,8 +2690,10 @@
       "id": 378,
       "name": "钱新之",
       "category": "政治社会",
-      "img": "",
-      "desc": "Category: 政治社会"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/%E9%92%B1%E6%B0%B8%E9%93%AD.jpg/330px-%E9%92%B1%E6%B0%B8%E9%93%AD.jpg",
+      "desc": "錢永銘（1885年8月29日—1958年6月19日），字新之，以字行，晚号北监老人，男，浙江吴兴（今湖州）人，中华民国银行家、政治人物，江浙财阀代表人物。1933年至1937年，其担任国民政府全国经济委员会委员。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E9%8C%A2%E6%B0%B8%E9%8A%98"
     },
     {
       "id": 379,
@@ -2742,7 +2784,9 @@
       "name": "黄冠芳",
       "category": "政治社会",
       "img": "",
-      "desc": "Category: 政治社会"
+      "desc": "黃麗芳，前香港女配音員。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E9%BB%83%E9%BA%97%E8%8A%B3"
     },
     {
       "id": 392,
@@ -2867,8 +2911,10 @@
       "id": 409,
       "name": "韦悫",
       "category": "政治社会",
-      "img": "",
-      "desc": "Category: 政治社会"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/b/b2/%E9%9F%8B%E6%84%A8.jpg",
+      "desc": "韦悫（1896年9月15日—1976年11月25日），原名乃坤，号捧丹，笔名普天，广东香山县翠微乡 人，中国教育家。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E9%9F%8B%E6%84%A8"
     },
     {
       "id": 410,
@@ -2881,8 +2927,10 @@
       "id": 411,
       "name": "吴开先",
       "category": "政治社会",
-      "img": "",
-      "desc": "Category: 政治社会"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/%E5%90%B3%E9%96%8B%E5%85%882.jpg/330px-%E5%90%B3%E9%96%8B%E5%85%882.jpg",
+      "desc": "吳開先（1899年—1990年1月30日），字啟人，生于今上海市金山区枫泾镇界河弄，中华民国政治人物。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E5%90%B3%E9%96%8B%E5%85%88"
     },
     {
       "id": 412,
@@ -2895,8 +2943,10 @@
       "id": 413,
       "name": "吴迈",
       "category": "政治社会",
-      "img": "",
-      "desc": "Category: 政治社会"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Xiamen_Nanputuo_20120226-14.jpg/330px-Xiamen_Nanputuo_20120226-14.jpg",
+      "desc": "吳邁（1885年—1937年1月13日），字良翰，中国江西省余江县平定乡石背吴村人。民国早期著名律师。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E5%90%B3%E9%82%81"
     },
     {
       "id": 414,
@@ -3154,8 +3204,10 @@
       "id": 450,
       "name": "陈启昌",
       "category": "政治社会",
-      "img": "",
-      "desc": "Category: 政治社会"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Tan_Khe-chhoan_%281931_jinbutsushi%29.jpg/300px-Tan_Khe-chhoan_%281931_jinbutsushi%29.jpg",
+      "desc": "陳啓川，臺灣高雄市人，日治時期曾出任高雄州協議員。國民政府接收臺灣後，曾在總統蔣中正多次邀約下任高雄市市長。出身陳中和家族，為陳中和六子。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E9%99%B3%E5%95%93%E5%B7%9D"
     },
     {
       "id": 451,
@@ -3196,8 +3248,10 @@
       "id": 456,
       "name": "张群",
       "category": "政治社会",
-      "img": "",
-      "desc": "Category: 政治社会"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/%E5%BC%A0%E7%BE%A4%E8%82%96%E5%83%8F%E7%85%A7.jpg/330px-%E5%BC%A0%E7%BE%A4%E8%82%96%E5%83%8F%E7%85%A7.jpg",
+      "desc": "張羣（1889年5月9日—1990年12月14日），字岳軍，四川省華陽縣人，中華民國政治人物，中國國民黨元老成員之一，也是國民黨內部派系政學系的元老之一。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E5%BC%B5%E7%BE%A3"
     },
     {
       "id": 457,
@@ -3232,7 +3286,9 @@
       "name": "张锡荣",
       "category": "政治社会",
       "img": "/public/data/images/relationships/20230412094744_8i.jpg",
-      "desc": "Category: 政治社会"
+      "desc": "張錫榮（1914年1月—1997年10月19日），浙江绍兴人，香港宝生银行创始人。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E5%BC%B5%E9%8C%AB%E6%A6%AE"
     },
     {
       "id": 462,
@@ -3357,8 +3413,10 @@
       "id": 479,
       "name": "邹恩慧",
       "category": "亲人家属",
-      "img": "",
-      "desc": "Category: 亲人家属"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/CollinChouMar08.jpg/330px-CollinChouMar08.jpg",
+      "desc": "鄒兆龍，曾用藝名倪星、鄒龍云，出生於臺灣高雄市國軍眷村，臺灣外省人，美籍华裔男演員，也曾演出好萊塢的《駭客任務》系列、Netflix美剧《马可·波罗》系列，其妻為1989年度香港小姐模特兒翁慧德。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E9%84%92%E5%85%86%E9%BE%8D"
     },
     {
       "id": 480,
@@ -3406,22 +3464,28 @@
       "id": 486,
       "name": "邹嘉骝",
       "category": "亲人家属",
-      "img": "",
-      "desc": "Category: 亲人家属"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/%E9%82%B9%E9%9F%AC%E5%A5%8B_%E9%9D%92%E5%B9%B4%E6%97%B6%E6%9C%9F.JPG/330px-%E9%82%B9%E9%9F%AC%E5%A5%8B_%E9%9D%92%E5%B9%B4%E6%97%B6%E6%9C%9F.JPG",
+      "desc": "鄒韜奮（1895年11月5日—1944年7月24日），原名恩潤，筆名谷僧、韜奮，取「韜光養晦」和「奮鬥」之意，生于福建省永安縣沙塘村，祖籍江西省餘江縣，新聞記者、出版家。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E9%84%92%E9%9F%9C%E5%A5%AE"
     },
     {
       "id": 487,
       "name": "邹嘉骊",
       "category": "亲人家属",
-      "img": "",
-      "desc": "Category: 亲人家属"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/%E9%82%B9%E9%9F%AC%E5%A5%8B_%E9%9D%92%E5%B9%B4%E6%97%B6%E6%9C%9F.JPG/330px-%E9%82%B9%E9%9F%AC%E5%A5%8B_%E9%9D%92%E5%B9%B4%E6%97%B6%E6%9C%9F.JPG",
+      "desc": "鄒韜奮（1895年11月5日—1944年7月24日），原名恩潤，筆名谷僧、韜奮，取「韜光養晦」和「奮鬥」之意，生于福建省永安縣沙塘村，祖籍江西省餘江縣，新聞記者、出版家。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E9%84%92%E9%9F%9C%E5%A5%AE"
     },
     {
       "id": 488,
       "name": "邹恩俊",
       "category": "亲人家属",
-      "img": "",
-      "desc": "Category: 亲人家属"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/%E9%84%92%E5%B9%B8%E5%BD%A4.jpg/330px-%E9%84%92%E5%B9%B8%E5%BD%A4.jpg",
+      "desc": "鄒幸彤，香港大律師，前支聯會副主席。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E9%84%92%E5%B9%B8%E5%BD%A4"
     },
     {
       "id": 489,
@@ -3448,8 +3512,10 @@
       "id": 492,
       "name": "邹恩敏",
       "category": "亲人家属",
-      "img": "",
-      "desc": "Category: 亲人家属"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/CollinChouMar08.jpg/330px-CollinChouMar08.jpg",
+      "desc": "鄒兆龍，曾用藝名倪星、鄒龍云，出生於臺灣高雄市國軍眷村，臺灣外省人，美籍华裔男演員，也曾演出好萊塢的《駭客任務》系列、Netflix美剧《马可·波罗》系列，其妻為1989年度香港小姐模特兒翁慧德。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E9%84%92%E5%85%86%E9%BE%8D"
     },
     {
       "id": 493,
@@ -3483,8 +3549,10 @@
       "id": 497,
       "name": "邹国珂",
       "category": "亲人家属",
-      "img": "",
-      "desc": "Category: 亲人家属"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/c/c8/General_Zou_Hong.jpg",
+      "desc": "鄒洪（1897年4月3日—1945年4月16日），名若虛，原名德寶，台灣新竹縣芎林鄉鹿寮坑（華龍村）客家人，中華民國將領。因抗日戰功彪炳，被譽為「常勝將軍」，生前受中華民國政府頒發四等雲麾勳章及寶鼎勳章，死後追封為陸軍上將，為第一位台籍上將，屬於半唐山。",
+      "sources": "维基百科",
+      "link": "https://zh.wikipedia.org/wiki/%E9%84%92%E6%B4%AA"
     },
     {
       "id": 498,
