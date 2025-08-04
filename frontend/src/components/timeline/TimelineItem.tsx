@@ -19,6 +19,7 @@ interface TimelineItemProps {
 const TimelineItem: React.FC<TimelineItemProps> = ({ event, isFeatured }) => {
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
   const [isPersonDataLoaded, setIsPersonDataLoaded] = useState(false);
+  const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
 
   // 初始化人物数据
   useEffect(() => {
@@ -34,6 +35,15 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, isFeatured }) => {
     loadPersonData();
   }, []);
 
+  // 清理定时器
+  useEffect(() => {
+    return () => {
+      if (hoverTimeout) {
+        clearTimeout(hoverTimeout);
+      }
+    };
+  }, [hoverTimeout]);
+
   const containerClasses = isFeatured
     ? 'transform scale(1.1) mb-8'
     : 'transform scale(0.95)';
@@ -45,8 +55,37 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, isFeatured }) => {
   const timeTextClasses = isFeatured ? 'text-base font-semibold' : 'text-sm font-medium';
   const experienceTextClasses = isFeatured ? 'text-lg leading-relaxed font-medium' : 'text-base';
 
-  // 处理人物姓名点击
+  // 处理人物姓名悬停
+  const handlePersonHover = (person: Person) => {
+    // 清除之前的延迟
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+    }
+    
+    // 设置悬停延迟（500ms后显示）
+    const timeout = setTimeout(() => {
+      setSelectedPerson(person);
+    }, 500);
+    
+    setHoverTimeout(timeout);
+  };
+
+  // 处理鼠标离开
+  const handlePersonLeave = () => {
+    // 清除悬停延迟
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+      setHoverTimeout(null);
+    }
+  };
+
+  // 处理人物姓名点击（保留原有功能）
   const handlePersonClick = (person: Person) => {
+    // 清除悬停延迟
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+      setHoverTimeout(null);
+    }
     setSelectedPerson(person);
   };
 
@@ -80,8 +119,10 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, isFeatured }) => {
         <button
           key={`person-${index}`}
           onClick={() => handlePersonClick(match.person)}
+          onMouseEnter={() => handlePersonHover(match.person)}
+          onMouseLeave={handlePersonLeave}
           className="text-gold underline hover:text-gold/80 transition-colors duration-200 font-medium"
-          title={`点击查看${match.person.name}的详细信息`}
+          title={`悬停或点击查看${match.person.name}的详细信息`}
         >
           {match.name}
         </button>
