@@ -27,11 +27,11 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
   const [visibleItems, setVisibleItems] = useState<number>(20); // 懒加载初始数量
   const [isLoading, setIsLoading] = useState(false);
   
-  // 卡片基础配置
-  const CARD_WIDTH = 280;
+  // 卡片基础配置（纵向长方形）
+  const CARD_WIDTH = 220; // 减小宽度
   const GAP = 24;
   const MIN_COLUMNS = 1;
-  const MAX_COLUMNS = 5;
+  const MAX_COLUMNS = 6; // 增加最大列数以适应更窄的卡片
   
   // 计算列数
   const getColumnCount = useCallback((width: number) => {
@@ -40,9 +40,9 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
     return Math.max(MIN_COLUMNS, Math.min(MAX_COLUMNS, possibleColumns));
   }, []);
   
-  // 估算卡片高度（统一高度，不再基于内容长度）
+  // 估算卡片高度（纵向长方形，高度大于宽度）
   const estimateCardHeight = useCallback((person: Person) => {
-    const baseHeight = 200; // 统一基础高度
+    const baseHeight = 280; // 增加高度，形成纵向长方形
     return baseHeight;
   }, []);
   
