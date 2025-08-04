@@ -114,12 +114,24 @@ export class PersonMatcher {
   }
   
   /**
-   * 从文本中提取可能的人名并进行匹配
-   * @param text 要分析的文本
-   * @param maxDistance 最大允许的编辑距离
-   * @returns 匹配结果数组，包含人名、位置和匹配到的人物对象
+   * 检查是否为词边界（避免匹配到词汇中间的部分）
    */
-  extractPersonsFromText(text: string, maxDistance: number = 2): Array<{
+  private isWordBoundary(text: string, startIndex: number, endIndex: number): boolean {
+    const prevChar = startIndex > 0 ? text[startIndex - 1] : '';
+    const nextChar = endIndex < text.length ? text[endIndex] : '';
+    
+    const boundaryChars = /[\s，。！？；：、（）【】《》""'']/;
+    
+    const isPrevBoundary = !prevChar || boundaryChars.test(prevChar);
+    const isNextBoundary = !nextChar || boundaryChars.test(nextChar);
+    
+    return isPrevBoundary || isNextBoundary;
+  }
+
+  /**
+   * 使用模糊包含匹配从文本中提取人名
+   */
+  extractPersonsFromText(text: string): Array<{
     name: string;
     startIndex: number;
     endIndex: number;
@@ -129,34 +141,90 @@ export class PersonMatcher {
       console.warn('Persons data not loaded. Call loadPersons() first.');
       return [];
     }
-    
+
     const results: Array<{
       name: string;
       startIndex: number;
       endIndex: number;
       person: Person;
+      matchLength: number;
     }> = [];
-    
-    // 简单的中文姓名提取规则：2-4个连续的中文字符
-    const namePattern = /[\u4e00-\u9fa5]{2,4}/g;
-    let match;
-    
-    while ((match = namePattern.exec(text)) !== null) {
-      const potentialName = match[0];
-      const person = this.findPersonByName(potentialName, maxDistance);
+
+    // 遍历所有人物，进行包含匹配
+    for (const person of this.personsCache) {
+      const personName = person.name;
       
-      if (person) {
-        results.push({
-          name: potentialName,
-          startIndex: match.index,
-          endIndex: match.index + potentialName.length,
-          person
+      // 1. 完整匹配
+      let index = text.indexOf(personName);
+      while (index !== -1) {
+        if (this.isWordBoundary(text, index, index + personName.length)) {
+          results.push({
+            name: personName,
+            startIndex: index,
+            endIndex: index + personName.length,
+            person,
+            matchLength: personName.length
+          });
+        }
+        index = text.indexOf(personName, index + 1);
+      }
+      
+      // 2. 部分匹配（去掉第一个字符）
+      if (personName.length > 2) {
+        const partialName = personName.substring(1);
+        let partialIndex = text.indexOf(partialName);
+        while (partialIndex !== -1) {
+          if (this.isWordBoundary(text, partialIndex, partialIndex + partialName.length)) {
+            const hasLongerMatch = results.some(r => 
+              r.startIndex <= partialIndex && r.endIndex >= partialIndex + partialName.length
+            );
+            
+            if (!hasLongerMatch) {
+              results.push({
+                name: partialName,
+                startIndex: partialIndex,
+                endIndex: partialIndex + partialName.length,
+                person,
+                matchLength: partialName.length
+              });
+            }
+          }
+          partialIndex = text.indexOf(partialName, partialIndex + 1);
+        }
+      }
+    }
+
+    // 去重处理：优先保留最长的匹配
+    const finalResults: Array<{
+      name: string;
+      startIndex: number;
+      endIndex: number;
+      person: Person;
+    }> = [];
+
+    const sortedResults = results.sort((a, b) => {
+      if (b.matchLength !== a.matchLength) {
+        return b.matchLength - a.matchLength;
+      }
+      return a.startIndex - b.startIndex;
+    });
+
+    for (const result of sortedResults) {
+      const hasOverlap = finalResults.some(existing => 
+        !(result.endIndex <= existing.startIndex || result.startIndex >= existing.endIndex)
+      );
+      
+      if (!hasOverlap) {
+        finalResults.push({
+          name: result.name,
+          startIndex: result.startIndex,
+          endIndex: result.endIndex,
+          person: result.person
         });
       }
     }
-    
-    // 按照首次出现的位置排序
-    return results.sort((a, b) => a.startIndex - b.startIndex);
+
+    return finalResults.sort((a, b) => a.startIndex - b.startIndex);
   }
 }
 
