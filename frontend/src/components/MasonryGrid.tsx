@@ -18,8 +18,9 @@ interface MasonryItem {
 // 配置常量
 const MASONRY_CONFIG = {
   layout: {
-    CARD_WIDTH: 120, // 增加卡片宽度，提供更多空间
-    GAP: 16, // 增加卡片间距，减少拥挤感
+    CARD_WIDTH: 140, // 进一步增宽卡片宽度
+    GAP: 24, // 水平间距（列间距）
+    VERTICAL_GAP: 20, // 垂直间距（行间距）
     MIN_COLUMNS: 1,
     MAX_COLUMNS: 4,
     BASE_HEIGHT: 280, // 适当增加基础高度
@@ -119,7 +120,7 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
       });
       
       // 更新列高度，使用固定间距
-      columnHeights[shortestColumnIndex] += estimatedHeight + MASONRY_CONFIG.layout.GAP;
+      columnHeights[shortestColumnIndex] += estimatedHeight + MASONRY_CONFIG.layout.VERTICAL_GAP;
     });
     
     return layoutItems;
@@ -172,7 +173,7 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
   
   // 计算容器高度
   const containerHeight = masonryItems.length > 0 
-    ? Math.max(...masonryItems.map(item => item.top + item.height)) + MASONRY_CONFIG.layout.GAP
+    ? Math.max(...masonryItems.map(item => item.top + item.height)) + MASONRY_CONFIG.layout.VERTICAL_GAP
     : 0;
   
   const columnCount = getColumnCount(containerWidth);
