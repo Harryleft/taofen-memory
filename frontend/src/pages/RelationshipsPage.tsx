@@ -143,17 +143,6 @@ export default function RelationshipsPage() {
     return categoryInfo?.color || 'bg-gray-500';
   };
 
-  // 邹韬奋的基本信息
-  const taofen: Person = {
-    id: RELATIONSHIPS_CONFIG.person.TAOFEN_ID,
-    name: '邹韬奋',
-    category: '邹韬奋',
-    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/%E9%82%B9%E9%9F%AC%E5%A5%8B_%E9%9D%92%E5%B9%B4%E6%97%B6%E6%9C%9F.JPG/330px-%E9%82%B9%E9%9F%AC%E5%A5%8B_%E9%9D%92%E5%B9%B4%E6%97%B6%E6%9C%9F.JPG',
-    desc: '文化先驱，新闻出版家',
-    sources: [],
-    link: []
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -172,7 +161,6 @@ export default function RelationshipsPage() {
         <div className={`max-w-7xl mx-auto px-${RELATIONSHIPS_CONFIG.ui.spacing.LARGE} py-${RELATIONSHIPS_CONFIG.ui.spacing.LARGE}`}>
           <div className="text-center">
             <h1 className={`text-4xl font-bold text-gray-800 mb-${RELATIONSHIPS_CONFIG.ui.spacing.SMALL}`}>邹韬奋人脉网络</h1>
-            <p className="text-gray-600">探索一位文化先驱的社会关系图谱</p>
           </div>
           
           {/* Category Filter */}
