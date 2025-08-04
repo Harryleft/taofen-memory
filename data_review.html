@@ -561,12 +561,12 @@
                         <textarea id="editDesc" placeholder="请输入人物描述..."></textarea>
                     </div>
                     <div class="form-group">
-                        <label for="editSources">来源:</label>
-                        <input type="text" id="editSources" placeholder="维基百科">
+                        <label for="editSources">来源 (多个来源用逗号分隔):</label>
+                        <input type="text" id="editSources" placeholder="上海图书馆人名规范库, 维基百科">
                     </div>
                     <div class="form-group">
-                        <label for="editLink">链接:</label>
-                        <input type="text" id="editLink" placeholder="https://zh.wikipedia.org/wiki/... 或本地路径">
+                        <label for="editLink">链接 (多个链接用逗号分隔):</label>
+                        <input type="text" id="editLink" placeholder="http://data.library.sh.cn/entity/person/..., https://zh.wikipedia.org/wiki/...">
                     </div>
                 </form>
             </div>
@@ -625,8 +625,8 @@
                     category: "新闻出版",
                     img: "/public/data/images/relationships/20230628124722_4u.jpg",
                     desc: "邹韬奋（1895年11月5日—1944年7月24日），原名恩润，字韬奋，福建永安人，中国著名记者、出版家、政治活动家。",
-                    sources: "维基百科",
-                    link: "https://zh.wikipedia.org/wiki/邹韬奋"
+                    sources: ["上海图书馆人名规范库", "维基百科"],
+                    link: ["http://data.library.sh.cn/entity/person/jw5l5kzmesq4pdtl", "https://zh.wikipedia.org/wiki/邹韬奋"]
                 },
                 {
                     id: 2,
@@ -634,8 +634,8 @@
                     category: "新闻出版",
                     img: "/public/data/images/relationships/20210924110353.jpg",
                     desc: "梁启超（1873年2月23日—1929年1月19日），字卓如，号任公，广东新会人，中国近代思想家、政治活动家、教育家、史学家、文学家。",
-                    sources: "维基百科",
-                    link: "https://zh.wikipedia.org/wiki/梁启超"
+                    sources: ["上海图书馆人名规范库", "维基百科"],
+                    link: ["http://data.library.sh.cn/entity/person/0rs2exbs4fq613y6", "https://zh.wikipedia.org/wiki/梁启超"]
                 }
             ];
             filteredData = [...personsData];
@@ -649,8 +649,8 @@
             const total = personsData.length;
             const withImage = personsData.filter(p => p.img && p.img.trim() !== '').length;
             const withDesc = personsData.filter(p => p.desc && p.desc.trim() !== '' && !p.desc.startsWith('Category:')).length;
-            const withSource = personsData.filter(p => p.sources && p.sources.trim() !== '').length;
-            const withLink = personsData.filter(p => p.link && p.link.trim() !== '').length;
+            const withSource = personsData.filter(p => p.sources && Array.isArray(p.sources) && p.sources.length > 0).length;
+            const withLink = personsData.filter(p => p.link && Array.isArray(p.link) && p.link.length > 0).length;
 
             document.getElementById('totalCount').textContent = total;
             document.getElementById('withImageCount').textContent = withImage;
@@ -704,10 +704,12 @@
                         ${person.desc ? person.desc.substring(0, 100) + (person.desc.length > 100 ? '...' : '') : '<span style="color:#999;">无描述</span>'}
                     </td>
                     <td>
-                        ${person.sources || '<span style="color:#999;">无</span>'}
+                        ${person.sources && Array.isArray(person.sources) && person.sources.length > 0 ? person.sources.join(', ') : '<span style="color:#999;">无</span>'}
                     </td>
                     <td class="link-cell">
-                        ${person.link ? `<a href="${person.link}" target="_blank">${person.link.length > 30 ? person.link.substring(0, 30) + '...' : person.link}</a>` : '<span style="color:#999;">无</span>'}
+                        ${person.link && Array.isArray(person.link) && person.link.length > 0 ? 
+                            person.link.map(url => `<a href="${url}" target="_blank" style="display:block;margin-bottom:2px;">${url.length > 30 ? url.substring(0, 30) + '...' : url}</a>`).join('') : 
+                            '<span style="color:#999;">无</span>'}
                     </td>
                     <td>
                         <button class="edit-btn" onclick="editPerson(${person.id})">编辑</button>
@@ -771,8 +773,8 @@
             document.getElementById('editCategory').value = person.category;
             document.getElementById('editImg').value = person.img || '';
             document.getElementById('editDesc').value = person.desc || '';
-            document.getElementById('editSources').value = person.sources || '';
-            document.getElementById('editLink').value = person.link || '';
+            document.getElementById('editSources').value = Array.isArray(person.sources) ? person.sources.join(', ') : (person.sources || '');
+            document.getElementById('editLink').value = Array.isArray(person.link) ? person.link.join(', ') : (person.link || '');
             
             document.getElementById('editModal').style.display = 'block';
         }
@@ -802,14 +804,17 @@
                 return;
             }
 
+            const sourcesValue = document.getElementById('editSources').value.trim();
+            const linkValue = document.getElementById('editLink').value.trim();
+            
             const personData = {
                 id: parseInt(document.getElementById('editId').value),
                 name: document.getElementById('editName').value.trim(),
                 category: document.getElementById('editCategory').value.trim(),
                 img: document.getElementById('editImg').value.trim(),
                 desc: document.getElementById('editDesc').value.trim(),
-                sources: document.getElementById('editSources').value.trim(),
-                link: document.getElementById('editLink').value.trim()
+                sources: sourcesValue ? sourcesValue.split(',').map(s => s.trim()).filter(s => s) : [],
+                link: linkValue ? linkValue.split(',').map(l => l.trim()).filter(l => l) : []
             };
 
             if (editingIndex === -1) {
