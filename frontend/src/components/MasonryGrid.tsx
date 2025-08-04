@@ -13,16 +13,22 @@ interface MasonryItem {
   height: number;
   column: number;
   top: number;
+  gap?: number; // 可选的随机间距属性
 }
 
 // 配置常量
 const MASONRY_CONFIG = {
   layout: {
-    CARD_WIDTH: 150,
-    GAP: 5,
+    CARD_WIDTH: 100,
+    GAP: 5, // 基础间距，实际使用时会添加随机变化
+    GAP_MIN: 8, // 最小随机间距
+    GAP_MAX: 15, // 最大随机间距
     MIN_COLUMNS: 1,
-    MAX_COLUMNS: 5,
-    BASE_HEIGHT: 180
+    MAX_COLUMNS: 4,
+    BASE_HEIGHT: 280, // 基础高度，会根据内容动态调整
+    HEIGHT_PER_CHAR: 1.2, // 每个字符增加的高度
+    MIN_HEIGHT: 250, // 最小卡片高度
+    MAX_HEIGHT: 400 // 最大卡片高度
   },
   lazyLoad: {
     INITIAL_ITEMS: 20,
@@ -32,7 +38,7 @@ const MASONRY_CONFIG = {
   },
   ui: {
     ICON_SIZE: 12,
-    DESC_MAX_LENGTH: 50 // 人物简介最大显示字符数
+    DESC_MAX_LENGTH: 60 // 人物简介最大显示字符数
   },
   avatar: {
     // 头像外层容器尺寸 - 从w-16 h-16 (64px)优化为更平衡的尺寸
@@ -73,35 +79,65 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
     return Math.max(MASONRY_CONFIG.layout.MIN_COLUMNS, Math.min(MASONRY_CONFIG.layout.MAX_COLUMNS, possibleColumns));
   }, []);
   
-  // 估算卡片高度（纵向长方形，高度大于宽度）
+  // 根据人物描述长度动态估算卡片高度
   const estimateCardHeight = useCallback((person: Person) => {
-    return MASONRY_CONFIG.layout.BASE_HEIGHT;
+    let height = MASONRY_CONFIG.layout.BASE_HEIGHT;
+    
+    // 根据描述长度调整高度
+    if (person.desc) {
+      const descLength = person.desc.length;
+      const additionalHeight = Math.min(
+        descLength * MASONRY_CONFIG.layout.HEIGHT_PER_CHAR,
+        MASONRY_CONFIG.layout.MAX_HEIGHT - MASONRY_CONFIG.layout.BASE_HEIGHT
+      );
+      height += additionalHeight;
+    }
+    
+    // 确保高度在合理范围内
+    return Math.max(
+      MASONRY_CONFIG.layout.MIN_HEIGHT,
+      Math.min(MASONRY_CONFIG.layout.MAX_HEIGHT, height)
+    );
   }, []);
   
-  // 瀑布流布局算法
+  // 生成随机间距的函数
+  const getRandomGap = useCallback(() => {
+    return Math.random() * (MASONRY_CONFIG.layout.GAP_MAX - MASONRY_CONFIG.layout.GAP_MIN) + MASONRY_CONFIG.layout.GAP_MIN;
+  }, []);
+  
+  // 增强的瀑布流布局算法
   const calculateMasonryLayout = useCallback((itemsToLayout: Person[], containerWidth: number) => {
     const columnCount = getColumnCount(containerWidth);
     const columnHeights = new Array(columnCount).fill(0);
     const layoutItems: MasonryItem[] = [];
     
-    itemsToLayout.forEach((person) => {
-      // 找到最短的列
-      const shortestColumnIndex = columnHeights.indexOf(Math.min(...columnHeights));
+    itemsToLayout.forEach((person, index) => {
+      // 找到最短的列，添加轻微随机因子避免过于机械的排列
+      const minHeight = Math.min(...columnHeights);
+      const shortestColumns = columnHeights
+        .map((height, idx) => ({ height, idx }))
+        .filter(col => col.height <= minHeight + 20); // 允许20px的高度差
+      
+      const randomColumn = shortestColumns[Math.floor(Math.random() * shortestColumns.length)];
+      const columnIndex = randomColumn.idx;
+      
       const estimatedHeight = estimateCardHeight(person);
+      const randomGap = getRandomGap();
       
       layoutItems.push({
         person,
         height: estimatedHeight,
-        column: shortestColumnIndex,
-        top: columnHeights[shortestColumnIndex]
+        column: columnIndex,
+        top: columnHeights[columnIndex],
+        gap: randomGap // 存储每个卡片的随机间距
       });
       
-      // 更新列高度
-      columnHeights[shortestColumnIndex] += estimatedHeight + MASONRY_CONFIG.layout.GAP;
+      // 更新列高度，使用随机间距
+      columnHeights[columnIndex] += estimatedHeight + randomGap;
     });
     
     return layoutItems;
-  }, [getColumnCount, estimateCardHeight]);
+  }, [getColumnCount, estimateCardHeight, getRandomGap]);
   
   // 监听容器宽度变化
   useEffect(() => {
@@ -166,21 +202,28 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
         style={{ height: containerHeight }}
       >
         {masonryItems.map((item, index) => {
-          const { person, column, top } = item;
+          const { person, column, top, gap } = item;
           const categoryInfo = categories.find(cat => cat.id === person.category);
           const Icon = categoryInfo?.icon;
           
           const left = MASONRY_CONFIG.layout.GAP + column * (columnWidth + MASONRY_CONFIG.layout.GAP);
           
+          // 添加微妙的视觉变化
+          const randomRotation = (Math.random() - 0.5) * 2; // -1到1度的轻微旋转
+          const randomScale = 0.98 + Math.random() * 0.04; // 0.98到1.02的轻微缩放
+          const shadowIntensity = Math.random() * 0.3 + 0.7; // 0.7到1.0的阴影强度变化
+          
           return (
             <div
               key={`${person.id}-${index}`}
-              className="absolute bg-gradient-to-br from-cream to-white rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border border-gold/10 hover:border-gold/20 group hover:bg-gradient-to-br hover:from-gold/5 hover:to-cream"
+              className="absolute bg-gradient-to-br from-cream to-white rounded-2xl p-4 shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer border border-gold/10 hover:border-gold/30 group hover:bg-gradient-to-br hover:from-gold/8 hover:to-cream hover:scale-105"
               style={{
                 left: `${left}px`,
                 top: `${top}px`,
                 width: `${columnWidth}px`,
-                transform: 'translateZ(0)', // 硬件加速
+                transform: `translateZ(0) rotate(${randomRotation}deg) scale(${randomScale})`, // 添加微妙变化
+                boxShadow: `0 ${4 + Math.random() * 8}px ${16 + Math.random() * 8}px rgba(0,0,0,${0.1 * shadowIntensity})`, // 随机阴影
+                transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)', // 更流畅的过渡
               }}
               onClick={() => onItemClick(person)}
             >
