@@ -20,7 +20,7 @@ const MASONRY_CONFIG = {
   layout: {
     CARD_WIDTH: 140, // 进一步增宽卡片宽度
     GAP: 24, // 水平间距（列间距）
-    VERTICAL_GAP: 20, // 垂直间距（行间距）
+    VERTICAL_GAP: 60, // 垂直间距（行间距）
     MIN_COLUMNS: 1,
     MAX_COLUMNS: 4,
     BASE_HEIGHT: 280, // 适当增加基础高度
@@ -77,7 +77,7 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
     return Math.max(MASONRY_CONFIG.layout.MIN_COLUMNS, Math.min(MASONRY_CONFIG.layout.MAX_COLUMNS, possibleColumns));
   }, []);
   
-  // 根据人物描述长度动态估算卡片高度
+  // 根据人物描述长度动态估算卡片高度，增加随机变化实现交错效果
   const estimateCardHeight = useCallback((person: Person) => {
     let height = MASONRY_CONFIG.layout.BASE_HEIGHT;
     
@@ -91,6 +91,12 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
       height += additionalHeight;
     }
     
+    // 添加基于人物ID的伪随机高度变化，实现更好的交错效果
+    const randomSeed = person.id * 9301 + 49297; // 使用简单的线性同余生成器
+    const randomFactor = (randomSeed % 1000) / 1000; // 生成0-1之间的伪随机数
+    const heightVariation = (randomFactor - 0.5) * 60; // ±30px的高度变化
+    height += heightVariation;
+    
     // 确保高度在合理范围内
     return Math.max(
       MASONRY_CONFIG.layout.MIN_HEIGHT,
@@ -100,27 +106,45 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
   
 
   
-  // 瀑布流布局算法
+  // 优化的瀑布流布局算法，实现更好的交错排列效果
   const calculateMasonryLayout = useCallback((itemsToLayout: Person[], containerWidth: number) => {
     const columnCount = getColumnCount(containerWidth);
     const columnHeights = new Array(columnCount).fill(0);
     const layoutItems: MasonryItem[] = [];
     
-    itemsToLayout.forEach((person) => {
-      // 找到最短的列
-      const shortestColumnIndex = columnHeights.indexOf(Math.min(...columnHeights));
+    itemsToLayout.forEach((person, index) => {
+      let targetColumnIndex;
+      
+      // 前几个卡片使用顺序分布，确保每列都有内容
+      if (index < columnCount) {
+        targetColumnIndex = index;
+      } else {
+        // 后续卡片使用智能选择策略，平衡最短列和交错效果
+        const minHeight = Math.min(...columnHeights);
+        const candidateColumns = columnHeights
+          .map((height, idx) => ({ idx, height }))
+          .filter(col => col.height <= minHeight + 100) // 允许一定的高度差异
+          .sort((a, b) => a.height - b.height);
+        
+        // 在候选列中选择，增加随机性实现交错效果
+        const randomSeed = person.id * 7919 + 65537;
+        const randomIndex = randomSeed % candidateColumns.length;
+        targetColumnIndex = candidateColumns[randomIndex].idx;
+      }
       
       const estimatedHeight = estimateCardHeight(person);
       
       layoutItems.push({
         person,
         height: estimatedHeight,
-        column: shortestColumnIndex,
-        top: columnHeights[shortestColumnIndex]
+        column: targetColumnIndex,
+        top: columnHeights[targetColumnIndex]
       });
       
-      // 更新列高度，使用固定间距
-      columnHeights[shortestColumnIndex] += estimatedHeight + MASONRY_CONFIG.layout.VERTICAL_GAP;
+      // 更新列高度，使用动态间距增强交错效果
+      const dynamicGap = MASONRY_CONFIG.layout.VERTICAL_GAP + 
+        ((person.id * 1103) % 20) - 10; // ±10px的间距变化
+      columnHeights[targetColumnIndex] += estimatedHeight + Math.max(40, dynamicGap);
     });
     
     return layoutItems;
