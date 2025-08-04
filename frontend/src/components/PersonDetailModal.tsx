@@ -60,9 +60,10 @@ import { Person } from '../types/Person';
 interface PersonDetailModalProps {
   person: Person | null;
   onClose: () => void;
+  getCategoryColor: (category: string) => string;
 }
 
-const PersonDetailModal: React.FC<PersonDetailModalProps> = ({ person, onClose }) => {
+const PersonDetailModal: React.FC<PersonDetailModalProps> = ({ person, onClose, getCategoryColor }) => {
   if (!person) return null;
 
   // const getCategoryColor = (category: string) => {
@@ -121,33 +122,18 @@ const PersonDetailModal: React.FC<PersonDetailModalProps> = ({ person, onClose }
                 alt={person.name}
                 className="w-20 h-20 rounded-full mx-auto object-cover border-2 border-white shadow-lg"
               />
-              <div className={`absolute -bottom-2 -right-2 w-8 h-8 rounded-full border-3 border-white flex items-center justify-center ${
-                person.category === '亲人家属' ? 'bg-warm-rose' :
-                person.category === '新闻出版' ? 'bg-gold' :
-                person.category === '学术文化' ? 'bg-heritage-blue' :
-                person.category === '政治社会' ? 'bg-sage-green' : 'bg-gray-500'
-              }`}>
+              <div className={`absolute -bottom-2 -right-2 w-8 h-8 rounded-full border-3 border-white flex items-center justify-center ${getCategoryColor(person.category)}`}>
                 <span className="text-white text-xs font-bold">{person.category.charAt(0)}</span>
               </div>
             </div>
           ) : (
-            <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto shadow-lg ${
-              person.category === '亲人家属' ? 'bg-warm-rose' :
-              person.category === '新闻出版' ? 'bg-gold' :
-              person.category === '学术文化' ? 'bg-heritage-blue' :
-              person.category === '政治社会' ? 'bg-sage-green' : 'bg-gray-500'
-            }`}>
+            <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto shadow-lg ${getCategoryColor(person.category)}`}>
               <span className="text-white font-bold text-2xl">{person.name.charAt(0)}</span>
             </div>
           )}
           
           <h2 className="text-2xl font-bold text-charcoal mt-4 mb-2">{person.name}</h2>
-          <div className={`inline-block px-4 py-1 rounded-full text-sm font-medium text-white ${
-            person.category === '亲人家属' ? 'bg-warm-rose' :
-            person.category === '新闻出版' ? 'bg-gold' :
-            person.category === '学术文化' ? 'bg-heritage-blue' :
-            person.category === '政治社会' ? 'bg-sage-green' : 'bg-gray-500'
-          }`}>
+          <div className={`inline-block px-4 py-1 rounded-full text-sm font-medium text-white ${getCategoryColor(person.category)}`}>
             {person.category}
           </div>
         </div>

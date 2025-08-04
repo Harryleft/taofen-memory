@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Heart, BookOpen, GraduationCap, Building } from 'lucide-react';
+import { Users, Home, BookOpen, GraduationCap, Landmark } from 'lucide-react';
 import MasonryGrid from '../components/MasonryGrid';
 import PersonDetailModal from '../components/PersonDetailModal';
 import { Person } from '../types/Person';
@@ -84,10 +84,10 @@ const RELATIONSHIPS_CONFIG = {
 
 const categories = [
   { id: 'all', name: '全部关系', icon: Users, color: 'bg-charcoal' },
-  { id: '亲人家属', name: '亲人家属', icon: Heart, color: 'bg-warm-rose' },
+  { id: '亲人家属', name: '亲人家属', icon: Home, color: 'bg-rose-400' },
   { id: '新闻出版', name: '新闻出版', icon: BookOpen, color: 'bg-gold' },
   { id: '学术文化', name: '学术文化', icon: GraduationCap, color: 'bg-heritage-blue' },
-  { id: '政治社会', name: '政治社会', icon: Building, color: 'bg-sage-green' }
+  { id: '政治社会', name: '政治社会', icon: Landmark, color: 'bg-sage-green' }
 ];
 
 export default function RelationshipsPage() {
@@ -198,6 +198,7 @@ export default function RelationshipsPage() {
       <PersonDetailModal 
         person={selectedPerson}
         onClose={() => setSelectedPerson(null)}
+        getCategoryColor={getCategoryColor}
       />
     </div>
   );
