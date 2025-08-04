@@ -36,13 +36,21 @@ const CoreEventSection: React.FC<CoreEventSectionProps> = ({ coreEvent, coreInde
         </h3>
       </div>
 
-      <button
-        className={`first-event-clickable ${isExpanded ? 'expanded' : ''}`}
+      <div
+        className={`first-event-clickable ${isExpanded ? 'expanded' : ''} cursor-pointer`}
         onClick={toggleExpansion}
+        role="button"
+        tabIndex={0}
         aria-expanded={isExpanded}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleExpansion();
+          }
+        }}
       >
         <TimelineItem event={firstEvent} isFeatured />
-      </button>
+      </div>
 
       {isExpanded && (
         <div className="space-y-6 animate-fadeIn mt-8">
