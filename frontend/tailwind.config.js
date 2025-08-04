@@ -9,7 +9,7 @@ export default {
         charcoal: '#2C2C2C',
         seal: '#DC2626',
         // 新增配色方案
-        'warm-rose': '#E91E63',     // 亲人家属 - 温暖亲密的玫瑰色
+        'warm-rose': '#8D6E63',     // 亲人家属 - 温暖克制的棕玫瑰色
         'heritage-blue': '#1565C0', // 学术文化 - 文化传承的深蓝色
         'sage-green': '#689F38',    // 政治社会 - 稳重的橄榄绿
       },
