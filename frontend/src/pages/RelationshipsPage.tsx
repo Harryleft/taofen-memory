@@ -9,10 +9,10 @@ interface RelationshipsData {
 
 const categories = [
   { id: 'all', name: '全部关系', icon: Users, color: 'bg-charcoal' },
-  { id: '亲人家属', name: '亲人家属', icon: Heart, color: 'bg-seal' },
+  { id: '亲人家属', name: '亲人家属', icon: Heart, color: 'bg-warm-rose' },
   { id: '新闻出版', name: '新闻出版', icon: BookOpen, color: 'bg-gold' },
-  { id: '学术文化', name: '学术文化', icon: GraduationCap, color: 'bg-charcoal' },
-  { id: '政治社会', name: '政治社会', icon: Building, color: 'bg-seal' }
+  { id: '学术文化', name: '学术文化', icon: GraduationCap, color: 'bg-heritage-blue' },
+  { id: '政治社会', name: '政治社会', icon: Building, color: 'bg-sage-green' }
 ];
 
 export default function RelationshipsPage() {
