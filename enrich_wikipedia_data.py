@@ -259,6 +259,7 @@ class WikipediaEnricher:
         result = {}
         
         # 提取描述信息和来源
+        biography_parsed = False
         if 'briefBiography' in sh_data and sh_data['briefBiography']:
             biography = sh_data['briefBiography'].strip()
             # 清理描述文本
@@ -284,21 +285,25 @@ class WikipediaEnricher:
             
             # 清理描述文本
             biography = re.sub(r'\s+', ' ', biography).strip()
-            result['desc'] = biography
             
-            # 如果找到了来源，添加到结果中
-            if sources:
-                result['sources'] = sources
+            # 如果成功解析到描述内容，标记为已解析
+            if biography:
+                result['desc'] = biography
+                biography_parsed = True
+                
+                # 如果找到了来源，添加到结果中
+                if sources:
+                    result['sources'] = sources
         
         # 提取链接信息（改为数组格式）
         if 'uri' in sh_data and sh_data['uri']:
             result['links'] = [sh_data['uri']]
         
-        # 确保sources是数组格式，并添加上海图书馆作为数据源
-        if 'sources' not in result:
-            result['sources'] = []
-        if '上海图书馆' not in result['sources']:
-            result['sources'].append('上海图书馆')
+        # 只有在briefBiography字段解析失败时，才添加"上海图书馆人名规范库"作为来源
+        if not biography_parsed:
+            if 'sources' not in result:
+                result['sources'] = []
+            result['sources'].append('上海图书馆人名规范库')
         
         return result
     
