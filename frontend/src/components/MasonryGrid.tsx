@@ -13,22 +13,19 @@ interface MasonryItem {
   height: number;
   column: number;
   top: number;
-  gap?: number; // 可选的随机间距属性
 }
 
 // 配置常量
 const MASONRY_CONFIG = {
   layout: {
-    CARD_WIDTH: 100,
-    GAP: 5, // 基础间距，实际使用时会添加随机变化
-     GAP_MIN: 5, // 最小随机间距（减少以降低累积效应）
-     GAP_MAX: 10, // 最大随机间距（减少以降低累积效应）
+    CARD_WIDTH: 120, // 增加卡片宽度，提供更多空间
+    GAP: 16, // 增加卡片间距，减少拥挤感
     MIN_COLUMNS: 1,
     MAX_COLUMNS: 4,
-    BASE_HEIGHT: 280, // 基础高度，会根据内容动态调整
-     HEIGHT_PER_CHAR: 0.8, // 每个字符增加的高度（降低以减少空白）
-     MIN_HEIGHT: 250, // 最小卡片高度
-     MAX_HEIGHT: 350 // 最大卡片高度（降低以减少过度估算）
+    BASE_HEIGHT: 280, // 适当增加基础高度
+    HEIGHT_PER_CHAR: 0.6, // 稍微增加每字符高度
+    MIN_HEIGHT: 240, // 增加最小卡片高度
+    MAX_HEIGHT: 320 // 增加最大卡片高度
   },
   lazyLoad: {
     INITIAL_ITEMS: 20,
@@ -38,25 +35,25 @@ const MASONRY_CONFIG = {
   },
   ui: {
     ICON_SIZE: 12,
-    DESC_MAX_LENGTH: 60 // 人物简介最大显示字符数
+    DESC_MAX_LENGTH: 100 // 人物简介最大显示字符数
   },
   avatar: {
-    // 头像外层容器尺寸 - 从w-16 h-16 (64px)优化为更平衡的尺寸
-    CONTAINER_SIZE: 'w-15 h-15', // 60px，减少整体尺寸但保持视觉平衡
+    // 头像外层容器尺寸 - 增加尺寸提供更好的视觉效果
+    CONTAINER_SIZE: 'w-18 h-18', // 72px，增加头像容器尺寸
     // 头像内层尺寸 - 相应调整以保持比例
-    INNER_SIZE: 'w-11 h-11', // 44px，保持合适的内容显示区域
-    // 边框宽度 - 从border-2 (8px)减少到border-1 (4px)
-    BORDER_WIDTH: 'border-1', // 4px，减少空白区域
+    INNER_SIZE: 'w-14 h-14', // 56px，增加内容显示区域
+    // 边框宽度 - 保持适中的边框
+    BORDER_WIDTH: 'border-2', // 8px，恢复合适的边框宽度
     // 分类图标容器
     CATEGORY_ICON: {
-      SIZE: 'p-1', // 从p-1.5减少到p-1，与整体缩小保持一致
-      BORDER: 'border-1', // 与头像边框保持一致
-      POSITION: '-bottom-0.5 -right-0.5' // 微调位置以适应新尺寸
+      SIZE: 'p-1.5', // 增加图标容器内边距
+      BORDER: 'border-2', // 与头像边框保持一致
+      POSITION: '-bottom-1 -right-1' // 调整位置适应新尺寸
     },
     // 字体大小调整
-    FONT_SIZE: 'text-sm', // 从text-base减少，适配较小的头像尺寸
+    FONT_SIZE: 'text-base', // 恢复正常字体大小
     // 阴影效果
-    SHADOW: 'shadow-sm' // 从shadow-md减少，避免视觉过重
+    SHADOW: 'shadow-md' // 恢复适中的阴影效果
   }
 };
 
@@ -100,44 +97,33 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
     );
   }, []);
   
-  // 生成随机间距的函数
-  const getRandomGap = useCallback(() => {
-    return Math.random() * (MASONRY_CONFIG.layout.GAP_MAX - MASONRY_CONFIG.layout.GAP_MIN) + MASONRY_CONFIG.layout.GAP_MIN;
-  }, []);
+
   
-  // 增强的瀑布流布局算法
+  // 瀑布流布局算法
   const calculateMasonryLayout = useCallback((itemsToLayout: Person[], containerWidth: number) => {
     const columnCount = getColumnCount(containerWidth);
     const columnHeights = new Array(columnCount).fill(0);
     const layoutItems: MasonryItem[] = [];
     
-    itemsToLayout.forEach((person, index) => {
-      // 找到最短的列，添加轻微随机因子避免过于机械的排列
-      const minHeight = Math.min(...columnHeights);
-      const shortestColumns = columnHeights
-        .map((height, idx) => ({ height, idx }))
-        .filter(col => col.height <= minHeight + 20); // 允许20px的高度差
-      
-      const randomColumn = shortestColumns[Math.floor(Math.random() * shortestColumns.length)];
-      const columnIndex = randomColumn.idx;
+    itemsToLayout.forEach((person) => {
+      // 找到最短的列
+      const shortestColumnIndex = columnHeights.indexOf(Math.min(...columnHeights));
       
       const estimatedHeight = estimateCardHeight(person);
-      const randomGap = getRandomGap();
       
       layoutItems.push({
         person,
         height: estimatedHeight,
-        column: columnIndex,
-        top: columnHeights[columnIndex],
-        gap: randomGap // 存储每个卡片的随机间距
+        column: shortestColumnIndex,
+        top: columnHeights[shortestColumnIndex]
       });
       
-      // 更新列高度，使用随机间距
-      columnHeights[columnIndex] += estimatedHeight + randomGap;
+      // 更新列高度，使用固定间距
+      columnHeights[shortestColumnIndex] += estimatedHeight + MASONRY_CONFIG.layout.GAP;
     });
     
     return layoutItems;
-  }, [getColumnCount, estimateCardHeight, getRandomGap]);
+  }, [getColumnCount, estimateCardHeight]);
   
   // 监听容器宽度变化
   useEffect(() => {
@@ -202,34 +188,26 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
         style={{ height: containerHeight }}
       >
         {masonryItems.map((item, index) => {
-          const { person, column, top, gap } = item;
+          const { person, column, top } = item;
           const categoryInfo = categories.find(cat => cat.id === person.category);
           const Icon = categoryInfo?.icon;
           
           const left = MASONRY_CONFIG.layout.GAP + column * (columnWidth + MASONRY_CONFIG.layout.GAP);
           
-          // 添加微妙的视觉变化
-          const randomRotation = (Math.random() - 0.5) * 2; // -1到1度的轻微旋转
-          const randomScale = 0.98 + Math.random() * 0.04; // 0.98到1.02的轻微缩放
-          const shadowIntensity = Math.random() * 0.3 + 0.7; // 0.7到1.0的阴影强度变化
-          
           return (
             <div
               key={`${person.id}-${index}`}
-              className="absolute bg-gradient-to-br from-cream to-white rounded-2xl p-4 shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer border border-gold/10 hover:border-gold/30 group hover:bg-gradient-to-br hover:from-gold/8 hover:to-cream hover:scale-105"
+              className="absolute bg-gradient-to-br from-cream to-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border border-gold/10 hover:border-gold/30 group hover:bg-gradient-to-br hover:from-gold/8 hover:to-cream hover:scale-105"
               style={{
                 left: `${left}px`,
                 top: `${top}px`,
                 width: `${columnWidth}px`,
-                transform: `translateZ(0) rotate(${randomRotation}deg) scale(${randomScale})`, // 添加微妙变化
-                boxShadow: `0 ${4 + Math.random() * 8}px ${16 + Math.random() * 8}px rgba(0,0,0,${0.1 * shadowIntensity})`, // 随机阴影
-                transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)', // 更流畅的过渡
               }}
               onClick={() => onItemClick(person)}
             >
               <div className="flex flex-col items-center text-center">
                 {/* 头像或占位符 */}
-                <div className="relative mb-3">
+                <div className="relative mb-4">
                   {person.img ? (
                     <div className="relative">
                       {/* 头像外层容器 - 使用配置常量管理尺寸和样式 */}
@@ -261,13 +239,13 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
                 </div>
                 
                 {/* 姓名 */}
-                <h3 className="text-lg font-semibold text-charcoal mb-1.5 group-hover:text-gold transition-colors">
+                <h3 className="text-lg font-semibold text-charcoal mb-2 group-hover:text-gold transition-colors">
                   {person.name}
                 </h3>
                 
                 {/* 人物简介 - 截取前50个字符 */}
                 {person.desc && (
-                  <p className="text-sm text-gray-600 mb-2 px-2 leading-relaxed">
+                  <p className="text-sm text-gray-600 mb-3 px-1 leading-relaxed">
                     {person.desc.length > MASONRY_CONFIG.ui.DESC_MAX_LENGTH 
                       ? `${person.desc.substring(0, MASONRY_CONFIG.ui.DESC_MAX_LENGTH)}...` 
                       : person.desc
@@ -276,7 +254,7 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
                 )}
                 
                 {/* 分类标签 */}
-                <div className={`px-3 py-1 rounded-full text-xs font-medium text-white ${getCategoryColor(person.category)}`}>
+                <div className={`px-3 py-1.5 rounded-full text-xs font-medium text-white ${getCategoryColor(person.category)}`}>
                   {person.category}
                 </div>
               </div>
