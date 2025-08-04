@@ -26,7 +26,7 @@ const RELATIONSHIPS_CONFIG = {
     // 头像尺寸配置
     avatarSizes: {
       DETAIL_AVATAR: 20,      // 详情页面头像尺寸 (w-20 h-20)
-      PLACEHOLDER_AVATAR: 24, // 无头像时占位符尺寸 (w-24 h-24)
+      PLACEHOLDER_AVATAR: 20, // 无头像时占位符尺寸 (w-24 h-24)
       CATEGORY_BADGE: 8       // 分类徽章尺寸 (w-8 h-8)
     },
     
@@ -41,7 +41,7 @@ const RELATIONSHIPS_CONFIG = {
     
     // 边框宽度配置
     borders: {
-      AVATAR_BORDER: 4, // 头像边框宽度 (border-4)
+      AVATAR_BORDER: 2, // 头像边框宽度 (border-4)
       BADGE_BORDER: 3   // 分类徽章边框宽度 (border-3)
     },
     
