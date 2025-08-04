@@ -211,7 +211,7 @@ export default function RelationshipsPage() {
                   <BookOpen size={18} className="text-gold" />
                   人物简介
                 </h3>
-                <p className="text-gray-700 leading-relaxed bg-gray-50 rounded-xl p-2">{selectedPerson.desc}</p>
+                <p className="text-gray-700 leading-relaxed bg-gray-50 rounded-xl p-4 indent-8">{selectedPerson.desc}</p>
               </div>
               
               {/* Sources */}
