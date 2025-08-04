@@ -91,15 +91,15 @@ const PersonDetailModal: React.FC<PersonDetailModalProps> = ({ person, onClose }
 
   return (
     <div 
-      className={`fixed inset-0 bg-black/${MODAL_CONFIG.layout.opacity.MODAL_BACKDROP} backdrop-blur-sm flex items-center justify-center z-${MODAL_CONFIG.layout.zIndex.MODAL} p-${MODAL_CONFIG.ui.spacing.MEDIUM}`}
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4"
       onClick={handleBackdropClick}
     >
-      <div className={`bg-white rounded-3xl shadow-2xl max-w-lg w-full max-h-[${MODAL_CONFIG.layout.viewport.MODAL_MAX_HEIGHT}vh] overflow-y-auto`}>
+      <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className={`relative bg-gradient-to-br from-cream/${MODAL_CONFIG.layout.opacity.GRADIENT_START} to-gold/${MODAL_CONFIG.layout.opacity.GRADIENT_END} rounded-t-3xl p-${MODAL_CONFIG.ui.spacing.XLARGE} text-center`}>
+        <div className="relative bg-gradient-to-br from-cream/50 to-gold/20 rounded-t-3xl p-8 text-center">
           <button 
             onClick={onClose}
-            className={`absolute top-${MODAL_CONFIG.ui.positioning.BUTTON_POSITION} right-${MODAL_CONFIG.ui.positioning.BUTTON_POSITION} w-${MODAL_CONFIG.ui.avatarSizes.CATEGORY_BADGE} h-${MODAL_CONFIG.ui.avatarSizes.CATEGORY_BADGE} bg-white/${MODAL_CONFIG.layout.opacity.BUTTON_BG} hover:bg-white rounded-full flex items-center justify-center transition-all duration-${MODAL_CONFIG.animation.HOVER_DURATION} hover:scale-${MODAL_CONFIG.animation.HOVER_SCALE}`}
+            className="absolute top-4 right-4 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110"
           >
             <span className="text-gray-600 text-lg leading-none">×</span>
           </button>
@@ -109,47 +109,47 @@ const PersonDetailModal: React.FC<PersonDetailModalProps> = ({ person, onClose }
               <img 
                 src={person.img} 
                 alt={person.name}
-                className={`w-${MODAL_CONFIG.ui.avatarSizes.DETAIL_AVATAR} h-${MODAL_CONFIG.ui.avatarSizes.DETAIL_AVATAR} rounded-full mx-auto object-cover border-${MODAL_CONFIG.ui.borders.AVATAR_BORDER} border-white shadow-lg`}
+                className="w-20 h-20 rounded-full mx-auto object-cover border-2 border-white shadow-lg"
               />
-              <div className={`absolute -bottom-${MODAL_CONFIG.ui.positioning.BADGE_OFFSET} -right-${MODAL_CONFIG.ui.positioning.BADGE_OFFSET} w-${MODAL_CONFIG.ui.avatarSizes.CATEGORY_BADGE} h-${MODAL_CONFIG.ui.avatarSizes.CATEGORY_BADGE} ${getCategoryColor(person.category)} rounded-full border-${MODAL_CONFIG.ui.borders.BADGE_BORDER} border-white flex items-center justify-center`}>
+              <div className={`absolute -bottom-2 -right-2 w-8 h-8 ${getCategoryColor(person.category)} rounded-full border-3 border-white flex items-center justify-center`}>
                 <span className="text-white text-xs font-bold">{person.category.charAt(0)}</span>
               </div>
             </div>
           ) : (
-            <div className={`w-${MODAL_CONFIG.ui.avatarSizes.PLACEHOLDER_AVATAR} h-${MODAL_CONFIG.ui.avatarSizes.PLACEHOLDER_AVATAR} ${getCategoryColor(person.category)} rounded-full flex items-center justify-center mx-auto shadow-lg`}>
+            <div className={`w-20 h-20 ${getCategoryColor(person.category)} rounded-full flex items-center justify-center mx-auto shadow-lg`}>
               <span className="text-white font-bold text-2xl">{person.name.charAt(0)}</span>
             </div>
           )}
           
-          <h2 className={`text-2xl font-bold text-charcoal mt-${MODAL_CONFIG.ui.spacing.MEDIUM} mb-${MODAL_CONFIG.ui.spacing.SMALL}`}>{person.name}</h2>
-          <div className={`inline-block px-${MODAL_CONFIG.ui.spacing.MEDIUM} py-1 rounded-full text-sm font-medium text-white ${getCategoryColor(person.category)}`}>
+          <h2 className="text-2xl font-bold text-charcoal mt-4 mb-2">{person.name}</h2>
+          <div className={`inline-block px-4 py-1 rounded-full text-sm font-medium text-white ${getCategoryColor(person.category)}`}>
             {person.category}
           </div>
         </div>
         
         {/* Content */}
-        <div className={`p-${MODAL_CONFIG.ui.spacing.XLARGE}`}>
+        <div className="p-8">
           {/* Description */}
-          <div className={`mb-${MODAL_CONFIG.ui.spacing.LARGE}`}>
-            <h3 className={`text-lg font-semibold text-charcoal mb-${MODAL_CONFIG.ui.spacing.SMALL} flex items-center gap-${MODAL_CONFIG.ui.spacing.SMALL}`}>
-              <BookOpen size={MODAL_CONFIG.ui.iconSizes.DETAIL_SECTION} className="text-gold" />
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-charcoal mb-2 flex items-center gap-2">
+              <BookOpen size={18} className="text-gold" />
               人物简介
             </h3>
-            <p className={`text-gray-700 leading-relaxed bg-gray-50 rounded-xl p-${MODAL_CONFIG.ui.spacing.MEDIUM} indent-8`}>{person.desc}</p>
+            <p className="text-gray-700 leading-relaxed bg-gray-50 rounded-xl p-4 indent-8">{person.desc}</p>
           </div>
           
           {/* Sources */}
           {person.sources && person.sources.length > 0 && (
-            <div className={`mb-${MODAL_CONFIG.ui.spacing.LARGE}`}>
-              <h3 className={`text-lg font-semibold text-charcoal mb-${MODAL_CONFIG.ui.spacing.SMALL} flex items-center gap-${MODAL_CONFIG.ui.spacing.SMALL}`}>
-                <ExternalLink size={MODAL_CONFIG.ui.iconSizes.DETAIL_SECTION} className="text-gold" />
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-charcoal mb-2 flex items-center gap-2">
+                <FileText size={18} className="text-gold" />
                 相关资料
               </h3>
-              <div className={`space-y-${MODAL_CONFIG.ui.spacing.SMALL}`}>
+              <div className="space-y-2">
                 {person.sources.map((source, index) => {
                   const hasLink = person.link && person.link[index];
                   return (
-                    <div key={index} className={`bg-gray-50 rounded-lg p-${MODAL_CONFIG.ui.spacing.MEDIUM} hover:bg-gray-100 transition-colors`}>
+                    <div key={index} className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
                       {hasLink ? (
                         <a 
                           href={person.link[index]} 
@@ -158,7 +158,7 @@ const PersonDetailModal: React.FC<PersonDetailModalProps> = ({ person, onClose }
                           className="flex items-center justify-between text-gray-700 hover:text-gold transition-colors group"
                         >
                           <span className="flex-1">{source}</span>
-                          <ExternalLink size={MODAL_CONFIG.ui.iconSizes.CATEGORY_BADGE} className={`text-gray-400 group-hover:text-gold ml-${MODAL_CONFIG.ui.spacing.SMALL}`} />
+                          <ExternalLink size={16} className="text-gray-400 group-hover:text-gold ml-2" />
                         </a>
                       ) : (
                         <span className="text-gray-700">{source}</span>
