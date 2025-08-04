@@ -332,36 +332,40 @@ class WikipediaEnricher:
             print(f"  找到上海图书馆数据: {sh_data.get('fname', 'Unknown')}")
             sh_extracted = self.extract_sh_library_data(sh_data)
             
-            # desc优先使用上海图书馆数据
-            if 'desc' in sh_extracted:
-                person['desc'] = sh_extracted['desc']
-                got_sh_data = True
-                print(f"  获取到描述: {sh_extracted['desc'][:50]}...")
-            
-            # 添加上海图书馆的链接
-            if 'links' in sh_extracted:
-                for link in sh_extracted['links']:
-                    if link not in person['link']:
-                        person['link'].append(link)
-                        got_sh_data = True
-                        print(f"  获取到链接: {link}")
-            
-            # 添加上海图书馆的来源
-            if 'sources' in sh_extracted:
-                sources_to_add = sh_extracted['sources']
-                if isinstance(sources_to_add, str):
-                    sources_to_add = [sources_to_add]
+            # 检查是否成功解析到有效数据
+            if sh_extracted:
+                # desc优先使用上海图书馆数据
+                if 'desc' in sh_extracted:
+                    person['desc'] = sh_extracted['desc']
+                    got_sh_data = True
+                    print(f"  获取到描述: {sh_extracted['desc'][:50]}...")
                 
-                for source in sources_to_add:
-                    if source not in person['sources']:
-                        person['sources'].append(source)
-                        got_sh_data = True
-                        print(f"  添加来源: {source}")
-            
-            # 添加上海图书馆作为来源标识
-            if got_sh_data and '上海图书馆' not in person['sources']:
-                person['sources'].append('上海图书馆')
-                print(f"  添加来源标识: 上海图书馆")
+                # 添加上海图书馆的链接
+                if 'links' in sh_extracted:
+                    for link in sh_extracted['links']:
+                        if link not in person['link']:
+                            person['link'].append(link)
+                            got_sh_data = True
+                            print(f"  获取到链接: {link}")
+                
+                # 添加上海图书馆的来源
+                if 'sources' in sh_extracted:
+                    sources_to_add = sh_extracted['sources']
+                    if isinstance(sources_to_add, str):
+                        sources_to_add = [sources_to_add]
+                    
+                    for source in sources_to_add:
+                        if source not in person['sources']:
+                            person['sources'].append(source)
+                            got_sh_data = True
+                            print(f"  添加来源: {source}")
+                
+                # 只有在成功获取到数据时才添加上海图书馆作为来源标识
+                if got_sh_data and '上海图书馆' not in person['sources']:
+                    person['sources'].append('上海图书馆')
+                    print(f"  添加来源标识: 上海图书馆")
+            else:
+                print(f"  上海图书馆数据解析失败")
         else:
             print(f"  上海图书馆未找到 {name} 的数据")
         
