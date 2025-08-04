@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { personMatcher } from '../../utils/personMatcher';
-import PersonDetailModal from '../PersonDetailModal';
 import { Person } from '../../types/Person';
 
 interface TimelineEvent {
@@ -17,9 +16,7 @@ interface TimelineItemProps {
 }
 
 const TimelineItem: React.FC<TimelineItemProps> = ({ event, isFeatured }) => {
-  const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
   const [isPersonDataLoaded, setIsPersonDataLoaded] = useState(false);
-  const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
 
   // 初始化人物数据
   useEffect(() => {
@@ -35,14 +32,7 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, isFeatured }) => {
     loadPersonData();
   }, []);
 
-  // 清理定时器
-  useEffect(() => {
-    return () => {
-      if (hoverTimeout) {
-        clearTimeout(hoverTimeout);
-      }
-    };
-  }, [hoverTimeout]);
+
 
   const containerClasses = isFeatured
     ? 'transform scale(1.1) mb-8'
@@ -55,38 +45,12 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, isFeatured }) => {
   const timeTextClasses = isFeatured ? 'text-base font-semibold' : 'text-sm font-medium';
   const experienceTextClasses = isFeatured ? 'text-lg leading-relaxed font-medium' : 'text-base';
 
-  // 处理人物姓名悬停
-  const handlePersonHover = (person: Person) => {
-    // 清除之前的延迟
-    if (hoverTimeout) {
-      clearTimeout(hoverTimeout);
-    }
-    
-    // 设置悬停延迟（500ms后显示）
-    const timeout = setTimeout(() => {
-      setSelectedPerson(person);
-    }, 500);
-    
-    setHoverTimeout(timeout);
-  };
-
-  // 处理鼠标离开
-  const handlePersonLeave = () => {
-    // 清除悬停延迟
-    if (hoverTimeout) {
-      clearTimeout(hoverTimeout);
-      setHoverTimeout(null);
-    }
-  };
-
-  // 处理人物姓名点击（保留原有功能）
+  // 处理人物姓名点击 - 跳转到外部链接
   const handlePersonClick = (person: Person) => {
-    // 清除悬停延迟
-    if (hoverTimeout) {
-      clearTimeout(hoverTimeout);
-      setHoverTimeout(null);
+    if (person.link && person.link.length > 0) {
+      window.open(person.link[0], '_blank', 'noopener,noreferrer');
     }
-    setSelectedPerson(person);
+    // 如果没有外部链接，保持静默（不做任何操作）
   };
 
   // 渲染带有人物链接的文本
@@ -119,10 +83,8 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, isFeatured }) => {
         <button
           key={`person-${index}`}
           onClick={() => handlePersonClick(match.person)}
-          onMouseEnter={() => handlePersonHover(match.person)}
-          onMouseLeave={handlePersonLeave}
           className="text-gold underline hover:text-gold/80 transition-colors duration-200 font-medium"
-          title={`悬停或点击查看${match.person.name}的详细信息`}
+          title={match.person.link && match.person.link.length > 0 ? `点击查看${match.person.name}的相关链接` : match.person.name}
         >
           {match.name}
         </button>
@@ -185,11 +147,7 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, isFeatured }) => {
         </div>
       </div>
       
-      {/* Person Detail Modal */}
-      <PersonDetailModal 
-        person={selectedPerson}
-        onClose={() => setSelectedPerson(null)}
-      />
+
     </div>
   );
 };
