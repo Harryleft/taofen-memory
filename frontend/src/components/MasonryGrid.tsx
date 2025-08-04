@@ -29,7 +29,7 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
   
   // 卡片基础配置（纵向长方形）
   const CARD_WIDTH = 220; // 减小宽度
-  const GAP = 24;
+  const GAP = 16; // 减少间距，让布局更紧凑
   const MIN_COLUMNS = 1;
   const MAX_COLUMNS = 6; // 增加最大列数以适应更窄的卡片
   
@@ -143,7 +143,7 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
           return (
             <div
               key={`${person.id}-${index}`}
-              className="absolute bg-gradient-to-br from-cream to-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border border-gold/10 hover:border-gold/20 group hover:bg-gradient-to-br hover:from-gold/5 hover:to-cream"
+              className="absolute bg-gradient-to-br from-cream to-white rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border border-gold/10 hover:border-gold/20 group hover:bg-gradient-to-br hover:from-gold/5 hover:to-cream"
               style={{
                 left: `${left}px`,
                 top: `${top}px`,
@@ -154,7 +154,7 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
             >
               <div className="flex flex-col items-center text-center">
                 {/* 头像或占位符 */}
-                <div className="relative mb-4">
+                <div className="relative mb-3">
                   {person.img ? (
                     <div className="relative">
                       {/* 
@@ -197,7 +197,7 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
                 </div>
                 
                 {/* 姓名 */}
-                <h3 className="text-lg font-semibold text-charcoal mb-2 group-hover:text-gold transition-colors">
+                <h3 className="text-lg font-semibold text-charcoal mb-1.5 group-hover:text-gold transition-colors">
                   {person.name}
                 </h3>
                 
