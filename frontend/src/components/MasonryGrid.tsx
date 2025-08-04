@@ -156,21 +156,31 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
                 {/* 头像或占位符 */}
                 <div className="relative mb-4">
                   {person.img ? (
-                    <img
-                      src={person.img}
-                      alt={person.name}
-                      className="w-20 h-20 rounded-full object-cover border-2 border-gray-200 group-hover:border-gray-300 transition-colors"
-                      loading="lazy"
-                    />
+                    <div className="relative">
+                      {/* 外层圆圈 - 默认白色，悬停时淡金色填充 */}
+                      <div className="w-24 h-24 rounded-full bg-white group-hover:bg-gold/20 border-4 border-white group-hover:border-gold/30 transition-all duration-300 flex items-center justify-center shadow-lg">
+                        <img
+                          src={person.img}
+                          alt={person.name}
+                          className="w-16 h-16 rounded-full object-cover"
+                          loading="lazy"
+                        />
+                      </div>
+                    </div>
                   ) : (
-                    <div className={`w-20 h-20 rounded-full ${getCategoryColor(person.category)} flex items-center justify-center text-white text-2xl font-bold`}>
-                      {person.name.charAt(0)}
+                    <div className="relative">
+                      {/* 外层圆圈 - 默认白色，悬停时淡金色填充 */}
+                      <div className="w-24 h-24 rounded-full bg-white group-hover:bg-gold/20 border-4 border-white group-hover:border-gold/30 transition-all duration-300 flex items-center justify-center shadow-lg">
+                        <div className={`w-16 h-16 rounded-full ${getCategoryColor(person.category)} flex items-center justify-center text-white text-xl font-bold`}>
+                          {person.name.charAt(0)}
+                        </div>
+                      </div>
                     </div>
                   )}
                   {/* 分类图标 */}
                   {Icon && (
-                    <div className={`absolute -bottom-1 -right-1 ${getCategoryColor(person.category)} rounded-full p-2 border-2 border-white`}>
-                      <Icon size={16} className="text-white" />
+                    <div className={`absolute -bottom-2 -right-2 ${getCategoryColor(person.category)} rounded-full p-2 border-3 border-white shadow-md`}>
+                      <Icon size={14} className="text-white" />
                     </div>
                   )}
                 </div>
