@@ -64,26 +64,39 @@ export default function RelationshipsPage() {
     <div className={relationshipsStyles.pageContainer}>
       {/* Header */}
       <div className={relationshipsStyles.header.container}>
+        {/* Background Pattern */}
+        <div className={relationshipsStyles.header.backgroundPattern}></div>
+        
         <div className={relationshipsStyles.header.wrapper}>
-          <div className="text-center">
+          {/* Title Section */}
+          <div className={relationshipsStyles.header.titleSection}>
             <h1 className={relationshipsStyles.header.title}>邹韬奋人脉网络</h1>
+            <p className={relationshipsStyles.header.subtitle}>
+              探索中国现代新闻出版事业先驱的人际关系网络，感受那个时代知识分子的精神风貌与社会担当
+            </p>
+            <div className={relationshipsStyles.header.decorativeLine}></div>
           </div>
           
           {/* Category Filter */}
           <div className={relationshipsStyles.header.filterContainer}>
             {RELATIONSHIPS_CATEGORIES.map((category) => {
               const Icon = category.icon;
+              const isSelected = selectedCategory === category.id;
               return (
                 <button
                   key={category.id}
                   onClick={() => setSelectedCategory(category.id)}
-                  className={getCategoryButtonClass(
-                    selectedCategory === category.id,
-                    category.color
-                  )}
+                  className={getCategoryButtonClass(isSelected, category.color)}
                 >
-                  <Icon size={RELATIONSHIPS_CONFIG.ui.iconSizes.CATEGORY_BUTTON} />
-                  {category.name}
+                  <Icon 
+                    size={RELATIONSHIPS_CONFIG.ui.iconSizes.CATEGORY_BUTTON} 
+                    className={`transition-transform duration-200 ${
+                      isSelected ? 'scale-110' : 'group-hover:scale-110'
+                    }`}
+                  />
+                  <span className="relative z-10">{category.name}</span>
+                  {/* Hover effect background */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </button>
               );
             })}
