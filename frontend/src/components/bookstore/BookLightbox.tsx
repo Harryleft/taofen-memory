@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { BookItem } from '../../types/bookTypes';
+import { BOOKSTORE_STYLES, BOOKSTORE_FONTS } from '../../styles/bookstore';
 
 interface BookLightboxProps {
   selectedItem: BookItem | null;
@@ -33,57 +34,57 @@ const BookLightbox: React.FC<BookLightboxProps> = ({
   if (!selectedItem) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
-      <div className="relative max-w-4xl max-h-[90vh] bg-white rounded-lg overflow-hidden">
+    <div className={BOOKSTORE_STYLES.lightbox.overlay}>
+      <div className={BOOKSTORE_STYLES.lightbox.container}>
         {/* Navigation */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+          className={BOOKSTORE_STYLES.lightbox.navigation.close}
         >
           <X size={24} />
         </button>
         
         <button
           onClick={onPrev}
-          className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+          className={BOOKSTORE_STYLES.lightbox.navigation.prev}
         >
           <ChevronLeft size={32} />
         </button>
         
         <button
           onClick={onNext}
-          className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+          className={BOOKSTORE_STYLES.lightbox.navigation.next}
         >
           <ChevronRight size={32} />
         </button>
 
         {/* Content */}
-        <div className="flex flex-col lg:flex-row max-h-[90vh]">
+        <div className={BOOKSTORE_STYLES.lightbox.content}>
           {/* Image */}
-          <div className="flex-1 flex items-center justify-center bg-amber-50 p-4">
+          <div className={BOOKSTORE_STYLES.lightbox.imageSection}>
             <img
               src={selectedItem.image}
               alt={selectedItem.title}
-              className="max-w-full max-h-full object-contain"
+              className={BOOKSTORE_STYLES.lightbox.image}
             />
           </div>
           
           {/* Details */}
-          <div className="w-full lg:w-96 p-6 overflow-y-auto bg-white">
-            <h3 className="text-2xl font-bold text-charcoal mb-4" style={{fontFamily: "'KaiTi', 'STKaiti', '华文楷体', serif", letterSpacing: '0.02em'}}>
+          <div className={BOOKSTORE_STYLES.lightbox.detailsSection}>
+            <h3 className={BOOKSTORE_STYLES.lightbox.title} style={{fontFamily: BOOKSTORE_FONTS.kai, letterSpacing: '0.02em'}}>
               {selectedItem.title}
             </h3>
             
-            <div className="space-y-3 mb-6">
-              <p className="text-charcoal/80" style={{fontFamily: "'SimSun', '宋体', 'NSimSun', serif"}}>
+            <div className={BOOKSTORE_STYLES.lightbox.details}>
+              <p className={BOOKSTORE_STYLES.lightbox.detailItem} style={{fontFamily: BOOKSTORE_FONTS.song}}>
                 <span className="font-semibold">作者：</span>{selectedItem.author}
               </p>
-              <p className="text-charcoal/80" style={{fontFamily: "'SimSun', '宋体', 'NSimSun', serif"}}>
+              <p className={BOOKSTORE_STYLES.lightbox.detailItem} style={{fontFamily: BOOKSTORE_FONTS.song}}>
                 <span className="font-semibold">出版社：</span>{selectedItem.publisher}
               </p>
             </div>
             
-            <div className="mt-4 text-sm text-charcoal/60 text-center" style={{fontFamily: "'SimSun', '宋体', 'NSimSun', serif"}}>
+            <div className={BOOKSTORE_STYLES.lightbox.counter} style={{fontFamily: BOOKSTORE_FONTS.song}}>
               {currentIndex + 1} / {totalCount}
             </div>
           </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BookItem } from '../../types/bookTypes';
+import { BOOKSTORE_STYLES, BOOKSTORE_ANIMATIONS } from '../../styles/bookstore';
 
 //【修改】从 Props 中移除 isRapidScrolling
 interface BookCardProps {
@@ -45,45 +46,38 @@ const BookCard: React.FC<BookCardProps> = ({
   return (
     <div
       data-item-id={item.id}
-      //【修改】简化 className，移除基于 isRapidScrolling 的三元表达式
-      className={`group cursor-pointer transform transition-all duration-500 ${
-        isVisible
-          ? 'translate-y-0 opacity-100'
-          : 'translate-y-8 opacity-0'
-      }`}
+      className={BOOKSTORE_STYLES.card.container(isVisible)}
       onClick={() => onOpenLightbox(item)}
       style={{
-        animationDelay: `${columnIndex * 100}ms`
+        animationDelay: BOOKSTORE_ANIMATIONS.cardEnterDelay(columnIndex)
       }}
     >
-      <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
-        <div className="relative aspect-[3/4] overflow-hidden">
+      <div className={BOOKSTORE_STYLES.card.wrapper}>
+        <div className={BOOKSTORE_STYLES.card.imageContainer}>
           <img
             key={`${item.id}-${item.image}`}
             src={item.image}
             alt={item.title}
-            className={`w-full h-full object-cover transition-all duration-500 ${
-              imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
-            }`}
+            className={BOOKSTORE_STYLES.card.image(imageLoaded)}
             onLoad={handleImageLoad}
             loading="lazy"
           />
           
           {!imageLoaded && (
-            <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
+            <div className={BOOKSTORE_STYLES.card.imagePlaceholder}>
               <div className="text-gray-400 text-sm">加载中...</div>
             </div>
           )}
           
-          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300" />
+          <div className={BOOKSTORE_STYLES.card.imageOverlay} />
         </div>
         
-        <div className="p-4">
-          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 text-sm leading-tight">
+        <div className={BOOKSTORE_STYLES.card.content}>
+          <h3 className={BOOKSTORE_STYLES.card.title}>
             {item.title}
           </h3>
           
-          <div className="space-y-1 text-xs text-gray-600">
+          <div className={BOOKSTORE_STYLES.card.details}>
             {item.author && (
               <p className="line-clamp-1">
                 <span className="font-medium">作者：</span>{item.author}
