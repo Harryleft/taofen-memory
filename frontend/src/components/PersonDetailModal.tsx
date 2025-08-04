@@ -16,10 +16,10 @@ interface PersonDetailModalProps {
 }
 
 const PersonDetailModal: React.FC<PersonDetailModalProps> = ({ person, isOpen, onClose }) => {
-  if (!person || !isOpen) return null;
-
   // 处理ESC键关闭
   React.useEffect(() => {
+    if (!isOpen) return;
+    
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         onClose();
@@ -28,7 +28,9 @@ const PersonDetailModal: React.FC<PersonDetailModalProps> = ({ person, isOpen, o
 
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [onClose]);
+  }, [onClose, isOpen]);
+
+  if (!person || !isOpen) return null;
 
   // 处理点击背景关闭
   const handleBackdropClick = (event: React.MouseEvent) => {
