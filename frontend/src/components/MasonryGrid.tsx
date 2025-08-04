@@ -1,5 +1,14 @@
 import React, { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react';
 import { Person } from '../types/Person';
+import { 
+  MASONRY_CONFIG, 
+  masonryStyles, 
+  getMasonryAvatarBgClass, 
+  getMasonryAvatarImgClass, 
+  getMasonryAvatarPlaceholderClass, 
+  getMasonryCategoryIconClass, 
+  getMasonryCategoryTagClass 
+} from '../styles/relationships';
 
 // 简单防抖 hook
 function useDebouncedCallback<T extends (...args: any[]) => void>(callback: T, delay = 100) {
@@ -19,7 +28,6 @@ function useDebouncedCallback<T extends (...args: any[]) => void>(callback: T, d
 interface MasonryGridProps {
   items: Person[];
   onItemClick: (person: Person) => void;
-  getCategoryColor: (category: string) => string;
   categories: Array<{ id: string; name: string; icon: React.ComponentType<any>; color: string }>;
 }
 
@@ -30,47 +38,11 @@ interface MasonryItem {
   top: number;
 }
 
-const MASONRY_CONFIG = {
-  layout: {
-    CARD_WIDTH: 140,
-    GAP: 24,
-    VERTICAL_GAP: 65,
-    MIN_COLUMNS: 1,
-    MAX_COLUMNS: 4,
-    // 估算仍可用于初始占位，但不会决定最终布局
-    BASE_HEIGHT: 280,
-    HEIGHT_PER_CHAR: 0.6,
-    MIN_HEIGHT: 240,
-    MAX_HEIGHT: 320
-  },
-  lazyLoad: {
-    INITIAL_ITEMS: 20,
-    LOAD_THRESHOLD: 200,
-    ITEMS_PER_LOAD: 10,
-    LOAD_DELAY: 300
-  },
-  ui: {
-    ICON_SIZE: 12,
-    DESC_MAX_LENGTH: 100
-  },
-  avatar: {
-    CONTAINER_SIZE: 'w-18 h-18',
-    INNER_SIZE: 'w-14 h-14',
-    BORDER_WIDTH: 'border-2',
-    CATEGORY_ICON: {
-      SIZE: 'p-1.5',
-      BORDER: 'border-2',
-      POSITION: '-bottom-1 -right-1'
-    },
-    FONT_SIZE: 'text-base',
-    SHADOW: 'shadow-md'
-  }
-};
+
 
 const MasonryGrid: React.FC<MasonryGridProps> = ({
   items,
   onItemClick,
-  getCategoryColor,
   categories
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -248,10 +220,10 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
     : MASONRY_CONFIG.layout.CARD_WIDTH;
 
   return (
-    <div className="w-full">
+    <div className={masonryStyles.container}>
       <div
         ref={containerRef}
-        className="relative"
+        className={masonryStyles.gridContainer}
         style={{ height: containerHeight }}
       >
         {masonryItems.map((item) => {
@@ -270,7 +242,7 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
                   cardRefs.current.delete(person.id);
                 }
               }}
-              className="absolute bg-gradient-to-br from-cream to-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border border-gold/10 hover:border-gold/30 group hover:bg-gradient-to-br hover:from-gold/8 hover:to-cream hover:scale-105"
+              className={masonryStyles.card.base}
               style={{
                 left: `${left}px`,
                 top: `${top}px`,
@@ -278,15 +250,15 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
               }}
               onClick={() => onItemClick(person)}
             >
-              <div className="flex flex-col items-center text-center">
-                <div className="relative mb-4">
+              <div className={masonryStyles.card.content}>
+                <div className={masonryStyles.card.avatarContainer}>
                   {person.img ? (
-                    <div className="relative">
-                      <div className={`${MASONRY_CONFIG.avatar.CONTAINER_SIZE} rounded-full bg-white group-hover:bg-gold/20 ${MASONRY_CONFIG.avatar.BORDER_WIDTH} border-white group-hover:border-gold/30 transition-all duration-300 flex items-center justify-center ${MASONRY_CONFIG.avatar.SHADOW}`}>
+                    <div className={masonryStyles.card.avatarWrapper}>
+                      <div className={getMasonryAvatarBgClass()}>
                         <img
                           src={person.img}
                           alt={person.name}
-                          className={`${MASONRY_CONFIG.avatar.INNER_SIZE} rounded-full object-cover`}
+                          className={getMasonryAvatarImgClass()}
                           loading="lazy"
                           onLoad={() => {
                             // 图片加载后可能撑高，强制触发一次布局（防抖会合并）
@@ -296,27 +268,27 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
                       </div>
                     </div>
                   ) : (
-                    <div className="relative">
-                      <div className={`${MASONRY_CONFIG.avatar.CONTAINER_SIZE} rounded-full bg-white group-hover:bg-gold/20 ${MASONRY_CONFIG.avatar.BORDER_WIDTH} border-white group-hover:border-gold/30 transition-all duration-300 flex items-center justify-center ${MASONRY_CONFIG.avatar.SHADOW}`}>
-                        <div className={`${MASONRY_CONFIG.avatar.INNER_SIZE} rounded-full ${getCategoryColor(person.category)} flex items-center justify-center text-white ${MASONRY_CONFIG.avatar.FONT_SIZE} font-bold`}>
+                    <div className={masonryStyles.card.avatarWrapper}>
+                      <div className={getMasonryAvatarBgClass()}>
+                        <div className={getMasonryAvatarPlaceholderClass(person.category)}>
                           {person.name.charAt(0)}
                         </div>
                       </div>
                     </div>
                   )}
                   {Icon && (
-                    <div className={`absolute ${MASONRY_CONFIG.avatar.CATEGORY_ICON.POSITION} ${getCategoryColor(person.category)} rounded-full ${MASONRY_CONFIG.avatar.CATEGORY_ICON.SIZE} ${MASONRY_CONFIG.avatar.CATEGORY_ICON.BORDER} border-white ${MASONRY_CONFIG.avatar.SHADOW}`}>
+                    <div className={getMasonryCategoryIconClass(person.category)}>
                       <Icon size={MASONRY_CONFIG.ui.ICON_SIZE} className="text-white" />
                     </div>
                   )}
                 </div>
 
-                <h3 className="text-lg font-semibold text-charcoal mb-2 group-hover:text-gold transition-colors">
+                <h3 className={masonryStyles.card.name}>
                   {person.name}
                 </h3>
 
                 {person.desc && (
-                  <p className="text-sm text-gray-600 mb-3 px-1 leading-relaxed">
+                  <p className={masonryStyles.card.description}>
                     {person.desc.length > MASONRY_CONFIG.ui.DESC_MAX_LENGTH
                       ? `${person.desc.substring(0, MASONRY_CONFIG.ui.DESC_MAX_LENGTH)}...`
                       : person.desc
@@ -324,7 +296,7 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
                   </p>
                 )}
 
-                <div className={`px-3 py-1.5 rounded-full text-xs font-medium text-white ${getCategoryColor(person.category)}`}>
+                <div className={getMasonryCategoryTagClass(person.category)}>
                   {person.category}
                 </div>
               </div>
@@ -334,13 +306,13 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
       </div>
 
       {isLoading && (
-        <div className="flex justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gold"></div>
+        <div className={masonryStyles.loading.container}>
+          <div className={masonryStyles.loading.spinner}></div>
         </div>
       )}
 
       {visibleItems >= items.length && items.length > 0 && (
-        <div className="text-center py-8 text-gray-500">
+        <div className={masonryStyles.complete.container}>
           已显示全部 {items.length} 位人物
         </div>
       )}
