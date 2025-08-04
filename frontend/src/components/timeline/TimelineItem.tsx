@@ -56,7 +56,7 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, isFeatured }) => {
       return <span>{text}</span>;
     }
 
-    const personMatches = personMatcher.extractPersonsFromText(text, 2);
+    const personMatches = personMatcher.extractPersonsFromText(text);
     
     if (personMatches.length === 0) {
       return <span>{text}</span>;
