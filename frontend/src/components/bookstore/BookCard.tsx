@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ZoomIn } from 'lucide-react';
-import { BookItem } from '../../types/bookTypes';
+import { BookItem } from '../../types/book';
 
 interface BookCardProps {
   item: BookItem;
@@ -10,57 +9,75 @@ interface BookCardProps {
   onOpenLightbox: (item: BookItem) => void;
 }
 
-// 添加调试常量
 const DEBUG = true;
-const logDebug = (message: string, data?: any) => {
-  if (DEBUG) {
-    console.log(`[BookCard] ${message}`, data || '');
-  }
-};
 
-const BookCard: React.FC<BookCardProps> = ({
-  item,
-  isVisible,
-  isRapidScrolling,
-  columnIndex,
-  onOpenLightbox
+const BookCard: React.FC<BookCardProps> = ({ 
+  item, 
+  isVisible, 
+  isRapidScrolling, 
+  columnIndex, 
+  onOpenLightbox 
 }) => {
-  // 添加图片加载状态
   const [imageLoaded, setImageLoaded] = useState(false);
-  // 添加渲染计数器，用于调试
   const renderCountRef = useRef(0);
-  // 添加上一次可见性状态引用，用于比较
-  const prevVisibleRef = useRef(isVisible);
-
-  // 组件渲染时增加计数器
+  const prevPropsRef = useRef<BookCardProps | null>(null);
+  const componentIdRef = useRef(`BookCard-${item.id}-${Math.random().toString(36).substr(2, 9)}`);
+  
+  // 增加渲染计数
   renderCountRef.current += 1;
   
-  // 当可见性变化时记录日志
-  useEffect(() => {
-    const visibilityChanged = prevVisibleRef.current !== isVisible;
-    if (visibilityChanged) {
-      logDebug(`项目 ${item.id} 可见性变化`, { 
-        isVisible, 
-        isRapidScrolling, 
-        renderCount: renderCountRef.current,
-        prevVisible: prevVisibleRef.current
-      });
-      prevVisibleRef.current = isVisible;
+  const logDebug = (message: string, data?: any) => {
+    if (DEBUG) {
+      console.log(`[${componentIdRef.current}] ${message}`, data || '');
     }
-  }, [isVisible, isRapidScrolling, item.id]);
+  };
+
+  // 详细的props变化追踪
+  useEffect(() => {
+    const currentProps = { item, isVisible, isRapidScrolling, columnIndex };
+    
+    if (prevPropsRef.current) {
+      const changes: string[] = [];
+      
+      if (prevPropsRef.current.isVisible !== isVisible) {
+        changes.push(`isVisible: ${prevPropsRef.current.isVisible} → ${isVisible}`);
+      }
+      if (prevPropsRef.current.isRapidScrolling !== isRapidScrolling) {
+        changes.push(`isRapidScrolling: ${prevPropsRef.current.isRapidScrolling} → ${isRapidScrolling}`);
+      }
+      if (prevPropsRef.current.item.id !== item.id) {
+        changes.push(`item.id: ${prevPropsRef.current.item.id} → ${item.id}`);
+      }
+      if (prevPropsRef.current.columnIndex !== columnIndex) {
+        changes.push(`columnIndex: ${prevPropsRef.current.columnIndex} → ${columnIndex}`);
+      }
+      
+      if (changes.length > 0) {
+        logDebug('Props变化导致重新渲染', {
+          renderCount: renderCountRef.current,
+          changes: changes.join(', '),
+          timestamp: Date.now()
+        });
+      }
+    }
+    
+    prevPropsRef.current = currentProps;
+  }, [item, isVisible, isRapidScrolling, columnIndex]);
 
   // 处理图片加载完成事件
   const handleImageLoad = () => {
-    logDebug(`项目 ${item.id} 图片加载完成`);
+    logDebug(`图片加载完成`);
     setImageLoaded(true);
   };
 
   // 记录组件渲染
   if (DEBUG) {
-    console.log(`[BookCard] 渲染项目 ${item.id}`, { 
+    logDebug('组件渲染', { 
       renderCount: renderCountRef.current,
       isVisible, 
-      isRapidScrolling 
+      isRapidScrolling,
+      imageLoaded,
+      timestamp: Date.now()
     });
   }
 
@@ -79,72 +96,106 @@ const BookCard: React.FC<BookCardProps> = ({
         animationDelay: `${columnIndex * 100}ms`
       }}
     >
-      <div className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-amber-200 relative">
-        <div className="relative overflow-hidden">
-          {/* 使用 key 属性确保图片在 id 变化时重新加载 */}
+      <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
+        <div className="relative aspect-[3/4] overflow-hidden">
+          {/* 图片容器 */}
           <img
-            key={`img-${item.id}`}
-            src={item.image}
+            key={`${item.id}-${item.cover_image}`} // 确保图片在item变化时重新加载
+            src={item.cover_image}
             alt={item.title}
-            className={`w-full object-cover group-hover:scale-110 transition-transform duration-700 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
-            style={{ 
-              height: `${item.dimensions.height}px`,
-              transition: 'opacity 0.5s ease-in-out'
-            }}
-            loading="lazy"
+            className={`w-full h-full object-cover transition-all duration-500 ${
+              imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
+            }`}
             onLoad={handleImageLoad}
+            loading="lazy"
           />
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
-            <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={32} />
-          </div>
           
-          <div className="absolute bottom-3 left-3">
-            <div className="relative">
-              <div className="absolute inset-0 bg-black/40 backdrop-blur-sm rounded-lg"></div>
-              <div className="relative px-3 py-1.5 text-white">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-1 h-1 bg-gold rounded-full"></div>
-                  <span className="text-xs font-medium tracking-wide">
-                    {item.year}
-                  </span>
-                </div>
-              </div>
+          {/* 加载状态 */}
+          {!imageLoaded && (
+            <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
+              <div className="text-gray-400 text-sm">加载中...</div>
             </div>
-          </div>
+          )}
+          
+          {/* 悬停遮罩 */}
+          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300" />
         </div>
-        <div className="p-4 bg-amber-50">
-          <h3 className="font-bold text-charcoal mb-2 group-hover:text-gold transition-colors line-clamp-2" style={{fontFamily: "'KaiTi', 'STKaiti', '华文楷体', serif", letterSpacing: '0.02em'}}>
+        
+        {/* 书籍信息 */}
+        <div className="p-4">
+          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 text-sm leading-tight">
             {item.title}
           </h3>
-          <p className="text-sm text-charcoal/70 mb-1" style={{fontFamily: "'SimSun', '宋体', 'NSimSun', serif"}}>
-            作者：{item.author}
-          </p>
-          <p className="text-sm text-charcoal/70 mb-2" style={{fontFamily: "'SimSun', '宋体', 'NSimSun', serif"}}>
-            出版：{item.publisher}
-          </p>
+          
+          <div className="space-y-1 text-xs text-gray-600">
+            {item.author && (
+              <p className="line-clamp-1">
+                <span className="font-medium">作者：</span>{item.author}
+              </p>
+            )}
+            {item.publisher && (
+              <p className="line-clamp-1">
+                <span className="font-medium">出版：</span>{item.publisher}
+              </p>
+            )}
+            {item.year && (
+              <p>
+                <span className="font-medium">年份：</span>{item.year}
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-// 使用 React.memo 包装组件，添加自定义比较函数以减少不必要的重新渲染
-export default React.memo(BookCard, (prevProps, nextProps) => {
-  // 只有在这些属性发生变化时才重新渲染
-  const shouldRerender = (
-    prevProps.isVisible !== nextProps.isVisible ||
-    prevProps.isRapidScrolling !== nextProps.isRapidScrolling ||
-    prevProps.item.id !== nextProps.item.id
+// 优化的React.memo比较函数
+const arePropsEqual = (prevProps: BookCardProps, nextProps: BookCardProps): boolean => {
+  // 基本属性比较
+  const isVisibleSame = prevProps.isVisible === nextProps.isVisible;
+  const isRapidScrollingSame = prevProps.isRapidScrolling === nextProps.isRapidScrolling;
+  const itemIdSame = prevProps.item.id === nextProps.item.id;
+  const columnIndexSame = prevProps.columnIndex === nextProps.columnIndex;
+  
+  // 深度比较item对象的关键属性
+  const itemSame = (
+    prevProps.item.title === nextProps.item.title &&
+    prevProps.item.author === nextProps.item.author &&
+    prevProps.item.publisher === nextProps.item.publisher &&
+    prevProps.item.year === nextProps.item.year &&
+    prevProps.item.cover_image === nextProps.item.cover_image
   );
   
-  if (DEBUG && shouldRerender) {
-    console.log(`[BookCard] 组件将重新渲染`, {
-      id: nextProps.item.id,
-      isVisibleChanged: prevProps.isVisible !== nextProps.isVisible,
-      isRapidScrollingChanged: prevProps.isRapidScrolling !== nextProps.isRapidScrolling,
-      itemIdChanged: prevProps.item.id !== nextProps.item.id
+  const shouldSkipRender = isVisibleSame && isRapidScrollingSame && itemIdSame && columnIndexSame && itemSame;
+  
+  if (DEBUG && !shouldSkipRender) {
+    console.log(`[BookCard-${nextProps.item.id}] 组件将重新渲染`, {
+      itemId: nextProps.item.id,
+      reasons: {
+        isVisibleChanged: !isVisibleSame,
+        isRapidScrollingChanged: !isRapidScrollingSame,
+        itemIdChanged: !itemIdSame,
+        columnIndexChanged: !columnIndexSame,
+        itemContentChanged: !itemSame
+      },
+      prevProps: {
+        isVisible: prevProps.isVisible,
+        isRapidScrolling: prevProps.isRapidScrolling,
+        itemId: prevProps.item.id,
+        columnIndex: prevProps.columnIndex
+      },
+      nextProps: {
+        isVisible: nextProps.isVisible,
+        isRapidScrolling: nextProps.isRapidScrolling,
+        itemId: nextProps.item.id,
+        columnIndex: nextProps.columnIndex
+      },
+      timestamp: Date.now()
     });
   }
   
-  return !shouldRerender;
-});
+  return shouldSkipRender;
+};
+
+export default React.memo(BookCard, arePropsEqual);
