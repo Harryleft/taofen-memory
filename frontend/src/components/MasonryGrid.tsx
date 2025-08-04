@@ -157,21 +157,32 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
                 <div className="relative mb-4">
                   {person.img ? (
                     <div className="relative">
-                      {/* 外层圆圈 - 默认白色，悬停时淡金色填充 */}
-                      <div className="w-20 h-20 rounded-full bg-white group-hover:bg-gold/20 border-3 border-white group-hover:border-gold/30 transition-all duration-300 flex items-center justify-center shadow-lg">
+                      {/* 
+                        外层圆圈优化建议：
+                        1. 尺寸调整：w-20 h-20 (80px) → w-16 h-16 (64px) 或 w-18 h-18 (72px)
+                        2. 边框优化：border-3 (12px) → border-2 (8px) 或 border-1 (4px)
+                        3. 内部头像：w-18 h-18 → w-12 h-12 或 w-14 h-14 保持比例
+                        4. 阴影调整：shadow-lg → shadow-md 减少视觉重量
+                      */}
+                      <div className="w-16 h-16 rounded-full bg-white group-hover:bg-gold/20 border-2 border-white group-hover:border-gold/30 transition-all duration-300 flex items-center justify-center shadow-md">
                         <img
                           src={person.img}
                           alt={person.name}
-                          className="w-14 h-14 rounded-full object-cover"
+                          className="w-12 h-12 rounded-full object-cover"
                           loading="lazy"
                         />
                       </div>
                     </div>
                   ) : (
                     <div className="relative">
-                      {/* 外层圆圈 - 默认白色，悬停时淡金色填充 */}
-                      <div className="w-20 h-20 rounded-full bg-white group-hover:bg-gold/20 border-3 border-white group-hover:border-gold/30 transition-all duration-300 flex items-center justify-center shadow-lg">
-                        <div className={`w-14 h-14 rounded-full ${getCategoryColor(person.category)} flex items-center justify-center text-white text-lg font-bold`}>
+                      {/* 
+                        无头像占位符优化建议：
+                        1. 外层圆圈：与有头像版本保持一致的尺寸调整
+                        2. 内层圆圈：相应缩小以保持视觉平衡
+                        3. 字体大小：text-lg → text-base 或 text-sm 适配小尺寸
+                      */}
+                      <div className="w-16 h-16 rounded-full bg-white group-hover:bg-gold/20 border-2 border-white group-hover:border-gold/30 transition-all duration-300 flex items-center justify-center shadow-md">
+                        <div className={`w-12 h-12 rounded-full ${getCategoryColor(person.category)} flex items-center justify-center text-white text-base font-bold`}>
                           {person.name.charAt(0)}
                         </div>
                       </div>
