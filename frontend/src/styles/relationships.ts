@@ -91,12 +91,16 @@ export const relationshipsStyles = {
   // 页面容器样式
   pageContainer: 'min-h-screen bg-white',
   
-  // 头部样式
+  // 头部样式 - 现代化设计
   header: {
-    container: `bg-cream/${RELATIONSHIPS_CONFIG.layout.opacity.HEADER_BG} backdrop-blur-sm border-b border-gray-200 sticky top-0 z-${RELATIONSHIPS_CONFIG.layout.zIndex.HEADER}`,
-    wrapper: `max-w-7xl mx-auto px-${RELATIONSHIPS_CONFIG.ui.spacing.LARGE} py-${RELATIONSHIPS_CONFIG.ui.spacing.LARGE}`,
-    title: `text-4xl font-bold text-gray-800 mb-${RELATIONSHIPS_CONFIG.ui.spacing.SMALL}`,
-    filterContainer: `flex flex-wrap justify-center gap-${RELATIONSHIPS_CONFIG.ui.spacing.MEDIUM} mt-${RELATIONSHIPS_CONFIG.ui.spacing.LARGE}`
+    container: `relative bg-gradient-to-br from-cream via-white to-cream/50 backdrop-blur-xl border-b border-gray-100/50 sticky top-0 z-${RELATIONSHIPS_CONFIG.layout.zIndex.HEADER} shadow-sm`,
+    wrapper: `max-w-7xl mx-auto px-${RELATIONSHIPS_CONFIG.ui.spacing.LARGE} py-${RELATIONSHIPS_CONFIG.ui.spacing.XXLARGE}`,
+    titleSection: 'text-center mb-12 relative',
+    title: `text-5xl md:text-6xl font-bold bg-gradient-to-r from-charcoal via-gray-700 to-charcoal bg-clip-text text-transparent mb-${RELATIONSHIPS_CONFIG.ui.spacing.MEDIUM} tracking-tight`,
+    subtitle: 'text-lg text-gray-600 font-light max-w-2xl mx-auto leading-relaxed',
+    decorativeLine: 'w-24 h-1 bg-gradient-to-r from-gold/60 via-gold to-gold/60 mx-auto mt-6 rounded-full',
+    filterContainer: `flex flex-wrap justify-center gap-${RELATIONSHIPS_CONFIG.ui.spacing.MEDIUM} mt-${RELATIONSHIPS_CONFIG.ui.spacing.XXLARGE}`,
+    backgroundPattern: 'absolute inset-0 bg-noise opacity-[0.02] pointer-events-none'
   },
   
   // 主内容区域样式
@@ -125,15 +129,15 @@ export const relationshipsStyles = {
   }
 };
 
-// 分类按钮样式生成函数
+// 分类按钮样式生成函数 - 现代化设计
 export const getCategoryButtonClass = (isSelected: boolean, categoryColor: string) => {
-  const baseClass = `flex items-center gap-2 px-${RELATIONSHIPS_CONFIG.ui.spacing.MEDIUM} py-${RELATIONSHIPS_CONFIG.ui.spacing.SMALL} rounded-full transition-all duration-${RELATIONSHIPS_CONFIG.animation.TRANSITION_DURATION}`;
+  const baseClass = `group relative flex items-center gap-3 px-6 py-3 rounded-2xl transition-all duration-${RELATIONSHIPS_CONFIG.animation.TRANSITION_DURATION} font-medium text-sm backdrop-blur-sm overflow-hidden`;
   
   if (isSelected) {
-    return `${baseClass} ${categoryColor} text-white shadow-lg`;
+    return `${baseClass} ${categoryColor} text-white shadow-lg shadow-black/10 scale-105 ring-2 ring-white/20`;
   }
   
-  return `${baseClass} bg-white text-gray-600 hover:bg-gray-50 border border-gray-200`;
+  return `${baseClass} bg-white/80 text-gray-700 hover:bg-white hover:shadow-md hover:shadow-black/5 hover:scale-105 border border-gray-200/60 hover:border-gray-300/60`;
 };
 
 // 获取分类颜色的工具函数
