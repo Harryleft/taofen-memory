@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useTimelineData } from '../hooks/useTimelineData';
 import CoreEventSection from './timeline/CoreEventSection';
 import ProgressBar from './timeline/ProgressBar';
-import TimelineHeader from './timeline/TimelineHeader';
+import MinimalTimelineHeader from './timeline/MinimalTimelineHeader';
 import '../styles/timeline.css';
 
 interface LifeTimelineModuleProps {
@@ -40,7 +40,7 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
   return (
     <>
       <ProgressBar />
-      <TimelineHeader />
+      <MinimalTimelineHeader />
       <section className={`py-20 bg-cream ${className}`}>
         <div className="max-w-6xl mx-auto px-6">
 

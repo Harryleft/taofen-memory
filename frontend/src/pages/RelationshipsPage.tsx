@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import MasonryGrid from '../components/MasonryGrid';
 import PersonDetailModal from '../components/PersonDetailModal';
-import RelationshipsHeader from '../components/relationships/RelationshipsHeader';
+import MinimalRelationshipsHeader from '../components/relationships/MinimalRelationshipsHeader';
 import { Person } from '../types/Person';
 import { useRelationshipsData } from '../hooks/useRelationshipsData';
 import { 
@@ -63,7 +63,7 @@ export default function RelationshipsPage() {
 
   return (
     <div className={relationshipsStyles.pageContainer}>
-      <RelationshipsHeader />
+      <MinimalRelationshipsHeader />
       
       {/* Category Filter */}
       <div className="max-w-6xl mx-auto px-6 py-8">
