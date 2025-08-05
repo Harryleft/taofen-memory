@@ -1,6 +1,3 @@
-import React from 'react';
-import { BOOKSTORE_FONTS, BOOKSTORE_STYLES } from '../../styles/bookstore';
-
 const BookstoreHeader = () => (
   <div className="relative text-center mb-20 overflow-hidden">
     {/* 装饰性背景元素 */}
@@ -22,8 +19,7 @@ const BookstoreHeader = () => (
       
       {/* 主标题 */}
       <div className="mb-6">
-        <h1 className="text-6xl md:text-7xl font-bold text-charcoal mb-2 tracking-wide leading-tight" 
-            style={{ fontFamily: BOOKSTORE_FONTS.fangsong }}>
+        <h1 className="text-6xl md:text-7xl font-bold text-charcoal mb-2 tracking-wide leading-tight font-serif">
           <span className="inline-block transform hover:scale-105 transition-transform duration-300">韬</span>
           <span className="inline-block transform hover:scale-105 transition-transform duration-300" style={{transitionDelay: '50ms'}}>奋</span>
           <span className="mx-2 text-gold/60">·</span>
@@ -34,16 +30,14 @@ const BookstoreHeader = () => (
         </h1>
         
         {/* 英文副标题 */}
-        <div className="text-sm text-charcoal/50 tracking-[0.3em] font-light mb-4" 
-             style={{ fontFamily: "'Times New Roman', serif" }}>
+        <div className="text-sm text-charcoal/50 tracking-[0.3em] font-light mb-4 font-serif">
           TAOFEN BOOKSTORE HERITAGE
         </div>
       </div>
       
       {/* 中文描述 */}
       <div className="max-w-2xl mx-auto">
-        <p className="text-xl text-charcoal/80 leading-relaxed mb-4" 
-           style={{ fontFamily: BOOKSTORE_FONTS.kai }}>
+        <p className="text-xl text-charcoal/80 leading-relaxed mb-4 font-serif">
           探寻生活书店出版文化印记
         </p>
         

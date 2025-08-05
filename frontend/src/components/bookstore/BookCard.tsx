@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BookItem } from '../../types/bookTypes';
-import { BOOKSTORE_STYLES, BOOKSTORE_ANIMATIONS } from '../../styles/bookstore';
 
 //【修改】从 Props 中移除 isRapidScrolling
 interface BookCardProps {
@@ -22,11 +21,11 @@ const BookCard: React.FC<BookCardProps> = ({
   const renderCountRef = useRef(0);
   
   //【修改】简化日志，移除 isRapidScrolling
-  const logDebug = (message: string, data?: any) => {
+  const logDebug = React.useCallback((message: string, data?: unknown) => {
     if (DEBUG) {
       console.log(`[BookCard-${item.id}] ${message}`, data || '');
     }
-  };
+  }, [item.id]);
 
   useEffect(() => {
     // 可以在这里保留一些调试逻辑，但移除对 isRapidScrolling 的追踪
@@ -36,7 +35,7 @@ const BookCard: React.FC<BookCardProps> = ({
         timestamp: Date.now()
     });
     renderCountRef.current += 1;
-  }, [isVisible]);
+  }, [isVisible, logDebug]);
 
 
   const handleImageLoad = () => {
@@ -46,38 +45,42 @@ const BookCard: React.FC<BookCardProps> = ({
   return (
     <div
       data-item-id={item.id}
-      className={BOOKSTORE_STYLES.card.container(isVisible)}
+      className={`group cursor-pointer transform transition-all duration-300 ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+      }`}
       onClick={() => onOpenLightbox(item)}
       style={{
-        animationDelay: BOOKSTORE_ANIMATIONS.cardEnterDelay(columnIndex)
+        animationDelay: `${columnIndex * 0.1}s`
       }}
     >
-      <div className={BOOKSTORE_STYLES.card.wrapper}>
-        <div className={BOOKSTORE_STYLES.card.imageContainer}>
+      <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
+        <div className="relative overflow-hidden aspect-[3/4]">
           <img
             key={`${item.id}-${item.image}`}
             src={item.image}
             alt={item.title}
-            className={BOOKSTORE_STYLES.card.image(imageLoaded)}
+            className={`w-full h-full object-cover transition-all duration-300 ${
+              imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
+            }`}
             onLoad={handleImageLoad}
             loading="lazy"
           />
           
           {!imageLoaded && (
-            <div className={BOOKSTORE_STYLES.card.imagePlaceholder}>
+            <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
               <div className="text-gray-400 text-sm">加载中...</div>
             </div>
           )}
           
-          <div className={BOOKSTORE_STYLES.card.imageOverlay} />
+          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300" />
         </div>
         
-        <div className={BOOKSTORE_STYLES.card.content}>
-          <h3 className={BOOKSTORE_STYLES.card.title}>
+        <div className="p-4">
+          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 text-sm leading-tight">
             {item.title}
           </h3>
           
-          <div className={BOOKSTORE_STYLES.card.details}>
+          <div className="space-y-1 text-xs text-gray-600">
             {item.author && (
               <p className="line-clamp-1">
                 <span className="font-medium">作者：</span>{item.author}

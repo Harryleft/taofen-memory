@@ -1,23 +1,39 @@
 import React, { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react';
 import { Person } from '../types/Person';
-import { 
-  MASONRY_CONFIG, 
-  masonryStyles, 
-  getMasonryAvatarBgClass, 
-  getMasonryAvatarImgClass, 
-  getMasonryAvatarPlaceholderClass, 
-  getMasonryCategoryIconClass, 
-  getMasonryCategoryTagClass 
-} from '../styles/relationships';
+import '../styles/relationships.css';
+
+// 瀑布流配置
+const MASONRY_CONFIG = {
+  layout: {
+    GAP: 16,
+    CARD_WIDTH: 280,
+    MIN_COLUMNS: 2,
+    MAX_COLUMNS: 5,
+    BASE_HEIGHT: 200,
+    MIN_HEIGHT: 150,
+    MAX_HEIGHT: 400,
+    HEIGHT_PER_CHAR: 0.8,
+    VERTICAL_GAP: 20
+  },
+  ui: {
+    ICON_SIZE: 16,
+    DESC_MAX_LENGTH: 150
+  },
+  lazyLoad: {
+    INITIAL_ITEMS: 20,
+    ITEMS_PER_LOAD: 10,
+    LOAD_THRESHOLD: 200,
+    LOAD_DELAY: 300
+  }
+};
 
 // 简单防抖 hook
-function useDebouncedCallback<T extends (...args: any[]) => void>(callback: T, delay = 100) {
+function useDebouncedCallback<T extends (...args: unknown[]) => void>(callback: T, delay = 100) {
   const timer = useRef<number | null>(null);
   return useCallback((...args: Parameters<T>) => {
     if (timer.current !== null) {
       window.clearTimeout(timer.current);
     }
-    // @ts-ignore
     timer.current = window.setTimeout(() => {
       callback(...args);
       timer.current = null;
@@ -28,7 +44,7 @@ function useDebouncedCallback<T extends (...args: any[]) => void>(callback: T, d
 interface MasonryGridProps {
   items: Person[];
   onItemClick: (person: Person) => void;
-  categories: Array<{ id: string; name: string; icon: React.ComponentType<any>; color: string }>;
+  categories: Array<{ id: string; name: string; icon: React.ComponentType<{ size?: number; className?: string }>; color: string }>;
 }
 
 interface MasonryItem {
@@ -37,8 +53,6 @@ interface MasonryItem {
   column: number;
   top: number;
 }
-
-
 
 const MasonryGrid: React.FC<MasonryGridProps> = ({
   items,
@@ -87,7 +101,7 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
     );
   }, []);
 
-  // 主要布局：基于每张卡“真实高度”做瀑布流
+  // 主要布局：基于每张卡"真实高度"做瀑布流
   const calculateMasonryLayout = useCallback((persons: Person[], width: number) => {
     const columnCount = getColumnCount(width);
     const columnHeights = new Array(columnCount).fill(0);
@@ -220,10 +234,10 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
     : MASONRY_CONFIG.layout.CARD_WIDTH;
 
   return (
-    <div className={masonryStyles.container}>
+    <div className="masonry-container">
       <div
         ref={containerRef}
-        className={masonryStyles.gridContainer}
+        className="masonry-grid-container"
         style={{ height: containerHeight }}
       >
         {masonryItems.map((item) => {
@@ -242,7 +256,7 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
                   cardRefs.current.delete(person.id);
                 }
               }}
-              className={masonryStyles.card.base}
+              className="masonry-card-base"
               style={{
                 left: `${left}px`,
                 top: `${top}px`,
@@ -250,15 +264,15 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
               }}
               onClick={() => onItemClick(person)}
             >
-              <div className={masonryStyles.card.content}>
-                <div className={masonryStyles.card.avatarContainer}>
+              <div className="masonry-card-content">
+                <div className="masonry-card-avatar-container">
                   {person.img ? (
-                    <div className={masonryStyles.card.avatarWrapper}>
-                      <div className={getMasonryAvatarBgClass()}>
+                    <div className="masonry-card-avatar-wrapper">
+                      <div className="masonry-avatar-container">
                         <img
                           src={person.img}
                           alt={person.name}
-                          className={getMasonryAvatarImgClass()}
+                          className="masonry-avatar-image"
                           loading="lazy"
                           onLoad={() => {
                             // 图片加载后可能撑高，强制触发一次布局（防抖会合并）
@@ -268,27 +282,27 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
                       </div>
                     </div>
                   ) : (
-                    <div className={masonryStyles.card.avatarWrapper}>
-                      <div className={getMasonryAvatarBgClass()}>
-                        <div className={getMasonryAvatarPlaceholderClass(person.category)}>
+                    <div className="masonry-card-avatar-wrapper">
+                      <div className="masonry-avatar-container">
+                        <div className={`masonry-avatar-placeholder ${person.category}`}>
                           {person.name.charAt(0)}
                         </div>
                       </div>
                     </div>
                   )}
                   {Icon && (
-                    <div className={getMasonryCategoryIconClass(person.category)}>
+                    <div className={`masonry-category-icon ${person.category}`}>
                       <Icon size={MASONRY_CONFIG.ui.ICON_SIZE} className="text-white" />
                     </div>
                   )}
                 </div>
 
-                <h3 className={masonryStyles.card.name}>
+                <h3 className="masonry-card-name">
                   {person.name}
                 </h3>
 
                 {person.description && (
-                  <p className={masonryStyles.card.description}>
+                  <p className="masonry-card-description">
                     {person.description.length > MASONRY_CONFIG.ui.DESC_MAX_LENGTH
                       ? `${person.description.substring(0, MASONRY_CONFIG.ui.DESC_MAX_LENGTH)}...`
                       : person.description
@@ -296,7 +310,7 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
                   </p>
                 )}
 
-                <div className={getMasonryCategoryTagClass(person.category)}>
+                <div className={`masonry-category-tag ${person.category}`}>
                   {person.category}
                 </div>
               </div>
@@ -306,13 +320,13 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
       </div>
 
       {isLoading && (
-        <div className={masonryStyles.loading.container}>
-          <div className={masonryStyles.loading.spinner}></div>
+        <div className="masonry-loading-container">
+          <div className="masonry-loading-spinner"></div>
         </div>
       )}
 
       {visibleItems >= items.length && items.length > 0 && (
-        <div className={masonryStyles.complete.container}>
+        <div className="masonry-complete-container">
           已显示全部 {items.length} 位人物
         </div>
       )}
