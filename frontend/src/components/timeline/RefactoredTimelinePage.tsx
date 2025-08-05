@@ -255,7 +255,7 @@ const RefactoredTimelinePage: React.FC<RefactoredTimelinePageProps> = ({
       />
 
       {/* 时间线内容 */}
-      <main className={styles.timelineContent}>
+      <main className={`${styles.timelineContent} ${styles.timelineContainer}`}>
         <div className="space-y-8">
           {filteredData.groups.map((coreEventGroup: CoreEventGroup, index: number) => (
             <RefactoredCoreEventSection
