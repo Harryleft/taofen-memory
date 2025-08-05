@@ -3,39 +3,7 @@ import { Clock, Calendar, MapPin } from 'lucide-react';
 import BaseHeader from '../common/BaseHeader';
 import { ModuleHeaderConfig } from '../../styles/commonHeader';
 
-// TimelineHeader组件的props接口定义
-interface TimelineHeaderProps {
-  stats?: {
-    totalEvents: number;
-    totalGroups: number;
-    yearRange: { min: number; max: number } | null;
-    uniqueLocations: string[];
-  } | null;
-  searchQuery?: string;
-  selectedYear?: number | null;
-  selectedLocation?: string | null;
-  availableYears?: number[];
-  availableLocations?: string[];
-  onSearch?: (query: string) => void;
-  onYearFilter?: (year: number | null) => void;
-  onLocationFilter?: (location: string | null) => void;
-  onRefresh?: () => void;
-  onClearCache?: () => void;
-}
-
-const TimelineHeader: React.FC<TimelineHeaderProps> = ({
-  stats = null,
-  searchQuery = '',
-  selectedYear = null,
-  selectedLocation = null,
-  availableYears = [],
-  availableLocations = [],
-  onSearch,
-  onYearFilter,
-  onLocationFilter,
-  onRefresh,
-  onClearCache
-}) => {
+const TimelineHeader: React.FC = () => {
   const config: ModuleHeaderConfig = {
     moduleId: 'timeline',
     icon: <Clock className="w-8 h-8 text-gold" />,
@@ -59,20 +27,12 @@ const TimelineHeader: React.FC<TimelineHeaderProps> = ({
         <div className="flex items-center space-x-8 text-charcoal/50">
           <div className="flex items-center space-x-2">
             <Calendar className="w-4 h-4" />
-            <span className="text-sm">
-              {stats?.yearRange 
-                ? `${stats.yearRange.min}-${stats.yearRange.max}` 
-                : '1895-1944'}
-            </span>
+            <span className="text-sm">1895-1944</span>
           </div>
           <div className="w-px h-4 bg-gold/30"></div>
           <div className="flex items-center space-x-2">
             <MapPin className="w-4 h-4" />
-            <span className="text-sm">
-              {stats?.uniqueLocations && stats.uniqueLocations.length > 0
-                ? stats.uniqueLocations.slice(0, 3).join(' → ')
-                : '福建永安 → 上海 → 香港'}
-            </span>
+            <span className="text-sm">福建永安 → 上海 → 香港</span>
           </div>
         </div>
       </div>
