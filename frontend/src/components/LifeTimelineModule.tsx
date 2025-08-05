@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useTimelineData } from '../hooks/useTimelineData';
 import CoreEventSection from './timeline/CoreEventSection';
 import ProgressBar from './timeline/ProgressBar';
+import TimelineHeader from './timeline/TimelineHeader';
 import '../styles/timeline.css';
 
 interface LifeTimelineModuleProps {
@@ -39,15 +40,9 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
   return (
     <>
       <ProgressBar />
+      <TimelineHeader />
       <section className={`py-20 bg-cream ${className}`}>
         <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl font-bold text-charcoal mb-6 font-serif">人生大事</h2>
-            <p className="text-xl text-charcoal/70 max-w-3xl mx-auto leading-relaxed">
-              追溯邹韬奋先生的人生轨迹，感受一位文化先驱的成长历程与时代担当
-            </p>
-            <div className="w-24 h-px bg-gradient-to-r from-transparent via-gold to-transparent mx-auto mt-8"></div>
-          </div>
 
           <div className="timeline-container">
             {timelineData.map((coreEvent, coreIndex) => (

@@ -93,19 +93,23 @@ export const relationshipsStyles = {
   
   // 头部样式 - 现代化设计
   header: {
-    container: `relative bg-gradient-to-br from-cream via-white to-cream/50 backdrop-blur-xl border-b border-gray-100/50 sticky top-0 z-${RELATIONSHIPS_CONFIG.layout.zIndex.HEADER} shadow-sm`,
-    wrapper: `max-w-7xl mx-auto px-${RELATIONSHIPS_CONFIG.ui.spacing.LARGE} py-${RELATIONSHIPS_CONFIG.ui.spacing.XXLARGE}`,
+    container: 'relative bg-gradient-to-br from-cream via-white to-cream/50 backdrop-blur-xl border-b border-gray-100/50 sticky top-0 z-40 shadow-sm',
+    wrapper: 'max-w-7xl mx-auto px-6 py-12',
     titleSection: 'text-center mb-12 relative',
-    title: `text-5xl md:text-6xl font-bold bg-gradient-to-r from-charcoal via-gray-700 to-charcoal bg-clip-text text-transparent mb-${RELATIONSHIPS_CONFIG.ui.spacing.MEDIUM} tracking-tight`,
+    title: 'text-5xl md:text-6xl font-bold bg-gradient-to-r from-charcoal via-gray-700 to-charcoal bg-clip-text text-transparent mb-4 tracking-tight',
     subtitle: 'text-lg text-gray-600 font-light max-w-2xl mx-auto leading-relaxed',
     decorativeLine: 'w-24 h-1 bg-gradient-to-r from-gold/60 via-gold to-gold/60 mx-auto mt-6 rounded-full',
-    filterContainer: `flex flex-wrap justify-center gap-${RELATIONSHIPS_CONFIG.ui.spacing.MEDIUM} mt-${RELATIONSHIPS_CONFIG.ui.spacing.XXLARGE}`,
-    backgroundPattern: 'absolute inset-0 bg-noise opacity-[0.02] pointer-events-none'
+    filterContainer: 'flex flex-wrap justify-center gap-4 mt-12',
+    backgroundPattern: 'absolute inset-0 bg-noise opacity-[0.02] pointer-events-none',
+    statsContainer: 'flex justify-center gap-8 mt-8',
+    statItem: 'text-center',
+    statNumber: 'block text-2xl font-bold text-charcoal',
+    statLabel: 'text-sm text-gray-600 mt-1'
   },
   
   // 主内容区域样式
   mainContent: {
-    container: `max-w-7xl mx-auto px-${RELATIONSHIPS_CONFIG.ui.spacing.LARGE} py-${RELATIONSHIPS_CONFIG.ui.spacing.XXLARGE}`,
+    container: 'max-w-7xl mx-auto px-6 py-12',
     emptyState: {
       container: 'text-center py-12',
       title: 'text-gray-400 text-lg mb-2',
@@ -131,7 +135,7 @@ export const relationshipsStyles = {
 
 // 分类按钮样式生成函数 - 现代化设计
 export const getCategoryButtonClass = (isSelected: boolean, categoryColor: string) => {
-  const baseClass = `group relative flex items-center gap-3 px-6 py-3 rounded-2xl transition-all duration-${RELATIONSHIPS_CONFIG.animation.TRANSITION_DURATION} font-medium text-sm backdrop-blur-sm overflow-hidden`;
+  const baseClass = 'group relative flex items-center gap-3 px-6 py-3 rounded-2xl transition-all duration-300 font-medium text-sm backdrop-blur-sm overflow-hidden';
   
   if (isSelected) {
     return `${baseClass} ${categoryColor} text-white shadow-lg shadow-black/10 scale-105 ring-2 ring-white/20`;

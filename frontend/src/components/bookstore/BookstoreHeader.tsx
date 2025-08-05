@@ -48,15 +48,15 @@ const BookstoreHeader = () => (
         </p>
         
         {/* 详细描述 */}
-        <p className="text-base text-charcoal/60 leading-relaxed max-w-xl mx-auto" 
+        {/* <p className="text-base text-charcoal/60 leading-relaxed max-w-xl mx-auto" 
            style={{ fontFamily: BOOKSTORE_FONTS.song }}>
           穿越时光长河，重温那些承载着思想与智慧的珍贵典籍，
           感受邹韬奋先生倾注毕生心血的文化事业
-        </p>
+        </p> */}
       </div>
       
       {/* 装饰性底部元素 */}
-      <div className="flex items-center justify-center mt-8">
+      <div className="flex items-center justify-center mt-2">
         <div className="flex items-center space-x-2">
           <div className="w-8 h-px bg-gradient-to-r from-transparent to-gold/30"></div>
           <div className="w-1 h-1 bg-gold/50 rounded-full"></div>
