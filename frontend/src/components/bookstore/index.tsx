@@ -16,7 +16,7 @@ import BookstoreHeader from './BookstoreHeader';
 import BookstoreFilters from './BookstoreFilters';
 import BookGrid from './BookGrid';
 import BookLightbox from './BookLightbox';
-import { BOOKSTORE_CONSTANTS, BOOKSTORE_STYLES, BOOKSTORE_FONTS } from '../../styles/bookstore';
+
 
 import { useBookData } from '../../hooks/useBookData';
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
@@ -24,9 +24,9 @@ import { useLightbox } from '../../hooks/useLightbox';
 import { useResponsiveColumns } from '../../hooks/useResponsiveColumns';
 
 // 使用配置常量
-const SEARCH_DEBOUNCE_DELAY = BOOKSTORE_CONSTANTS.searchDebounceDelay;
-const COLUMN_GAP = BOOKSTORE_CONSTANTS.columnGap;
-const LOAD_MORE_INDICATOR_HEIGHT = BOOKSTORE_CONSTANTS.loadMoreIndicatorHeight;
+const SEARCH_DEBOUNCE_DELAY = 300; // ms
+const COLUMN_GAP = 16; // px
+const LOAD_MORE_INDICATOR_HEIGHT = 80; // px
 
 interface BookstoreTimelineModuleProps {
   className?: string;
@@ -146,9 +146,9 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
       <section className={`relative py-20 bg-white ${className}`}>
         <div className="max-w-7xl mx-auto px-6">
           <BookstoreHeader />
-          <div className={BOOKSTORE_STYLES.loading.container}>
-            <div className={BOOKSTORE_STYLES.loading.spinner}></div>
-            <span className={BOOKSTORE_STYLES.loading.text} style={{fontFamily: BOOKSTORE_FONTS.song}}>正在加载书籍数据...</span>
+          <div className="flex flex-col items-center justify-center p-12 text-center">
+            <div className="w-12 h-12 border-4 border-gray-200 border-t-gray-500 rounded-full animate-spin"></div>
+            <span className="mt-4 text-lg text-gray-600 font-song">正在加载书籍数据...</span>
           </div>
         </div>
       </section>
@@ -189,10 +189,10 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
 
             {/* 加载更多指示器 */}
             {isLoading && (
-              <div className={BOOKSTORE_STYLES.loading.loadMore.container}>
-                 <div className={BOOKSTORE_STYLES.loading.loadMore.wrapper}>
-                   <div className={BOOKSTORE_STYLES.loading.loadMore.spinner}></div>
-                   <span className={BOOKSTORE_STYLES.loading.loadMore.text} style={{fontFamily: BOOKSTORE_FONTS.song}}>正在加载更多...</span>
+              <div className="flex items-center justify-center w-full py-4">
+                 <div className="flex items-center text-gray-500">
+                   <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-500 rounded-full animate-spin"></div>
+                   <span className="ml-3 font-song">正在加载更多...</span>
                 </div>
               </div>
             )}
