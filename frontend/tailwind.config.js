@@ -12,10 +12,26 @@ export default {
         'warm-rose': '#8D6E63',     // 亲人家属 - 温暖克制的棕玫瑰色
         'heritage-blue': '#1565C0', // 学术文化 - 文化传承的深蓝色
         'sage-green': '#689F38',    // 政治社会 - 稳重的橄榄绿
+        // From MINIMAL_COLORS
+        'primary-dark': '#2C2C2C',
+        'primary-medium': '#666666',
+        'primary-light': '#999999',
+        'accent-gold': '#D4AF37',
+        'accent-light-gold': '#F4E4BC',
+        'bg-pure': '#FFFFFF',
+        'bg-warm': '#FEFEFE',
+        'bg-subtle': '#F8F8F8',
       },
       fontFamily: {
         'serif': ['EB Garamond', 'serif'],
         'sans': ['Noto Sans', 'sans-serif'],
+        // From COMMON_FONTS & MINIMAL_FONTS
+        'song': ['SimSun', '宋体', 'NSimSun', 'serif'],
+        'kai': ['KaiTi', 'STKaiti', '华文楷体', 'serif'],
+        'fangsong': ['FangSong', 'STFangsong', '华文仿宋', 'serif'],
+        'hei': ['SimHei', '黑体', 'Microsoft YaHei', 'sans-serif'],
+        'pingfang': ['PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'sans-serif'],
+        'times': ['Times New Roman', 'Georgia', 'serif'],
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out',
