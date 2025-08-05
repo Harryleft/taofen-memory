@@ -51,9 +51,9 @@ const PersonLinkRenderer: React.FC<PersonLinkRendererProps> = ({
       const processedIndices = new Set<number>();
 
       // 使用personMatcher提取人名
-      const extractedNames = personMatcher.extractPersonNames(text);
+      const extractedNames = personMatcher.extractPersonsFromText(text);
       
-      extractedNames.forEach(({ name, person }) => {
+      extractedNames.forEach(({ name, person }: { name: string; person: Person }) => {
         // 查找所有匹配的位置
         let startIndex = 0;
         while (true) {
