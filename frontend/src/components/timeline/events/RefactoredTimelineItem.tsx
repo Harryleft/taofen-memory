@@ -6,6 +6,7 @@ import { Person } from '../../../types/Person';
 import TimelineEventContent from './TimelineEventContent';
 import TimelineEventImage from './TimelineEventImage';
 import PersonLinkRenderer from './PersonLinkRenderer';
+import styles from '../styles/timelineStyles.module.css';
 
 interface RefactoredTimelineItemProps {
   event: BaseTimelineEvent;
@@ -26,7 +27,7 @@ const RefactoredTimelineItem: React.FC<RefactoredTimelineItemProps> = ({
 }) => {
   // 样式计算逻辑
   const getContainerStyles = () => {
-    const baseClasses = 'timeline-item';
+    const baseClasses = styles.timelineItem;
     const featuredClasses = isFeatured 
       ? 'transform scale-1.1 mb-8' 
       : 'transform scale-0.95';
@@ -35,10 +36,10 @@ const RefactoredTimelineItem: React.FC<RefactoredTimelineItemProps> = ({
   };
 
   const getDotStyles = () => {
-    const baseClasses = 'timeline-dot';
+    const baseClasses = styles.timelineDot;
     const colorClasses = event.timespot 
-      ? 'timeline-dot-gray' 
-      : 'timeline-dot-gold';
+      ? styles.timelineDotGray 
+      : styles.timelineDotGold;
     const visibilityClasses = isFeatured ? 'hidden' : '';
     
     return `${baseClasses} ${colorClasses} ${visibilityClasses}`;

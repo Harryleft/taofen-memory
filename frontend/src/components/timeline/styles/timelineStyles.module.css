@@ -242,6 +242,10 @@
   @apply max-w-6xl mx-auto px-4 py-8;
 }
 
+.timelineContent {
+  @apply relative;
+}
+
 .pageHeader {
   @apply mb-12;
 }

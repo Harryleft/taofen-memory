@@ -6,6 +6,7 @@ import { Person } from '../../types/Person';
 import { useUnifiedTimelineData } from '../../hooks/useUnifiedTimelineData';
 import RefactoredCoreEventSection from './sections/RefactoredCoreEventSection';
 import TimelineHeader from './TimelineHeader';
+import styles from './styles/timelineStyles.module.css';
 
 interface RefactoredTimelinePageProps {
   dataSource?: DataSourceType;
@@ -208,7 +209,7 @@ const RefactoredTimelinePage: React.FC<RefactoredTimelinePageProps> = ({
   // 渲染空数据状态
   if (!filteredData || filteredData.groups.length === 0) {
     return (
-      <div className={`timeline-page-empty ${className}`}>
+      <div className={`${styles.timelinePage} ${className}`}>
         <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
           <div className="text-charcoal/40 text-6xl">📅</div>
           <h2 className="text-xl font-bold text-charcoal">暂无数据</h2>
@@ -235,7 +236,7 @@ const RefactoredTimelinePage: React.FC<RefactoredTimelinePageProps> = ({
   }
 
   return (
-    <div className={`refactored-timeline-page ${className}`}>
+    <div className={`${styles.timelinePage} ${className}`}>
       {/* 页面头部 */}
       <TimelineHeader 
         stats={stats}
@@ -254,7 +255,7 @@ const RefactoredTimelinePage: React.FC<RefactoredTimelinePageProps> = ({
       />
 
       {/* 时间线内容 */}
-      <main className="timeline-content">
+      <main className={styles.timelineContent}>
         <div className="space-y-8">
           {filteredData.groups.map((coreEventGroup: CoreEventGroup, index: number) => (
             <RefactoredCoreEventSection
