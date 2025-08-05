@@ -1,0 +1,201 @@
+@layer components {
+  .bookstore-page-container {
+    @apply relative py-20 bg-white;
+  }
+
+  .bookstore-content-container {
+    @apply max-w-7xl mx-auto px-6;
+  }
+
+  .bookstore-header-container {
+    @apply text-center mb-16;
+  }
+
+  .bookstore-header-title {
+    @apply text-5xl font-bold text-charcoal mb-6;
+  }
+
+  .bookstore-header-subtitle {
+    @apply text-lg text-charcoal/70 mb-2;
+  }
+
+  .bookstore-filters-container {
+    @apply flex flex-wrap gap-4 mb-8 justify-center;
+  }
+
+  .bookstore-search-input-container {
+    @apply relative;
+  }
+
+  .bookstore-search-input-icon {
+    @apply absolute left-3 top-1/2 transform -translate-y-1/2 text-charcoal/60;
+  }
+
+  .bookstore-search-input {
+    @apply pl-10 pr-4 py-2 bg-white border border-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50 w-80;
+  }
+
+  .bookstore-select {
+    @apply px-4 py-2 bg-white border border-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50;
+  }
+
+  .bookstore-download-button {
+    @apply flex items-center gap-2 px-4 py-2 bg-white border-2 border-gold/30 text-charcoal rounded-lg hover:bg-gold/5 hover:border-gold/60 focus:outline-none focus:ring-2 focus:ring-gold/30 transition-all duration-300 shadow-sm hover:shadow-md;
+  }
+
+  .bookstore-grid-container {
+    @apply flex gap-5;
+  }
+
+  .bookstore-grid-column {
+    @apply flex-1 flex flex-col gap-5;
+  }
+
+  .bookstore-card-container {
+    @apply group cursor-pointer transform transition-all duration-500;
+  }
+
+  .bookstore-card-container.visible {
+    @apply translate-y-0 opacity-100;
+  }
+
+  .bookstore-card-container.hidden {
+    @apply translate-y-8 opacity-0;
+  }
+
+  .bookstore-card-wrapper {
+    @apply bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300;
+  }
+
+  .bookstore-card-image-container {
+    @apply relative aspect-[3/4] overflow-hidden;
+  }
+
+  .bookstore-card-image {
+    @apply w-full h-full object-cover transition-all duration-500;
+  }
+
+  .bookstore-card-image.loaded {
+    @apply opacity-100 scale-100;
+  }
+
+  .bookstore-card-image.loading {
+    @apply opacity-0 scale-105;
+  }
+
+  .bookstore-card-image-placeholder {
+    @apply absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center;
+  }
+
+  .bookstore-card-image-overlay {
+    @apply absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300;
+  }
+
+  .bookstore-card-content {
+    @apply p-4;
+  }
+
+  .bookstore-card-title {
+    @apply font-semibold text-gray-900 mb-2 line-clamp-2 text-sm leading-tight;
+  }
+
+  .bookstore-card-details {
+    @apply space-y-1 text-xs text-gray-600;
+  }
+
+  .bookstore-lightbox-overlay {
+    @apply fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4;
+  }
+
+  .bookstore-lightbox-container {
+    @apply relative max-w-4xl max-h-[90vh] bg-white rounded-lg overflow-hidden;
+  }
+
+  .bookstore-lightbox-close {
+    @apply absolute top-4 right-4 z-10 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors;
+  }
+
+  .bookstore-lightbox-prev {
+    @apply absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors;
+  }
+
+  .bookstore-lightbox-next {
+    @apply absolute right-4 top-1/2 transform -translate-y-1/2 z-10 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors;
+  }
+
+  .bookstore-lightbox-content {
+    @apply flex flex-col lg:flex-row max-h-[90vh];
+  }
+
+  .bookstore-lightbox-image-section {
+    @apply flex-1 flex items-center justify-center bg-amber-50 p-4;
+  }
+
+  .bookstore-lightbox-image {
+    @apply max-w-full max-h-full object-contain;
+  }
+
+  .bookstore-lightbox-details-section {
+    @apply w-full lg:w-96 p-6 overflow-y-auto bg-white;
+  }
+
+  .bookstore-lightbox-title {
+    @apply text-2xl font-bold text-charcoal mb-4;
+  }
+
+  .bookstore-lightbox-details {
+    @apply space-y-3 mb-6;
+  }
+
+  .bookstore-lightbox-detail-item {
+    @apply text-charcoal/80;
+  }
+
+  .bookstore-lightbox-counter {
+    @apply mt-4 text-sm text-charcoal/60 text-center;
+  }
+
+  .bookstore-loading-container {
+    @apply flex items-center justify-center py-12;
+  }
+
+  .bookstore-loading-spinner {
+    @apply animate-spin rounded-full h-8 w-8 border-b-2 border-gold;
+  }
+
+  .bookstore-loading-text {
+    @apply ml-3 text-charcoal/60;
+  }
+
+  .bookstore-load-more-container {
+    @apply text-center py-8;
+  }
+
+  .bookstore-load-more-wrapper {
+    @apply flex items-center justify-center;
+  }
+
+  .bookstore-load-more-spinner {
+    @apply animate-spin rounded-full h-6 w-6 border-b-2 border-gold mr-3;
+  }
+
+  .bookstore-load-more-text {
+    @apply text-charcoal/60;
+  }
+
+  .bookstore-empty-container {
+    @apply text-center py-12;
+  }
+
+  .bookstore-empty-icon {
+    @apply text-6xl mb-4;
+  }
+
+  .bookstore-empty-title {
+    @apply text-xl font-bold text-charcoal mb-2;
+  }
+
+  .bookstore-empty-description {
+    @apply text-charcoal/60;
+  }
+}

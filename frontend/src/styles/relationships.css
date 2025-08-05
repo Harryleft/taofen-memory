@@ -1,0 +1,205 @@
+@layer components {
+  .relationships-page-container {
+    @apply min-h-screen bg-white;
+  }
+
+  .relationships-header-container {
+    @apply relative bg-gradient-to-br from-cream via-white to-cream/50 backdrop-blur-xl border-b border-gray-100/50 sticky top-0 z-40 shadow-sm;
+  }
+
+  .relationships-header-wrapper {
+    @apply max-w-7xl mx-auto px-6 py-12;
+  }
+
+  .relationships-title-section {
+    @apply text-center mb-12 relative;
+  }
+
+  .relationships-title {
+    @apply text-5xl md:text-6xl font-bold bg-gradient-to-r from-charcoal via-gray-700 to-charcoal bg-clip-text text-transparent mb-4 tracking-tight;
+  }
+
+  .relationships-subtitle {
+    @apply text-lg text-gray-600 font-light max-w-2xl mx-auto leading-relaxed;
+  }
+
+  .relationships-decorative-line {
+    @apply w-24 h-1 bg-gradient-to-r from-gold/60 via-gold to-gold/60 mx-auto mt-6 rounded-full;
+  }
+
+  .relationships-filter-container {
+    @apply flex flex-wrap justify-center gap-4 mt-12;
+  }
+
+  .relationships-background-pattern {
+    @apply absolute inset-0 bg-noise opacity-[0.02] pointer-events-none;
+  }
+
+  .relationships-stats-container {
+    @apply flex justify-center gap-8 mt-8;
+  }
+
+  .relationships-stat-item {
+    @apply text-center;
+  }
+
+  .relationships-stat-number {
+    @apply block text-2xl font-bold text-charcoal;
+  }
+
+  .relationships-stat-label {
+    @apply text-sm text-gray-600 mt-1;
+  }
+
+  .relationships-main-content-container {
+    @apply max-w-7xl mx-auto px-6 py-12;
+  }
+
+  .relationships-empty-state-container {
+    @apply text-center py-12;
+  }
+
+  .relationships-empty-state-title {
+    @apply text-gray-400 text-lg mb-2;
+  }
+
+  .relationships-empty-state-subtitle {
+    @apply text-gray-500 text-sm;
+  }
+
+  .relationships-loading-container {
+    @apply min-h-screen bg-white flex items-center justify-center;
+  }
+
+  .relationships-loading-content {
+    @apply text-center;
+  }
+
+  .relationships-loading-spinner {
+    @apply animate-spin rounded-full h-32 w-32 border-b-2 border-charcoal mx-auto mb-4;
+  }
+
+  .relationships-loading-text {
+    @apply text-gray-600;
+  }
+
+  .relationships-error-container {
+    @apply min-h-screen bg-white flex items-center justify-center;
+  }
+
+  .relationships-error-content {
+    @apply text-center text-red-500;
+  }
+
+  .relationships-error-message {
+    @apply text-sm text-gray-500;
+  }
+
+  .relationships-category-button {
+    @apply group relative flex items-center gap-3 px-6 py-3 rounded-2xl transition-all duration-300 font-medium text-sm backdrop-blur-sm overflow-hidden;
+  }
+
+  .relationships-category-button.selected {
+    @apply text-white shadow-lg shadow-black/10 scale-105 ring-2 ring-white/20;
+  }
+
+  .relationships-category-button.not-selected {
+    @apply bg-white/80 text-gray-700 hover:bg-white hover:shadow-md hover:shadow-black/5 hover:scale-105 border border-gray-200/60 hover:border-gray-300/60;
+  }
+
+  .relationships-modal-backdrop {
+    @apply fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4;
+  }
+
+  .relationships-modal-container {
+    @apply bg-white rounded-3xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto;
+  }
+
+  .relationships-modal-header-container {
+    @apply relative bg-gradient-to-br from-cream/50 to-gold/20 rounded-t-3xl p-8 text-center;
+  }
+
+  .relationships-modal-close-button {
+    @apply absolute top-4 right-4 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110;
+  }
+
+  .relationships-modal-close-icon {
+    @apply text-gray-600 text-lg leading-none;
+  }
+
+  .relationships-modal-avatar-container {
+    @apply relative inline-block;
+  }
+
+  .relationships-modal-avatar {
+    @apply w-20 h-20 rounded-full mx-auto object-cover border-2 border-white shadow-lg;
+  }
+
+  .relationships-modal-avatar-placeholder {
+    @apply w-20 h-20 rounded-full flex items-center justify-center mx-auto shadow-lg;
+  }
+
+  .relationships-modal-avatar-placeholder-text {
+    @apply text-white font-bold text-2xl;
+  }
+
+  .relationships-modal-category-badge {
+    @apply absolute -bottom-2 -right-2 w-8 h-8 rounded-full border-3 border-white flex items-center justify-center;
+  }
+
+  .relationships-modal-category-badge-text {
+    @apply text-white text-xs font-bold;
+  }
+
+  .relationships-modal-name {
+    @apply text-2xl font-bold text-charcoal mt-4 mb-2;
+  }
+
+  .relationships-modal-category-tag {
+    @apply inline-block px-4 py-1 rounded-full text-sm font-medium text-white;
+  }
+
+  .relationships-modal-content-container {
+    @apply p-8;
+  }
+
+  .relationships-modal-section {
+    @apply mb-6;
+  }
+
+  .relationships-modal-section-title {
+    @apply text-lg font-semibold text-charcoal mb-2 flex items-center gap-2;
+  }
+
+  .relationships-modal-section-icon {
+    @apply text-gold;
+  }
+
+  .relationships-modal-description {
+    @apply text-gray-700 leading-relaxed bg-gray-50 rounded-xl p-4 indent-8;
+  }
+
+  .relationships-modal-sources-list {
+    @apply space-y-2;
+  }
+
+  .relationships-modal-source-item {
+    @apply bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors;
+  }
+
+  .relationships-modal-source-link {
+    @apply flex items-center justify-between text-gray-700 hover:text-gold transition-colors group;
+  }
+
+  .relationships-modal-source-link-text {
+    @apply flex-1;
+  }
+
+  .relationships-modal-source-link-icon {
+    @apply text-gray-400 group-hover:text-gold ml-2;
+  }
+
+  .relationships-modal-source-text {
+    @apply text-gray-700;
+  }
+}

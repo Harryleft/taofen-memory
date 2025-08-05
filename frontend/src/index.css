@@ -4,6 +4,9 @@
 @tailwind components;
 @tailwind utilities;
 
+@import './styles/bookstore.css';
+@import './styles/relationships.css';
+
 @layer base {
   html {
     scroll-behavior: smooth;
