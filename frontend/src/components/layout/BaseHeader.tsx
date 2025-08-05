@@ -4,7 +4,7 @@ import {
   COMMON_HEADER_LAYOUT, 
   COMMON_HEADER_STYLES,
   ModuleHeaderConfig 
-} from '../../styles/commonHeader';
+} from '../../styles/commonHeader.ts';
 
 interface BaseHeaderProps {
   config: ModuleHeaderConfig;
