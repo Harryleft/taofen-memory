@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { BaseTimelineEvent } from '../../../types/timelineTypes';
+import styles from '../styles/timelineStyles.module.css';
 
 interface TimelineEventContentProps {
   event: BaseTimelineEvent;
@@ -16,25 +17,26 @@ const TimelineEventContent: React.FC<TimelineEventContentProps> = ({
 }) => {
   // 样式计算逻辑
   const getContentStyles = () => {
-    const baseStyles = {
-      time: isFeatured ? 'text-base font-semibold' : 'text-sm font-medium',
-      experience: isFeatured ? 'text-lg leading-relaxed font-medium' : 'text-base',
-      location: 'text-sm text-charcoal font-bold'
+    return {
+      container: isFeatured ? styles.eventContentFeatured : styles.eventContent,
+      time: isFeatured ? styles.eventTimeFeatured : styles.eventTime,
+      location: isFeatured ? styles.eventLocationFeatured : styles.eventLocation,
+      title: isFeatured ? styles.eventTitleFeatured : styles.eventTitleRegular,
+      experience: isFeatured ? styles.eventExperienceFeatured : styles.eventExperienceRegular
     };
-    return baseStyles;
   };
 
-  const styles = getContentStyles();
+  const contentStyles = getContentStyles();
 
   return (
-    <div className={`space-y-2 ${className}`}>
+    <div className={`${contentStyles.container} ${className}`}>
       {/* 时间和地点信息 */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-        <p className={`text-gold ${styles.time}`}>
+        <p className={contentStyles.time}>
           {event.time}
         </p>
         {event.location && (
-          <div className={styles.location}>
+          <div className={contentStyles.location}>
             {event.location}
           </div>
         )}
@@ -43,11 +45,11 @@ const TimelineEventContent: React.FC<TimelineEventContentProps> = ({
       {/* 事件描述 */}
       <div className="space-y-1">
         {event.title && (
-          <h4 className="font-semibold text-charcoal">
+          <h4 className={contentStyles.title}>
             {event.title}
           </h4>
         )}
-        <p className={`text-charcoal/80 ${styles.experience}`}>
+        <p className={contentStyles.experience}>
           {event.experience}
         </p>
         
