@@ -1,7 +1,7 @@
 // 重构后的时间线页面组件 - 高内聚低耦合设计
 
 import React, { useState, useCallback, useMemo } from 'react';
-import { DataSourceType } from '../../types/timelineTypes';
+import { CoreEventGroup, DataSourceType } from '../../types/timelineTypes';
 import { Person } from '../../types/Person';
 import { useUnifiedTimelineData } from '../../hooks/useUnifiedTimelineData';
 import RefactoredCoreEventSection from './sections/RefactoredCoreEventSection';
@@ -30,7 +30,7 @@ const RefactoredTimelinePage: React.FC<RefactoredTimelinePageProps> = ({
 
   // 数据管理
   const {
-    data,
+    timelineData,
     loading,
     error,
     loadData,
@@ -40,26 +40,26 @@ const RefactoredTimelinePage: React.FC<RefactoredTimelinePageProps> = ({
     getEventsByYear,
     getEventsByLocation
   } = useUnifiedTimelineData({
-    dataSource,
+    sourceType: dataSource,
     enableCache: true,
     autoLoad: true
   });
 
   // 过滤后的数据
   const filteredData = useMemo(() => {
-    if (!data) return null;
+    if (!timelineData) return null;
 
-    let filteredGroups = data.coreEventGroups;
+    let filteredGroups = timelineData.groups;
 
     // 搜索过滤
     if (searchQuery.trim()) {
       const searchResults = searchEvents(searchQuery);
       const searchEventIds = new Set(searchResults.map(event => event.id));
       
-      filteredGroups = filteredGroups.map(group => ({
+      filteredGroups = filteredGroups.map((group: CoreEventGroup) => ({
         ...group,
         timeline: group.timeline.filter(event => searchEventIds.has(event.id))
-      })).filter(group => group.timeline.length > 0);
+      })).filter((group: CoreEventGroup) => group.timeline.length > 0);
     }
 
     // 年份过滤
@@ -67,10 +67,10 @@ const RefactoredTimelinePage: React.FC<RefactoredTimelinePageProps> = ({
       const yearEvents = getEventsByYear(selectedYear);
       const yearEventIds = new Set(yearEvents.map(event => event.id));
       
-      filteredGroups = filteredGroups.map(group => ({
+      filteredGroups = filteredGroups.map((group: CoreEventGroup) => ({
         ...group,
         timeline: group.timeline.filter(event => yearEventIds.has(event.id))
-      })).filter(group => group.timeline.length > 0);
+      })).filter((group: CoreEventGroup) => group.timeline.length > 0);
     }
 
     // 地点过滤
@@ -78,42 +78,42 @@ const RefactoredTimelinePage: React.FC<RefactoredTimelinePageProps> = ({
       const locationEvents = getEventsByLocation(selectedLocation);
       const locationEventIds = new Set(locationEvents.map(event => event.id));
       
-      filteredGroups = filteredGroups.map(group => ({
+      filteredGroups = filteredGroups.map((group: CoreEventGroup) => ({
         ...group,
         timeline: group.timeline.filter(event => locationEventIds.has(event.id))
-      })).filter(group => group.timeline.length > 0);
+      })).filter((group: CoreEventGroup) => group.timeline.length > 0);
     }
 
     return {
-      ...data,
-      coreEventGroups: filteredGroups
+      ...timelineData,
+      groups: filteredGroups
     };
-  }, [data, searchQuery, selectedYear, selectedLocation, searchEvents, getEventsByYear, getEventsByLocation]);
+  }, [timelineData, searchQuery, selectedYear, selectedLocation, searchEvents, getEventsByYear, getEventsByLocation]);
 
   // 统计信息
   const stats = useMemo(() => {
     if (!filteredData) return null;
     
-    const totalEvents = filteredData.coreEventGroups.reduce(
-      (sum, group) => sum + group.timeline.length, 
+    const totalEvents = filteredData.groups.reduce(
+      (sum: number, group: CoreEventGroup) => sum + group.timeline.length, 
       0
     );
     
     const years = new Set(
-      filteredData.coreEventGroups.flatMap(group => 
+      filteredData.groups.flatMap((group: CoreEventGroup) => 
         group.timeline.map(event => new Date(event.time).getFullYear())
       )
     );
     
     const locations = new Set(
-      filteredData.coreEventGroups.flatMap(group => 
+      filteredData.groups.flatMap((group: CoreEventGroup) => 
         group.timeline.map(event => event.location).filter(Boolean)
       )
     );
 
     return {
       totalEvents,
-      totalGroups: filteredData.coreEventGroups.length,
+      totalGroups: filteredData.groups.length,
       yearRange: years.size > 0 ? {
         min: Math.min(...Array.from(years)),
         max: Math.max(...Array.from(years))
@@ -206,7 +206,7 @@ const RefactoredTimelinePage: React.FC<RefactoredTimelinePageProps> = ({
   }
 
   // 渲染空数据状态
-  if (!filteredData || filteredData.coreEventGroups.length === 0) {
+  if (!filteredData || filteredData.groups.length === 0) {
     return (
       <div className={`timeline-page-empty ${className}`}>
         <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
@@ -256,7 +256,7 @@ const RefactoredTimelinePage: React.FC<RefactoredTimelinePageProps> = ({
       {/* 时间线内容 */}
       <main className="timeline-content">
         <div className="space-y-8">
-          {filteredData.coreEventGroups.map((coreEventGroup, index) => (
+          {filteredData.groups.map((coreEventGroup: CoreEventGroup, index: number) => (
             <RefactoredCoreEventSection
               key={`${coreEventGroup.core_event}-${index}`}
               coreEventGroup={coreEventGroup}
