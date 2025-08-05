@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { personMatcher } from '../../../utils/personMatcher';
 import { Person } from '../../../types/Person';
+import styles from '../styles/timelineStyles.module.css';
 
 interface PersonLinkRendererProps {
   text: string;
@@ -175,7 +176,7 @@ const PersonLinkComponent: React.FC<PersonLinkComponentProps> = ({
         onClick={handleClick}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        className="text-blue-600 hover:text-blue-800 underline decoration-dotted underline-offset-2 transition-colors duration-200 cursor-pointer bg-transparent border-none p-0 font-inherit"
+        className={`${styles.personLink} bg-transparent border-none p-0 font-inherit`}
         title={`点击查看${name}的详细信息`}
       >
         {name}
@@ -183,17 +184,15 @@ const PersonLinkComponent: React.FC<PersonLinkComponentProps> = ({
       
       {/* 悬浮提示 */}
       {isHovered && (
-        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-10">
-          <div className="bg-black text-white text-xs rounded px-2 py-1 whitespace-nowrap shadow-lg">
-            <div className="font-semibold">{person.name}</div>
-            {person.description && (
-              <div className="text-gray-300 mt-1">
-                {person.description.substring(0, 50)}...
-              </div>
-            )}
-            {/* 小箭头 */}
-            <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black"></div>
-          </div>
+        <div className={styles.personTooltip}>
+          <div className={styles.personName}>{person.name}</div>
+          {person.description && (
+            <div className={styles.personDescription}>
+              {person.description.substring(0, 50)}...
+            </div>
+          )}
+          {/* 小箭头 */}
+          <div className={styles.personTooltipArrow}></div>
         </div>
       )}
     </span>
