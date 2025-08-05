@@ -1,7 +1,6 @@
 import React from 'react';
 import { Network } from 'lucide-react';
-import MinimalHeader from '../common/MinimalHeader';
-import { MinimalHeaderConfig, MINIMAL_COLORS, MINIMAL_SPACING } from '../../styles/minimalistHeader';
+import MinimalHeader, { MinimalHeaderConfig } from '../layout/MinimalHeader';
 
 const MinimalRelationshipsHeader: React.FC = () => {
   const config: MinimalHeaderConfig = {
@@ -20,183 +19,40 @@ const MinimalRelationshipsHeader: React.FC = () => {
   return (
     <MinimalHeader config={config}>
       {/* 人物关系特有的极简网络装饰 */}
-      <div 
-        style={{
-          marginTop: MINIMAL_SPACING.lg,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          position: 'relative',
-          height: '60px'
-        }}
-      >
+      <div className="mt-8 flex justify-center items-center relative h-15">
         {/* 中心节点 - 韬奋 */}
-        <div 
-          style={{
-            width: '8px',
-            height: '8px',
-            backgroundColor: MINIMAL_COLORS.accent.gold,
-            borderRadius: '50%',
-            position: 'relative',
-            zIndex: 2
-          }}
-        />
+        <div className="w-2 h-2 bg-accent-gold rounded-full relative z-10" />
 
         {/* 连接线和周围节点 - 极简几何 */}
         {/* 左上节点 */}
-        <div 
-          style={{
-            position: 'absolute',
-            left: 'calc(50% - 40px)',
-            top: '10px',
-            width: '4px',
-            height: '4px',
-            backgroundColor: MINIMAL_COLORS.primary.light,
-            borderRadius: '50%',
-            opacity: 0.6
-          }}
-        />
-        <div 
-          style={{
-            position: 'absolute',
-            left: 'calc(50% - 40px)',
-            top: '10px',
-            width: '35px',
-            height: '1px',
-            backgroundColor: MINIMAL_COLORS.primary.light,
-            opacity: 0.3,
-            transform: 'rotate(25deg)',
-            transformOrigin: 'right center'
-          }}
-        />
+        <div className="absolute left-[calc(50%-40px)] top-2.5 w-1 h-1 bg-primary-light rounded-full opacity-60" />
+        <div className="absolute left-[calc(50%-40px)] top-2.5 w-9 h-px bg-primary-light opacity-30 rotate-[25deg] origin-right" />
 
         {/* 右上节点 */}
-        <div 
-          style={{
-            position: 'absolute',
-            right: 'calc(50% - 40px)',
-            top: '10px',
-            width: '4px',
-            height: '4px',
-            backgroundColor: MINIMAL_COLORS.primary.light,
-            borderRadius: '50%',
-            opacity: 0.6
-          }}
-        />
-        <div 
-          style={{
-            position: 'absolute',
-            right: 'calc(50% - 40px)',
-            top: '10px',
-            width: '35px',
-            height: '1px',
-            backgroundColor: MINIMAL_COLORS.primary.light,
-            opacity: 0.3,
-            transform: 'rotate(-25deg)',
-            transformOrigin: 'left center'
-          }}
-        />
+        <div className="absolute right-[calc(50%-40px)] top-2.5 w-1 h-1 bg-primary-light rounded-full opacity-60" />
+        <div className="absolute right-[calc(50%-40px)] top-2.5 w-9 h-px bg-primary-light opacity-30 rotate-[-25deg] origin-left" />
 
         {/* 左下节点 */}
-        <div 
-          style={{
-            position: 'absolute',
-            left: 'calc(50% - 30px)',
-            bottom: '10px',
-            width: '4px',
-            height: '4px',
-            backgroundColor: MINIMAL_COLORS.primary.light,
-            borderRadius: '50%',
-            opacity: 0.6
-          }}
-        />
-        <div 
-          style={{
-            position: 'absolute',
-            left: 'calc(50% - 30px)',
-            bottom: '10px',
-            width: '25px',
-            height: '1px',
-            backgroundColor: MINIMAL_COLORS.primary.light,
-            opacity: 0.3,
-            transform: 'rotate(-20deg)',
-            transformOrigin: 'right center'
-          }}
-        />
+        <div className="absolute left-[calc(50%-30px)] bottom-2.5 w-1 h-1 bg-primary-light rounded-full opacity-60" />
+        <div className="absolute left-[calc(50%-30px)] bottom-2.5 w-6 h-px bg-primary-light opacity-30 rotate-[-20deg] origin-right" />
 
         {/* 右下节点 */}
-        <div 
-          style={{
-            position: 'absolute',
-            right: 'calc(50% - 30px)',
-            bottom: '10px',
-            width: '4px',
-            height: '4px',
-            backgroundColor: MINIMAL_COLORS.primary.light,
-            borderRadius: '50%',
-            opacity: 0.6
-          }}
-        />
-        <div 
-          style={{
-            position: 'absolute',
-            right: 'calc(50% - 30px)',
-            bottom: '10px',
-            width: '25px',
-            height: '1px',
-            backgroundColor: MINIMAL_COLORS.primary.light,
-            opacity: 0.3,
-            transform: 'rotate(20deg)',
-            transformOrigin: 'left center'
-          }}
-        />
+        <div className="absolute right-[calc(50%-30px)] bottom-2.5 w-1 h-1 bg-primary-light rounded-full opacity-60" />
+        <div className="absolute right-[calc(50%-30px)] bottom-2.5 w-6 h-px bg-primary-light opacity-30 rotate-[20deg] origin-left" />
       </div>
 
       {/* 关系类型 - 极简标签 */}
-      <div 
-        style={{
-          marginTop: MINIMAL_SPACING.lg,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: MINIMAL_SPACING.lg
-        }}
-      >
-        <div 
-          style={{
-            fontSize: '0.75rem',
-            color: MINIMAL_COLORS.primary.medium,
-            padding: `${MINIMAL_SPACING.xs} ${MINIMAL_SPACING.sm}`,
-            border: `1px solid ${MINIMAL_COLORS.primary.light}`,
-            borderRadius: '2px',
-            opacity: 0.7
-          }}
-        >
+      <div className="mt-8 flex justify-center items-center gap-8">
+        <div className="text-xs text-primary-medium px-2 py-1 border border-primary-light rounded-sm opacity-70">
           师友同窗
         </div>
-        <div 
-          style={{
-            fontSize: '0.75rem',
-            color: MINIMAL_COLORS.primary.medium,
-            padding: `${MINIMAL_SPACING.xs} ${MINIMAL_SPACING.sm}`,
-            border: `1px solid ${MINIMAL_COLORS.primary.light}`,
-            borderRadius: '2px',
-            opacity: 0.7
-          }}
-        >
+        <div className="text-xs text-primary-medium px-2 py-1 border border-primary-light rounded-sm opacity-70">
           革命伙伴
         </div>
       </div>
 
       {/* 核心理念 */}
-      <div 
-        style={{
-          marginTop: MINIMAL_SPACING.lg,
-          fontSize: '0.875rem',
-          color: MINIMAL_COLORS.primary.light,
-          letterSpacing: '0.05em'
-        }}
-      >
+      <div className="mt-8 text-sm text-primary-light tracking-wider">
         以文会友，以友辅仁
       </div>
     </MinimalHeader>

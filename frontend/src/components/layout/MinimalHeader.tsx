@@ -114,40 +114,13 @@ const MinimalHeader: React.FC<MinimalHeaderProps> = ({ config, children }) => {
         )}
 
         {/* 底部装饰 - 极简几何 */}
-        <div 
-          style={{
-            marginTop: MINIMAL_SPACING.xl,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: MINIMAL_SPACING.sm
-          }}
-        >
+        <div className="mt-12 flex justify-center items-center gap-2">
+          <div className="w-5 h-px bg-primary-light opacity-40" />
           <div 
-            style={{
-              width: '20px',
-              height: '1px',
-              backgroundColor: MINIMAL_COLORS.primary.light,
-              opacity: 0.4
-            }}
+            className="w-0.5 h-0.5 rounded-full opacity-60"
+            style={{ backgroundColor: accentColorValue }}
           />
-          <div 
-            style={{
-              width: '3px',
-              height: '3px',
-              backgroundColor: accentColorValue,
-              borderRadius: '50%',
-              opacity: 0.6
-            }}
-          />
-          <div 
-            style={{
-              width: '20px',
-              height: '1px',
-              backgroundColor: MINIMAL_COLORS.primary.light,
-              opacity: 0.4
-            }}
-          />
+          <div className="w-5 h-px bg-primary-light opacity-40" />
         </div>
       </div>
     </header>
