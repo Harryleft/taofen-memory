@@ -46,11 +46,11 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, isFeatured }) => {
   const experienceTextClasses = isFeatured ? 'text-lg leading-relaxed font-medium' : 'text-base';
 
   // 根据是否为特色事件设置图片尺寸样式
-  // 特色事件: 宽度自适应, 最大高度250px
-  // 普通事件: 宽度自适应, 固定高度210px
+  // 特色事件: 最大宽度80%, 高度自适应保持比例
+  // 普通事件: 最大宽度60%, 高度自适应保持比例
   const imageSizeClasses = isFeatured
-    ? 'w-full max-h-[250px]'
-    : 'w-full h-[210px]';
+    ? 'max-w-[80%] h-auto'
+    : 'max-w-[60%] h-auto';
 
   // 处理人物姓名点击 - 跳转到外部链接
   const handlePersonClick = (person: Person) => {
