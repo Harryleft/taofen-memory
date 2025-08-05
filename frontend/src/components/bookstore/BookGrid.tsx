@@ -1,11 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { BookItem } from '../../types/bookTypes';
 import BookCard from './BookCard';
-import { BOOKSTORE_STYLES, BOOKSTORE_FONTS } from '../../styles/bookstore';
 
 // 添加调试常量
 const DEBUG = true;
-const logDebug = (message: string, data?: any) => {
+const logDebug = (message: string, data?: unknown) => {
   if (DEBUG) {
     console.log(`[BookGrid] ${message}`, data || '');
   }
@@ -52,15 +51,15 @@ const BookGrid: React.FC<BookGridProps> = ({
   if (columnArrays.length === 0) {
     return (
       <div className="w-full text-center py-8">
-        <p className="text-charcoal/60" style={{ fontFamily: BOOKSTORE_FONTS.song }}>无数据可显示</p>
+        <p className="text-gray-600 font-serif">无数据可显示</p>
       </div>
     );
   }
 
   return (
-    <div className={BOOKSTORE_STYLES.grid.container}>
+    <div className="grid gap-4 auto-cols-fr" style={{ gridTemplateColumns: `repeat(${columnArrays.length}, 1fr)` }}>
       {columnArrays.map((column, columnIndex) => (
-        <div key={columnIndex} className={BOOKSTORE_STYLES.grid.column}>
+        <div key={columnIndex} className="flex flex-col gap-4">
           {column.map((item) => {
             const isVisible = visibleItems.has(item.id);
             return (
