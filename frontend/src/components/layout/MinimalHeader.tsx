@@ -44,8 +44,16 @@ const MinimalHeader: React.FC<MinimalHeaderProps> = ({ config, children }) => {
     red: 'bg-accent-red',
   };
 
+  const accentColorValueVariants = {
+    gold: '#f59e0b',
+    blue: '#3b82f6',
+    green: '#10b981',
+    red: '#ef4444',
+  };
+
   const accentColorClass = accentColorVariants[accentColor] || 'text-accent-gold';
   const accentBgColorClass = accentBgColorVariants[accentColor] || 'bg-accent-gold';
+  const accentColorValue = accentColorValueVariants[accentColor] || '#f59e0b';
 
   return (
     <header className="minimal-header bg-background-pure text-center p-8 md:p-12">
