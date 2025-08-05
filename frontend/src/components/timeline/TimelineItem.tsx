@@ -116,7 +116,7 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, isFeatured }) => {
                 <img 
                   src={event.image}
                   alt=""
-                  className={`inline-block w-full ml-auto rounded-lg transition-transform duration-300 group-hover:scale-105 ${imageClasses}`}
+                  className={`inline-block w-[280px] ml-auto rounded-lg transition-transform duration-300 group-hover:scale-105`}
                 />
               </div>
             )}
