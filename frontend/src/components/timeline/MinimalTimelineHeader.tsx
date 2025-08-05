@@ -1,7 +1,6 @@
 import React from 'react';
 import { Clock } from 'lucide-react';
-import MinimalHeader from '../common/MinimalHeader';
-import { MinimalHeaderConfig, MINIMAL_COLORS, MINIMAL_SPACING } from '../../styles/minimalistHeader';
+import MinimalHeader, { MinimalHeaderConfig } from '../layout/MinimalHeader';
 
 const MinimalTimelineHeader: React.FC = () => {
   const config: MinimalHeaderConfig = {
@@ -20,98 +19,30 @@ const MinimalTimelineHeader: React.FC = () => {
   return (
     <MinimalHeader config={config}>
       {/* 时间线特有的极简装饰元素 */}
-      <div 
-        style={{
-          marginTop: MINIMAL_SPACING.lg,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: MINIMAL_SPACING.xl
-        }}
-      >
+      <div className="mt-8 flex justify-center items-center gap-12">
         {/* 起点 */}
-        <div 
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            fontSize: '0.75rem',
-            color: MINIMAL_COLORS.primary.medium
-          }}
-        >
-          <div 
-            style={{
-              width: '6px',
-              height: '6px',
-              backgroundColor: MINIMAL_COLORS.accent.gold,
-              borderRadius: '50%',
-              marginBottom: MINIMAL_SPACING.xs
-            }}
-          />
+        <div className="flex flex-col items-center text-xs text-primary-medium">
+          <div className="w-1.5 h-1.5 bg-accent-gold rounded-full mb-1" />
           <span>1895</span>
-          <span style={{ fontSize: '0.625rem', marginTop: '2px' }}>福建永安</span>
+          <span className="text-xs mt-0.5">福建永安</span>
         </div>
 
         {/* 连接线 */}
-        <div 
-          style={{
-            width: '120px',
-            height: '1px',
-            backgroundColor: MINIMAL_COLORS.primary.light,
-            opacity: 0.3,
-            position: 'relative'
-          }}
-        >
+        <div className="w-30 h-px bg-primary-light opacity-30 relative">
           {/* 中间节点 */}
-          <div 
-            style={{
-              position: 'absolute',
-              left: '50%',
-              top: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: '4px',
-              height: '4px',
-              backgroundColor: MINIMAL_COLORS.accent.gold,
-              borderRadius: '50%',
-              opacity: 0.7
-            }}
-          />
+          <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1 h-1 bg-accent-gold rounded-full opacity-70" />
         </div>
 
         {/* 终点 */}
-        <div 
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            fontSize: '0.75rem',
-            color: MINIMAL_COLORS.primary.medium
-          }}
-        >
-          <div 
-            style={{
-              width: '6px',
-              height: '6px',
-              backgroundColor: MINIMAL_COLORS.accent.gold,
-              borderRadius: '50%',
-              marginBottom: MINIMAL_SPACING.xs
-            }}
-          />
+        <div className="flex flex-col items-center text-xs text-primary-medium">
+          <div className="w-1.5 h-1.5 bg-accent-gold rounded-full mb-1" />
           <span>1944</span>
-          <span style={{ fontSize: '0.625rem', marginTop: '2px' }}>上海</span>
+          <span className="text-xs mt-0.5">上海</span>
         </div>
       </div>
 
       {/* 核心理念 - 极简文字 */}
-      <div 
-        style={{
-          marginTop: MINIMAL_SPACING.xl,
-          fontSize: '0.875rem',
-          color: MINIMAL_COLORS.primary.light,
-          letterSpacing: '0.1em',
-          fontStyle: 'italic'
-        }}
-      >
+      <div className="mt-12 text-sm text-primary-light tracking-wider italic">
         "为了大众，奋斗终生"
       </div>
     </MinimalHeader>

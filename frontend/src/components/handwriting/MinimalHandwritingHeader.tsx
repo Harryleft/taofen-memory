@@ -1,7 +1,6 @@
 import React from 'react';
 import { PenTool } from 'lucide-react';
-import MinimalHeader from '../common/MinimalHeader';
-import { MinimalHeaderConfig, MINIMAL_COLORS, MINIMAL_SPACING } from '../../styles/minimalistHeader';
+import MinimalHeader, { MinimalHeaderConfig } from '../layout/MinimalHeader';
 
 const MinimalHandwritingHeader: React.FC = () => {
   const config: MinimalHeaderConfig = {
@@ -20,118 +19,33 @@ const MinimalHandwritingHeader: React.FC = () => {
   return (
     <MinimalHeader config={config}>
       {/* 手稿特有的极简装饰元素 */}
-      <div 
-        style={{
-          marginTop: MINIMAL_SPACING.lg,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: MINIMAL_SPACING.lg
-        }}
-      >
+      <div className="mt-8 flex justify-center items-center gap-8">
         {/* 书信类别 */}
-        <div 
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            fontSize: '0.75rem',
-            color: MINIMAL_COLORS.primary.medium
-          }}
-        >
-          <div 
-            style={{
-              width: '1px',
-              height: '16px',
-              backgroundColor: MINIMAL_COLORS.accent.gold,
-              marginBottom: MINIMAL_SPACING.xs,
-              opacity: 0.6
-            }}
-          />
+        <div className="flex flex-col items-center text-xs text-primary-medium">
+          <div className="w-px h-4 bg-accent-gold mb-1 opacity-60" />
           <span>书信手稿</span>
         </div>
 
         {/* 分隔符 */}
-        <div 
-          style={{
-            width: '20px',
-            height: '1px',
-            backgroundColor: MINIMAL_COLORS.primary.light,
-            opacity: 0.3
-          }}
-        />
+        <div className="w-5 h-px bg-primary-light opacity-30" />
 
         {/* 文献类别 */}
-        <div 
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            fontSize: '0.75rem',
-            color: MINIMAL_COLORS.primary.medium
-          }}
-        >
-          <div 
-            style={{
-              width: '1px',
-              height: '16px',
-              backgroundColor: MINIMAL_COLORS.accent.gold,
-              marginBottom: MINIMAL_SPACING.xs,
-              opacity: 0.6
-            }}
-          />
+        <div className="flex flex-col items-center text-xs text-primary-medium">
+          <div className="w-px h-4 bg-accent-gold mb-1 opacity-60" />
           <span>重要文献</span>
         </div>
       </div>
 
       {/* 笔触装饰 - 极简抽象 */}
-      <div 
-        style={{
-          marginTop: MINIMAL_SPACING.xl,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: MINIMAL_SPACING.xs
-        }}
-      >
+      <div className="mt-12 flex justify-center items-center gap-1">
         {/* 模拟毛笔笔触的极简表现 */}
-        <div 
-          style={{
-            width: '2px',
-            height: '8px',
-            backgroundColor: MINIMAL_COLORS.accent.gold,
-            opacity: 0.4,
-            transform: 'rotate(-15deg)'
-          }}
-        />
-        <div 
-          style={{
-            width: '12px',
-            height: '1px',
-            backgroundColor: MINIMAL_COLORS.accent.gold,
-            opacity: 0.3
-          }}
-        />
-        <div 
-          style={{
-            width: '1px',
-            height: '4px',
-            backgroundColor: MINIMAL_COLORS.accent.gold,
-            opacity: 0.5,
-            transform: 'rotate(20deg)'
-          }}
-        />
+        <div className="w-0.5 h-2 bg-accent-gold opacity-40 -rotate-12" />
+        <div className="w-3 h-px bg-accent-gold opacity-30" />
+        <div className="w-px h-1 bg-accent-gold opacity-50 rotate-12" />
       </div>
 
       {/* 文化内涵 - 极简表达 */}
-      <div 
-        style={{
-          marginTop: MINIMAL_SPACING.lg,
-          fontSize: '0.875rem',
-          color: MINIMAL_COLORS.primary.light,
-          letterSpacing: '0.05em'
-        }}
-      >
+      <div className="mt-8 text-sm text-primary-light tracking-wider">
         笔墨传情，文以载道
       </div>
     </MinimalHeader>
