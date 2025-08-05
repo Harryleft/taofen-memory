@@ -45,6 +45,10 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, isFeatured }) => {
   const timeTextClasses = isFeatured ? 'text-base font-semibold' : 'text-sm font-medium';
   const experienceTextClasses = isFeatured ? 'text-lg leading-relaxed font-medium' : 'text-base';
 
+  const imageSizeClasses = isFeatured
+    ? 'max-w-[185px] max-h-[250px]'
+    : 'w-[170px] h-[120px]';
+
   // 处理人物姓名点击 - 跳转到外部链接
   const handlePersonClick = (person: Person) => {
     if (person.link && person.link.length > 0) {
@@ -113,10 +117,10 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ event, isFeatured }) => {
           <div className="md:w-6/12 md:text-right md:pr-2">
             {event.image && (
               <div className="relative group">
-                <img 
+                <img
                   src={event.image}
                   alt=""
-                  className={`inline-block w-[280px] ml-auto rounded-lg transition-transform duration-300 group-hover:scale-105`}
+                  className={`inline-block ${imageSizeClasses} object-cover ml-auto rounded-lg transition-transform duration-300 group-hover:scale-105`}
                 />
               </div>
             )}
