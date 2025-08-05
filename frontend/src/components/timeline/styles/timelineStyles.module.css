@@ -1,0 +1,394 @@
+/* 时间线样式模块 - 样式与逻辑分离 */
+
+/* ==========================================================================
+   基础时间线样式
+   ========================================================================== */
+
+.timelineContainer {
+  @apply relative;
+}
+
+.timelineItem {
+  @apply relative mb-6 transition-all duration-300 ease-in-out;
+}
+
+.timelineItem:hover {
+  @apply transform translate-x-1;
+}
+
+/* 时间线圆点样式 */
+.timelineDot {
+  @apply absolute left-4 top-6 w-3 h-3 rounded-full border-2 border-white shadow-md z-10;
+}
+
+.timelineDotGold {
+  @apply bg-gold;
+}
+
+.timelineDotGray {
+  @apply bg-gray-400;
+}
+
+.timelineDotFeatured {
+  @apply w-4 h-4 top-5;
+}
+
+/* 时间线连接线 */
+.timelineLine {
+  @apply absolute left-6 top-0 w-0.5 h-full bg-gradient-to-b from-gold/30 via-gold/20 to-transparent;
+}
+
+/* ==========================================================================
+   事件内容样式
+   ========================================================================== */
+
+.eventContent {
+  @apply bg-white rounded-lg shadow-sm border border-gray-100 p-4 transition-all duration-200;
+}
+
+.eventContent:hover {
+  @apply shadow-md border-gold/20;
+}
+
+.eventContentFeatured {
+  @apply bg-gradient-to-br from-cream/50 to-white border-gold/30 shadow-lg;
+}
+
+.eventTime {
+  @apply text-sm font-medium text-charcoal/70 mb-2;
+}
+
+.eventTimeFeatured {
+  @apply text-base font-semibold text-gold;
+}
+
+.eventLocation {
+  @apply text-xs text-charcoal/50 mb-1;
+}
+
+.eventLocationFeatured {
+  @apply text-sm text-charcoal/60;
+}
+
+.eventTitle {
+  @apply font-serif font-bold text-charcoal mb-2 leading-tight;
+}
+
+.eventTitleRegular {
+  @apply text-lg;
+}
+
+.eventTitleFeatured {
+  @apply text-xl;
+}
+
+.eventExperience {
+  @apply text-charcoal/80 leading-relaxed;
+}
+
+.eventExperienceRegular {
+  @apply text-base;
+}
+
+.eventExperienceFeatured {
+  @apply text-lg font-medium;
+}
+
+.eventDetails {
+  @apply text-sm text-charcoal/60 mt-2 italic;
+}
+
+/* ==========================================================================
+   图片样式
+   ========================================================================== */
+
+.eventImage {
+  @apply rounded-lg shadow-sm transition-all duration-300 cursor-pointer;
+}
+
+.eventImage:hover {
+  @apply shadow-lg transform scale-105;
+}
+
+.eventImageRegular {
+  @apply w-full max-w-sm mx-auto;
+}
+
+.eventImageFeatured {
+  @apply w-full max-w-md mx-auto;
+}
+
+.eventImagePlaceholder {
+  @apply bg-gray-100 rounded-lg flex items-center justify-center text-gray-400;
+}
+
+.eventImageError {
+  @apply bg-red-50 border-2 border-dashed border-red-200 rounded-lg flex items-center justify-center text-red-400;
+}
+
+.eventImageLoading {
+  @apply bg-gray-50 rounded-lg flex items-center justify-center;
+}
+
+.imageLoadingSpinner {
+  @apply animate-spin rounded-full h-8 w-8 border-b-2 border-gold;
+}
+
+/* ==========================================================================
+   人物链接样式
+   ========================================================================== */
+
+.personLink {
+  @apply text-gold hover:text-gold/80 underline decoration-dotted underline-offset-2 cursor-pointer transition-colors duration-200;
+}
+
+.personLink:hover {
+  @apply decoration-solid;
+}
+
+.personTooltip {
+  @apply absolute z-50 bg-white border border-gray-200 rounded-lg shadow-lg p-3 max-w-xs;
+}
+
+.personTooltipArrow {
+  @apply absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-white;
+}
+
+.personName {
+  @apply font-semibold text-charcoal mb-1;
+}
+
+.personDescription {
+  @apply text-sm text-charcoal/70 leading-relaxed;
+}
+
+/* ==========================================================================
+   核心事件分组样式
+   ========================================================================== */
+
+.coreEventSection {
+  @apply mb-16;
+}
+
+.sectionHeader {
+  @apply mb-8;
+}
+
+.sectionTitle {
+  @apply text-2xl font-bold text-charcoal font-serif mb-4;
+}
+
+.sectionStats {
+  @apply flex items-center space-x-2 text-sm text-charcoal/60;
+}
+
+.statBadge {
+  @apply px-2 py-1 rounded-full;
+}
+
+.statBadgeTotal {
+  @apply bg-gold/10;
+}
+
+.statBadgeFeatured {
+  @apply bg-blue-100;
+}
+
+.statBadgeBackground {
+  @apply bg-gray-100;
+}
+
+.sectionDivider {
+  @apply w-full h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent;
+}
+
+.expandButton {
+  @apply text-charcoal/60 hover:text-charcoal transition-colors duration-200;
+}
+
+.expandIcon {
+  @apply w-6 h-6 transform transition-transform duration-200;
+}
+
+.expandIconRotated {
+  @apply rotate-180;
+}
+
+/* ==========================================================================
+   事件分类样式
+   ========================================================================== */
+
+.featuredEvents {
+  @apply space-y-6;
+}
+
+.regularEvents {
+  @apply space-y-4;
+}
+
+.backgroundEvents {
+  @apply space-y-3 pl-4 border-l-2 border-gray-200;
+}
+
+.backgroundEventsLabel {
+  @apply text-sm text-charcoal/50 mb-3 font-medium;
+}
+
+/* ==========================================================================
+   页面布局样式
+   ========================================================================== */
+
+.timelinePage {
+  @apply max-w-6xl mx-auto px-4 py-8;
+}
+
+.pageHeader {
+  @apply mb-12;
+}
+
+.pageTitle {
+  @apply text-4xl font-bold text-charcoal font-serif text-center mb-8;
+}
+
+.pageStats {
+  @apply text-center text-charcoal/60 mb-8;
+}
+
+.pageControls {
+  @apply flex flex-wrap items-center justify-center gap-4 mb-8;
+}
+
+.searchInput {
+  @apply px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold;
+}
+
+.filterSelect {
+  @apply px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold bg-white;
+}
+
+.actionButton {
+  @apply px-4 py-2 rounded-lg transition-colors duration-200 font-medium;
+}
+
+.actionButtonPrimary {
+  @apply bg-gold text-white hover:bg-gold/80;
+}
+
+.actionButtonSecondary {
+  @apply border border-charcoal/20 text-charcoal hover:bg-charcoal/5;
+}
+
+.pageFooter {
+  @apply mt-16 pt-8 border-t border-charcoal/10 text-center text-sm text-charcoal/50;
+}
+
+/* ==========================================================================
+   状态样式
+   ========================================================================== */
+
+.loadingState {
+  @apply flex flex-col items-center justify-center min-h-[400px] space-y-4;
+}
+
+.errorState {
+  @apply flex flex-col items-center justify-center min-h-[400px] space-y-4;
+}
+
+.emptyState {
+  @apply flex flex-col items-center justify-center min-h-[400px] space-y-4;
+}
+
+.loadingSpinner {
+  @apply animate-spin rounded-full h-12 w-12 border-b-2 border-gold;
+}
+
+.errorIcon {
+  @apply text-red-500 text-6xl;
+}
+
+.emptyIcon {
+  @apply text-charcoal/40 text-6xl;
+}
+
+.stateTitle {
+  @apply text-xl font-bold text-charcoal;
+}
+
+.stateDescription {
+  @apply text-charcoal/60 text-center max-w-md;
+}
+
+/* ==========================================================================
+   响应式样式
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .timelineItem {
+    @apply pl-8;
+  }
+  
+  .timelineDot {
+    @apply left-2;
+  }
+  
+  .eventImageRegular,
+  .eventImageFeatured {
+    @apply max-w-full;
+  }
+  
+  .pageControls {
+    @apply flex-col space-y-2;
+  }
+  
+  .searchInput,
+  .filterSelect {
+    @apply w-full;
+  }
+}
+
+/* ==========================================================================
+   动画效果
+   ========================================================================== */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fadeInUp {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.slideInLeft {
+  animation: slideInLeft 0.4s ease-out;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.pulseAnimation {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
