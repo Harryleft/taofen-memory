@@ -65,7 +65,18 @@ export const relationshipsStyles = {
   },
   header: {
     filterContainer: 'relationships-filter-container',
-    statsContainer: 'relationships-stats-container'
+    statsContainer: 'relationships-stats-container',
+    statItem: 'relationships-stat-item',
+    statNumber: 'relationships-stat-number',
+    statLabel: 'relationships-stat-label'
+  },
+  mainContent: {
+    container: 'relationships-main-content-container',
+    emptyState: {
+      container: 'relationships-empty-state-container',
+      title: 'relationships-empty-state-title',
+      subtitle: 'relationships-empty-state-subtitle'
+    }
   }
 };
 
