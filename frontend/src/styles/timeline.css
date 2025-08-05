@@ -52,16 +52,7 @@
   animation: fadeIn 0.6s ease-out;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+
 
 .core-event-section {
   position: relative;
@@ -130,12 +121,7 @@
   transform: translateY(20px);
 }
 
-@keyframes staggerIn {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+
 
 .timeline-progress {
   position: fixed;
@@ -154,21 +140,40 @@
 }
 
 @media (max-width: 768px) {
-  .timeline-container::before {
-    left: 20px;
-  }
+  .timeline-container::before,
   .timeline-dot::before {
     left: 20px;
   }
+
   .core-event-section {
     margin-bottom: 36px;
   }
+
   .core-event-title {
     padding: 16px 0;
     margin-bottom: 20px;
   }
+
   .first-event-clickable {
     margin: -12px;
     padding: 12px;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes staggerIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
