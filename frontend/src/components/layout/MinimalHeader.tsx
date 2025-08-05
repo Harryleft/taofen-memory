@@ -7,7 +7,7 @@ import {
   MINIMAL_LAYOUT,
   MINIMAL_ANIMATIONS,
   MinimalHeaderConfig
-} from '../../styles/minimalistHeader';
+} from '../../styles/minimalistHeader.ts';
 
 interface MinimalHeaderProps {
   config: MinimalHeaderConfig;

@@ -5,8 +5,8 @@
 
 import React from 'react';
 import { BookOpen, Clock, PenTool, Network } from 'lucide-react';
-import BaseHeader from './BaseHeader';
-import { ModuleHeaderConfig } from '../../styles/commonHeader';
+import BaseHeader from './BaseHeader.tsx';
+import { ModuleHeaderConfig } from '../../styles/commonHeader.ts';
 
 // 示例1：书店模块Header（已有实现，这里展示如何迁移）
 const BookstoreHeaderExample: React.FC = () => {
