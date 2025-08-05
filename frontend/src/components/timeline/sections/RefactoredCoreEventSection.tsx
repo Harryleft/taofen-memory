@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { CoreEventGroup, BaseTimelineEvent } from '../../../types/timelineTypes';
 import { Person } from '../../../types/Person';
 import RefactoredTimelineItem from '../events/RefactoredTimelineItem';
+import styles from '../styles/timelineStyles.module.css';
 
 interface RefactoredCoreEventSectionProps {
   coreEventGroup: CoreEventGroup;
@@ -99,7 +100,7 @@ const RefactoredCoreEventSection: React.FC<RefactoredCoreEventSectionProps> = ({
   );
 
   return (
-    <section className={`core-event-section mb-16 ${className}`}>
+    <section className={`${styles.coreEventSection} ${className}`}>
       {/* 分组标题 */}
       <div className="mb-8">
         <div 
