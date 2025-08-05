@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import MasonryGrid from '../components/MasonryGrid';
 import PersonDetailModal from '../components/PersonDetailModal';
+import RelationshipsHeader from '../components/relationships/RelationshipsHeader';
 import { Person } from '../types/Person';
 import { useRelationshipsData } from '../hooks/useRelationshipsData';
 import { 
@@ -62,23 +63,11 @@ export default function RelationshipsPage() {
 
   return (
     <div className={relationshipsStyles.pageContainer}>
-      {/* Header */}
-      <div className={relationshipsStyles.header.container}>
-        {/* Background Pattern */}
-        <div className={relationshipsStyles.header.backgroundPattern}></div>
-        
-        <div className={relationshipsStyles.header.wrapper}>
-          {/* Title Section */}
-          <div className={relationshipsStyles.header.titleSection}>
-            <h1 className={relationshipsStyles.header.title}>邹韬奋人脉网络</h1>
-            <p className={relationshipsStyles.header.subtitle}>
-              探索中国现代新闻出版事业先驱的人际关系网络，感受那个时代知识分子的精神风貌与社会担当
-            </p>
-            <div className={relationshipsStyles.header.decorativeLine}></div>
-          </div>
-          
-          {/* Category Filter */}
-          <div className={relationshipsStyles.header.filterContainer}>
+      <RelationshipsHeader />
+      
+      {/* Category Filter */}
+      <div className="max-w-6xl mx-auto px-6 py-8">
+        <div className={relationshipsStyles.header.filterContainer}>
             {RELATIONSHIPS_CATEGORIES.map((category) => {
               const Icon = category.icon;
               const isSelected = selectedCategory === category.id;
@@ -100,6 +89,17 @@ export default function RelationshipsPage() {
                 </button>
               );
             })}
+        </div>
+        
+        {/* Statistics */}
+        <div className={relationshipsStyles.header.statsContainer}>
+          <div className={relationshipsStyles.header.statItem}>
+            <span className={relationshipsStyles.header.statNumber}>{persons.length}</span>
+            <span className={relationshipsStyles.header.statLabel}>位人物</span>
+          </div>
+          <div className={relationshipsStyles.header.statItem}>
+            <span className={relationshipsStyles.header.statNumber}>{filteredPersons.length}</span>
+            <span className={relationshipsStyles.header.statLabel}>当前显示</span>
           </div>
         </div>
       </div>

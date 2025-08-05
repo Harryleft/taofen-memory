@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, Filter, Calendar, ZoomIn, Download, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import HandwritingHeader from './handwriting/HandwritingHeader';
 
 interface HandwritingItem {
   id: number;
@@ -246,15 +247,10 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
   const uniqueYears = [...new Set(handwritingItems.map(item => item.year))].sort();
 
   return (
-    <section className={`py-20 bg-cream ${className}`}>
-      <div className="max-w-7xl mx-auto px-6">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h2 className="text-5xl font-bold text-charcoal mb-6 font-serif">韬奋手迹</h2>
-          <p className="text-xl text-charcoal/70 max-w-3xl mx-auto leading-relaxed">
-            珍贵的手写文献，见证一位文化先驱的思想轨迹与人生感悟
-          </p>
-        </div>
+    <>
+      <HandwritingHeader />
+      <section className={`py-20 bg-cream ${className}`}>
+        <div className="max-w-7xl mx-auto px-6">
 
         {/* Filters */}
         <div className="flex flex-wrap gap-4 mb-8 justify-center">
@@ -366,10 +362,10 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
             <p className="text-charcoal/60">请尝试调整搜索条件</p>
           </div>
         )}
-      </div>
+        </div>
 
-      {/* Lightbox */}
-      {selectedItem && (
+        {/* Lightbox */}
+        {selectedItem && (
         <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
           <div className="relative max-w-6xl max-h-[90vh] bg-white rounded-lg overflow-hidden">
             {/* Navigation */}
@@ -450,6 +446,7 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
           </div>
         </div>
       )}
-    </section>
+      </section>
+    </>
   );
 }
