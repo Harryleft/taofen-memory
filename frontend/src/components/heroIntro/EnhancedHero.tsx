@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronDown, Scroll, Users, BookOpen, FileText, Network } from 'lucide-react';
 import HeroPageBackdrop from './HeroPageBackdrop.tsx';
 
 export default function EnhancedHero() {
+  const navigate = useNavigate();
   const [scrollY, setScrollY] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [activeModule, setActiveModule] = useState<number | null>(null);
@@ -130,7 +132,7 @@ export default function EnhancedHero() {
             {/* 导航卡片背景透明度 - 提升透明度以增强文字可读性 */}
             <div 
               className="group relative bg-white/85 backdrop-blur-md border border-gray-200/60 rounded-2xl p-8 hover:bg-white hover:border-gold/30 hover:shadow-xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
-              onClick={() => window.location.href = '/timeline'}
+              onClick={() => navigate('/timeline')}
               onMouseEnter={() => setActiveModule(0)}
               onMouseLeave={() => setActiveModule(null)}
             >
@@ -155,7 +157,7 @@ export default function EnhancedHero() {
             {/* Bookstore Module */}
             <div 
               className="group relative bg-white/85 backdrop-blur-md border border-gray-200/60 rounded-2xl p-8 hover:bg-white hover:border-heritage-blue/30 hover:shadow-xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
-              onClick={() => window.location.href = '/bookstore-timeline'}
+              onClick={() => navigate('/bookstore-timeline')}
               onMouseEnter={() => setActiveModule(1)}
               onMouseLeave={() => setActiveModule(null)}
             >
@@ -180,7 +182,7 @@ export default function EnhancedHero() {
             {/* Handwriting Module */}
             <div 
               className="group relative bg-white/85 backdrop-blur-md border border-gray-200/60 rounded-2xl p-8 hover:bg-white hover:border-sage-green/30 hover:shadow-xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
-              onClick={() => window.location.href = '/handwriting'}
+              onClick={() => navigate('/handwriting')}
               onMouseEnter={() => setActiveModule(2)}
               onMouseLeave={() => setActiveModule(null)}
             >
@@ -205,7 +207,7 @@ export default function EnhancedHero() {
             {/* Relationships Module */}
             <div 
               className="group relative bg-white/85 backdrop-blur-md border border-gray-200/60 rounded-2xl p-8 hover:bg-white hover:border-warm-rose/30 hover:shadow-xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
-              onClick={() => window.location.href = '/relationships'}
+              onClick={() => navigate('/relationships')}
               onMouseEnter={() => setActiveModule(3)}
               onMouseLeave={() => setActiveModule(null)}
             >
