@@ -1,6 +1,6 @@
 import React from 'react';
 import BaseHeader, { HeaderConfig } from './BaseHeader';
-import { headerConfigs } from '../../../constants/header.configs';
+import { headerConfigs } from '../../../constants/header.configs.tsx';
 
 interface AppHeaderProps {
   moduleId: string;
