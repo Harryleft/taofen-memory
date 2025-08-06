@@ -1,3 +1,12 @@
+:root {
+  --category-color-gray: #6b7280;
+  --category-color-red: #ef4444;
+  --category-color-blue: #3b82f6;
+  --category-color-green: #10b981;
+  --category-color-purple: #8b5cf6;
+  --category-color-orange: #f97316;
+}
+
 .relationships-page-container {
   @apply min-h-screen bg-white;
 }
@@ -337,4 +346,43 @@
 
 .masonry-complete-container {
   @apply text-center py-8 text-gray-500 text-sm;
+}
+
+/* 分类颜色样式类 */
+.category-color-gray {
+  color: var(--category-color-gray);
+}
+.category-color-red {
+  color: var(--category-color-red);
+}
+.category-color-blue {
+  color: var(--category-color-blue);
+}
+.category-color-green {
+  color: var(--category-color-green);
+}
+.category-color-purple {
+  color: var(--category-color-purple);
+}
+.category-color-orange {
+  color: var(--category-color-orange);
+}
+
+.category-bg-gray {
+  background-color: var(--category-color-gray);
+}
+.category-bg-red {
+  background-color: var(--category-color-red);
+}
+.category-bg-blue {
+  background-color: var(--category-color-blue);
+}
+.category-bg-green {
+  background-color: var(--category-color-green);
+}
+.category-bg-purple {
+  background-color: var(--category-color-purple);
+}
+.category-bg-orange {
+  background-color: var(--category-color-orange);
 }

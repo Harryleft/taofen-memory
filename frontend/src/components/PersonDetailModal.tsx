@@ -1,13 +1,7 @@
 import React from 'react';
-import { BookOpen, ExternalLink, FileText } from 'lucide-react';
+import { BookOpen, ExternalLink, FileText, X } from 'lucide-react';
 import { Person } from '../types/Person';
-import { 
-  RELATIONSHIPS_CONFIG, 
-  modalStyles, 
-  getAvatarContainerClass, 
-  getCategoryBadgeClass, 
-  getCategoryTagClass 
-} from '../styles/relationships';
+import { getCategoryColor } from '../constants/relationshipsConstants';
 
 interface PersonDetailModalProps {
   person: Person | null;
@@ -19,7 +13,7 @@ const PersonDetailModal: React.FC<PersonDetailModalProps> = ({ person, isOpen, o
   // 处理ESC键关闭
   React.useEffect(() => {
     if (!isOpen) return;
-    
+
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         onClose();
@@ -40,87 +34,97 @@ const PersonDetailModal: React.FC<PersonDetailModalProps> = ({ person, isOpen, o
   };
 
   return (
-    <div 
-      className={modalStyles.backdrop}
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
       onClick={handleBackdropClick}
     >
-      <div className={modalStyles.container}>
+      <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className={modalStyles.header.container}>
-          <button 
+        <div className="relative p-6 text-center border-b border-gray-200">
+          <button
             onClick={onClose}
-            className={modalStyles.header.closeButton}
+            className="absolute top-4 right-4 p-1 hover:bg-gray-100 rounded-full transition-colors"
           >
-            <span className={modalStyles.header.closeIcon}>×</span>
+            <X size={20} className="text-gray-500" />
           </button>
-          
+
           {person.img ? (
-            <div className={modalStyles.header.avatarContainer}>
-              <img 
-                src={person.img} 
-                alt={person.name}
-                className={modalStyles.header.avatar}
-              />
-              <div className={getCategoryBadgeClass(person.category)}>
-                <span className={modalStyles.header.categoryBadgeText}>{person.category.charAt(0)}</span>
+            <div className="mb-4">
+              <div className="relative inline-block">
+                <img
+                  src={person.img}
+                  alt={person.name}
+                  className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-lg"
+                />
+                <div
+                  className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-white text-sm font-semibold"
+                  style={{ backgroundColor: getCategoryColor(person.category) }}
+                >
+                  {person.category.charAt(0).toUpperCase()}
+                </div>
               </div>
             </div>
           ) : (
-            <div className={getAvatarContainerClass(person.category)}>
-              <span className={modalStyles.header.avatarPlaceholderText}>{person.name.charAt(0)}</span>
+            <div className="mb-4">
+              <div
+                className="w-20 h-20 rounded-full mx-auto flex items-center justify-center text-white text-2xl font-semibold"
+                style={{ backgroundColor: getCategoryColor(person.category) }}
+              >
+                {person.name.charAt(0).toUpperCase()}
+              </div>
             </div>
           )}
-          
-          <h2 className={modalStyles.header.name}>{person.name}</h2>
-          <div className={getCategoryTagClass(person.category)}>
+
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">{person.name}</h2>
+          <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
             {person.category}
           </div>
         </div>
-        
+
         {/* 内容 */}
-        <div className={modalStyles.content.container}>
+        <div className="p-6 space-y-6">
           {/* 描述 */}
           {person.description && (
-            <div className={modalStyles.content.section}>
-              <h3 className={modalStyles.content.sectionTitle}>
-                <FileText size={RELATIONSHIPS_CONFIG.ui.iconSizes.DETAIL_SECTION} className={modalStyles.content.sectionIcon} />
+            <div>
+              <h3 className="flex items-center text-lg font-medium text-gray-900 mb-3">
+                <FileText size={18} className="mr-2 text-gray-600" />
                 人物简介
               </h3>
-              <p className={modalStyles.content.description}>
+              <p className="text-gray-700 leading-relaxed">
                 {person.description}
               </p>
             </div>
           )}
-          
+
           {/* 来源 */}
           {person.sources && person.sources.length > 0 && (
-            <div className={modalStyles.content.section}>
-              <h3 className={modalStyles.content.sectionTitle}>
-                <BookOpen size={RELATIONSHIPS_CONFIG.ui.iconSizes.DETAIL_SECTION} className={modalStyles.content.sectionIcon} />
+            <div>
+              <h3 className="flex items-center text-lg font-medium text-gray-900 mb-3">
+                <BookOpen size={18} className="mr-2 text-gray-600" />
                 相关资料
               </h3>
-              <div className={modalStyles.content.sourcesList}>
+              <div className="space-y-3">
                 {person.sources.map((source, index) => (
-                  <div key={index} className={modalStyles.content.sourceItem}>
+                  <div key={index} className="bg-gray-50 rounded-lg p-3">
                     {source.url ? (
-                      <a 
-                        href={source.url} 
-                        target="_blank" 
+                      <a
+                        href={source.url}
+                        target="_blank"
                         rel="noopener noreferrer"
-                        className={modalStyles.content.sourceLink}
+                        className="flex items-center justify-between text-blue-600 hover:text-blue-800 transition-colors"
                       >
-                        <span className={modalStyles.content.sourceLinkText}>{source.title}</span>
-                        <ExternalLink size={RELATIONSHIPS_CONFIG.ui.iconSizes.CATEGORY_BADGE} className={modalStyles.content.sourceLinkIcon} />
+                        <span className="font-medium">{source.title}</span>
+                        <ExternalLink size={16} className="ml-2 flex-shrink-0" />
                       </a>
                     ) : (
-                      <span className={modalStyles.content.sourceText}>{source.title}</span>
+                      <span className="text-gray-800 font-medium">{source.title}</span>
                     )}
                   </div>
                 ))}
               </div>
             </div>
           )}
-        </div>           
+        </div>
       </div>
     </div>
   );
