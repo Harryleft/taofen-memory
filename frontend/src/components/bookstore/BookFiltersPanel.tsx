@@ -43,9 +43,6 @@ interface BookstoreFiltersProps {
 const BookFiltersPanel: React.FC<BookstoreFiltersProps> = ({
   searchTerm,
   setSearchTerm,
-  selectedCategory,
-  setSelectedCategory,
-  uniqueCategories,
   selectedYear,
   setSelectedYear,
   uniqueYears,
@@ -115,7 +112,7 @@ const BookFiltersPanel: React.FC<BookstoreFiltersProps> = ({
       <button
         onClick={onDownload}
         className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
-        title="下载全部书籍数据为CSV文件"
+        title="下载数据"
       >
         <Download size={18} className="mr-2" />
         <span className="font-medium">导出数据</span>
