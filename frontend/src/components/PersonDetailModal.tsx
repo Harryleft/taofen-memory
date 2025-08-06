@@ -3,6 +3,18 @@ import { BookOpen, ExternalLink, FileText, X } from 'lucide-react';
 import { Person } from '../types/Person';
 import { getCategoryColor } from '../constants/relationshipsConstants';
 
+// 分类名映射函数
+const getCategoryClass = (category: string): string => {
+  const categoryMap: { [key: string]: string } = {
+    '亲人家属': 'family',
+    '媒体人士': 'media', 
+    '学术界': 'academic',
+    '政治人物': 'political',
+    '全部': 'all'
+  };
+  return categoryMap[category] || 'all';
+};
+
 interface PersonDetailModalProps {
   person: Person | null;
   isOpen: boolean;
@@ -50,27 +62,24 @@ const PersonDetailModal: React.FC<PersonDetailModalProps> = ({ person, isOpen, o
 
           {person.img ? (
             <div className="mb-4">
-              <div className="relative inline-block">
-                <img
-                  src={person.img}
-                  alt={person.name}
-                  className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-lg"
-                />
-                <div
-                  className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-white text-sm font-semibold"
-                  style={{ backgroundColor: getCategoryColor(person.category) }}
-                >
-                  {person.category.charAt(0).toUpperCase()}
+              <div className="masonry-card-avatar-container">
+                <div className="masonry-avatar-container">
+                  <img
+                    src={person.img}
+                    alt={person.name}
+                    className="masonry-avatar-image"
+                  />
                 </div>
               </div>
             </div>
           ) : (
             <div className="mb-4">
-              <div
-                className="w-20 h-20 rounded-full mx-auto flex items-center justify-center text-white text-2xl font-semibold"
-                style={{ backgroundColor: getCategoryColor(person.category) }}
-              >
-                {person.name.charAt(0).toUpperCase()}
+              <div className="masonry-card-avatar-container">
+                <div className="masonry-avatar-container">
+                  <div className={`masonry-avatar-placeholder ${getCategoryClass(person.category)}`}>
+                    {person.name.charAt(0).toUpperCase()}
+                  </div>
+                </div>
               </div>
             </div>
           )}
