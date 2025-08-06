@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, Filter, Calendar, ZoomIn, Download, X, ChevronLeft, ChevronRight } from 'lucide-react';
-import MinimalHandwritingHeader from './MinimalHandwritingHeader.tsx';
+import MinimalHandwritingHeader from '../layout/header/MinimalHandwritingHeader.tsx';
 
 interface HandwritingItem {
   id: number;
