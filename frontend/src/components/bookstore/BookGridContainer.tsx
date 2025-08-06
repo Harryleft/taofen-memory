@@ -1,22 +1,42 @@
+/**
+ * @file BookGridContainer.tsx
+ * @description 书籍网格布局的容器组件，负责渲染瀑布流的列和卡片。
+ * @module components/bookstore/BookGridContainer
+ */
+
 import React, { useEffect, useRef } from 'react';
 import { BookItem } from '../../types/bookTypes';
 import BookCard from './BookCardContainer.tsx';
 
-// 添加调试常量
-const DEBUG = true;
+// 调试开关
+const DEBUG = false;
 const logDebug = (message: string, data?: unknown) => {
   if (DEBUG) {
     console.log(`[BookGrid] ${message}`, data || '');
   }
 };
 
-//【修改】从 Props 中移除 isRapidScrolling
+/**
+ * @interface BookGridProps
+ * @description BookGridContainer 组件的 props 定义。
+ * @property {BookItem[][]} columnArrays - 一个二维数组，代表瀑布流的各列，每个子数组包含该列的所有书籍项。
+ * @property {Set<number>} visibleItems - 一个包含当前视口内可见书籍 ID 的 Set 集合，用于懒加载。
+ * @property {(item: BookItem) => void} onOpenLightbox - 点击书籍卡片时触发的回调，用于打开详情弹窗。
+ */
 interface BookGridProps {
   columnArrays: BookItem[][];
   visibleItems: Set<number>;
   onOpenLightbox: (item: BookItem) => void;
 }
 
+/**
+ * @component BookGridContainer
+ * @description 负责将传入的、已经按列分配好的书籍数据渲染成一个响应式的网格布局。
+ * - 遍历 `columnArrays` 来创建列。
+ * - 在每列中遍历书籍项，并渲染 `BookCard` 组件。
+ * - 将 `visibleItems` 集合中的可见性状态传递给每个 `BookCard`。
+ * - 使用 `React.memo` 和自定义比较函数 `areEqual` 来优化性能，避免不必要的重渲染。
+ */
 const BookGridContainer: React.FC<BookGridProps> = ({
   columnArrays,
   visibleItems,
@@ -78,7 +98,15 @@ const BookGridContainer: React.FC<BookGridProps> = ({
   );
 };
 
-// 【修改】优化 React.memo 的比较函数
+/**
+ * @function areEqual
+ * @description `React.memo` 的自定义比较函数，用于优化 BookGridContainer 的重渲染。
+ * - 通过比较 `columnArrays` 和 `visibleItems` 的引用，快速判断数据和可见性是否发生变化。
+ * - 这是提升瀑布流滚动性能的关键，因为它阻止了在滚动过程中整个网格的频繁重渲染。
+ * @param {BookGridProps} prevProps - 上一次的 props。
+ * @param {BookGridProps} nextProps - 当前的 props。
+ * @returns {boolean} - 如果 props 相等，返回 `true`，跳过渲染；否则返回 `false`。
+ */
 const areEqual = (prevProps: BookGridProps, nextProps: BookGridProps) => {
   // 1. 如果列数组的引用没有变，那么数据就没有变，瀑布流结构不变
   if (prevProps.columnArrays !== nextProps.columnArrays) {
