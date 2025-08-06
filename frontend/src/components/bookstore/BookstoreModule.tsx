@@ -12,10 +12,10 @@ import { useState, useEffect, useMemo, useRef } from 'react'; // 【修改】引
 import { BookItem, FilterOptions } from '../../types/bookTypes';
 import { downloadCSV } from '../../utils/bookUtils';
 
-import BookstoreHeader from './BookstoreHeader';
-import BookstoreFilters from './BookstoreFilters';
-import BookGrid from './BookGrid';
-import BookLightbox from './BookLightbox';
+import BookstoreHeader from '../layout/header/BookstoreHeader.tsx';
+import BookFiltersPanel from './BookFiltersPanel.tsx';
+import BookGrid from './BookGridContainer.tsx';
+import BookDetailModal from './BookDetailModal.tsx';
 
 
 import { useBookData } from '../../hooks/useBookData';
@@ -161,7 +161,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
         <BookstoreHeader />
         
         {/* 筛选控件 */}
-        <BookstoreFilters
+        <BookFiltersPanel
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
           selectedCategory={selectedCategory}
@@ -210,7 +210,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
       </div>
 
       {/* 书籍详情灯箱 */}
-      <BookLightbox
+      <BookDetailModal
         selectedItem={selectedItem}
         currentIndex={currentIndex}
         totalCount={displayedData.length}

@@ -1,4 +1,4 @@
-import BookstoreTimelineModule from '../components/bookstore';
+import BookstoreTimelineModule from '../components/bookstore/BookstoreModule.tsx';
 
 function BookstoreTimelinePage() {
   return (
