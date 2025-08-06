@@ -1,7 +1,23 @@
+/**
+ * @file BookDetailModal.tsx
+ * @description 书籍详情弹窗（Lightbox）组件，用于展示单本书的详细信息和大图。
+ * @module components/bookstore/BookDetailModal
+ */
+
 import React, { useEffect } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { BookItem } from '../../types/bookTypes';
 
+/**
+ * @interface BookDetailModalProps
+ * @description BookDetailModal 组件的 props 定义。
+ * @property {BookItem | null} selectedItem - 当前选中的书籍项，为 null 时弹窗不显示。
+ * @property {number} currentIndex - 当前书籍在列表中的索引。
+ * @property {number} totalCount - 列表中的书籍总数。
+ * @property {() => void} onClose - 关闭弹窗的回调函数。
+ * @property {() => void} onNext - 切换到下一本书的回调函数。
+ * @property {() => void} onPrev - 切换到上一本书的回调函数。
+ */
 interface BookLightboxProps {
   selectedItem: BookItem | null;
   currentIndex: number;
@@ -11,6 +27,13 @@ interface BookLightboxProps {
   onPrev: () => void;
 }
 
+/**
+ * @component BookDetailModal
+ * @description 一个全屏模态框，用于展示书籍的封面大图和详细信息。
+ * - 监听键盘事件，支持通过 `Escape`键关闭，`ArrowLeft` 和 `ArrowRight` 键切换书籍。
+ * - 包含关闭、上一张、下一张的控制按钮。
+ * - 响应式布局，适应不同屏幕尺寸。
+ */
 const BookDetailModal: React.FC<BookLightboxProps> = ({
   selectedItem,
   currentIndex,

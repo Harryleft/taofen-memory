@@ -1,6 +1,25 @@
+/**
+ * @file BookFiltersPanel.tsx
+ * @description 书籍列表的筛选和操作面板组件。
+ * @module components/bookstore/BookFiltersPanel
+ */
+
 import React, { useState } from 'react';
 import { Search, Download, Calendar, ChevronDown, ChevronUp } from 'lucide-react';
 
+/**
+ * @interface BookFiltersPanelProps
+ * @description BookFiltersPanel 组件的 props 定义。
+ * @property {string} searchTerm - 当前的搜索关键词。
+ * @property {(term: string) => void} setSearchTerm - 更新搜索关键词的回调函数。
+ * @property {string} selectedCategory - 当前选中的分类。
+ * @property {(category: string) => void} setSelectedCategory - 更新选中分类的回调函数。
+ * @property {string[]} uniqueCategories - 所有唯一的分类列表。
+ * @property {string} selectedYear - 当前选中的年份。
+ * @property {(year: string) => void} setSelectedYear - 更新选中年份的回调函数。
+ * @property {number[]} uniqueYears - 所有唯一的年份列表。
+ * @property {() => void} onDownload - 点击“导出数据”按钮时触发的回调函数。
+ */
 interface BookstoreFiltersProps {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
@@ -13,6 +32,14 @@ interface BookstoreFiltersProps {
   onDownload: () => void;
 }
 
+/**
+ * @component BookFiltersPanel
+ * @description 提供用户界面以对书籍列表进行筛选和操作。
+ * - 包含一个文本输入框用于按关键词搜索。
+ * - 提供一个自定义的下拉菜单用于按年份筛选。
+ * - 包含一个按钮，用于触发数据导出功能。
+ * - 筛选状态由父组件通过 props 传入和控制。
+ */
 const BookFiltersPanel: React.FC<BookstoreFiltersProps> = ({
   searchTerm,
   setSearchTerm,

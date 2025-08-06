@@ -1,14 +1,19 @@
 /**
- * 邹韬奋纪念网站 - 书店模块
- * * 主要功能：
- * - 展示与生活书店相关的书籍
- * - 支持按年份、出版社分类筛选
- * - 实现瀑布流布局和无限滚动
- * - 提供书籍详情灯箱预览
- * - 支持CSV数据导出
+ * @file BookstoreModule.tsx
+ * @description 书店页面的核心业务逻辑和状态管理中心。
+ * @module components/bookstore/BookstoreModule
+ * @summary
+ * 该组件是书店功能的顶层容器，负责整合所有子组件和自定义 Hooks，以实现一个功能完整的书籍展示页面。
+ * - **状态管理**: 使用 `useState` 管理筛选条件（搜索词、年份、分类）。
+ * - **数据获取**: 通过自定义 Hook `useBookData` 获取、筛选和分页书籍数据。
+ * - **响应式布局**: 通过 `useResponsiveColumns` 动态计算瀑布流的列数。
+ * - **无限滚动**: 通过 `useInfiniteScroll` 实现滚动加载更多数据和卡片懒加载。
+ * - **详情展示**: 通过 `useLightbox` 管理书籍详情弹窗的显示和导航。
+ * - **组件协调**: 将状态和回调函数传递给 `BookFiltersPanel`、`BookGrid` 和 `BookDetailModal` 等子组件。
+ * - **性能优化**: 使用 `useMemo` 计算瀑布流布局，并通过防抖（debouncing）处理筛选输入。
  */
 
-import { useState, useEffect, useMemo, useRef } from 'react'; // 【修改】引入 useRef
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { BookItem, FilterOptions } from '../../types/bookTypes';
 import { downloadCSV } from '../../utils/bookUtils';
 
@@ -32,6 +37,12 @@ interface BookstoreTimelineModuleProps {
   className?: string;
 }
 
+/**
+ * @component BookstoreTimelineModule
+ * @description 书店页面的主组件，整合了所有功能模块。
+ * @param {BookstoreTimelineModuleProps} props - 组件的 props。
+ * @returns {JSX.Element} - 渲染出的书店页面。
+ */
 export default function BookstoreTimelineModule({ className = '' }: BookstoreTimelineModuleProps) {
   // 筛选状态管理
   const [searchTerm, setSearchTerm] = useState('');

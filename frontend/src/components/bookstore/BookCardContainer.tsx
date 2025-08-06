@@ -1,7 +1,20 @@
+/**
+ * @file BookCardContainer.tsx
+ * @description 单个书籍卡片的展示组件，负责渲染书籍封面、标题、作者等基本信息。
+ * @module components/bookstore/BookCardContainer
+ */
+
 import React, { useState, useEffect, useRef } from 'react';
 import { BookItem } from '../../types/bookTypes';
 
-//【修改】从 Props 中移除 isRapidScrolling
+/**
+ * @interface BookCardProps
+ * @description BookCard 组件的 props 定义。
+ * @property {BookItem} item - 需要渲染的书籍数据对象。
+ * @property {boolean} isVisible - 标记该卡片当前是否在视口内，用于实现懒加载和入场动画。
+ * @property {number} columnIndex - 卡片所在的列索引，用于实现交错动画效果。
+ * @property {(item: BookItem) => void} onOpenLightbox - 点击卡片时触发的回调函数，用于打开详情弹窗。
+ */
 interface BookCardProps {
   item: BookItem;
   isVisible: boolean;
@@ -9,8 +22,16 @@ interface BookCardProps {
   onOpenLightbox: (item: BookItem) => void;
 }
 
-const DEBUG = false; // 在生产中建议关闭
+const DEBUG = false; // 调试开关，生产环境中应保持为 false
 
+/**
+ * @component BookCardContainer
+ * @description 渲染单个书籍卡片的 React 功能组件。
+ * - 使用 `useState` 管理图片加载状态，实现优雅的加载动画。
+ * - 使用 `useRef` 追踪渲染次数，用于调试。
+ * - 点击时调用 `onOpenLightbox` 打开详情视图。
+ * - 根据 `isVisible` 属性应用入场动画。
+ */
 const BookCardContainer: React.FC<BookCardProps> = ({
   item, 
   isVisible, 
@@ -103,7 +124,15 @@ const BookCardContainer: React.FC<BookCardProps> = ({
   );
 };
 
-//【修改】简化 React.memo 的比较函数
+/**
+ * @function arePropsEqual
+ * @description `React.memo` 的自定义比较函数，用于优化 BookCardContainer 组件的重渲染。
+ * - 仅在 `isVisible` 或 `item` 的关键信息（如ID、标题等）发生变化时才允许重渲染。
+ * - 避免因父组件重渲染而导致不必要的卡片渲染，提升瀑布流滚动性能。
+ * @param {BookCardProps} prevProps - 上一次的 props。
+ * @param {BookCardProps} nextProps - 当前的 props。
+ * @returns {boolean} - 如果 props 相等，返回 `true`，跳过渲染；否则返回 `false`。
+ */
 const arePropsEqual = (prevProps: BookCardProps, nextProps: BookCardProps): boolean => {
   // 现在我们只关心 isVisible 和 item 的内容是否发生变化
   if (prevProps.isVisible !== nextProps.isVisible) return false;
