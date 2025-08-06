@@ -67,3 +67,33 @@ export const getCategoryTailwindClass = (color: string): string => {
 export const getCategoryBgTailwindClass = (color: string): string => {
   return `bg-category-${color}`;
 };
+
+// 根据分类名称获取对应的颜色
+export const getCategoryColorByName = (categoryName: string): string => {
+  const category = RELATIONSHIPS_CATEGORIES.find(cat => cat.nameInData === categoryName);
+  return category ? category.color : 'gray';
+};
+
+// 根据分类名称获取 Tailwind 文本颜色类名
+export const getCategoryTailwindClassByName = (categoryName: string): string => {
+  const color = getCategoryColorByName(categoryName);
+  return getCategoryTailwindClass(color);
+};
+
+// 根据分类名称获取 Tailwind 背景颜色类名
+export const getCategoryBgTailwindClassByName = (categoryName: string): string => {
+  const color = getCategoryColorByName(categoryName);
+  return getCategoryBgTailwindClass(color);
+};
+
+// 分类名映射函数（保持向后兼容）
+export const getCategoryClass = (category: string): string => {
+  const categoryMap: { [key: string]: string } = {
+    '亲人家属': 'family',
+    '新闻出版': 'media', 
+    '学术文化': 'academic',
+    '政治社会': 'political',
+    '全部': 'all'
+  };
+  return categoryMap[category] || 'all';
+};

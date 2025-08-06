@@ -17,7 +17,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { BookItem, FilterOptions } from '../../types/bookTypes';
 import { downloadCSV } from '../../utils/bookUtils';
 
-import BookstoreHeader from '../layout/header/BookstoreHeader.tsx';
+
 import BookFiltersPanel from './BookFiltersPanel.tsx';
 import BookGrid from './BookGridContainer.tsx';
 import BookDetailModal from './BookDetailModal.tsx';
@@ -156,7 +156,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
     return (
       <section className={`relative py-20 bg-white ${className}`}>
         <div className="max-w-7xl mx-auto px-6">
-          <BookstoreHeader />
+          
           <div className="flex flex-col items-center justify-center p-12 text-center">
             <div className="w-12 h-12 border-4 border-gray-200 border-t-gray-500 rounded-full animate-spin"></div>
             <span className="mt-4 text-lg text-gray-600 font-song">正在加载书籍数据...</span>

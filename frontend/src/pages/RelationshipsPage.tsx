@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import RelationshipPageMasonry from '../components/relationships/RelationshipPageMasonry.tsx';
 import RelationshipPagePersonModal from '../components/relationships/RelationshipPagePersonModal.tsx';
-import MinimalRelationshipsHeader from '../components/layout/header/MinimalRelationshipsHeader.tsx';
+import AppHeader from '../components/layout/header/AppHeader.tsx';
 import { Person } from '../types/Person';
 import { useRelationshipsData } from '../hooks/useRelationshipsData';
 import {
@@ -76,7 +76,7 @@ export default function RelationshipsPage() {
 
   return (
     <div className="relationships-page-container">
-      <MinimalRelationshipsHeader />
+      <AppHeader moduleId="relationships" />
 
       {/* Category Filter */}
       <div className="relationships-main-content-container">

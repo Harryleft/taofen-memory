@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, Filter, Calendar, ZoomIn, Download, X, ChevronLeft, ChevronRight } from 'lucide-react';
-import MinimalHandwritingHeader from '../layout/header/MinimalHandwritingHeader.tsx';
+import AppHeader from '../layout/header/AppHeader.tsx';
 
 interface HandwritingItem {
   id: number;
@@ -248,7 +248,7 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
 
   return (
     <>
-      <MinimalHandwritingHeader />
+      <AppHeader moduleId="handwriting" />
       <section className={`py-20 bg-cream ${className}`}>
         <div className="max-w-7xl mx-auto px-6">
 

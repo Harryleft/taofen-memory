@@ -43,7 +43,7 @@ const RelationshipPagePersonModal: React.FC<PersonDetailModalProps> = ({ person,
         <div className="relative p-6 text-center border-b border-gray-200">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-1 hover:bg-gray-100 rounded-full transition-colors"
+            className="absolute top-4 right-4 p-5 hover:bg-gray-100 rounded-full transition-colors z-10"
           >
             <X size={20} className="text-gray-500" />
           </button>
@@ -73,9 +73,9 @@ const RelationshipPagePersonModal: React.FC<PersonDetailModalProps> = ({ person,
           )}
 
           <h2 className="text-xl font-semibold text-gray-900 mb-2">{person.name}</h2>
-          <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getCategoryBgTailwindClassByName(person.category)} ${getCategoryTailwindClassByName(person.category)}`}>
+          {/* <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getCategoryBgTailwindClassByName(person.category)} ${getCategoryTailwindClassByName(person.category)}`}>
             {person.category}
-          </div>
+          </div> */}
         </div>
 
         {/* 内容 */}
