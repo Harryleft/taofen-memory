@@ -21,18 +21,20 @@ export default function EnhancedHero() {
 
   return (
     <section className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-white to-cream">
-      {/* 背景图案层 - 调整 opacity 值来控制背景图片的显示强度 */}
-      {/* opacity-5 = 5%, opacity-10 = 10%, opacity-15 = 15%, opacity-20 = 20% */}
-      <div className="absolute inset-0 opacity-50">
+      {/* 背景图案层 - 保持适中的透明度以确保背景图片可见 */}
+      <div className="absolute inset-0 opacity-40">
         <HeroPageBackdrop scrollY={scrollY} />
       </div>
       
-      {/* 几何装饰元素层 - 调整 /数字 来控制颜色透明度 */}
-      {/* /5 = 5%, /10 = 10%, /15 = 15%, /20 = 20% */}
+      {/* 渐变遮罩层 - 为文字内容提供更好的对比度保护 */}
+      <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-white/10 to-white/30" />
+      <div className="absolute inset-0 bg-gradient-to-r from-white/15 via-transparent to-white/15" />
+      
+      {/* 几何装饰元素层 - 优化色彩层次和透明度 */}
       <div className="absolute inset-0">
-        <div className="absolute top-20 left-20 w-32 h-32 bg-gradient-to-br from-gold/15 to-transparent rounded-full blur-xl" />
-        <div className="absolute bottom-32 right-32 w-48 h-48 bg-gradient-to-tl from-heritage-blue/15 to-transparent rounded-full blur-2xl" />
-        <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-gradient-to-r from-sage-green/15 to-transparent rounded-full blur-lg" />
+        <div className="absolute top-20 left-20 w-32 h-32 bg-gradient-to-br from-gold/20 to-gold/5 rounded-full blur-xl" />
+        <div className="absolute bottom-32 right-32 w-48 h-48 bg-gradient-to-tl from-heritage-blue/20 to-heritage-blue/5 rounded-full blur-2xl" />
+        <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-gradient-to-r from-sage-green/20 to-sage-green/5 rounded-full blur-lg" />
       </div>
       
       {/* Content Container */}
@@ -46,7 +48,7 @@ export default function EnhancedHero() {
           >
             
             {/* Main Title */}
-            <h1 className="text-7xl md:text-9xl font-bold mb-8 leading-none text-primary-dark font-serif">
+            <h1 className="text-7xl md:text-9xl font-bold mb-8 leading-none text-primary-dark font-serif" style={{textShadow: '2px 2px 4px rgba(255,255,255,0.8), 0 0 8px rgba(255,255,255,0.6)'}}>
               <span className="inline-block transform hover:scale-105 transition-all duration-500 hover:text-gold">
                 邹
               </span>
@@ -66,7 +68,7 @@ export default function EnhancedHero() {
             </div>
             
             {/* Description */}
-            <p className="text-xl md:text-2xl text-primary-medium leading-relaxed font-serif max-w-3xl mx-auto">
+            <p className="text-xl md:text-2xl text-primary-medium leading-relaxed font-serif max-w-3xl mx-auto" style={{textShadow: '1px 1px 2px rgba(255,255,255,0.7), 0 0 4px rgba(255,255,255,0.5)'}}>
               新闻出版家 · 社会活动家 · 进步文化的先驱
             </p>
           </div>
@@ -80,10 +82,9 @@ export default function EnhancedHero() {
         >
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
             {/* Timeline Module */}
-            {/* 导航卡片背景透明度 - 调整 bg-white/数字 来控制卡片背景透明度 */}
-            {/* bg-white/60 = 60%, bg-white/70 = 70%, bg-white/80 = 80%, bg-white/90 = 90% */}
+            {/* 导航卡片背景透明度 - 提升透明度以增强文字可读性 */}
             <div 
-              className="group relative bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-8 hover:bg-white hover:border-gold/30 hover:shadow-xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
+              className="group relative bg-white/85 backdrop-blur-md border border-gray-200/60 rounded-2xl p-8 hover:bg-white hover:border-gold/30 hover:shadow-xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
               onClick={() => window.location.href = '/timeline'}
               onMouseEnter={() => setActiveModule(0)}
               onMouseLeave={() => setActiveModule(null)}
@@ -108,7 +109,7 @@ export default function EnhancedHero() {
 
             {/* Bookstore Module */}
             <div 
-              className="group relative bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-8 hover:bg-white hover:border-heritage-blue/30 hover:shadow-xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
+              className="group relative bg-white/85 backdrop-blur-md border border-gray-200/60 rounded-2xl p-8 hover:bg-white hover:border-heritage-blue/30 hover:shadow-xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
               onClick={() => window.location.href = '/bookstore-timeline'}
               onMouseEnter={() => setActiveModule(1)}
               onMouseLeave={() => setActiveModule(null)}
@@ -133,7 +134,7 @@ export default function EnhancedHero() {
 
             {/* Handwriting Module */}
             <div 
-              className="group relative bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-8 hover:bg-white hover:border-sage-green/30 hover:shadow-xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
+              className="group relative bg-white/85 backdrop-blur-md border border-gray-200/60 rounded-2xl p-8 hover:bg-white hover:border-sage-green/30 hover:shadow-xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
               onClick={() => window.location.href = '/handwriting'}
               onMouseEnter={() => setActiveModule(2)}
               onMouseLeave={() => setActiveModule(null)}
@@ -158,7 +159,7 @@ export default function EnhancedHero() {
 
             {/* Relationships Module */}
             <div 
-              className="group relative bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-8 hover:bg-white hover:border-warm-rose/30 hover:shadow-xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
+              className="group relative bg-white/85 backdrop-blur-md border border-gray-200/60 rounded-2xl p-8 hover:bg-white hover:border-warm-rose/30 hover:shadow-xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
               onClick={() => window.location.href = '/relationships'}
               onMouseEnter={() => setActiveModule(3)}
               onMouseLeave={() => setActiveModule(null)}
