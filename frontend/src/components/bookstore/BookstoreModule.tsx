@@ -169,7 +169,6 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
   return (
     <section className={`relative py-20 bg-white ${className}`}>
       <div className="max-w-7xl mx-auto px-6">
-        <BookstoreHeader />
         
         {/* 筛选控件 */}
         <BookFiltersPanel
