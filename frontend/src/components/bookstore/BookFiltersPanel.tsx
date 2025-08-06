@@ -40,18 +40,6 @@ const BookFiltersPanel: React.FC<BookstoreFiltersProps> = ({
         />
       </div>
 
-      {/*{uniqueCategories.length > 0 && (*/}
-      {/*  <select*/}
-      {/*    value={selectedCategory}*/}
-      {/*    onChange={(e) => setSelectedCategory(e.target.value)}*/}
-      {/*    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-serif"*/}
-      {/*  >*/}
-      {/*    <option value="all">全部类别</option>*/}
-      {/*    {uniqueCategories.map(category => (*/}
-      {/*      <option key={category} value={category}>{category}</option>*/}
-      {/*    ))}*/}
-      {/*  </select>*/}
-      {/*)}*/}
 
       <div className="relative inline-block min-w-40">
         <button 
