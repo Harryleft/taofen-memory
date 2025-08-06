@@ -99,7 +99,7 @@ interface MasonryBackgroundProps {
   scrollY: number;
 }
 
-export default function MasonryBackground({ scrollY }: MasonryBackgroundProps) {
+export default function RelationshipPageBackdrop({ scrollY }: MasonryBackgroundProps) {
   const [columns, setColumns] = useState(4);
 
   useEffect(() => {
