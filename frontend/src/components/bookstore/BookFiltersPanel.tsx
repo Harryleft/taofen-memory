@@ -24,8 +24,8 @@ const BookFiltersPanel: React.FC<BookstoreFiltersProps> = ({
   uniqueYears,
   onDownload,
 }) => (
-  <div className="mb-8 space-y-4">
-    <div className="flex flex-wrap gap-4 items-center">
+  <div className="mb-8 space-y-4 mx-auto max-w-4xl">
+    <div className="flex flex-wrap gap-4 items-center justify-center">
       <div className="relative flex-1 min-w-64 max-w-md">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
         <input
