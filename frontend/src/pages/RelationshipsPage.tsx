@@ -9,6 +9,7 @@ import {
   RELATIONSHIPS_CATEGORIES,
   getCategoryColor
 } from '../constants/relationshipsConstants';
+import '../styles/relationships.css';
 
 export default function RelationshipsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -42,16 +43,6 @@ export default function RelationshipsPage() {
     ? persons
     : persons.filter(person => person.category === selectedCategoryInData);
 
-  // 获取分类按钮样式
-  const getCategoryButtonClass = (isSelected: boolean) => {
-    const baseClasses = "group relative flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 font-medium";
-
-    if (isSelected) {
-      return `${baseClasses} text-white shadow-lg transform scale-105`;
-    }
-    return `${baseClasses} text-gray-600 bg-white border border-gray-200 hover:border-gray-300 hover:shadow-md`;
-  };
-
   // 类型适配：将 LucideIcon 转换为 MasonryGrid 期望的组件类型
   const adaptedCategories = RELATIONSHIPS_CATEGORIES.map(category => ({
     ...category,
@@ -63,10 +54,10 @@ export default function RelationshipsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">加载中...</p>
+      <div className="relationships-loading-container">
+        <div className="relationships-loading-content">
+          <div className="relationships-loading-spinner"></div>
+          <p className="relationships-loading-text">加载中...</p>
         </div>
       </div>
     );
@@ -74,22 +65,22 @@ export default function RelationshipsPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center max-w-md mx-auto p-6">
-          <p className="text-red-600 mb-2">数据加载失败，请稍后重试。</p>
-          <p className="text-sm text-gray-500">{error.message}</p>
+      <div className="relationships-error-container">
+        <div className="relationships-error-content">
+          <p>数据加载失败，请稍后重试。</p>
+          <p className="relationships-error-message">{error.message}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="relationships-page-container">
       <MinimalRelationshipsHeader />
 
       {/* Category Filter */}
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        <div className="flex flex-wrap gap-3 justify-center mb-8">
+      <div className="relationships-main-content-container">
+        <div className="relationships-filter-container">
           {RELATIONSHIPS_CATEGORIES.map((category) => {
             const Icon = category.icon;
             const isSelected = selectedCategory === category.id;
@@ -97,7 +88,7 @@ export default function RelationshipsPage() {
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
-                className={getCategoryButtonClass(isSelected)}
+                className={`relationships-category-button ${isSelected ? 'selected' : 'not-selected'}`}
                 style={isSelected ? { backgroundColor: getCategoryColor(category.color) } : undefined}
               >
                 <Icon
@@ -114,24 +105,24 @@ export default function RelationshipsPage() {
         </div>
 
         {/* Statistics */}
-        <div className="flex items-center justify-center gap-8 mb-8">
-          <div className="text-center">
-            <span className="block text-2xl font-bold text-gray-900">{persons.length}</span>
-            <span className="text-sm text-gray-600">位人物</span>
+        <div className="relationships-stats-container">
+          <div className="relationships-stat-item">
+            <span className="relationships-stat-number">{persons.length}</span>
+            <span className="relationships-stat-label">位人物</span>
           </div>
-          <div className="text-center">
-            <span className="block text-2xl font-bold text-gray-900">{filteredPersons.length}</span>
-            <span className="text-sm text-gray-600">当前显示</span>
+          <div className="relationships-stat-item">
+            <span className="relationships-stat-number">{filteredPersons.length}</span>
+            <span className="relationships-stat-label">当前显示</span>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-6 pb-12">
+      <div className="relationships-main-content-container">
         {filteredPersons.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="text-xl font-medium text-gray-900 mb-2">暂无相关人物</div>
-            <div className="text-gray-500">请尝试选择其他分类</div>
+          <div className="relationships-empty-state-container">
+            <div className="relationships-empty-state-title">暂无相关人物</div>
+            <div className="relationships-empty-state-subtitle">请尝试选择其他分类</div>
           </div>
         ) : (
           <MasonryGrid

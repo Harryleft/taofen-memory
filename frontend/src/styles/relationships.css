@@ -285,7 +285,7 @@
 }
 
 .masonry-card-base:hover .masonry-avatar-image {
-  transform: scale(1.1);
+  transform: translate(-50%, -50%) scale(1.1);
 }
 
 .masonry-card-base:hover .masonry-avatar-container {
@@ -296,8 +296,11 @@
 .masonry-avatar-image {
   @apply w-full h-full object-cover;
   object-position: center center;
-  /* 确保头像完全居中显示 */
-  transform: scale(1.05);
+  /* 确保头像在容器中完全居中显示 */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   transition: transform 0.3s ease;
 }
 
