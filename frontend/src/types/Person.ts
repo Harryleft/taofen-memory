@@ -9,6 +9,6 @@ export interface Person {
   category: string;
   img: string;
   description: string;
-  sources: Source[];
+  sources: Source[] | string[]; // 支持两种格式：对象数组或字符串数组
   link: string[];
 }

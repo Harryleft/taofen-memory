@@ -113,23 +113,31 @@ const PersonDetailModal: React.FC<PersonDetailModalProps> = ({ person, isOpen, o
                 相关资料
               </h3>
               <div className="space-y-3">
-                {person.sources.map((source, index) => (
-                  <div key={index} className="bg-gray-50 rounded-lg p-3">
-                    {source.url ? (
-                      <a
-                        href={source.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-between text-blue-600 hover:text-blue-800 transition-colors"
-                      >
-                        <span className="font-medium">{source.title}</span>
-                        <ExternalLink size={16} className="ml-2 flex-shrink-0" />
-                      </a>
-                    ) : (
-                      <span className="text-gray-800 font-medium">{source.title}</span>
-                    )}
-                  </div>
-                ))}
+                {person.sources.map((source, index) => {
+                  // 处理数据结构不匹配：将字符串数组转换为Source对象
+                  const sourceTitle = typeof source === 'string' ? source : source.title;
+                  const sourceUrl = typeof source === 'string' 
+                    ? (person.link && person.link[index]) 
+                    : source.url;
+                  
+                  return (
+                    <div key={index} className="bg-gray-50 rounded-lg p-3">
+                      {sourceUrl ? (
+                        <a
+                          href={sourceUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-between text-blue-600 hover:text-blue-800 transition-colors"
+                        >
+                          <span className="font-medium">{sourceTitle}</span>
+                          <ExternalLink size={16} className="ml-2 flex-shrink-0" />
+                        </a>
+                      ) : (
+                        <span className="text-gray-800 font-medium">{sourceTitle}</span>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
