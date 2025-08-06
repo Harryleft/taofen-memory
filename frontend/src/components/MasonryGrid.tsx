@@ -246,14 +246,12 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
           const Icon = categoryInfo?.icon;
           const left = MASONRY_CONFIG.layout.GAP + column * (columnWidth + MASONRY_CONFIG.layout.GAP);
 
-          // 生成随机的头像位置和文字对齐方式
-          const avatarPositions = ['position-top-left', 'position-top-right', 'position-center', 'position-bottom-left', 'position-bottom-right'];
+          // 统一头像居中显示，保持文字对齐的随机性
           const textAligns = ['text-align-left', 'text-align-center', 'text-align-right'];
           
-          const avatarPositionSeed = person.id * 715827883;
           const textAlignSeed = person.id * 1299827;
           
-          const avatarPosition = avatarPositions[avatarPositionSeed % avatarPositions.length];
+          const avatarPosition = 'position-center'; // 所有头像统一居中
           const textAlign = textAligns[textAlignSeed % textAligns.length];
           
           // 添加延迟动画
