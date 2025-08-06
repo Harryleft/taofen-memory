@@ -7,7 +7,7 @@ import { useRelationshipsData } from '../hooks/useRelationshipsData';
 import {
   RELATIONSHIPS_CONFIG,
   RELATIONSHIPS_CATEGORIES,
-  getCategoryColor
+  getCategoryBgClass
 } from '../constants/relationshipsConstants';
 import '../styles/relationships.css';
 
@@ -88,8 +88,7 @@ export default function RelationshipsPage() {
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
-                className={`relationships-category-button ${isSelected ? 'selected' : 'not-selected'}`}
-                style={isSelected ? { backgroundColor: getCategoryColor(category.color) } : undefined}
+                className={`relationships-category-button ${isSelected ? 'selected' : 'not-selected'} ${isSelected ? getCategoryBgClass(category.color) : ''}`}
               >
                 <Icon
                   size={RELATIONSHIPS_CONFIG.ui.iconSizes.CATEGORY_BUTTON}
