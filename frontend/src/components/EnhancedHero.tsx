@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ChevronDown, Scroll, Users } from 'lucide-react';
 import MasonryBackground from './MasonryBackground';
 
