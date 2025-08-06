@@ -1,7 +1,6 @@
 import React from 'react';
 import { BookOpen, ExternalLink, FileText, X } from 'lucide-react';
 import { Person } from '../types/Person';
-import { getCategoryColor } from '../constants/relationshipsConstants';
 
 // 分类名映射函数
 const getCategoryClass = (category: string): string => {
@@ -116,24 +115,24 @@ const PersonDetailModal: React.FC<PersonDetailModalProps> = ({ person, isOpen, o
                 {person.sources.map((source, index) => {
                   // 处理数据结构不匹配：将字符串数组转换为Source对象
                   const sourceTitle = typeof source === 'string' ? source : source.title;
-                  let sourceUrl = typeof source === 'string' 
+                  const sourceUrl = typeof source === 'string' 
                     ? (person.link && person.link[index]) 
                     : source.url;
                   
                   // 如果没有链接或链接为空字符串，根据数据源类型添加默认链接
-                  if (!sourceUrl) {
-                    switch (sourceTitle) {
-                      case '上海图书馆人名规范库':
-                        sourceUrl = 'http://data.library.sh.cn/';
-                        break;
-                      case '维基百科':
-                        sourceUrl = 'https://zh.wikipedia.org/';
-                        break;
-                      default:
-                        sourceUrl = '#'; // 默认链接，防止href为空
-                        break;
-                    }
-                  }
+                  // if (!sourceUrl) {
+                  //   switch (sourceTitle) {
+                  //     case '上海图书馆人名规范库':
+                  //       sourceUrl = 'http://data.library.sh.cn/';
+                  //       break;
+                  //     case '维基百科':
+                  //       sourceUrl = 'https://zh.wikipedia.org/';
+                  //       break;
+                  //     default:
+                  //       sourceUrl = '#'; // 默认链接，防止href为空
+                  //       break;
+                  //   }
+                  // }
                   
                   return (
                     <div key={index} className="bg-gray-50 rounded-lg p-3">

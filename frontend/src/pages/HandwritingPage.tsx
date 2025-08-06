@@ -1,5 +1,5 @@
 import React from 'react';
-import HandwritingModule from '../components/HandwritingModule';
+import HandwritingModule from '../components/handwriting/HandwritingModule.tsx';
 
 function HandwritingPage() {
   return (
