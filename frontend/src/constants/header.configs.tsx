@@ -1,4 +1,3 @@
-import React from 'react';
 import { HeaderConfig } from '../components/layout/header/BaseHeader';
 
 // 生平时光轴模块的专属装饰元素
