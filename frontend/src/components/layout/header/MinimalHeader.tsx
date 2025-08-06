@@ -21,7 +21,6 @@ interface MinimalHeaderProps {
 
 const MinimalHeader: React.FC<MinimalHeaderProps> = ({ config, children }) => {
   const {
-    moduleId,
     title,
     subtitle,
     description,

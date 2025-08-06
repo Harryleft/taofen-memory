@@ -58,8 +58,12 @@ export const getCategoryBgClass = (color: string): string => {
   return `category-bg-${color}`;
 };
 
-// 获取分类颜色（为了向后兼容，但推荐使用CSS类）
-export const getCategoryColor = (color: string): string => {
-  // 这是一个CSS变量查询，实际值已经移到CSS文件中定义
-  return `var(--category-color-${color})`;
+// 获取分类颜色的 Tailwind 类名（推荐使用）
+export const getCategoryTailwindClass = (color: string): string => {
+  return `text-category-${color}`;
+};
+
+// 获取分类背景色的 Tailwind 类名（推荐使用）
+export const getCategoryBgTailwindClass = (color: string): string => {
+  return `bg-category-${color}`;
 };

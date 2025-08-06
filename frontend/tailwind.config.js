@@ -21,6 +21,13 @@ export default {
         'bg-pure': '#FFFFFF',
         'bg-warm': '#FEFEFE',
         'bg-subtle': '#F8F8F8',
+        // 人物关系分类颜色 - 从 relationships.css 迁移
+        'category-gray': '#6b7280',   // 全部/默认分类
+        'category-red': '#ef4444',    // 家庭关系 (保持原有，与 warm-rose 共存)
+        'category-blue': '#3b82f6',   // 媒体关系
+        'category-green': '#10b981',  // 政治关系
+        'category-purple': '#8b5cf6', // 学术关系
+        'category-orange': '#f97316', // 其他关系
       },
       fontFamily: {
         'serif': ['EB Garamond', 'serif'],

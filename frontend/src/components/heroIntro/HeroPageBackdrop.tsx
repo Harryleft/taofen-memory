@@ -79,21 +79,21 @@ const masonryItems: MasonryItem[] = [
     src: '/images/hero_page/person_21626_-5140615354747636853.jpg',
     title: '社会活动照片',
     year: '1939',
-    aspectRatio: 0.6
+    aspectRatio: 1.0
   },
   {
     id: 11,
     src: '/images/hero_page/person_21609_3188023555816154777.jpg',
     title: '文化活动',
     year: '1934',
-    aspectRatio: 0.8
+    aspectRatio: 1.0
   },
   {
     id: 12,
     src: '/images/hero_page/person_21628_-1981276088998818581.jpg',
     title: '历史文献',
     year: '1941',
-    aspectRatio: 0.7
+    aspectRatio: 1.0
   }
 ];
 

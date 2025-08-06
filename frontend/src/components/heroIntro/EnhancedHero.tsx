@@ -1,13 +1,13 @@
 import { useEffect, useState, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronDown, Scroll, Users, BookOpen, FileText, Network } from 'lucide-react';
+import { ChevronDown, Scroll, Users, BookOpen, FileText } from 'lucide-react';
 import HeroPageBackdrop from './HeroPageBackdrop.tsx';
 
 export default function EnhancedHero() {
   const navigate = useNavigate();
   const [scrollY, setScrollY] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
-  const [activeModule, setActiveModule] = useState<number | null>(null);
+  const [, setActiveModule] = useState<number | null>(null);
   const [currentSpiritIndex, setCurrentSpiritIndex] = useState(0);
   
   // 生活书店八大精神
