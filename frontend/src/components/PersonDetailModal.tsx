@@ -116,25 +116,37 @@ const PersonDetailModal: React.FC<PersonDetailModalProps> = ({ person, isOpen, o
                 {person.sources.map((source, index) => {
                   // 处理数据结构不匹配：将字符串数组转换为Source对象
                   const sourceTitle = typeof source === 'string' ? source : source.title;
-                  const sourceUrl = typeof source === 'string' 
+                  let sourceUrl = typeof source === 'string' 
                     ? (person.link && person.link[index]) 
                     : source.url;
                   
+                  // 如果没有链接或链接为空字符串，根据数据源类型添加默认链接
+                  if (!sourceUrl) {
+                    switch (sourceTitle) {
+                      case '上海图书馆人名规范库':
+                        sourceUrl = 'http://data.library.sh.cn/';
+                        break;
+                      case '维基百科':
+                        sourceUrl = 'https://zh.wikipedia.org/';
+                        break;
+                      default:
+                        sourceUrl = '#'; // 默认链接，防止href为空
+                        break;
+                    }
+                  }
+                  
                   return (
                     <div key={index} className="bg-gray-50 rounded-lg p-3">
-                      {sourceUrl ? (
-                        <a
-                          href={sourceUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center justify-between text-blue-600 hover:text-blue-800 transition-colors"
-                        >
-                          <span className="font-medium">{sourceTitle}</span>
-                          <ExternalLink size={16} className="ml-2 flex-shrink-0" />
-                        </a>
-                      ) : (
-                        <span className="text-gray-800 font-medium">{sourceTitle}</span>
-                      )}
+                      <a
+                        href={sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-between text-blue-600 hover:text-blue-800 transition-colors"
+                        onClick={sourceUrl === '#' ? (e) => e.preventDefault() : undefined}
+                      >
+                        <span className="font-medium">{sourceTitle}</span>
+                        <ExternalLink size={16} className="ml-2 flex-shrink-0" />
+                      </a>
                     </div>
                   );
                 })}
