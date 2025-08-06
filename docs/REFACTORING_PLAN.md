@@ -73,7 +73,7 @@ frontend/src/
 **目标：** 建立统一的样式管理方案，解决当前样式混乱问题
 
 - **步骤 1.1：Tailwind CSS 配置完善**
-  - 检查并完善 `tailwind.config.js` 配置，确保主题色彩、字体、间距等与设计系统对齐
+  - 检查并完善 `tailwind.config.js` 配置，确保主题色彩、字体、间距等 与设计系统对齐
   - 在 `src/styles/globals.css` 中定义项目级的 CSS 变量和基础样式
 
 - **步骤 1.2：清理样式文件**
