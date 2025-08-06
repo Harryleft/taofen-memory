@@ -1,18 +1,7 @@
 import React from 'react';
 import { BookOpen, ExternalLink, FileText, X } from 'lucide-react';
 import { Person } from '../../types/Person.ts';
-
-// 分类名映射函数
-const getCategoryClass = (category: string): string => {
-  const categoryMap: { [key: string]: string } = {
-    '亲人家属': 'family',
-    '媒体人士': 'media', 
-    '学术界': 'academic',
-    '政治人物': 'political',
-    '全部': 'all'
-  };
-  return categoryMap[category] || 'all';
-};
+import { getCategoryClass, getCategoryBgTailwindClassByName, getCategoryTailwindClassByName } from '../../constants/relationshipsConstants';
 
 interface PersonDetailModalProps {
   person: Person | null;
@@ -84,7 +73,7 @@ const RelationshipPagePersonModal: React.FC<PersonDetailModalProps> = ({ person,
           )}
 
           <h2 className="text-xl font-semibold text-gray-900 mb-2">{person.name}</h2>
-          <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+          <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getCategoryBgTailwindClassByName(person.category)} ${getCategoryTailwindClassByName(person.category)}`}>
             {person.category}
           </div>
         </div>
