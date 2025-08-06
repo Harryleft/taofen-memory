@@ -331,9 +331,7 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
                   </p>
                 )}
 
-                <div className={`masonry-category-tag ${getCategoryClass(person.category)}`}>
-                  {person.category}
-                </div>
+
               </div>
             </div>
           );

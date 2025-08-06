@@ -382,29 +382,7 @@
   @apply text-right;
 }
 
-.masonry-category-tag {
-  @apply inline-block px-2 py-1 rounded text-xs font-normal text-white text-center w-full;
-}
 
-.masonry-category-tag.family {
-  @apply bg-red-500;
-}
-
-.masonry-category-tag.media {
-  @apply bg-blue-500;
-}
-
-.masonry-category-tag.academic {
-  @apply bg-purple-500;
-}
-
-.masonry-category-tag.political {
-  @apply bg-green-500;
-}
-
-.masonry-category-tag.all {
-  @apply bg-gray-500;
-}
 
 .masonry-loading-container {
   @apply flex justify-center items-center py-8;
