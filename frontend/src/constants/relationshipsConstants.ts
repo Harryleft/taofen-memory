@@ -14,30 +14,35 @@ export const RELATIONSHIPS_CATEGORIES = [
   {
     id: 'all',
     name: '全部',
+    nameInData: 'all',
     icon: Globe,
     color: 'gray'
   },
   {
     id: 'family',
     name: '亲人家属',
+    nameInData: '亲人家属',
     icon: Heart,
     color: 'red'
   },
   {
     id: 'media',
     name: '新闻出版',
+    nameInData: '新闻出版',
     icon: Book,
     color: 'blue'
   },
   {
     id: 'academic',
     name: '学术文化',
+    nameInData: '学术文化',
     icon: GraduationCap,
     color: 'purple'
   },
   {
     id: 'political',
     name: '政治社会',
+    nameInData: '政治社会',
     icon: LandPlot,
     color: 'green'
   }

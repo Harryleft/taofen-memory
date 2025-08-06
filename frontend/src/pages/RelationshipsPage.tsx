@@ -32,10 +32,15 @@ export default function RelationshipsPage() {
     };
   }, [selectedPerson]);
 
+  // 获取当前选中分类在数据中对应的名称
+  const selectedCategoryInData = RELATIONSHIPS_CATEGORIES.find(
+    cat => cat.id === selectedCategory
+  )?.nameInData || 'all';
+
   // 过滤后的人物列表
   const filteredPersons = selectedCategory === 'all'
     ? persons
-    : persons.filter(person => person.category === selectedCategory);
+    : persons.filter(person => person.category === selectedCategoryInData);
 
   // 获取分类按钮样式
   const getCategoryButtonClass = (isSelected: boolean) => {
