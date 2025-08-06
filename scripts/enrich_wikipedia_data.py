@@ -563,8 +563,8 @@ class WikipediaEnricher:
 def main():
     enricher = WikipediaEnricher()
     
-    input_file = 'frontend/public/data/relationships.json'
-    output_file = 'frontend/public/data/relationships.json'
+    input_file = '../frontend/public/data/relationships.json'
+    output_file = '../frontend/public/data/relationships.json'
     
     print("=== 多源数据补充工具 ===")
     print("1. 完整处理")

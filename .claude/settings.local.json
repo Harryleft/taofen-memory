@@ -22,7 +22,8 @@
       "Bash(npx tsc:*)",
       "Bash(git commit:*)",
       "Bash(sed:*)",
-      "Bash(npm run typecheck:*)"
+      "Bash(npm run typecheck:*)",
+      "Bash(npm run)"
     ],
     "deny": []
   },
