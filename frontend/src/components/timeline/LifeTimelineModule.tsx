@@ -1,17 +1,34 @@
-// import React from 'react';
+/**
+ * @file LifeTimelineModule.tsx
+ * @description 时间轴功能的主模块，作为容器组件，负责获取时间轴数据并渲染核心事件、进度条和头部。
+ * @module LifeTimelineModule
+ */
+
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTimelineData } from '../../hooks/useTimelineData.ts';
-import CoreEventSection from './CoreEventSection.tsx';
-import ProgressBar from './ProgressBar.tsx';
-import MinimalTimelineHeader from './MinimalTimelineHeader.tsx';
+import TimelineCoreEventSection from './TimelineCoreEventSection.tsx';
+import TimelineProgressBar from './TimelineProgressBar.tsx';
+import MinimalTimelineHeader from '../layout/header/MinimalTimelineHeader.tsx';
 import '../../styles/timeline.css';
 
+/**
+ * @interface LifeTimelineModuleProps
+ * @description LifeTimelineModule 组件的属性定义。
+ * @property {string} [className] - 可选的 CSS 类名，用于自定义组件样式。
+ */
 interface LifeTimelineModuleProps {
   className?: string;
 }
 
+/**
+ * LifeTimelineModule 组件
+ * @param {LifeTimelineModuleProps} props - 组件属性
+ * @returns {JSX.Element} 渲染的时间轴模块，包含加载、错误和成功三种状态下的 UI。
+ */
+
 export default function LifeTimelineModule({ className = '' }: LifeTimelineModuleProps) {
+  // 使用自定义 Hook 获取时间轴数据、加载状态和错误信息
   const { timelineData, loading, error } = useTimelineData();
 
   if (loading) {
@@ -39,14 +56,14 @@ export default function LifeTimelineModule({ className = '' }: LifeTimelineModul
 
   return (
     <>
-      <ProgressBar />
+      <TimelineProgressBar />
       <MinimalTimelineHeader />
       <section className={`py-20 bg-cream ${className}`}>
         <div className="max-w-6xl mx-auto px-6">
 
           <div className="timeline-container">
             {timelineData.map((coreEvent, coreIndex) => (
-              <CoreEventSection
+              <TimelineCoreEventSection
                 key={coreIndex}
                 coreEvent={coreEvent}
                 coreIndex={coreIndex}
