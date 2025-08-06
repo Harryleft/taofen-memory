@@ -6,6 +6,13 @@ export default function EnhancedHero() {
   const [scrollY, setScrollY] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [activeModule, setActiveModule] = useState<number | null>(null);
+  const [currentSpiritIndex, setCurrentSpiritIndex] = useState(0);
+  
+  // 生活书店八大精神
+  const eightSpirits = [
+    '坚定', '虚心', '公正', '负责', 
+    '刻苦', '耐劳', '服务精神', '同志爱'
+  ];
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -16,6 +23,14 @@ export default function EnhancedHero() {
     
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+  
+  // 轮播效果
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSpiritIndex((prev) => (prev + 1) % eightSpirits.length);
+    }, 2500); // 每2.5秒切换一次
+    return () => clearInterval(interval);
+  }, [eightSpirits.length]);
 
 
 
@@ -67,10 +82,40 @@ export default function EnhancedHero() {
               <div className="h-px bg-gradient-to-r from-transparent via-gold to-transparent flex-1 max-w-32" />
             </div>
             
-            {/* Description */}
-            <p className="text-xl md:text-2xl text-primary-medium leading-relaxed font-serif max-w-3xl mx-auto" style={{textShadow: '1px 1px 2px rgba(255,255,255,0.7), 0 0 4px rgba(255,255,255,0.5)'}}>
-              新闻出版家 · 社会活动家 · 进步文化的先驱
-            </p>
+            {/* Description - 动态轮播八大精神 */}
+            <div className="text-xl md:text-2xl text-primary-dark leading-relaxed font-serif max-w-3xl mx-auto" style={{textShadow: '2px 2px 4px rgba(255,255,255,0.8), 0 0 8px rgba(255,255,255,0.6)'}}>
+              
+              <div className="relative h-8 overflow-hidden">
+                {eightSpirits.map((spirit, index) => (
+                  <div
+                    key={spirit}
+                    className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ease-in-out transform ${
+                      index === currentSpiritIndex 
+                        ? 'opacity-100 translate-y-0' 
+                        : index === (currentSpiritIndex - 1 + eightSpirits.length) % eightSpirits.length
+                        ? 'opacity-0 -translate-y-full'
+                        : 'opacity-0 translate-y-full'
+                    }`}
+                    style={{
+                      fontWeight: '600',
+                      letterSpacing: '0.1em'
+                    }}
+                  >
+                    {spirit}
+                  </div>
+                ))}
+              </div>
+              <div className="flex justify-center mt-3 space-x-1">
+                {eightSpirits.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                      index === currentSpiritIndex ? 'bg-gold scale-125' : 'bg-gold/30'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
