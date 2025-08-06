@@ -308,20 +308,16 @@
   @apply bg-red-500;
 }
 
-.masonry-avatar-placeholder.colleague {
+.masonry-avatar-placeholder.media {
   @apply bg-blue-500;
 }
 
-.masonry-avatar-placeholder.friend {
-  @apply bg-green-500;
-}
-
-.masonry-avatar-placeholder.mentor {
+.masonry-avatar-placeholder.academic {
   @apply bg-purple-500;
 }
 
-.masonry-avatar-placeholder.organization {
-  @apply bg-orange-500;
+.masonry-avatar-placeholder.political {
+  @apply bg-green-500;
 }
 
 .masonry-avatar-placeholder.all {
@@ -338,20 +334,16 @@
   @apply bg-red-500;
 }
 
-.masonry-category-icon.colleague {
+.masonry-category-icon.media {
   @apply bg-blue-500;
 }
 
-.masonry-category-icon.friend {
-  @apply bg-green-500;
-}
-
-.masonry-category-icon.mentor {
+.masonry-category-icon.academic {
   @apply bg-purple-500;
 }
 
-.masonry-category-icon.organization {
-  @apply bg-orange-500;
+.masonry-category-icon.political {
+  @apply bg-green-500;
 }
 
 .masonry-category-icon.all {
@@ -398,20 +390,16 @@
   @apply bg-red-500;
 }
 
-.masonry-category-tag.colleague {
+.masonry-category-tag.media {
   @apply bg-blue-500;
 }
 
-.masonry-category-tag.friend {
-  @apply bg-green-500;
-}
-
-.masonry-category-tag.mentor {
+.masonry-category-tag.academic {
   @apply bg-purple-500;
 }
 
-.masonry-category-tag.organization {
-  @apply bg-orange-500;
+.masonry-category-tag.political {
+  @apply bg-green-500;
 }
 
 .masonry-category-tag.all {
