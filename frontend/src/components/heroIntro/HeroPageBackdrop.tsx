@@ -106,7 +106,10 @@ export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
   const [containerHeight, setContainerHeight] = useState(0);
   const [columnWidth, setColumnWidth] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
-
+  
+  // 确保 scrollY 为有效数值，防止 NaN 或 undefined
+  const safeScrollY = typeof scrollY === 'number' && !isNaN(scrollY) ? scrollY : 0;
+  
   useEffect(() => {
     const updateLayout = () => {
       const width = window.innerWidth;
@@ -166,7 +169,7 @@ export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
       <div 
         className="flex gap-4 h-full"
         style={{
-          transform: `translateY(${scrollY * 0.5}px)`,
+          transform: `translateY(${safeScrollY * 0.5}px)`,
         }}
       >
         {columnArrays.map((column, columnIndex) => (
@@ -176,10 +179,10 @@ export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
               return (
                 <div
                   key={`${item.id}-${columnIndex}-${itemIndex}`}
-                  className="relative group overflow-hidden rounded-lg shadow-lg transform transition-all duration-700 hover:scale-105 hover:shadow-2xl"
+                  className="relative group overflow-hidden rounded-lg shadow-lg transform hover:scale-105 hover:shadow-2xl transition-transform duration-300"
                   style={{
                     height: `${itemWithHeight.calculatedHeight}px`,
-                    transform: `translateY(${Math.sin((scrollY + itemIndex * 100) * 0.001) * 10}px)`,
+                    transform: `translateY(${Math.sin((safeScrollY + itemIndex * 100) * 0.001) * 10}px)`,
                     animationDelay: `${itemIndex * 0.1}s`,
                   }}
                 >
