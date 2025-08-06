@@ -246,13 +246,9 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
           const Icon = categoryInfo?.icon;
           const left = MASONRY_CONFIG.layout.GAP + column * (columnWidth + MASONRY_CONFIG.layout.GAP);
 
-          // 统一头像居中显示，保持文字对齐的随机性
-          const textAligns = ['text-align-left', 'text-align-center', 'text-align-right'];
-          
-          const textAlignSeed = person.id * 1299827;
-          
+          // 统一头像和文字都居中显示
           const avatarPosition = 'position-center'; // 所有头像统一居中
-          const textAlign = textAligns[textAlignSeed % textAligns.length];
+          const textAlign = 'text-align-center'; // 所有文字统一居中
           
           // 添加延迟动画
           const animationDelay = (index * 0.1) % 2;

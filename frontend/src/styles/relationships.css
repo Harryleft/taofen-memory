@@ -275,23 +275,23 @@
 }
 
 /* 头像容器hover效果 - 显示分类主题色边框 */
-.masonry-card-base.all .masonry-avatar-container:hover {
+.masonry-card-base.all .masonry-card-avatar-container:hover .masonry-avatar-container {
   border-color: var(--category-color-gray);
 }
 
-.masonry-card-base.family .masonry-avatar-container:hover {
+.masonry-card-base.family .masonry-card-avatar-container:hover .masonry-avatar-container {
   border-color: var(--category-color-red);
 }
 
-.masonry-card-base.media .masonry-avatar-container:hover {
+.masonry-card-base.media .masonry-card-avatar-container:hover .masonry-avatar-container {
   border-color: var(--category-color-blue);
 }
 
-.masonry-card-base.academic .masonry-avatar-container:hover {
+.masonry-card-base.academic .masonry-card-avatar-container:hover .masonry-avatar-container {
   border-color: var(--category-color-purple);
 }
 
-.masonry-card-base.political .masonry-avatar-container:hover {
+.masonry-card-base.political .masonry-card-avatar-container:hover .masonry-avatar-container {
   border-color: var(--category-color-green);
 }
 
