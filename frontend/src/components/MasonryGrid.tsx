@@ -2,6 +2,19 @@ import React, { useState, useEffect, useRef, useCallback, useLayoutEffect } from
 import { Person } from '../types/Person';
 import '../styles/relationships.css';
 
+// 分类映射：将中文分类名映射为英文类名
+const getCategoryClass = (category: string): string => {
+  const categoryMap: Record<string, string> = {
+    '亲人家属': 'family',
+    '新闻出版': 'media', 
+    '学术文化': 'academic',
+    '政治社会': 'political',
+    '邹韬奋': 'all', // 邹韬奋本人归类为all
+    'all': 'all'
+  };
+  return categoryMap[category] || 'all';
+};
+
 // 瀑布流配置
 const MASONRY_CONFIG = {
   layout: {
@@ -263,7 +276,7 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
                   cardRefs.current.delete(person.id);
                 }
               }}
-              className={`masonry-card-base ${person.category}`}
+              className={`masonry-card-base ${getCategoryClass(person.category)}`}
               style={{
                 left: `${left}px`,
                 top: `${top}px`,
@@ -292,14 +305,14 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
                   ) : (
                     <div className="masonry-card-avatar-wrapper">
                       <div className="masonry-avatar-container">
-                        <div className={`masonry-avatar-placeholder ${person.category}`}>
+                        <div className={`masonry-avatar-placeholder ${getCategoryClass(person.category)}`}>
                           {person.name.charAt(0)}
                         </div>
                       </div>
                     </div>
                   )}
                   {Icon && (
-                    <div className={`masonry-category-icon ${person.category}`}>
+                    <div className={`masonry-category-icon ${getCategoryClass(person.category)}`}>
                       <Icon size={MASONRY_CONFIG.ui.ICON_SIZE} className="text-white" />
                     </div>
                   )}
@@ -318,7 +331,7 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
                   </p>
                 )}
 
-                <div className={`masonry-category-tag ${person.category}`}>
+                <div className={`masonry-category-tag ${getCategoryClass(person.category)}`}>
                   {person.category}
                 </div>
               </div>
