@@ -6,6 +6,7 @@ interface MasonryItem {
   title: string;
   year: string;
   aspectRatio?: number; // 宽高比，用于自适应高度计算
+  calculatedHeight?: number; // 计算后的高度
 }
 
 // 使用真实的本地图片数据 - 移除固定高度，改为自适应
