@@ -271,7 +271,32 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 2px solid rgba(0, 0, 0, 0.06);
+}
+
+/* 头像容器hover效果 - 显示分类主题色边框 */
+.masonry-card-base.family .masonry-avatar-container:hover {
+  border-color: #ef4444;
+}
+
+.masonry-card-base.colleague .masonry-avatar-container:hover {
+  border-color: #3b82f6;
+}
+
+.masonry-card-base.friend .masonry-avatar-container:hover {
+  border-color: #22c55e;
+}
+
+.masonry-card-base.mentor .masonry-avatar-container:hover {
+  border-color: #a855f7;
+}
+
+.masonry-card-base.organization .masonry-avatar-container:hover {
+  border-color: #f97316;
+}
+
+.masonry-card-base.all .masonry-avatar-container:hover {
+  border-color: #6b7280;
 }
 
 .masonry-avatar-image {
