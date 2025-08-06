@@ -1,6 +1,6 @@
 import React from 'react';
 import { PenTool } from 'lucide-react';
-import MinimalHeader, { MinimalHeaderConfig } from '../layout/MinimalHeader';
+import MinimalHeader, { MinimalHeaderConfig } from '../layout/header/MinimalHeader.tsx';
 
 const MinimalHandwritingHeader: React.FC = () => {
   const config: MinimalHeaderConfig = {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTimelineData } from '../hooks/useTimelineData';
-import CoreEventSection from '../components/timeline/CoreEventSection';
-import ProgressBar from '../components/timeline/ProgressBar';
+import TimelineCoreEventSection from '../components/timeline/TimelineCoreEventSection.tsx';
+import TimelineProgressBar from '../components/timeline/TimelineProgressBar.tsx';
 import '../styles/timeline.css';
 
 export default function TimelinePage() {
@@ -30,7 +30,7 @@ export default function TimelinePage() {
 
   return (
     <>
-      <ProgressBar />
+      <TimelineProgressBar />
       <div className="min-h-screen bg-cream">
         <div className="max-w-6xl mx-auto px-6 py-20">
           <div className="text-center mb-16">
@@ -43,7 +43,7 @@ export default function TimelinePage() {
 
           <div className="timeline-container">
             {timelineData.map((coreEvent, coreIndex) => (
-              <CoreEventSection
+              <TimelineCoreEventSection
                 key={coreIndex}
                 coreEvent={coreEvent}
                 coreIndex={coreIndex}

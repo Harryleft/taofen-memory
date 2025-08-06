@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import RelationshipPageMasonry from '../components/relationships/RelationshipPageMasonry.tsx';
 import RelationshipPagePersonModal from '../components/relationships/RelationshipPagePersonModal.tsx';
-import MinimalRelationshipsHeader from '../components/layout/MinimalRelationshipsHeader.tsx';
+import MinimalRelationshipsHeader from '../components/layout/header/MinimalRelationshipsHeader.tsx';
 import { Person } from '../types/Person';
 import { useRelationshipsData } from '../hooks/useRelationshipsData';
 import {
