@@ -62,7 +62,7 @@ const PersonDetailModal: React.FC<PersonDetailModalProps> = ({ person, isOpen, o
 
           {person.img ? (
             <div className="mb-4">
-              <div className="masonry-card-avatar-container">
+              <div className="masonry-card-avatar-container position-center">
                 <div className="masonry-avatar-container">
                   <img
                     src={person.img}
@@ -74,7 +74,7 @@ const PersonDetailModal: React.FC<PersonDetailModalProps> = ({ person, isOpen, o
             </div>
           ) : (
             <div className="mb-4">
-              <div className="masonry-card-avatar-container">
+              <div className="masonry-card-avatar-container position-center">
                 <div className="masonry-avatar-container">
                   <div className={`masonry-avatar-placeholder ${getCategoryClass(person.category)}`}>
                     {person.name.charAt(0).toUpperCase()}
