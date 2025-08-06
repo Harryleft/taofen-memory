@@ -7,9 +7,9 @@
 @tailwind utilities;
 
 @layer base {
-  html {
+  /* html {
     scroll-behavior: smooth;
-  }
+  } */
   
   body {
     font-family: 'Noto Sans', sans-serif;

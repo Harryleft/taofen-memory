@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronDown, Scroll, Users, BookOpen, FileText, Network } from 'lucide-react';
 import HeroPageBackdrop from './HeroPageBackdrop.tsx';
@@ -16,15 +16,49 @@ export default function EnhancedHero() {
     '刻苦', '耐劳', '服务精神', '同志爱'
   ];
 
-  useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
+  // 使用 useLayoutEffect 在浏览器绘制前同步滚动位置，消除首帧闪动
+  useLayoutEffect(() => {
+    // 🔥 关键修复：临时禁用平滑滚动
+    const originalScrollBehavior = document.documentElement.style.scrollBehavior;
+    document.documentElement.style.scrollBehavior = 'auto';
+    
+    // 强制重置滚动位置（多重保险）
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    window.scrollTo(0, 0);
+    
+    // 设置初始状态
+    setScrollY(0);
+    
+    // 恢复原始滚动行为（延迟恢复，确保重置完成）
+    setTimeout(() => {
+      document.documentElement.style.scrollBehavior = originalScrollBehavior;
+    }, 100);
+    
+    const handleScroll = () => {
+      const newScrollY = window.scrollY;
+      setScrollY(newScrollY);
+    };
+    
     window.addEventListener('scroll', handleScroll);
     
-    // Trigger entrance animation with staggered timing
-    setTimeout(() => setIsVisible(true), 200);
-    
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
+  
+  // 入场动画保持使用 useEffect
+  useEffect(() => {
+    // Trigger entrance animation with staggered timing
+    setTimeout(() => {
+      setIsVisible(true);
+    }, 200);
+  }, []);
+  
+  // 添加 scrollY 状态变化的监听
+  useEffect(() => {
+    console.log('🔍 [EnhancedHero] scrollY 状态变化:', scrollY);
+  }, [scrollY]);
   
   // 轮播效果
   useEffect(() => {
