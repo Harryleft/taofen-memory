@@ -21,12 +21,13 @@
       "WebFetch(domain:www.zoutaofen.com)",
       "Bash(npx tsc:*)",
       "Bash(git commit:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(npm run typecheck:*)"
     ],
     "deny": []
   },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "zen"
-  ],
-  "enableAllProjectMcpServers": true
+  ]
 }
