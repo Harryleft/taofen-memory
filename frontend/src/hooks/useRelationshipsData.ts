@@ -26,7 +26,8 @@ export function useRelationshipsData() {
         const transformedPersons: Person[] = rawData.persons.map((rawPerson: any) => ({
           ...rawPerson,
           description: rawPerson.desc, // 将desc转换为description
-          sources: rawPerson.sources.map((source: string) => ({ title: source })) // 将字符串数组转换为对象数组
+          sources: rawPerson.sources || [], // 保持sources为字符串数组
+          link: rawPerson.link || [] // 确保link字段被正确传递
         }));
         // 过滤掉邹韬奋本人，只保留其他人脉关系
         const filteredPersons = transformedPersons.filter(person => person.id !== TAOFEN_ID);
