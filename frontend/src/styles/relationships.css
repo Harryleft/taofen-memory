@@ -211,7 +211,7 @@
   @apply text-gold;
 }
 
-/* Masonry Grid Styles */
+/* Masonry Grid Styles - Minimalist Design */
 .masonry-container {
   @apply w-full;
 }
@@ -221,11 +221,18 @@
 }
 
 .masonry-card-base {
-  @apply absolute bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden border border-gray-100 hover:scale-[1.02] hover:border-gold/30;
+  @apply absolute bg-white rounded-xl transition-all duration-200 cursor-pointer overflow-hidden border border-gray-200/60;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.masonry-card-base:hover {
+  @apply border-gray-300/80;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
 }
 
 .masonry-card-content {
-  @apply p-6;
+  @apply p-5;
 }
 
 .masonry-card-avatar-container {
@@ -258,128 +265,80 @@
 }
 
 .masonry-avatar-container {
-  @apply w-16 h-16 rounded-full overflow-hidden border-2 border-white shadow-md bg-gradient-to-br from-gray-100 to-gray-200;
-  transition: all 0.3s ease;
+  @apply w-14 h-14 rounded-full overflow-hidden bg-gray-50;
+  transition: all 0.2s ease;
   position: relative;
-  /* 确保容器内容完全居中 */
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.masonry-avatar-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border-radius: 50%;
-  background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.2) 50%, transparent 70%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.masonry-card-base:hover .masonry-avatar-container::before {
-  opacity: 1;
-}
-
-.masonry-card-base:hover .masonry-avatar-image {
-  transform: translate(-50%, -50%) scale(1.1);
-}
-
-.masonry-card-base:hover .masonry-avatar-container {
-  transform: scale(1.05);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .masonry-avatar-image {
   @apply w-full h-full object-cover;
   object-position: center center;
-  /* 确保头像在容器中完全居中显示 */
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  transition: transform 0.3s ease;
 }
 
 .masonry-avatar-placeholder {
-  @apply w-full h-full flex items-center justify-center text-white font-bold text-xl;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  @apply w-full h-full flex items-center justify-center text-white font-medium text-lg;
 }
 
 .masonry-avatar-placeholder.family {
-  background: linear-gradient(135deg, var(--category-color-red), #dc2626);
+  @apply bg-red-500;
 }
 
 .masonry-avatar-placeholder.colleague {
-  background: linear-gradient(135deg, var(--category-color-blue), #1d4ed8);
+  @apply bg-blue-500;
 }
 
 .masonry-avatar-placeholder.friend {
-  background: linear-gradient(135deg, var(--category-color-green), #059669);
+  @apply bg-green-500;
 }
 
 .masonry-avatar-placeholder.mentor {
-  background: linear-gradient(135deg, var(--category-color-purple), #7c3aed);
+  @apply bg-purple-500;
 }
 
 .masonry-avatar-placeholder.organization {
-  background: linear-gradient(135deg, var(--category-color-orange), #ea580c);
+  @apply bg-orange-500;
 }
 
 .masonry-avatar-placeholder.all {
-  background: linear-gradient(135deg, var(--category-color-gray), #4b5563);
+  @apply bg-gray-500;
 }
 
 .masonry-category-icon {
-  @apply absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-2 border-white flex items-center justify-center;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  animation: iconPulse 2s infinite;
-}
-
-.masonry-category-icon:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  @apply absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full border border-white flex items-center justify-center;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .masonry-category-icon.family {
-  @apply bg-gradient-to-br from-red-400 to-red-600;
+  @apply bg-red-500;
 }
 
 .masonry-category-icon.colleague {
-  @apply bg-gradient-to-br from-blue-400 to-blue-600;
+  @apply bg-blue-500;
 }
 
 .masonry-category-icon.friend {
-  @apply bg-gradient-to-br from-green-400 to-green-600;
+  @apply bg-green-500;
 }
 
 .masonry-category-icon.mentor {
-  @apply bg-gradient-to-br from-purple-400 to-purple-600;
+  @apply bg-purple-500;
 }
 
 .masonry-category-icon.organization {
-  @apply bg-gradient-to-br from-orange-400 to-orange-600;
+  @apply bg-orange-500;
 }
 
 .masonry-category-icon.all {
-  @apply bg-gradient-to-br from-gray-400 to-gray-600;
-}
-
-@keyframes iconPulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
+  @apply bg-gray-500;
 }
 
 .masonry-card-name {
-  @apply text-lg font-semibold text-charcoal mb-3;
+  @apply text-base font-medium text-gray-900 mb-2;
 }
 
 .masonry-card-name.text-align-left {
@@ -395,7 +354,7 @@
 }
 
 .masonry-card-description {
-  @apply text-gray-600 text-sm leading-relaxed mb-4 line-clamp-4;
+  @apply text-gray-600 text-sm leading-normal mb-3 line-clamp-3;
 }
 
 .masonry-card-description.text-align-left {
@@ -411,31 +370,31 @@
 }
 
 .masonry-category-tag {
-  @apply inline-block px-3 py-1 rounded-full text-xs font-medium text-white text-center w-full;
+  @apply inline-block px-2 py-1 rounded text-xs font-normal text-white text-center w-full;
 }
 
 .masonry-category-tag.family {
-  @apply bg-gradient-to-r from-red-400 to-red-500;
+  @apply bg-red-500;
 }
 
 .masonry-category-tag.colleague {
-  @apply bg-gradient-to-r from-blue-400 to-blue-500;
+  @apply bg-blue-500;
 }
 
 .masonry-category-tag.friend {
-  @apply bg-gradient-to-r from-green-400 to-green-500;
+  @apply bg-green-500;
 }
 
 .masonry-category-tag.mentor {
-  @apply bg-gradient-to-r from-purple-400 to-purple-500;
+  @apply bg-purple-500;
 }
 
 .masonry-category-tag.organization {
-  @apply bg-gradient-to-r from-orange-400 to-orange-500;
+  @apply bg-orange-500;
 }
 
 .masonry-category-tag.all {
-  @apply bg-gradient-to-r from-gray-400 to-gray-500;
+  @apply bg-gray-500;
 }
 
 .masonry-loading-container {
@@ -489,16 +448,7 @@
   background-color: var(--category-color-orange);
 }
 
-/* 增强的卡片样式 */
-.masonry-card-base {
-  @apply absolute rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden border;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border-color: #e2e8f0;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  transform-style: preserve-3d;
-  animation: cardFadeIn 0.6s ease-out forwards;
-  opacity: 0;
-}
+
 
 /* 响应式卡片尺寸调整 */
 @media (max-width: 640px) {
@@ -543,78 +493,4 @@
   .masonry-card-name {
     @apply text-sm;
   }
-}
-
-.masonry-card-base:hover {
-  transform: translateY(-4px) rotateX(2deg);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  border-color: #d1d5db;
-}
-
-/* 分类特定的卡片背景 */
-.masonry-card-base.family {
-  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 50%, #fecaca 100%);
-  border-color: #fca5a5;
-}
-
-.masonry-card-base.colleague {
-  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #bfdbfe 100%);
-  border-color: #93c5fd;
-}
-
-.masonry-card-base.friend {
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);
-  border-color: #86efac;
-}
-
-.masonry-card-base.mentor {
-  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 50%, #e9d5ff 100%);
-  border-color: #c4b5fd;
-}
-
-.masonry-card-base.organization {
-  background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 50%, #fdba74 100%);
-  border-color: #fdba74;
-}
-
-.masonry-card-base.all {
-  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 50%, #e5e7eb 100%);
-  border-color: #d1d5db;
-}
-
-/* 卡片进入动画 */
-@keyframes cardFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* 增强的卡片内容样式 */
-.masonry-card-content {
-  @apply p-6 relative;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  border-radius: 1rem;
-}
-
-.masonry-card-content::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.masonry-card-base:hover .masonry-card-content::before {
-  opacity: 1;
 }
