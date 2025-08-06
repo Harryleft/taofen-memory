@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import MasonryGrid from '../components/MasonryGrid';
-import PersonDetailModal from '../components/PersonDetailModal';
-import MinimalRelationshipsHeader from '../components/relationships/MinimalRelationshipsHeader';
+import RelationshipPageMasonry from '../components/relationships/RelationshipPageMasonry.tsx';
+import RelationshipPagePersonModal from '../components/relationships/RelationshipPagePersonModal.tsx';
+import MinimalRelationshipsHeader from '../components/layout/MinimalRelationshipsHeader.tsx';
 import { Person } from '../types/Person';
 import { useRelationshipsData } from '../hooks/useRelationshipsData';
 import {
@@ -43,7 +43,7 @@ export default function RelationshipsPage() {
     ? persons
     : persons.filter(person => person.category === selectedCategoryInData);
 
-  // 类型适配：将 LucideIcon 转换为 MasonryGrid 期望的组件类型
+  // 类型适配：将 LucideIcon 转换为 RelationshipPageMasonry 期望的组件类型
   const adaptedCategories = RELATIONSHIPS_CATEGORIES.map(category => ({
     ...category,
     icon: (props: { size?: number; className?: string }) => {
@@ -125,7 +125,7 @@ export default function RelationshipsPage() {
             <div className="relationships-empty-state-subtitle">请尝试选择其他分类</div>
           </div>
         ) : (
-          <MasonryGrid
+          <RelationshipPageMasonry
             items={filteredPersons}
             onItemClick={setSelectedPerson}
             categories={adaptedCategories}
@@ -133,7 +133,7 @@ export default function RelationshipsPage() {
         )}
       </div>
 
-      <PersonDetailModal
+      <RelationshipPagePersonModal
         person={selectedPerson}
         isOpen={!!selectedPerson}
         onClose={() => setSelectedPerson(null)}

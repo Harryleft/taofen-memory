@@ -1,5 +1,5 @@
 import React from 'react';
-import EnhancedHero from '../components/EnhancedHero';
+import EnhancedHero from '../components/heroIntro/EnhancedHero.tsx';
 
 function HomePage() {
 
