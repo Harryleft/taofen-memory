@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, Filter, Calendar, ZoomIn, Download, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Search, ZoomIn, Download, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import AppHeader from '../layout/header/AppHeader.tsx';
 
 interface HandwritingItem {

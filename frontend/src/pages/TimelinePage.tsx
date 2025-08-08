@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTimelineData } from '../hooks/useTimelineData';
 import TimelineCoreEventSection from '../components/timeline/TimelineCoreEventSection.tsx';
 import TimelineProgressBar from '../components/timeline/TimelineProgressBar.tsx';
