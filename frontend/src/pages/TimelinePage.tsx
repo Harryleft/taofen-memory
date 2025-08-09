@@ -179,7 +179,7 @@ export default function TimelinePage() {
             </div>
           </div>
 
-          <div className="relative">
+          <div className="timeline-two-col">
             {/* 侧边索引（桌面端可见） */}
             <aside className="timeline-sidenav hidden lg:block">
               <div className="timeline-sidenav-card">
