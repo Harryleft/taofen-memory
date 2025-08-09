@@ -96,10 +96,10 @@
   position: relative;
   border-radius: 12px;
   padding: 16px;
-  margin: -16px;
+  margin: 0;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   background: transparent;
-  overflow: hidden;
+  overflow: visible;
   width: 100%;
   text-align: left;
 }
@@ -300,6 +300,15 @@
     transform: translateY(0);
   }
 }
+
+/* 首事件标题在桌面端隐藏（TOC 已提供导航）；移动端保留 */
+@media (min-width: 1024px) {
+  .core-event-title { display: none; }
+}
+
+/* 图片尺寸上限（使用 !important 覆盖实用类） */
+.featured-img { max-width: clamp(420px, 58%, 680px) !important; height: auto !important; }
+.regular-img { max-width: clamp(320px, 60%, 520px) !important; height: auto !important; }
 
 @keyframes staggerIn {
   to {
