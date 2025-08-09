@@ -307,8 +307,27 @@
 }
 
 /* 图片尺寸上限（使用 !important 覆盖实用类） */
-.featured-img { max-width: clamp(420px, 58%, 680px) !important; height: auto !important; }
-.regular-img { max-width: clamp(320px, 60%, 520px) !important; height: auto !important; }
+.featured-img {
+  height: auto !important;
+  /* 桌面：限制最大宽高，避免压迫文字区 */
+  max-width: clamp(360px, 52%, 560px) !important;
+  max-height: clamp(220px, 38vh, 420px) !important;
+}
+.regular-img {
+  height: auto !important;
+  max-width: clamp(300px, 48%, 480px) !important;
+  max-height: clamp(200px, 32vh, 360px) !important;
+}
+
+/* 移动端：图片占满容器宽度，保持适当高度 */
+@media (max-width: 767px) {
+  .featured-img,
+  .regular-img {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 60vh !important;
+  }
+}
 
 @keyframes staggerIn {
   to {
