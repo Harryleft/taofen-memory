@@ -1,3 +1,16 @@
+.timeline-page-root {
+  --bg-cream: #FAF7F0;
+  --text-charcoal: #1F2937;
+  --text-muted: #6B7280;
+  --accent-gold: #B8860B;
+  --surface: #FFFFFF;
+  --border: rgba(0, 0, 0, 0.08);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.08);
+}
+
 .timeline-container {
   position: relative;
 }
@@ -8,15 +21,14 @@
   top: 0;
   bottom: 0;
   left: 50%;
-  width: 3px;
-  background: linear-gradient(to bottom, 
-    transparent 0%, 
-    rgba(184, 134, 11, 0.2) 10%, 
-    rgba(184, 134, 11, 0.6) 30%, 
-    #B8860B 50%, 
-    rgba(184, 134, 11, 0.6) 70%, 
-    rgba(184, 134, 11, 0.2) 90%, 
-    transparent 100%
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    rgba(184, 134, 11, 0.0) 0%,
+    rgba(184, 134, 11, 0.18) 20%,
+    rgba(184, 134, 11, 0.28) 50%,
+    rgba(184, 134, 11, 0.18) 80%,
+    rgba(184, 134, 11, 0.0) 100%
   );
   transform: translateX(-50%);
   z-index: 0;
@@ -33,12 +45,12 @@
   position: absolute;
   top: 8px;
   left: 50%;
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: #B8860B;
-  border: 3px solid #FAF7F0;
-  box-shadow: 0 0 15px rgba(184, 134, 11, 0.3);
+  background: var(--accent-gold);
+  border: 2px solid var(--bg-cream);
+  box-shadow: 0 0 8px rgba(184, 134, 11, 0.22);
   transform: translateX(-50%);
   z-index: 2;
 }
@@ -121,6 +133,19 @@
   transform: translateY(20px);
 }
 
+/* 事件卡片骨架（占位样式，先定义，后续可按需启用） */
+.timeline-skeleton {
+  background: linear-gradient(90deg, #f2f2f2 25%, #ececec 37%, #f2f2f2 63%);
+  background-size: 400% 100%;
+  animation: timelineSkeleton 1.2s ease-in-out infinite;
+  border-radius: var(--radius);
+}
+
+@keyframes timelineSkeleton {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
 
 
 .timeline-progress {
@@ -151,20 +176,22 @@
 }
 
 .timeline-sidenav-card {
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  background: rgba(255, 255, 255, 0.7);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
-  border-radius: 10px;
-  padding: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.86);
+  -webkit-backdrop-filter: saturate(1.1) blur(6px);
+  backdrop-filter: saturate(1.1) blur(6px);
+  border-radius: var(--radius);
+  padding: 10px 12px;
   max-height: 70vh;
   overflow: auto;
+  box-shadow: var(--shadow-sm);
 }
 
 .timeline-sidenav-title {
   font-size: 12px;
-  color: rgba(31, 41, 55, 0.6); /* 类似 text-charcoal/60 */
-  margin-bottom: 8px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  letter-spacing: .02em;
 }
 
 .timeline-sidenav-list {
@@ -177,23 +204,34 @@
   display: block;
   width: 100%;
   text-align: left;
-  padding: 6px 8px;
-  border-radius: 6px;
+  padding: 6px 10px;
+  border-left: 3px solid transparent;
+  border-radius: 8px;
   background: transparent;
   border: none;
-  color: rgba(31, 41, 55, 0.8); /* 类似 text-charcoal/80 */
+  color: rgba(31, 41, 55, 0.86);
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .timeline-sidenav-item:hover {
-  background: rgba(184, 134, 11, 0.1); /* hover:bg-gold/10 */
+  background: rgba(184, 134, 11, 0.08);
 }
 
 .timeline-sidenav-item.active {
-  background: rgba(184, 134, 11, 0.15); /* bg-gold/15 */
-  color: #1f2937; /* 类似 text-charcoal */
-  font-weight: 500;
+  background: rgba(184, 134, 11, 0.12);
+  color: var(--text-charcoal);
+  font-weight: 600;
+  border-left-color: var(--accent-gold);
+}
+
+/* 过滤栏卡片（吸顶工具条风格） */
+.timeline-filter-card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 16px;
 }
 
 @media (max-width: 768px) {

@@ -68,36 +68,20 @@ frontend/src/
 
 采用**最小风险的增量改进策略**，专注解决实际痛点，避免大规模重构。
 
-### 🎯 第一阶段：样式系统统一（高优先级 - 1周内完成）
+### 🎯 第一阶段：样式系统统一
 
 **目标：** 建立统一的样式管理方案，解决当前样式混乱问题
 
 - **步骤 1.1：Tailwind CSS 配置完善**
   - 检查并完善 `tailwind.config.js` 配置，确保主题色彩、字体、间距等 与设计系统对齐
-  - 在 `src/styles/globals.css` 中定义项目级的 CSS 变量和基础样式
-
-- **步骤 1.2：清理样式文件**
-  - 逐步将 `styles/bookstore.ts`、`styles/relationships.ts` 等样式对象转换为 Tailwind classes
-  - 保留必要的动画和复杂样式定义，简化重复的颜色和尺寸定义
 
 - **步骤 1.3：建立设计令牌（Design Tokens）**
   - 在 `tailwind.config.js` 中定义项目专用的颜色、字体、间距等设计令牌
   - 创建 `src/styles/design-system.ts` 统一管理设计规范
 
-### 🧩 第二阶段：组件归位整理（中优先级 - 3天内完成）
+### 🧩 第二阶段：组件归位整理
 
 **目标：** 建立语义一致的组件架构，解决职责混乱问题
-
-- **步骤 2.1：布局组件重新归位**
-  - 将 `common/BaseHeader.tsx`、`common/MinimalHeader.tsx` 等移入 `components/layout/`
-  - 删除空的 `assets/` 目录和职责混乱的 `common/` 目录
-  - 更新所有相关的导入路径
-
-- **步骤 2.2：时间线组件归类**
-  - 创建 `components/timeline/` 目录
-  - 将 `LifeTimelineModule.tsx` 移入 `components/timeline/`
-  - 调整相关导入路径
-
 - **步骤 2.3：建立基础 UI 组件库**
   - 基于现有组件使用情况，抽象出 3-5 个核心 UI 组件（Button, Card, Modal, Input）
   - 在 `components/ui/` 中建立这些基础组件，使用 Tailwind CSS 实现

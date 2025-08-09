@@ -128,7 +128,7 @@ export default function TimelinePage() {
         <AppHeader moduleId="timeline" />
         <div className="max-w-6xl mx-auto px-6 py-20">
           {/* 过滤栏 */}
-          <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div className="timeline-filter-card mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div className="flex-1">
               <label className="block text-sm text-charcoal/70 mb-2">搜索事件</label>
               <input
