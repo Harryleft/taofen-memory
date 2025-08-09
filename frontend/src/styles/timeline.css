@@ -139,6 +139,63 @@
   transition: width 0.3s ease;
 }
 
+/* 侧边滚动索引（第一阶段新增） */
+.timeline-sidenav {
+  position: sticky;
+  top: 7rem; /* 约等于 top-28 */
+  left: 0;
+  float: left;
+  margin-right: 2rem; /* 约等于 mr-8 */
+  width: 12rem; /* 约等于 w-48 */
+  z-index: 10;
+}
+
+.timeline-sidenav-card {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.7);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border-radius: 10px;
+  padding: 12px;
+  max-height: 70vh;
+  overflow: auto;
+}
+
+.timeline-sidenav-title {
+  font-size: 12px;
+  color: rgba(31, 41, 55, 0.6); /* 类似 text-charcoal/60 */
+  margin-bottom: 8px;
+}
+
+.timeline-sidenav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.timeline-sidenav-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  color: rgba(31, 41, 55, 0.8); /* 类似 text-charcoal/80 */
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.timeline-sidenav-item:hover {
+  background: rgba(184, 134, 11, 0.1); /* hover:bg-gold/10 */
+}
+
+.timeline-sidenav-item.active {
+  background: rgba(184, 134, 11, 0.15); /* bg-gold/15 */
+  color: #1f2937; /* 类似 text-charcoal */
+  font-weight: 500;
+}
+
 @media (max-width: 768px) {
   .timeline-container::before,
   .timeline-dot::before {
