@@ -33,6 +33,7 @@ interface TimelineEvent {
 interface TimelineItemProps {
   event: TimelineEvent;
   isFeatured?: boolean;
+  layout?: 'image-left' | 'image-right';
 }
 
 /**
@@ -41,7 +42,7 @@ interface TimelineItemProps {
  * @param {TimelineItemProps} props - 组件属性。
  * @returns {JSX.Element} 渲染的单个时间轴事件。
  */
-const TimelineEventItem: React.FC<TimelineItemProps> = ({ event, isFeatured }) => {
+const TimelineEventItem: React.FC<TimelineItemProps> = ({ event, isFeatured, layout = 'image-left' }) => {
     // 状态：标记人物数据是否已加载完成，用于控制人名链接的渲染
   const [isPersonDataLoaded, setIsPersonDataLoaded] = useState(false);
 
@@ -63,8 +64,8 @@ const TimelineEventItem: React.FC<TimelineItemProps> = ({ event, isFeatured }) =
 
     // 根据 isFeatured 属性决定容器的样式类，特色事件会放大
   const containerClasses = isFeatured
-    ? 'transform scale(1.1) mb-8'
-    : 'transform scale(0.95)';
+    ? 'transform scale-[1.06] mb-8'
+    : 'transform scale-[0.98]';
 
 
     // 根据 isFeatured 属性决定时间和描述文本的样式
@@ -77,7 +78,9 @@ const TimelineEventItem: React.FC<TimelineItemProps> = ({ event, isFeatured }) =
     // 根据 isFeatured 属性决定图片尺寸，特色事件的图片更大
   const imageSizeClasses = isFeatured
     ? 'max-w-[80%] h-auto'
-    : 'max-w-[60%] h-auto';
+    : 'max-w-[70%] h-auto';
+
+  const isImageRight = layout === 'image-right';
 
   // 处理人物姓名点击 - 跳转到外部链接
     // 事件处理：点击人名时，在新标签页打开相关链接
@@ -141,12 +144,13 @@ const TimelineEventItem: React.FC<TimelineItemProps> = ({ event, isFeatured }) =
     return <>{elements}</>;
   };
 
+  // 骨架屏（统一样式）：当图片存在但尚未加载时由浏览器自己处理；这里提供统一结构供未来扩展
   return (
     <div className={`timeline-item ${containerClasses}`}>
       <div className={`timeline-dot ${event.timespot ? 'timeline-dot-gray' : 'timeline-dot-gold'} ${isFeatured ? 'hidden' : ''}`}></div>
       <div className="pl-[45px] md:pl-0">
-        <div className="md:flex justify-between items-start w-full">
-          <div className="md:w-6/12 md:text-right md:pr-2">
+        <div className={`md:flex justify-between items-start w-full ${isImageRight ? 'md:flex-row-reverse' : ''}`}>
+          <div className={`md:w-6/12 ${isImageRight ? 'md:text-left md:pl-2' : 'md:text-right md:pr-2'}`}>
             {event.image && (
               <div className="relative group">
                 <img

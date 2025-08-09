@@ -76,7 +76,7 @@ const TimelineCoreEventSection: React.FC<CoreEventSectionProps> = ({ coreEvent, 
           }
         }}
       >
-        <TimelineEventItem event={firstEvent} isFeatured />
+        <TimelineEventItem event={firstEvent} isFeatured layout={coreIndex % 2 === 0 ? 'image-left' : 'image-right'} />
       </div>
 
       {isExpanded && (
@@ -87,7 +87,7 @@ const TimelineCoreEventSection: React.FC<CoreEventSectionProps> = ({ coreEvent, 
               className="staggered-animation"
               style={{ animationDelay: `${eventIndex * 0.1}s` }}
             >
-              <TimelineEventItem event={event} />
+              <TimelineEventItem event={event} layout={(coreIndex + eventIndex + 1) % 2 === 0 ? 'image-left' : 'image-right'} />
             </div>
           ))}
         </div>

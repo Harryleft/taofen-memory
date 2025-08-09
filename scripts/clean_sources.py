@@ -133,7 +133,7 @@ def clean_relationships_file(input_file: str, output_file: str = None) -> None:
 
 def main():
     """主函数"""
-    input_file = '../frontend/public/data/relationships.json'
+    input_file = '../frontend/public/data/json/relationships.json'
     
     if not os.path.exists(input_file):
         print(f"错误: 文件不存在 {input_file}")
