@@ -1,101 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
+import { fetchHeroImages, type MasonryItem as BaseMasonryItem } from '@/services/heroImageService';
 
-interface MasonryItem {
-  id: number;
-  src: string;
-  title: string;
-  year: string;
-  aspectRatio?: number; // 宽高比，用于自适应高度计算
-  calculatedHeight?: number; // 计算后的高度
-}
-
-// 使用真实的本地图片数据 - 移除固定高度，改为自适应
-const masonryItems: MasonryItem[] = [
-  {
-    id: 1,
-    src: '/images/hero_page/shenghuo_first.jpg',
-    title: '生活周刊创刊号',
-    year: '1925',
-    aspectRatio: 0.7 // 高度/宽度比例
-  },
-  {
-    id: 2,
-    src: '/images/hero_page/shenghuoxinqikan.jpg',
-    title: '生活新期刊',
-    year: '1935',
-    aspectRatio: 0.8
-  },
-  {
-    id: 3,
-    src: '/images/hero_page/070_韬奋像_70.jpg',
-    title: '邹韬奋肖像',
-    year: '1940',
-    aspectRatio: 1.2
-  },
-  {
-    id: 4,
-    src: '/images/hero_page/shenghuodaily.jpg',
-    title: '生活日报',
-    year: '1932',
-    aspectRatio: 0.75
-  },
-  {
-    id: 5,
-    src: '/images/hero_page/quanminkangzhan.jpg',
-    title: '全民抗战',
-    year: '1937',
-    aspectRatio: 0.65
-  },
-  {
-    id: 6,
-    src: '/images/hero_page/shenhuorbao.jpg',
-    title: '生活日报',
-    year: '1930',
-    aspectRatio: 0.85
-  },
-  {
-    id: 7,
-    src: '/images/hero_page/077_韬奋像_77.jpg',
-    title: '韬奋先生照片',
-    year: '1928',
-    aspectRatio: 1.1
-  },
-  {
-    id: 8,
-    src: '/images/hero_page/068_韬奋像_68.jpg',
-    title: '韬奋工作照',
-    year: '1933',
-    aspectRatio: 0.9
-  },
-  {
-    id: 9,
-    src: '/images/hero_page/074_韬奋像_74.jpg',
-    title: '韬奋晚年照片',
-    year: '1936',
-    aspectRatio: 1.0
-  },
-  {
-    id: 10,
-    src: '/images/hero_page/person_21626_-5140615354747636853.jpg',
-    title: '社会活动照片',
-    year: '1939',
-    aspectRatio: 1.0
-  },
-  {
-    id: 11,
-    src: '/images/hero_page/person_21609_3188023555816154777.jpg',
-    title: '文化活动',
-    year: '1934',
-    aspectRatio: 1.0
-  },
-  {
-    id: 12,
-    src: '/images/hero_page/person_21628_-1981276088998818581.jpg',
-    title: '历史文献',
-    year: '1941',
-    aspectRatio: 1.0
-  }
-];
+type MasonryItem = BaseMasonryItem & { calculatedHeight?: number };
 
 interface HeroBackgroundProps {
   scrollY: number;
@@ -105,12 +11,21 @@ export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
   const [columns, setColumns] = useState(4);
   const [containerHeight, setContainerHeight] = useState(0);
   const [columnWidth, setColumnWidth] = useState(0);
+  const [remoteItems, setRemoteItems] = useState<BaseMasonryItem[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   
   // 确保 scrollY 为有效数值，防止 NaN 或 undefined
   const safeScrollY = typeof scrollY === 'number' && !isNaN(scrollY) ? scrollY : 0;
   
   useEffect(() => {
+    // 加载图片数据
+    fetchHeroImages()
+      .then(setRemoteItems)
+      .catch((err) => {
+        // eslint-disable-next-line no-console
+        console.error(err);
+      });
+
     const updateLayout = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
@@ -137,7 +52,7 @@ export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
     const columnHeights = new Array(columns).fill(0);
 
     // 复制并重复图片项目以确保填满屏幕
-    const repeatedItems = [...masonryItems, ...masonryItems, ...masonryItems];
+    const repeatedItems = [...remoteItems, ...remoteItems, ...remoteItems];
 
     repeatedItems.forEach((item) => {
       const shortestColumnIndex = columnHeights.indexOf(Math.min(...columnHeights));
