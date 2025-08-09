@@ -234,6 +234,41 @@
   padding: 16px;
 }
 
+/* 顶部统计卡片（Phase 3） */
+.timeline-summary-card {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+
+.timeline-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.timeline-summary-tile {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+}
+
+.timeline-summary-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.timeline-summary-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-charcoal);
+}
+
 @media (max-width: 768px) {
   .timeline-container::before,
   .timeline-dot::before {

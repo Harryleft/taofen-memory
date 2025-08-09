@@ -127,6 +127,23 @@ export default function TimelinePage() {
       <div className="min-h-screen bg-cream">
         <AppHeader moduleId="timeline" />
         <div className="max-w-6xl mx-auto px-6 py-20">
+          {/* 顶部统计（Phase 3，可选显示） */}
+          <div className="timeline-summary-card hidden">
+            <div className="timeline-summary-grid">
+              <div className="timeline-summary-tile">
+                <div className="timeline-summary-label">时间范围</div>
+                <div className="timeline-summary-value">自动读取（Phase 3 数据）</div>
+              </div>
+              <div className="timeline-summary-tile">
+                <div className="timeline-summary-label">核心事件</div>
+                <div className="timeline-summary-value">自动读取（Phase 3 数据）</div>
+              </div>
+              <div className="timeline-summary-tile">
+                <div className="timeline-summary-label">事件总数</div>
+                <div className="timeline-summary-value">自动读取（Phase 3 数据）</div>
+              </div>
+            </div>
+          </div>
           {/* 过滤栏 */}
           <div className="timeline-filter-card mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div className="flex-1">
