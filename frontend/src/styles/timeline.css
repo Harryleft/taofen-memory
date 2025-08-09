@@ -168,9 +168,6 @@
 .timeline-sidenav {
   position: sticky;
   top: 7rem; /* 约等于 top-28 */
-  left: 0;
-  float: left;
-  margin-right: 2rem; /* 约等于 mr-8 */
   width: 12rem; /* 约等于 w-48 */
   z-index: 10;
 }
@@ -267,6 +264,25 @@
   font-size: 18px;
   font-weight: 600;
   color: var(--text-charcoal);
+}
+
+/* 双列布局容器（方案B：使用 Grid 替代 float） */
+.timeline-two-col {
+  display: grid;
+  grid-template-columns: 12rem minmax(0, 1fr);
+  column-gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 1023px) {
+  .timeline-two-col {
+    display: block; /* 移动端回退为单列 */
+  }
+}
+
+/* 防止首段 margin 折叠导致顶端空白 */
+.timeline-container > section:first-child {
+  margin-top: 0;
 }
 
 @media (max-width: 768px) {
