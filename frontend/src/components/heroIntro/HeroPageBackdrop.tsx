@@ -1,7 +1,26 @@
 import { useEffect, useState, useRef } from 'react';
 import { fetchHeroImages, type MasonryItem as BaseMasonryItem } from '@/services/heroImageService';
 
-type MasonryItem = BaseMasonryItem & { calculatedHeight?: number };
+type MasonryItem = BaseMasonryItem & {
+  calculatedHeight?: number;
+};
+
+// 生成稳定的伪随机数（0~1），用于保证每次渲染的“错落感”一致
+function randomUnitFromKey(key: string): number {
+  let hash = 2166136261;
+  for (let i = 0; i < key.length; i += 1) {
+    hash ^= key.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  // 归一化到 [0,1)
+  return ((hash >>> 0) % 10000) / 10000;
+}
+
+// 布局与视觉常量（避免魔法数字）
+const GAP_PX = 16;               // 卡片垂直间距
+const FALLBACK_ASPECT = 0.8;     // 当无法测量图片时的备用宽高比
+const IMAGE_HEIGHT_SCALE = 0.8; // 图片高度缩放（<1 缩小，>1 放大）
+const REPEAT_TIMES = 6;          // 背景图重复次数，确保可填满容器
 
 interface HeroBackgroundProps {
   scrollY: number;
@@ -12,6 +31,7 @@ export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
   const [containerHeight, setContainerHeight] = useState(0);
   const [columnWidth, setColumnWidth] = useState(0);
   const [remoteItems, setRemoteItems] = useState<BaseMasonryItem[]>([]);
+  const [aspectMap, setAspectMap] = useState<Record<number, number>>({});
   const containerRef = useRef<HTMLDivElement>(null);
   
   // 确保 scrollY 为有效数值，防止 NaN 或 undefined
@@ -39,7 +59,7 @@ export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
       
       setColumns(newColumns);
       setContainerHeight(height * 1.5); // 确保背景高度足够覆盖首屏
-      setColumnWidth((width - (newColumns - 1) * 16) / newColumns); // 计算列宽，减去间距
+      setColumnWidth((width - (newColumns - 1) * GAP_PX) / newColumns); // 计算列宽，减去间距
     };
 
     updateLayout();
@@ -47,22 +67,37 @@ export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
     return () => window.removeEventListener('resize', updateLayout);
   }, []);
 
+  // 预加载图片并测量真实宽高比，恢复“最初样式”的自然高低差
+  useEffect(() => {
+    if (!remoteItems.length) return;
+    remoteItems.forEach((item) => {
+      const img = new Image();
+      img.src = item.src;
+      img.onload = () => {
+        const ratio = img.naturalHeight / img.naturalWidth;
+        setAspectMap((prev) => (prev[item.id] ? prev : { ...prev, [item.id]: ratio }));
+      };
+    });
+  }, [remoteItems]);
+
   const distributeItems = () => {
     const columnArrays: MasonryItem[][] = Array.from({ length: columns }, () => []);
     const columnHeights = new Array(columns).fill(0);
 
-    // 复制并重复图片项目以确保填满屏幕
-    const repeatedItems = [...remoteItems, ...remoteItems, ...remoteItems];
+    // 复制并重复图片项目以确保填满屏幕（可通过 REPEAT_TIMES 手动调节）
+    const repeatedItems = Array.from({ length: REPEAT_TIMES }, () => remoteItems).flat();
 
     repeatedItems.forEach((item) => {
       const shortestColumnIndex = columnHeights.indexOf(Math.min(...columnHeights));
-      const calculatedHeight = columnWidth * (item.aspectRatio || 0.8); // 根据宽高比计算高度
+      const measuredAspect = aspectMap[item.id];
+      const aspect = typeof measuredAspect === 'number' && measuredAspect > 0 ? measuredAspect : (item.aspectRatio || FALLBACK_ASPECT);
+      const calculatedHeight = columnWidth * aspect * IMAGE_HEIGHT_SCALE;
       
       columnArrays[shortestColumnIndex].push({
         ...item,
-        calculatedHeight
+        calculatedHeight,
       });
-      columnHeights[shortestColumnIndex] += calculatedHeight + 16; // 16px gap
+      columnHeights[shortestColumnIndex] += calculatedHeight + GAP_PX;
       
       // 如果最短列的高度已经超过容器高度，停止添加
       if (Math.min(...columnHeights) > containerHeight) {
@@ -88,13 +123,16 @@ export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
         }}
       >
         {columnArrays.map((column, columnIndex) => (
-          <div key={columnIndex} className="flex-1 space-y-4">
+          <div
+            key={columnIndex}
+            className="flex-1 space-y-4"
+          >
             {column.map((item, itemIndex) => {
               const itemWithHeight = item as MasonryItem & { calculatedHeight: number };
               return (
                 <div
                   key={`${item.id}-${columnIndex}-${itemIndex}`}
-                  className="relative group overflow-hidden rounded-lg shadow-lg transform hover:scale-105 hover:shadow-2xl transition-transform duration-300"
+                  className="relative group overflow-hidden rounded-lg shadow-lg transform hover:scale-105 hover:shadow-2xl transition-transform duration-300 will-change-transform"
                   style={{
                     height: `${itemWithHeight.calculatedHeight}px`,
                     transform: `translateY(${Math.sin((safeScrollY + itemIndex * 100) * 0.001) * 10}px)`,
