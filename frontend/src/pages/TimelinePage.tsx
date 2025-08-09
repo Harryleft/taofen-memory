@@ -1,6 +1,6 @@
-import { lazy, Suspense, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import { useTimelineData } from '@/hooks/useTimelineData';
-const TimelineCoreEventSection = lazy(() => import('@/components/timeline/TimelineCoreEventSection.tsx'));
+import TimelineCoreEventSection from '@/components/timeline/TimelineCoreEventSection.tsx';
 import TimelineProgressBar from '@/components/timeline/TimelineProgressBar.tsx';
 import AppHeader from '@/components/layout/header/AppHeader.tsx';
 import '@/styles/timeline.css';
@@ -26,6 +26,7 @@ function extractYear(input: string): number | null {
 export default function TimelinePage() {
   const { timelineData, loading, error } = useTimelineData();
 
+  // 第一阶段新增：搜索 + 年份过滤 + 侧边索引 + 回到顶部
   const [search, setSearch] = useState('');
   const [yearStart, setYearStart] = useState<number | null>(null);
   const [yearEnd, setYearEnd] = useState<number | null>(null);
@@ -71,6 +72,7 @@ export default function TimelinePage() {
       .filter(group => group.timeline.length > 0);
   }, [timelineData, deferredSearch, yearStart, yearEnd]);
 
+  // Scrollspy：监听各核心段曝光并高亮侧边索引
   const sectionRefs = useRef<Array<HTMLElement | null>>([]);
   sectionRefs.current = [];
 
@@ -125,6 +127,7 @@ export default function TimelinePage() {
       <div className="min-h-screen bg-cream">
         <AppHeader moduleId="timeline" />
         <div className="max-w-6xl mx-auto px-6 py-20">
+          {/* 过滤栏 */}
           <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div className="flex-1">
               <label className="block text-sm text-charcoal/70 mb-2">搜索事件</label>
@@ -160,18 +163,18 @@ export default function TimelinePage() {
           </div>
 
           <div className="relative">
-            <aside className="hidden lg:block sticky top-28 left-0 float-left mr-8 w-48">
-              <div className="rounded-lg border border-charcoal/10 bg-white/70 backdrop-blur p-3 max-h-[70vh] overflow-auto">
-                <div className="text-xs text-charcoal/60 mb-2">核心事件</div>
-                <ul className="space-y-1">
+            {/* 侧边索引（桌面端可见） */}
+            <aside className="timeline-sidenav hidden lg:block">
+              <div className="timeline-sidenav-card">
+                <div className="timeline-sidenav-title">核心事件</div>
+                <ul className="timeline-sidenav-list">
                   {filteredData.map((g, idx) => (
                     <li key={idx}>
                       <button
                         onClick={() => handleJump(idx)}
-                        className={`text-left w-full px-2 py-1 rounded hover:bg-gold/10 ${
-                          idx === activeIndex ? 'bg-gold/15 text-charcoal font-medium' : 'text-charcoal/80'
-                        }`}
+                        className={`timeline-sidenav-item ${idx === activeIndex ? 'active' : ''}`}
                         title={g.core_event}
+                        aria-current={idx === activeIndex ? 'true' : undefined}
                       >
                         {g.core_event}
                       </button>
@@ -181,35 +184,27 @@ export default function TimelinePage() {
               </div>
             </aside>
 
+            {/* 主时间线 */}
             <main className="timeline-container">
               {filteredData.length === 0 ? (
                 <div className="text-center text-charcoal/60 py-12">未找到匹配的事件，请调整搜索或年份范围。</div>
               ) : (
-                <Suspense
-                  fallback={
-                    <div className="space-y-6">
-                      <div className="animate-pulse h-28 rounded bg-white/60" />
-                      <div className="animate-pulse h-28 rounded bg-white/60" />
-                      <div className="animate-pulse h-28 rounded bg-white/60" />
-                    </div>
-                  }
-                >
-                  {filteredData.map((coreEvent, coreIndex) => (
-                    <section
-                      key={coreIndex}
-                      id={`core-${coreIndex}`}
-                      data-core-idx={coreIndex}
-                      ref={(el) => (sectionRefs.current[coreIndex] = el)}
-                      className="mb-12 clear-right"
-                    >
-                      <TimelineCoreEventSection coreEvent={coreEvent} coreIndex={coreIndex} />
-                    </section>
-                  ))}
-                </Suspense>
+                filteredData.map((coreEvent, coreIndex) => (
+                  <section
+                    key={coreIndex}
+                    id={`core-${coreIndex}`}
+                    data-core-idx={coreIndex}
+                    ref={(el) => (sectionRefs.current[coreIndex] = el)}
+                    className="mb-12 clear-right"
+                  >
+                    <TimelineCoreEventSection coreEvent={coreEvent} coreIndex={coreIndex} />
+                  </section>
+                ))
               )}
             </main>
           </div>
 
+          {/* 回到顶部 */}
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             className="fixed bottom-6 right-6 rounded-full bg-charcoal text-cream shadow-lg hover:shadow-xl px-3 py-2 text-sm"
