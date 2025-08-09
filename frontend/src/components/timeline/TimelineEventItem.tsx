@@ -77,8 +77,8 @@ const TimelineEventItem: React.FC<TimelineItemProps> = ({ event, isFeatured, lay
   // 普通事件: 最大宽度60%, 高度自适应保持比例
     // 根据 isFeatured 属性决定图片尺寸，特色事件的图片更大
   const imageSizeClasses = isFeatured
-    ? 'max-w-[80%] h-auto'
-    : 'max-w-[70%] h-auto';
+    ? 'featured-img'
+    : 'regular-img';
 
   const isImageRight = layout === 'image-right';
 
@@ -148,7 +148,7 @@ const TimelineEventItem: React.FC<TimelineItemProps> = ({ event, isFeatured, lay
   return (
     <div className={`timeline-item ${containerClasses}`}>
       <div className={`timeline-dot ${event.timespot ? 'timeline-dot-gray' : 'timeline-dot-gold'} ${isFeatured ? 'hidden' : ''}`}></div>
-      <div className="pl-[45px] md:pl-0">
+      <div className={`${isFeatured ? 'pl-0' : 'pl-[45px]'} md:pl-0`}>
         <div className={`md:flex justify-between items-start w-full ${isImageRight ? 'md:flex-row-reverse' : ''}`}>
           <div className={`md:w-6/12 ${isImageRight ? 'md:text-left md:pl-2' : 'md:text-right md:pr-2'}`}>
             {event.image && (
