@@ -229,13 +229,13 @@ export default function EnhancedHero() {
                   <Scroll className="text-gold group-hover:scale-110 transition-transform duration-300" size={26} />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-gold transition-colors duration-300 font-serif flex-shrink-0">
-                  人生大事
+                  岁月行履
                 </h3>
                 <p className="text-gray-800 leading-relaxed mb-6 text-sm flex-grow">
-                  追溯邹韬奋先生的人生轨迹，感受文化先驱的成长历程
+                  循迹韬奋足音，见风云际会与初心不改
                 </p>
                 <div className="flex items-center text-gold group-hover:text-gold/80 transition-colors duration-300 flex-shrink-0">
-                  <span className="text-sm font-medium">探索时间线</span>
+                  <span className="text-sm font-medium">探索</span>
                   <ChevronDown className="ml-2 transform rotate-[-90deg] group-hover:translate-x-1 transition-transform duration-300" size={14} />
                 </div>
               </div>
@@ -269,13 +269,13 @@ export default function EnhancedHero() {
                   <BookOpen className="text-heritage-blue group-hover:scale-110 transition-transform duration-300" size={26} />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-heritage-blue transition-colors duration-300 font-serif flex-shrink-0">
-                  生活书店
+                  生活与书
                 </h3>
                 <p className="text-gray-800 leading-relaxed mb-6 text-sm flex-grow">
-                  探索生活书店的发展历程，了解进步出版事业的光辉足迹
+                  在纸与铅字之间，重访生活书店的生长与担当
                 </p>
                 <div className="flex items-center text-heritage-blue group-hover:text-heritage-blue/80 transition-colors duration-300 flex-shrink-0">
-                  <span className="text-sm font-medium">查看出版物</span>
+                  <span className="text-sm font-medium">进入</span>
                   <ChevronDown className="ml-2 transform rotate-[-90deg] group-hover:translate-x-1 transition-transform duration-300" size={14} />
                 </div>
               </div>
@@ -306,13 +306,13 @@ export default function EnhancedHero() {
                   <FileText className="text-sage-green group-hover:scale-110 transition-transform duration-300" size={26} />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-sage-green transition-colors duration-300 font-serif flex-shrink-0">
-                  韬奋手迹
+                  笔下风骨
                 </h3>
                 <p className="text-gray-800 leading-relaxed mb-6 text-sm flex-grow">
-                  欣赏邹韬奋先生的珍贵手稿，感受文字背后的思想力量
+                  从字里行间，见其思虑与炽热
                 </p>
                 <div className="flex items-center text-sage-green group-hover:text-sage-green/80 transition-colors duration-300 flex-shrink-0">
-                  <span className="text-sm font-medium">查看手稿</span>
+                  <span className="text-sm font-medium">展开</span>
                   <ChevronDown className="ml-2 transform rotate-[-90deg] group-hover:translate-x-1 transition-transform duration-300" size={14} />
                 </div>
               </div>
@@ -343,13 +343,13 @@ export default function EnhancedHero() {
                   <Users className="text-warm-rose group-hover:scale-110 transition-transform duration-300" size={26} />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-warm-rose transition-colors duration-300 font-serif flex-shrink-0">
-                  人脉网络
+                  同道群像
                 </h3>
                 <p className="text-gray-800 leading-relaxed mb-6 text-sm flex-grow">
-                  探索邹韬奋先生的社会关系网络，了解其人际交往轨迹
+                  以人观史，勾连一个时代的脉络
                 </p>
                 <div className="flex items-center text-warm-rose group-hover:text-warm-rose/80 transition-colors duration-300 flex-shrink-0">
-                  <span className="text-sm font-medium">查看关系</span>
+                  <span className="text-sm font-medium">查看</span>
                   <ChevronDown className="ml-2 transform rotate-[-90deg] group-hover:translate-x-1 transition-transform duration-300" size={14} />
                 </div>
               </div>
