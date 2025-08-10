@@ -355,12 +355,12 @@ export default function EnhancedHero() {
         {YearDivider}
         <div className="relative">
           <div className="absolute inset-0 -z-10">
-            <div className="absolute inset-0 bg-gradient-to-b from-amber-100/40 via-orange-50/30 to-amber-50/20 rounded-full blur-3xl scale-150" />
+            <div className="absolute inset-0 bg-gradient-to-b from-gray-100/30 via-gray-50/20 to-gray-100/10 rounded-full blur-3xl scale-150" />
           </div>
           <h1
             className={`font-serif text-gray-900 ${styles.fontSize} ${styles.fontWeight} ${styles.tracking} ${styles.lineHeight}`}
             style={{
-              textShadow: '0 8px 32px rgba(251, 191, 36, 0.15), 0 4px 16px rgba(0, 0, 0, 0.1)',
+              textShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08)',
               backgroundImage: 'linear-gradient(135deg, #374151 0%, #1f2937 50%, #111827 100%)',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
@@ -510,7 +510,7 @@ export default function EnhancedHero() {
               loading="lazy"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-br from-amber-900/10 via-transparent to-amber-900/20" />
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-900/15 via-transparent to-gray-900/10" />
           </div>
 
           {/* Content */}
