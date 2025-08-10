@@ -224,6 +224,7 @@ export default function EnhancedHero() {
               <div className="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl bg-blue-600" />
               <div className="absolute inset-0 bg-gradient-to-br from-heritage-blue/5 to-gold/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="relative z-10 flex flex-col h-full">
+     
                 <div className="w-12 h-12 bg-gradient-to-br from-blue-500/20 to-blue-400/10 rounded-2xl flex items-center justify-center mb-6 group-hover:from-blue-500/30 group-hover:to-blue-400/20 transition-all duration-300 flex-shrink-0">
                   <BookOpen className="text-heritage-blue group-hover:scale-110 transition-transform duration-300" size={26} />
                 </div>
