@@ -272,7 +272,7 @@ export default function EnhancedHero() {
               <img 
                 src="/images/hero_page/070_韬奋像_70.jpg" 
                 alt="韬奋像" 
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
             </div>
@@ -301,7 +301,7 @@ export default function EnhancedHero() {
               <img 
                 src="/images/hero_page/shenghuo_first.jpg" 
                 alt="生活书店" 
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
             </div>
@@ -330,7 +330,7 @@ export default function EnhancedHero() {
               <img 
                 src="/images/hero_page/shenghuoxinqikan.jpg" 
                 alt="生活新期刊" 
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
             </div>
@@ -359,7 +359,7 @@ export default function EnhancedHero() {
               <img 
                 src="/images/hero_page/person_21609_3188023555816154777.jpg" 
                 alt="同道群像" 
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
             </div>
