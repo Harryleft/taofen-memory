@@ -174,11 +174,11 @@ function SiteLogo({ className = "", onClick }: SiteLogoProps) {
       {/* Logo Text */}
       <div className="flex flex-col items-start">
         <span
-            className={`font-bold text-xl text-gray-900 transition-all duration-[${ANIMATION.duration.normal}] group-hover:shadow-sm group-hover:shadow-amber-500/20`}>
+            className={`font-bold text-xl text-gray-900 transition-all duration-[${ANIMATION.duration.normal}] group-hover:shadow-sm`}>
           韬奋 · 纪念
         </span>
         <span
-            className={`text-xs text-gray-500 leading-none mt-0.5 transition-all duration-[${ANIMATION.duration.normal}] font-medium tracking-wide group-hover:shadow-sm group-hover:shadow-amber-500/15`}>
+            className={`text-xs text-gray-500 leading-none mt-0.5 transition-all duration-[${ANIMATION.duration.normal}] font-medium tracking-wide group-hover:shadow-sm`}>
           TAOFEN MEMORIAL
         </span>
       </div>
@@ -387,7 +387,7 @@ export default function EnhancedHero() {
           onClick={() => handleNavigation(item.to)}
           className={`relative px-4 py-2 font-medium text-gray-700 hover:text-gray-900 transition-all duration-[${ANIMATION.duration.normal}] focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 group`}
         >
-          <span className="relative z-10 group-hover:shadow-sm group-hover:shadow-amber-500/20">{item.label}</span>
+          <span className="relative z-10 group-hover:shadow-sm">{item.label}</span>
 
           {/* Background hover effect */}
           <div className={`absolute inset-0 bg-gradient-to-r ${THEME.gradients.primarySubtle} rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-[${ANIMATION.duration.normal}]`} />
@@ -403,7 +403,7 @@ export default function EnhancedHero() {
   const MobileMenuButton = useMemo(() => (
     <button
       onClick={() => setIsMenuOpen(!isMenuOpen)}
-      className={`md:hidden relative w-10 h-10 flex flex-col items-center justify-center space-y-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg transition-all duration-[${ANIMATION.duration.normal}] hover:bg-gray-50 hover:shadow-sm hover:shadow-amber-500/20`}
+      className={`md:hidden relative w-10 h-10 flex flex-col items-center justify-center space-y-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg transition-all duration-[${ANIMATION.duration.normal}] hover:bg-gray-50 hover:shadow-sm`}
       aria-label="菜单"
       aria-expanded={isMenuOpen}
       aria-controls="mobile-menu"
@@ -449,7 +449,7 @@ export default function EnhancedHero() {
                 animation: isMenuOpen ? 'slideInFromRight 0.3s ease-out forwards' : 'none'
               }}
             >
-              <span className={`text-lg font-medium text-gray-700 group-hover:text-gray-900 group-hover:shadow-sm group-hover:shadow-amber-500/20 transition-colors duration-[${ANIMATION.duration.fast}]`}>
+              <span className={`text-lg font-medium text-gray-700 group-hover:text-gray-900 group-hover:shadow-sm transition-colors duration-[${ANIMATION.duration.fast}]`}>
                 {item.label}
               </span>
               <div className={`w-0 h-0.5 bg-gradient-to-r ${THEME.gradients.primary} group-hover:w-full transition-all duration-[${ANIMATION.duration.normal}] mt-1`} />
