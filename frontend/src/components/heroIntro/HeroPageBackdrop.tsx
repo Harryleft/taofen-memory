@@ -26,11 +26,12 @@ const STABLE_SEED = 'hero-backdrop-v1';
 // 渐进方案：四卡所在横带的前景遮罩与背后弱化参数
 const BAND_CENTER_RATIO = 0.60;     // 四卡带中心（相对于视口高度 0~1）
 const BAND_HEIGHT_RATIO = 0.40;     // 四卡带高度占视口比例
-const BAND_OPACITY_CENTER = 0.14;   // 纸白遮罩在带中心的不透明度（降低灰度感）
-const BAND_OPACITY_EDGE = 0.04;     // 纸白遮罩在带上下边缘的不透明度
-const BAND_BLUR_PX = 1;             // 更轻的模糊，保留纸纹理
-const BAND_SATURATE = 0.90;         // 略降饱和，避免死灰
-const BAND_BRIGHTNESS = 0.96;       // 更亮一些，减轻压暗感
+// 稳妥方案：加强对比度（背景更深、更去饱和），仅在卡片带内生效
+const BAND_OPACITY_CENTER = 0.34;   // 黑色遮罩在带中心的不透明度
+const BAND_OPACITY_EDGE = 0.16;     // 黑色遮罩在带上下边缘的不透明度
+const BAND_BLUR_PX = 1;             // 轻模糊，保留纸纹理
+const BAND_SATURATE = 0.75;         // 更明显的去饱和，避免花
+const BAND_BRIGHTNESS = 0.88;       // 略降亮度，压住背景
 
 
 // 列节奏模板：轻微高度节奏，依次循环（幅度后续乘以 VARIATION_INTENSITY）
@@ -210,14 +211,14 @@ export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
       className="absolute inset-0 overflow-hidden"
       style={{ height: `${containerHeight}px` }}
     >
-      {/* 渐进方案：在四卡横带上方叠加纸白遮罩，提升区分度 */}
+      {/* 稳妥方案：在四卡横带上方叠加黑色半透明遮罩，压住背景，提升对比 */}
       <div
         aria-hidden
         className="pointer-events-none absolute left-0 right-0"
         style={{
           top: bandTop,
           height: bandHeight,
-          background: `linear-gradient(to bottom, rgba(255,255,255,${BAND_OPACITY_EDGE}) 0%, rgba(255,255,255,${BAND_OPACITY_CENTER}) 50%, rgba(255,255,255,${BAND_OPACITY_EDGE}) 100%)`,
+          background: `linear-gradient(to bottom, rgba(0,0,0,${BAND_OPACITY_EDGE}) 0%, rgba(0,0,0,${BAND_OPACITY_CENTER}) 50%, rgba(0,0,0,${BAND_OPACITY_EDGE}) 100%)`,
           zIndex: 2,
         }}
       />
