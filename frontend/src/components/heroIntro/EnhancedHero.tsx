@@ -466,7 +466,7 @@ export default function EnhancedHero() {
         {/* Title Section - Centered vertically in the card with transparent background */}
         <div className="absolute top-1/2 left-0 right-0 z-30 overflow-visible transform -translate-y-1/2">
           <div className="relative overflow-visible">
-            <div className={`relative inline-block transform -translate-x-12 group-hover:-translate-x-8 transition-all duration-[${ANIMATION.duration.slow}] overflow-visible`}>
+            <div className={`relative inline-block transform -translate-x-14 group-hover:-translate-x-10 transition-all duration-[${ANIMATION.duration.slow}] overflow-visible`}>
               {/* Title text with always transparent background */}
               <div className="relative px-18 py-4 bg-transparent">
                 <h3
@@ -485,7 +485,7 @@ export default function EnhancedHero() {
 
         {/* Main Card */}
         <div
-          className={`relative bg-white shadow-2xl rounded-lg transition-all duration-[${ANIMATION.duration.slow}] cursor-pointer transform group-hover:scale-[1.02] group-hover:-translate-y-1 overflow-hidden`}
+          className={`relative bg-white shadow-2xl rounded-lg transition-all duration-[${ANIMATION.duration.slow}] cursor-pointer transform group-hover:scale-[1.22] group-hover:-translate-y-1.5 overflow-hidden`}
           onClick={() => navigate(module.path)}
           onMouseEnter={() => setActiveModule(module.id)}
           onMouseLeave={() => setActiveModule(null)}
@@ -625,7 +625,7 @@ export default function EnhancedHero() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-20 max-w-6xl mx-auto overflow-visible -ml-2.5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-20 lg:gap-24 max-w-6xl mx-auto overflow-visible -ml-2.5">
             {MODULE_ITEMS.map((module) => (
               <ModuleCard key={module.id} module={module} />
             ))}
