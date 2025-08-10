@@ -258,10 +258,10 @@ export default function EnhancedHero() {
     {/* Second Screen: Modules */}
     <section ref={secondSectionRef} className="relative min-h-screen flex flex-col justify-center bg-white">
       <div className="max-w-7xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-6xl mx-auto">
           {/* Timeline Module */}
           <div 
-            className="group relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1" 
+            className="group relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1 hover:scale-105" 
             onClick={() => navigate('/timeline')} 
             onMouseEnter={() => setActiveModule(0)} 
             onMouseLeave={() => setActiveModule(null)}
@@ -272,7 +272,7 @@ export default function EnhancedHero() {
               <img 
                 src="/images/hero_page/070_韬奋像_70.jpg" 
                 alt="韬奋像" 
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
             </div>
@@ -290,7 +290,7 @@ export default function EnhancedHero() {
 
           {/* Bookstore Module */}
           <div 
-            className="group relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1" 
+            className="group relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1 hover:scale-105" 
             onClick={() => navigate('/bookstore-timeline')} 
             onMouseEnter={() => setActiveModule(1)} 
             onMouseLeave={() => setActiveModule(null)}
@@ -301,7 +301,7 @@ export default function EnhancedHero() {
               <img 
                 src="/images/hero_page/shenghuo_first.jpg" 
                 alt="生活书店" 
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
             </div>
@@ -319,7 +319,7 @@ export default function EnhancedHero() {
 
           {/* Handwriting Module */}
           <div 
-            className="group relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1" 
+            className="group relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1 hover:scale-105" 
             onClick={() => navigate('/handwriting')} 
             onMouseEnter={() => setActiveModule(2)} 
             onMouseLeave={() => setActiveModule(null)}
@@ -330,7 +330,7 @@ export default function EnhancedHero() {
               <img 
                 src="/images/hero_page/shenghuoxinqikan.jpg" 
                 alt="生活新期刊" 
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
             </div>
@@ -348,7 +348,7 @@ export default function EnhancedHero() {
 
           {/* Relationships Module */}
           <div 
-            className="group relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1" 
+            className="group relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1 hover:scale-105" 
             onClick={() => navigate('/relationships')} 
             onMouseEnter={() => setActiveModule(3)} 
             onMouseLeave={() => setActiveModule(null)}
@@ -359,7 +359,7 @@ export default function EnhancedHero() {
               <img 
                 src="/images/hero_page/person_21609_3188023555816154777.jpg" 
                 alt="同道群像" 
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
             </div>
