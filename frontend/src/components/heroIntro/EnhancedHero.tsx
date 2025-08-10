@@ -185,16 +185,6 @@ export default function EnhancedHero() {
         style={{ height: '56px' }}
       >
         <div className="w-full h-full px-4 md:px-6 flex items-center text-gray-900">
-          <div className="flex items-center gap-2 mr-auto">
-            <button aria-label="菜单" className="p-2 text-black/60 hover:text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2">
-              <svg width="24" height="24" viewBox="0 0 48 48" aria-hidden="true">
-                <path d="M6 36h36v-4H6v4zm0-10h36v-4H6v4zm0-14v4h36v-4H6z"></path>
-              </svg>
-            </button>
-            <button aria-label="首页" onClick={() => navigate('/')} className="font-semibold tracking-wide text-sm md:text-base">
-              邹韬奋
-            </button>
-          </div>
           <nav className="hidden md:flex items-center gap-6 text-sm ml-auto">
             {[
               { label: '岁月行履', to: '/timeline' },
