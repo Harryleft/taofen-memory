@@ -37,19 +37,27 @@ export default function EnhancedHero() {
     setTimeout(() => {
       document.documentElement.style.scrollBehavior = originalScrollBehavior;
     }, 100);
-    
+
+    // 优化滚动处理：使用 rAF (requestAnimationFrame) 提高性能
+    let ticking = false;
     const handleScroll = () => {
-      const newScrollY = window.scrollY;
-      setScrollY(newScrollY);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setScrollY(window.scrollY);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
-    
-    window.addEventListener('scroll', handleScroll);
-    
+
+    // 添加 passive: true 选项，告知浏览器我们的监听器不会阻止默认滚动行为
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
-  
+
   // 入场动画保持使用 useEffect
   useEffect(() => {
     // Trigger entrance animation with staggered timing
