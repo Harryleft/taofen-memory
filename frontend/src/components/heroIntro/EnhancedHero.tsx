@@ -209,8 +209,8 @@ export default function EnhancedHero() {
       </div>
       
       {/* 渐变遮罩层 - 为文字内容提供更好的对比度保护 */}
-      <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-white/10 to-white/30" />
-      <div className="absolute inset-0 bg-gradient-to-r from-white/15 via-transparent to-white/15" />
+      {/* <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-white/10 to-white/30" /> */}
+      {/* <div className="absolute inset-0 bg-gradient-to-r from-white/15 via-transparent to-white/15" /> */}
       
       {/* 几何装饰元素层 - 优化色彩层次和透明度 */}
       <div className="absolute inset-0">
