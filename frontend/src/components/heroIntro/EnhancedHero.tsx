@@ -171,10 +171,10 @@ function SiteLogo({ className = "", onClick }: SiteLogoProps) {
       {/* Logo Text */}
       <div className="flex flex-col items-start">
         <span className={`font-bold text-xl text-gray-900 group-hover:text-amber-800 transition-colors duration-[${ANIMATION.duration.normal}]`}>
-          韬奋纪念馆
+          韬奋 · 纪念
         </span>
         <span className={`text-xs text-gray-500 leading-none mt-0.5 group-hover:text-amber-600 transition-colors duration-[${ANIMATION.duration.normal}] font-medium tracking-wide`}>
-          ZOU TAOFEN MEMORIAL
+          TAOFEN MEMORIAL
         </span>
       </div>
     </button>
