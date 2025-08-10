@@ -34,6 +34,63 @@ const CONSTANTS = {
   SUBTITLE: '沿邹韬奋的生活、事业与遗产，洞见时代精神'
 } as const;
 
+// 统一颜色主题配置
+const THEME = {
+  colors: {
+    primary: {
+      50: '#fffbeb',
+      100: '#fef3c7',
+      500: '#f59e0b',
+      600: '#d97706',
+      700: '#b45309',
+      800: '#92400e',
+      900: '#78350f'
+    },
+    neutral: {
+      50: '#f9fafb',
+      100: '#f3f4f6',
+      200: '#e5e7eb',
+      300: '#d1d5db',
+      400: '#9ca3af',
+      500: '#6b7280',
+      600: '#4b5563',
+      700: '#374151',
+      800: '#1f2937',
+      900: '#111827'
+    },
+    white: '#ffffff',
+    black: '#000000'
+  },
+  gradients: {
+    primary: 'from-amber-500 via-orange-500 to-red-500',
+    primarySubtle: 'from-amber-500/10 to-orange-500/10',
+    bgHero: 'from-slate-50 via-orange-50/50 to-amber-50',
+    bgModules: 'from-white to-gray-50'
+  }
+} as const;
+
+// 响应式断点配置
+const BREAKPOINTS = {
+  sm: '640px',
+  md: '768px',
+  lg: '1024px',
+  xl: '1280px'
+} as const;
+
+// 动画配置
+const ANIMATION = {
+  duration: {
+    fast: '150ms',
+    normal: '300ms',
+    slow: '500ms',
+    extraSlow: '700ms'
+  },
+  easing: {
+    easeOut: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+    easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)'
+  }
+} as const;
+
 const NAVIGATION_ITEMS: NavigationItem[] = [
   { label: '岁月行履', to: '/timeline' },
   { label: '生活与书', to: '/bookstore-timeline' },
@@ -76,25 +133,25 @@ const MODULE_ITEMS: ModuleItem[] = [
   }
 ];
 
-// 样式配置
+// 优化的标题样式配置
 const TITLE_STYLES = {
   classic: {
-    fontSize: 'text-[44px] sm:text-[60px] md:text-[80px] lg:text-[96px]',
+    fontSize: 'text-[40px] sm:text-[52px] md:text-[68px] lg:text-[84px] xl:text-[96px]',
     fontWeight: 'font-bold',
     tracking: 'tracking-[-0.02em]',
-    lineHeight: '0.98'
+    lineHeight: '1.05'
   },
   editorial: {
-    fontSize: 'text-[52px] sm:text-[72px] md:text-[92px] lg:text-[108px]',
+    fontSize: 'text-[44px] sm:text-[60px] md:text-[76px] lg:text-[92px] xl:text-[104px]',
     fontWeight: 'font-extrabold',
-    tracking: 'tracking-[-0.035em]',
-    lineHeight: '0.94'
+    tracking: 'tracking-[-0.025em]',
+    lineHeight: '1.02'
   },
   monumental: {
-    fontSize: 'text-[56px] sm:text-[72px] md:text-[88px] lg:text-[104px] xl:text-[120px]',
+    fontSize: 'text-[48px] sm:text-[64px] md:text-[80px] lg:text-[96px] xl:text-[112px]',
     fontWeight: 'font-black',
     tracking: 'tracking-[-0.03em]',
-    lineHeight: '0.92'
+    lineHeight: '0.98'
   }
 } as const;
 
@@ -104,13 +161,15 @@ function SiteLogo({ className = "", onClick }: SiteLogoProps) {
     <button
       onClick={onClick}
       className={`group flex items-center gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg p-1 transition-all duration-300 ${className}`}
+      aria-label="韬奋纪念馆首页"
     >
       {/* Logo Icon */}
-      <div className="w-8 h-8 bg-gradient-to-br from-amber-600 to-orange-600 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-300">
+      <div className="w-8 h-8 bg-gradient-to-br from-amber-600 to-orange-600 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:scale-105">
         <svg
           className="w-5 h-5 text-white"
           fill="currentColor"
           viewBox="0 0 24 24"
+          aria-hidden="true"
         >
           <path d="M12 2L2 7v10c0 5.55 3.84 9.739 9 11 5.16-1.261 9-5.45 9-11V7l-10-5z"/>
           <path d="M12 8v8M8 12l8 0" stroke="currentColor" strokeWidth="1.5" fill="none"/>
@@ -122,7 +181,7 @@ function SiteLogo({ className = "", onClick }: SiteLogoProps) {
         <span className="font-bold text-xl text-gray-900 group-hover:text-amber-800 transition-colors duration-300">
           韬奋纪念馆
         </span>
-        <span className="text-xs text-gray-500 leading-none mt-0.5 group-hover:text-amber-600 transition-colors duration-300">
+        <span className="text-xs text-gray-500 leading-none mt-0.5 group-hover:text-amber-600 transition-colors duration-300 font-medium tracking-wide">
           ZOU TAOFEN MEMORIAL
         </span>
       </div>
@@ -286,7 +345,7 @@ export default function EnhancedHero() {
             >
               邹韬奋
             </h1>
-            <div className="absolute -bottom-3 left-0 right-0 h-1 bg-gradient-to-r from-amber-600 via-orange-500 to-red-500 rounded-full" />
+            <div className="absolute -bottom-3 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-amber-600 rounded-full" />
           </div>
           {Subtitle}
         </div>
@@ -299,7 +358,7 @@ export default function EnhancedHero() {
         {YearDivider}
         <div className="relative">
           <div className="absolute inset-0 -z-10">
-            <div className="absolute inset-0 bg-gradient-to-b from-amber-100/40 via-orange-50/30 to-red-50/20 rounded-full blur-3xl scale-150" />
+            <div className="absolute inset-0 bg-gradient-to-b from-amber-100/40 via-orange-50/30 to-amber-50/20 rounded-full blur-3xl scale-150" />
           </div>
           <h1
             className={`font-serif text-gray-900 ${styles.fontSize} ${styles.fontWeight} ${styles.tracking} ${styles.lineHeight}`}
@@ -314,7 +373,7 @@ export default function EnhancedHero() {
             邹韬奋
           </h1>
           <div className="mt-8 flex justify-center">
-            <div className="w-32 h-1 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 rounded-full shadow-lg" />
+            <div className="w-32 h-1 bg-gradient-to-r from-amber-500 to-amber-600 rounded-full shadow-lg" />
           </div>
         </div>
         {Subtitle}
@@ -324,7 +383,7 @@ export default function EnhancedHero() {
 
   // 桌面端导航按钮
   const DesktopNavigationButtons = useMemo(() => (
-    <nav className="hidden md:flex items-center gap-8">
+    <nav className="hidden md:flex items-center gap-8" aria-label="主导航">
       {NAVIGATION_ITEMS.map((item) => (
         <button
           key={item.to}
@@ -334,10 +393,10 @@ export default function EnhancedHero() {
           <span className="relative z-10">{item.label}</span>
 
           {/* Background hover effect */}
-          <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 to-amber-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
           {/* Enhanced underline effect - expands from center */}
-          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-amber-500 to-orange-500 group-hover:w-full transition-all duration-300 ease-out" />
+          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-amber-500 to-amber-600 group-hover:w-full transition-all duration-300 ease-out" />
         </button>
       ))}
     </nav>
@@ -347,8 +406,10 @@ export default function EnhancedHero() {
   const MobileMenuButton = useMemo(() => (
     <button
       onClick={() => setIsMenuOpen(!isMenuOpen)}
-      className="md:hidden relative w-10 h-10 flex flex-col items-center justify-center space-y-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg transition-all duration-300"
+      className="md:hidden relative w-10 h-10 flex flex-col items-center justify-center space-y-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg transition-all duration-300 hover:bg-gray-50"
       aria-label="菜单"
+      aria-expanded={isMenuOpen}
+      aria-controls="mobile-menu"
     >
       <span
         className={`block w-6 h-0.5 bg-gray-700 transition-all duration-300 ${
@@ -371,6 +432,7 @@ export default function EnhancedHero() {
   // 移动端菜单
   const MobileMenu = useMemo(() => (
     <div
+      id="mobile-menu"
       className={`md:hidden fixed top-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200/80 shadow-xl transition-all duration-300 ${
         isMenuOpen 
           ? 'transform translate-y-0 opacity-100' 
@@ -378,13 +440,13 @@ export default function EnhancedHero() {
       }`}
       style={{ paddingTop: `${CONSTANTS.HEADER_HEIGHT}px` }}
     >
-      <nav className="px-6 py-8">
+      <nav className="px-6 py-8" aria-label="移动端导航">
         <div className="space-y-6">
           {NAVIGATION_ITEMS.map((item, index) => (
             <button
               key={item.to}
               onClick={() => handleNavigation(item.to)}
-              className="group block w-full text-left py-3 px-4 rounded-lg hover:bg-gradient-to-r hover:from-amber-500/10 hover:to-orange-500/10 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+              className="group block w-full text-left py-3 px-4 rounded-lg hover:bg-gradient-to-r hover:from-amber-500/10 hover:to-amber-500/10 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
               style={{
                 animationDelay: `${index * 50}ms`,
                 animation: isMenuOpen ? 'slideInFromRight 0.3s ease-out forwards' : 'none'
@@ -393,7 +455,7 @@ export default function EnhancedHero() {
               <span className="text-lg font-medium text-gray-700 group-hover:text-gray-900 transition-colors duration-200">
                 {item.label}
               </span>
-              <div className="w-0 h-0.5 bg-gradient-to-r from-amber-500 to-orange-500 group-hover:w-full transition-all duration-300 mt-1" />
+              <div className="w-0 h-0.5 bg-gradient-to-r from-amber-500 to-amber-600 group-hover:w-full transition-all duration-300 mt-1" />
             </button>
           ))}
         </div>
@@ -431,6 +493,15 @@ export default function EnhancedHero() {
           onMouseEnter={() => setActiveModule(module.id)}
           onMouseLeave={() => setActiveModule(null)}
           style={{ aspectRatio: '4/3' }}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              navigate(module.path);
+            }
+          }}
+          aria-label={`查看${module.title}详情`}
         >
           {/* Background Image */}
           <div className="absolute inset-0">
@@ -439,9 +510,10 @@ export default function EnhancedHero() {
               alt={module.imageAlt}
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               style={{ filter: 'grayscale(20%) sepia(10%)' }}
+              loading="lazy"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-br from-amber-900/10 via-transparent to-orange-900/20" />
+            <div className="absolute inset-0 bg-gradient-to-br from-amber-900/10 via-transparent to-amber-900/20" />
           </div>
 
           {/* Content */}
@@ -465,13 +537,13 @@ export default function EnhancedHero() {
       <button
         aria-label="下滑查看更多"
         onClick={scrollToModules}
-        className="group flex flex-col items-center text-gray-600 hover:text-gray-900 focus:outline-none transition-colors duration-300"
+        className="group flex flex-col items-center text-gray-600 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg transition-colors duration-300 p-2"
       >
         <span className="text-sm font-medium mb-2 opacity-80 group-hover:opacity-100 transition-opacity">
           探索更多
         </span>
         <div className="w-12 h-12 rounded-full border-2 border-current opacity-70 group-hover:opacity-100 flex items-center justify-center animate-bounce">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
           </svg>
         </div>
@@ -507,7 +579,7 @@ export default function EnhancedHero() {
       </a>
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-orange-50/50 to-amber-50">
+      <section className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-amber-50/30 to-amber-50">
         {/* Header */}
         <header
           className={headerClassName}
@@ -545,7 +617,9 @@ export default function EnhancedHero() {
       {/* Modules Section */}
       <section
         ref={secondSectionRef}
-        className="relative min-h-screen flex flex-col justify-center bg-gradient-to-b from-white to-gray-50 overflow-visible"
+        className="relative min-h-screen flex flex-col justify-center bg-gradient-to-b from-white to-amber-50/20 overflow-visible"
+        id="modules"
+        aria-label="模块展示区域"
       >
         <div className="max-w-7xl mx-auto px-6 py-20 overflow-visible">
           <div className="text-center mb-20">
