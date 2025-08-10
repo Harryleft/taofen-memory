@@ -95,7 +95,7 @@ const MODULE_ITEMS: ModuleItem[] = [
     id: 0,
     title: '岁月行履',
     description: '循迹韬奋足音，见风云际会与初心不改',
-    imageSrc: '/images/hero_page/070_韬奋像_70.jpg',
+    imageSrc: '/images/hero_page/068_韬奋像_68.jpg',
     imageAlt: '韬奋像',
     path: '/timeline'
   },
@@ -103,7 +103,7 @@ const MODULE_ITEMS: ModuleItem[] = [
     id: 1,
     title: '时光书影',
     description: '在纸与铅字之间，重访生活书店的生长与担当',
-    imageSrc: '/images/hero_page/shenghuo_first.jpg',
+    imageSrc: '/images/hero_page/shsdts.jpg',
     imageAlt: '生活书店',
     path: '/bookstore-timeline'
   },
@@ -111,16 +111,16 @@ const MODULE_ITEMS: ModuleItem[] = [
     id: 2,
     title: '笔下风骨',
     description: '从字里行间，见其思虑与炽热',
-    imageSrc: '/images/hero_page/shenghuoxinqikan.jpg',
-    imageAlt: '生活新期刊', 
+    imageSrc: '/images/hero_page/001.jpg',
+    imageAlt: '生活期刊', 
     path: '/handwriting'
   },
   {
     id: 3,
     title: '同行群像',
     description: '以人观史，勾连一个时代的脉络',
-    imageSrc: '/images/hero_page/person_21609_3188023555816154777.jpg',
-    imageAlt: '同道群像',
+    imageSrc: '/images/hero_page/30.jpg',
+    imageAlt: '同行群像',
     path: '/relationships'
   }
 ];
@@ -484,7 +484,7 @@ export default function EnhancedHero() {
           onClick={() => navigate(module.path)}
           onMouseEnter={() => setActiveModule(module.id)}
           onMouseLeave={() => setActiveModule(null)}
-          style={{ aspectRatio: '4/3' }}
+          style={{ aspectRatio: '3/2' }}
           role="button"
           tabIndex={0}
           onKeyDown={(e) => {
