@@ -184,8 +184,18 @@ export default function EnhancedHero() {
         }`}
         style={{ height: '56px' }}
       >
-        <div className="w-full h-full px-4 md:px-6 flex items-center text-gray-900">
-          <nav className="hidden md:flex items-center gap-8 text-base ml-auto">
+        <div className="w-full h-full px-4 md:px-6 flex items-center justify-between text-gray-900">
+          {/* Logo section */}
+          <div className="flex items-center">
+            <img 
+              src="/images/hero_page/taofen_name.svg" 
+              alt="陶芬" 
+              className="h-8 w-auto opacity-90 hover:opacity-100 transition-opacity duration-200"
+            />
+          </div>
+          
+          {/* Navigation section */}
+          <nav className="hidden md:flex items-center gap-8 text-base">
             {[
               { label: '岁月行履', to: '/timeline' },
               { label: '生活与书', to: '/bookstore-timeline' },
