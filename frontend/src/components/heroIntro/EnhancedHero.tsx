@@ -62,14 +62,14 @@ const THEME = {
     black: '#000000'
   },
   gradients: {
-    primary: 'from-amber-500 via-orange-500 to-red-500',
-    primarySubtle: 'from-amber-500/10 to-orange-500/10',
-    bgHero: 'from-slate-50 via-orange-50/50 to-amber-50',
-    bgModules: 'from-white to-gray-50'
+    primary: 'from-amber-500 to-amber-600',
+    primarySubtle: 'from-amber-500/10 to-amber-500/10',
+    bgHero: 'from-slate-50 via-amber-50/30 to-amber-50',
+    bgModules: 'from-white to-amber-50/20'
   }
 } as const;
 
-// 响应式断点配置
+// 响应式断点配置（为将来扩展预留）
 const BREAKPOINTS = {
   sm: '640px',
   md: '768px',
@@ -160,11 +160,11 @@ function SiteLogo({ className = "", onClick }: SiteLogoProps) {
   return (
     <button
       onClick={onClick}
-      className={`group flex items-center gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg p-1 transition-all duration-300 ${className}`}
+      className={`group flex items-center gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg p-1 transition-all duration-[${ANIMATION.duration.normal}] ${className}`}
       aria-label="韬奋纪念馆首页"
     >
       {/* Logo Icon */}
-      <div className="w-8 h-8 bg-gradient-to-br from-amber-600 to-orange-600 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:scale-105">
+      <div className="w-8 h-8 bg-gradient-to-br from-amber-600 to-orange-600 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-[${ANIMATION.duration.normal}] transform group-hover:scale-105">
         <svg
           className="w-5 h-5 text-white"
           fill="currentColor"
@@ -178,10 +178,10 @@ function SiteLogo({ className = "", onClick }: SiteLogoProps) {
 
       {/* Logo Text */}
       <div className="flex flex-col items-start">
-        <span className="font-bold text-xl text-gray-900 group-hover:text-amber-800 transition-colors duration-300">
+        <span className={`font-bold text-xl text-gray-900 group-hover:text-amber-800 transition-colors duration-[${ANIMATION.duration.normal}]`}>
           韬奋纪念馆
         </span>
-        <span className="text-xs text-gray-500 leading-none mt-0.5 group-hover:text-amber-600 transition-colors duration-300 font-medium tracking-wide">
+        <span className={`text-xs text-gray-500 leading-none mt-0.5 group-hover:text-amber-600 transition-colors duration-[${ANIMATION.duration.normal}] font-medium tracking-wide`}>
           ZOU TAOFEN MEMORIAL
         </span>
       </div>
@@ -345,7 +345,7 @@ export default function EnhancedHero() {
             >
               邹韬奋
             </h1>
-            <div className="absolute -bottom-3 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-amber-600 rounded-full" />
+            <div className={`absolute -bottom-3 left-0 right-0 h-1 bg-gradient-to-r ${THEME.gradients.primary} rounded-full`} />
           </div>
           {Subtitle}
         </div>
@@ -373,7 +373,7 @@ export default function EnhancedHero() {
             邹韬奋
           </h1>
           <div className="mt-8 flex justify-center">
-            <div className="w-32 h-1 bg-gradient-to-r from-amber-500 to-amber-600 rounded-full shadow-lg" />
+            <div className={`w-32 h-1 bg-gradient-to-r ${THEME.gradients.primary} rounded-full shadow-lg`} />
           </div>
         </div>
         {Subtitle}
@@ -388,15 +388,15 @@ export default function EnhancedHero() {
         <button
           key={item.to}
           onClick={() => handleNavigation(item.to)}
-          className="relative px-4 py-2 font-medium text-gray-700 hover:text-gray-900 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 group"
+          className={`relative px-4 py-2 font-medium text-gray-700 hover:text-gray-900 transition-all duration-[${ANIMATION.duration.normal}] focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 group`}
         >
           <span className="relative z-10">{item.label}</span>
 
           {/* Background hover effect */}
-          <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 to-amber-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className={`absolute inset-0 bg-gradient-to-r ${THEME.gradients.primarySubtle} rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-[${ANIMATION.duration.normal}]`} />
 
           {/* Enhanced underline effect - expands from center */}
-          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-amber-500 to-amber-600 group-hover:w-full transition-all duration-300 ease-out" />
+          <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r ${THEME.gradients.primary} group-hover:w-full transition-all duration-[${ANIMATION.duration.normal}] ${ANIMATION.easing.easeOut}`} />
         </button>
       ))}
     </nav>
@@ -406,23 +406,23 @@ export default function EnhancedHero() {
   const MobileMenuButton = useMemo(() => (
     <button
       onClick={() => setIsMenuOpen(!isMenuOpen)}
-      className="md:hidden relative w-10 h-10 flex flex-col items-center justify-center space-y-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg transition-all duration-300 hover:bg-gray-50"
+      className={`md:hidden relative w-10 h-10 flex flex-col items-center justify-center space-y-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg transition-all duration-[${ANIMATION.duration.normal}] hover:bg-gray-50`}
       aria-label="菜单"
       aria-expanded={isMenuOpen}
       aria-controls="mobile-menu"
     >
       <span
-        className={`block w-6 h-0.5 bg-gray-700 transition-all duration-300 ${
+        className={`block w-6 h-0.5 bg-gray-700 transition-all duration-[${ANIMATION.duration.normal}] ${
           isMenuOpen ? 'rotate-45 translate-y-2' : ''
         }`}
       />
       <span
-        className={`block w-6 h-0.5 bg-gray-700 transition-all duration-300 ${
+        className={`block w-6 h-0.5 bg-gray-700 transition-all duration-[${ANIMATION.duration.normal}] ${
           isMenuOpen ? 'opacity-0' : ''
         }`}
       />
       <span
-        className={`block w-6 h-0.5 bg-gray-700 transition-all duration-300 ${
+        className={`block w-6 h-0.5 bg-gray-700 transition-all duration-[${ANIMATION.duration.normal}] ${
           isMenuOpen ? '-rotate-45 -translate-y-2' : ''
         }`}
       />
@@ -433,7 +433,7 @@ export default function EnhancedHero() {
   const MobileMenu = useMemo(() => (
     <div
       id="mobile-menu"
-      className={`md:hidden fixed top-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200/80 shadow-xl transition-all duration-300 ${
+      className={`md:hidden fixed top-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200/80 shadow-xl transition-all duration-[${ANIMATION.duration.normal}] ${
         isMenuOpen 
           ? 'transform translate-y-0 opacity-100' 
           : 'transform -translate-y-full opacity-0 pointer-events-none'
@@ -446,16 +446,16 @@ export default function EnhancedHero() {
             <button
               key={item.to}
               onClick={() => handleNavigation(item.to)}
-              className="group block w-full text-left py-3 px-4 rounded-lg hover:bg-gradient-to-r hover:from-amber-500/10 hover:to-amber-500/10 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+              className={`group block w-full text-left py-3 px-4 rounded-lg hover:bg-gradient-to-r ${THEME.gradients.primarySubtle} transition-all duration-[${ANIMATION.duration.normal}] focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500`}
               style={{
                 animationDelay: `${index * 50}ms`,
                 animation: isMenuOpen ? 'slideInFromRight 0.3s ease-out forwards' : 'none'
               }}
             >
-              <span className="text-lg font-medium text-gray-700 group-hover:text-gray-900 transition-colors duration-200">
+              <span className={`text-lg font-medium text-gray-700 group-hover:text-gray-900 transition-colors duration-[${ANIMATION.duration.fast}]`}>
                 {item.label}
               </span>
-              <div className="w-0 h-0.5 bg-gradient-to-r from-amber-500 to-amber-600 group-hover:w-full transition-all duration-300 mt-1" />
+              <div className={`w-0 h-0.5 bg-gradient-to-r ${THEME.gradients.primary} group-hover:w-full transition-all duration-[${ANIMATION.duration.normal}] mt-1`} />
             </button>
           ))}
         </div>
@@ -469,11 +469,11 @@ export default function EnhancedHero() {
         {/* Title Section - Centered vertically in the card with transparent background */}
         <div className="absolute top-1/2 left-0 right-0 z-30 overflow-visible transform -translate-y-1/2">
           <div className="relative overflow-visible">
-            <div className="relative inline-block transform -translate-x-12 group-hover:-translate-x-8 transition-all duration-500 overflow-visible">
+            <div className={`relative inline-block transform -translate-x-12 group-hover:-translate-x-8 transition-all duration-[${ANIMATION.duration.slow}] overflow-visible`}>
               {/* Title text with always transparent background */}
               <div className="relative px-8 py-4 bg-transparent">
                 <h3
-                  className="text-2xl md:text-3xl lg:text-4xl font-black text-white leading-none tracking-tight whitespace-nowrap transition-colors duration-500"
+                  className={`text-2xl md:text-3xl lg:text-4xl font-black text-white leading-none tracking-tight whitespace-nowrap transition-colors duration-[${ANIMATION.duration.slow}]`}
                   style={{
                     textShadow: '2px 2px 8px rgba(0,0,0,0.8), 1px 1px 4px rgba(0,0,0,0.6)',
                     fontFamily: '"Helvetica Neue", Arial, sans-serif'
@@ -488,7 +488,7 @@ export default function EnhancedHero() {
 
         {/* Main Card */}
         <div
-          className="relative bg-white shadow-2xl rounded-lg transition-all duration-500 cursor-pointer transform group-hover:scale-[1.02] group-hover:-translate-y-1 overflow-hidden"
+          className={`relative bg-white shadow-2xl rounded-lg transition-all duration-[${ANIMATION.duration.slow}] cursor-pointer transform group-hover:scale-[1.02] group-hover:-translate-y-1 overflow-hidden`}
           onClick={() => navigate(module.path)}
           onMouseEnter={() => setActiveModule(module.id)}
           onMouseLeave={() => setActiveModule(null)}
@@ -508,7 +508,7 @@ export default function EnhancedHero() {
             <img
               src={module.imageSrc}
               alt={module.imageAlt}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              className={`w-full h-full object-cover transition-transform duration-[${ANIMATION.duration.extraSlow}] group-hover:scale-105`}
               style={{ filter: 'grayscale(20%) sepia(10%)' }}
               loading="lazy"
             />
@@ -518,7 +518,7 @@ export default function EnhancedHero() {
 
           {/* Content */}
           <div className="relative z-10 flex flex-col justify-end h-full p-8">
-            <div className="transform transition-all duration-500">
+            <div className={`transform transition-all duration-[${ANIMATION.duration.slow}]`}>
               <p className="text-white/95 text-base md:text-lg leading-relaxed font-light">
                 {module.description}
               </p>
@@ -526,7 +526,7 @@ export default function EnhancedHero() {
           </div>
 
           {/* Click hint overlay */}
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 pointer-events-none" />
+          <div className={`absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-[${ANIMATION.duration.normal}] pointer-events-none`} />
         </div>
       </div>
     );
@@ -537,9 +537,9 @@ export default function EnhancedHero() {
       <button
         aria-label="下滑查看更多"
         onClick={scrollToModules}
-        className="group flex flex-col items-center text-gray-600 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg transition-colors duration-300 p-2"
+        className={`group flex flex-col items-center text-gray-600 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg transition-colors duration-[${ANIMATION.duration.normal}] p-2`}
       >
-        <span className="text-sm font-medium mb-2 opacity-80 group-hover:opacity-100 transition-opacity">
+        <span className={`text-sm font-medium mb-2 opacity-80 group-hover:opacity-100 transition-opacity duration-[${ANIMATION.duration.normal}]`}>
           探索更多
         </span>
         <div className="w-12 h-12 rounded-full border-2 border-current opacity-70 group-hover:opacity-100 flex items-center justify-center animate-bounce">
@@ -553,7 +553,7 @@ export default function EnhancedHero() {
 
   // 计算头部样式
   const headerClassName = useMemo(() =>
-    `fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+    `fixed top-0 left-0 right-0 z-50 transition-all duration-[${ANIMATION.duration.slow}] ${
       scrollY > CONSTANTS.SCROLL_THRESHOLD || isMenuOpen
         ? 'bg-white/95 backdrop-blur-md border-b border-gray-200/80 shadow-sm' 
         : 'bg-transparent'
@@ -579,7 +579,7 @@ export default function EnhancedHero() {
       </a>
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-amber-50/30 to-amber-50">
+      <section className={`relative min-h-screen flex flex-col justify-center overflow-hidden bg-gradient-to-br ${THEME.gradients.bgHero}`}>
         {/* Header */}
         <header
           className={headerClassName}
@@ -617,7 +617,7 @@ export default function EnhancedHero() {
       {/* Modules Section */}
       <section
         ref={secondSectionRef}
-        className="relative min-h-screen flex flex-col justify-center bg-gradient-to-b from-white to-amber-50/20 overflow-visible"
+        className={`relative min-h-screen flex flex-col justify-center bg-gradient-to-b ${THEME.gradients.bgModules} overflow-visible`}
         id="modules"
         aria-label="模块展示区域"
       >
