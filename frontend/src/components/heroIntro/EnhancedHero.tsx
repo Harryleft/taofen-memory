@@ -261,7 +261,7 @@ export default function EnhancedHero() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-6xl mx-auto">
           {/* Timeline Module */}
           <div 
-            className="group relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1 hover:scale-105" 
+            className="group relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-[1.08]" 
             onClick={() => navigate('/timeline')} 
             onMouseEnter={() => setActiveModule(0)} 
             onMouseLeave={() => setActiveModule(null)}
@@ -279,7 +279,7 @@ export default function EnhancedHero() {
             
             {/* Content */}
             <div className="relative z-10 flex flex-col justify-end h-full p-8">
-              <h3 className="text-2xl md:text-3xl font-bold text-white mb-3 leading-tight">
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-3 leading-tight -translate-x-2.5 group-hover:translate-x-0 transition-transform duration-300">
                 岁月行履
               </h3>
               <p className="text-white/90 text-base leading-relaxed mb-4">
@@ -290,7 +290,7 @@ export default function EnhancedHero() {
 
           {/* Bookstore Module */}
           <div 
-            className="group relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1 hover:scale-105" 
+            className="group relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-[1.08]" 
             onClick={() => navigate('/bookstore-timeline')} 
             onMouseEnter={() => setActiveModule(1)} 
             onMouseLeave={() => setActiveModule(null)}
@@ -308,7 +308,7 @@ export default function EnhancedHero() {
             
             {/* Content */}
             <div className="relative z-10 flex flex-col justify-end h-full p-8">
-              <h3 className="text-2xl md:text-3xl font-bold text-white mb-3 leading-tight">
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-3 leading-tight -translate-x-2.5 group-hover:translate-x-0 transition-transform duration-300">
                 生活与书
               </h3>
               <p className="text-white/90 text-base leading-relaxed mb-4">
@@ -319,7 +319,7 @@ export default function EnhancedHero() {
 
           {/* Handwriting Module */}
           <div 
-            className="group relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1 hover:scale-105" 
+            className="group relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-[1.08]" 
             onClick={() => navigate('/handwriting')} 
             onMouseEnter={() => setActiveModule(2)} 
             onMouseLeave={() => setActiveModule(null)}
@@ -337,7 +337,7 @@ export default function EnhancedHero() {
             
             {/* Content */}
             <div className="relative z-10 flex flex-col justify-end h-full p-8">
-              <h3 className="text-2xl md:text-3xl font-bold text-white mb-3 leading-tight">
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-3 leading-tight -translate-x-2.5 group-hover:translate-x-0 transition-transform duration-300">
                 笔下风骨
               </h3>
               <p className="text-white/90 text-base leading-relaxed mb-4">
@@ -348,7 +348,7 @@ export default function EnhancedHero() {
 
           {/* Relationships Module */}
           <div 
-            className="group relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1 hover:scale-105" 
+            className="group relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-[1.08]" 
             onClick={() => navigate('/relationships')} 
             onMouseEnter={() => setActiveModule(3)} 
             onMouseLeave={() => setActiveModule(null)}
@@ -366,7 +366,7 @@ export default function EnhancedHero() {
             
             {/* Content */}
             <div className="relative z-10 flex flex-col justify-end h-full p-8">
-              <h3 className="text-2xl md:text-3xl font-bold text-white mb-3 leading-tight">
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-3 leading-tight -translate-x-2.5 group-hover:translate-x-0 transition-transform duration-300">
                 同道群像
               </h3>
               <p className="text-white/90 text-base leading-relaxed mb-4">
