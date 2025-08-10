@@ -2,7 +2,7 @@ import { useEffect, useState, useLayoutEffect, useRef, useCallback, useMemo } fr
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import HeroPageBackdrop from './HeroPageBackdrop.tsx';
 
-// 类型定义
+// ====== 类型定义 ======
 type TitleVariant = 'classic' | 'monumental' | 'editorial';
 
 interface NavigationItem {
@@ -24,17 +24,17 @@ interface SiteLogoProps {
   onClick?: () => void;
 }
 
-// 常量配置
+// ====== 常量配置 ======
 const CONSTANTS = {
   HEADER_HEIGHT: 64,
   SCROLL_THRESHOLD: 8,
   ENTRANCE_ANIMATION_DELAY: 300,
   SMOOTH_SCROLL_RESTORE_DELAY: 100,
   YEAR_RANGE: '1895 - 1944',
-  SUBTITLE: '沿邹韬奋的生活、事业与遗产，洞见时代精神'
+  SUBTITLE: '沿邹韬奋的生活、事业与遗产，洞见时代精神',
+  ANIMATION_STAGGER_DELAY: 50, // 移动端菜单动画延迟
 } as const;
 
-// 统一颜色主题配置
 const THEME = {
   colors: {
     primary: {
@@ -69,7 +69,6 @@ const THEME = {
   }
 } as const;
 
-// 动画配置
 const ANIMATION = {
   duration: {
     fast: '150ms',
@@ -83,6 +82,7 @@ const ANIMATION = {
   }
 } as const;
 
+// ====== 数据配置 ======
 const NAVIGATION_ITEMS: NavigationItem[] = [
   { label: '岁月行履', to: '/timeline' },
   { label: '生活与书', to: '/bookstore-timeline' },
@@ -112,7 +112,7 @@ const MODULE_ITEMS: ModuleItem[] = [
     title: '笔下风骨',
     description: '从字里行间，见其思虑与炽热',
     imageSrc: '/images/hero_page/001.jpg',
-    imageAlt: '生活期刊', 
+    imageAlt: '生活期刊',
     path: '/handwriting'
   },
   {
@@ -125,7 +125,7 @@ const MODULE_ITEMS: ModuleItem[] = [
   }
 ];
 
-// 优化的标题样式配置
+// ====== 样式配置 ======
 const TITLE_STYLES = {
   classic: {
     fontSize: 'text-[40px] sm:text-[52px] md:text-[68px] lg:text-[84px] xl:text-[96px]',
@@ -147,19 +147,26 @@ const TITLE_STYLES = {
   }
 } as const;
 
-// SiteLogo Component
+// ====== 工具函数 ======
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const createGradientClasses = (gradient: string, opacity?: string) =>
+  `bg-gradient-to-r ${gradient}${opacity ? `/${opacity}` : ''}`;
+
+// ====== 子组件 ======
 function SiteLogo({ className = "", onClick }: SiteLogoProps) {
+  const logoClasses = useMemo(() =>
+    `group flex items-center gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg p-1 transition-all duration-[${ANIMATION.duration.normal}] ${className}`,
+    [className]
+  );
+
   return (
     <button
       onClick={onClick}
-      className={`group flex items-center gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg p-1 transition-all duration-[${ANIMATION.duration.normal}] ${className}`}
+      className={logoClasses}
       aria-label="韬奋纪念馆首页"
     >
-      {/* Logo Icon - 灰黑书页 + 琥珀书签（与当前灰黑/金色体系协调） */}
-      <div
-          className="w-9 h-9 rounded-lg bg-gray-900 text-white ring-1 ring-amber-400/20 flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-[${ANIMATION.duration.normal}] transform">
-        <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor"
-             viewBox="0 0 24 24">
+      <div className="w-9 h-9 rounded-lg bg-gray-900 text-white ring-1 ring-amber-400/20 flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-[${ANIMATION.duration.normal}] transform">
+        <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <rect x="3" y="6" width="18" height="12" rx="2" strokeWidth="1.5"/>
           <rect x="6" y="3" width="12" height="8" rx="1" strokeWidth="1.5"
                 fill="currentColor" fillOpacity="0.2"/>
@@ -170,15 +177,11 @@ function SiteLogo({ className = "", onClick }: SiteLogoProps) {
           <circle cx="14" cy="15" r="1" fill="currentColor"/>
         </svg>
       </div>
-
-      {/* Logo Text */}
       <div className="flex flex-col items-start">
-        <span
-            className={`font-bold text-xl text-gray-900 transition-all duration-[${ANIMATION.duration.normal}] group-hover:shadow-sm`}>
+        <span className={`font-bold text-xl text-gray-900 transition-all duration-[${ANIMATION.duration.normal}] group-hover:shadow-sm`}>
           韬奋 · 纪念
         </span>
-        <span
-            className={`text-xs text-gray-500 leading-none mt-0.5 transition-all duration-[${ANIMATION.duration.normal}] font-medium tracking-wide group-hover:shadow-sm`}>
+        <span className={`text-xs text-gray-500 leading-none mt-0.5 transition-all duration-[${ANIMATION.duration.normal}] font-medium tracking-wide group-hover:shadow-sm`}>
           TAOFEN MEMORIAL
         </span>
       </div>
@@ -186,45 +189,10 @@ function SiteLogo({ className = "", onClick }: SiteLogoProps) {
   );
 }
 
-export default function EnhancedHero() {
-  // Hooks
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const secondSectionRef = useRef<HTMLDivElement | null>(null);
-
-  // State
+// ====== Custom Hooks ======
+function useScrollHandler() {
   const [scrollY, setScrollY] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
-  const [, setActiveModule] = useState<number | null>(null);
-  const [titleVariant, setTitleVariant] = useState<TitleVariant>('monumental');
-  const [reducedMotion, setReducedMotion] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // 工具函数
-  const scrollToModules = useCallback(() => {
-    secondSectionRef.current?.scrollIntoView({
-      behavior: reducedMotion ? 'auto' : 'smooth',
-      block: 'start'
-    });
-  }, [reducedMotion]);
-
-  const resetScrollPosition = useCallback(() => {
-    const originalScrollBehavior = document.documentElement.style.scrollBehavior;
-    document.documentElement.style.scrollBehavior = 'auto';
-
-    // 多重保险重置滚动位置
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-    window.scrollTo(0, 0);
-
-    setScrollY(0);
-
-    setTimeout(() => {
-      document.documentElement.style.scrollBehavior = originalScrollBehavior;
-    }, CONSTANTS.SMOOTH_SCROLL_RESTORE_DELAY);
-  }, []);
-
-  // 性能优化的滚动处理
   const handleScroll = useCallback(() => {
     let ticking = false;
     return () => {
@@ -238,24 +206,117 @@ export default function EnhancedHero() {
     };
   }, []);
 
-  // Effects
+  return { scrollY, handleScroll };
+}
+
+function useScrollPosition() {
+  const resetScrollPosition = useCallback(() => {
+    const originalScrollBehavior = document.documentElement.style.scrollBehavior;
+    document.documentElement.style.scrollBehavior = 'auto';
+
+    // 多重保险重置滚动位置
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    window.scrollTo(0, 0);
+
+    setTimeout(() => {
+      document.documentElement.style.scrollBehavior = originalScrollBehavior;
+    }, CONSTANTS.SMOOTH_SCROLL_RESTORE_DELAY);
+  }, []);
+
+  return { resetScrollPosition };
+}
+
+function useReducedMotion() {
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const motionListener = () => setReducedMotion(mediaQuery.matches);
+    motionListener();
+    mediaQuery.addEventListener?.('change', motionListener);
+
+    return () => mediaQuery.removeEventListener?.('change', motionListener);
+  }, []);
+
+  return reducedMotion;
+}
+
+function useMobileMenu() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = useCallback(() => {
+    setIsMenuOpen(prev => !prev);
+  }, []);
+
+  const closeMenu = useCallback(() => {
+    setIsMenuOpen(false);
+  }, []);
+
+  // 阻止菜单打开时的背景滚动
+  useEffect(() => {
+    document.body.style.overflow = isMenuOpen ? 'hidden' : 'unset';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMenuOpen]);
+
+  return { isMenuOpen, toggleMenu, closeMenu };
+}
+
+// ====== 主组件 ======
+export default function EnhancedHero() {
+  // ====== Hooks ======
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const secondSectionRef = useRef<HTMLDivElement | null>(null);
+
+  // Custom hooks
+  const { scrollY, handleScroll } = useScrollHandler();
+  const { resetScrollPosition } = useScrollPosition();
+  const reducedMotion = useReducedMotion();
+  const { isMenuOpen, toggleMenu, closeMenu } = useMobileMenu();
+
+  // ====== State ======
+  const [isVisible, setIsVisible] = useState(false);
+  const [, setActiveModule] = useState<number | null>(null);
+  const [titleVariant, setTitleVariant] = useState<TitleVariant>('monumental');
+
+  // ====== 事件处理 ======
+  const scrollToModules = useCallback(() => {
+    secondSectionRef.current?.scrollIntoView({
+      behavior: reducedMotion ? 'auto' : 'smooth',
+      block: 'start'
+    });
+  }, [reducedMotion]);
+
+  const handleNavigation = useCallback((path: string) => {
+    navigate(path);
+    closeMenu();
+  }, [navigate, closeMenu]);
+
+  const handleLogoClick = useCallback(() => {
+    navigate('/');
+    closeMenu();
+  }, [navigate, closeMenu]);
+
+  const handleModuleClick = useCallback((path: string) => {
+    navigate(path);
+  }, [navigate]);
+
+  const handleModuleKeyDown = useCallback((e: React.KeyboardEvent, path: string) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      navigate(path);
+    }
+  }, [navigate]);
+
+  // ====== Effects ======
   useLayoutEffect(() => {
     resetScrollPosition();
-
     const scrollHandler = handleScroll();
-
     window.addEventListener('scroll', scrollHandler, { passive: true });
-
-    // reduced-motion
-    const m = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const motionListener = () => setReducedMotion(m.matches);
-    motionListener();
-    m.addEventListener?.('change', motionListener);
-
-    return () => {
-      window.removeEventListener('scroll', scrollHandler);
-      m.removeEventListener?.('change', motionListener);
-    };
+    return () => window.removeEventListener('scroll', scrollHandler);
   }, [resetScrollPosition, handleScroll]);
 
   useEffect(() => {
@@ -270,31 +331,7 @@ export default function EnhancedHero() {
     }
   }, [searchParams]);
 
-  // 处理导航
-  const handleNavigation = useCallback((path: string) => {
-    navigate(path);
-    setIsMenuOpen(false); // 关闭移动端菜单
-  }, [navigate]);
-
-  const handleLogoClick = useCallback(() => {
-    navigate('/');
-    setIsMenuOpen(false);
-  }, [navigate]);
-
-  // 阻止菜单打开时的背景滚动
-  useEffect(() => {
-    if (isMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isMenuOpen]);
-
-  // 渲染组件
+  // ====== 渲染辅助组件 ======
   const YearDivider = useMemo(() => (
     <div className="mb-12">
       <div className="inline-flex items-center gap-6">
@@ -317,69 +354,58 @@ export default function EnhancedHero() {
 
   const TitleSection = useMemo(() => {
     const styles = TITLE_STYLES[titleVariant];
+    const baseClasses = `font-serif text-gray-900 ${styles.fontSize} ${styles.fontWeight} ${styles.tracking}`;
 
-    if (titleVariant === 'classic') {
-      return (
+    const titleConfigs = {
+      classic: () => (
         <div className="space-y-8">
           {YearDivider}
-          <h1
-            className={`font-serif text-gray-900 ${styles.fontSize} ${styles.fontWeight} ${styles.tracking} ${styles.lineHeight}`}
-          >
-            邹韬奋
-          </h1>
+          <h1 className={`${baseClasses} ${styles.lineHeight}`}>邹韬奋</h1>
           {Subtitle}
         </div>
-      );
-    }
-
-    if (titleVariant === 'editorial') {
-      return (
+      ),
+      editorial: () => (
         <div className="space-y-8">
           {YearDivider}
           <div className="relative inline-block">
-            <h1
-              className={`font-serif text-gray-900 ${styles.fontSize} ${styles.fontWeight} ${styles.tracking} ${styles.lineHeight}`}
-            >
-              邹韬奋
-            </h1>
-            <div className={`absolute -bottom-3 left-0 right-0 h-1 bg-gradient-to-r from-black/80 to-black/60 rounded-full`} />
+            <h1 className={`${baseClasses} ${styles.lineHeight}`}>邹韬奋</h1>
+            <div className="absolute -bottom-3 left-0 right-0 h-1 bg-gradient-to-r from-black/80 to-black/60 rounded-full" />
           </div>
           {Subtitle}
         </div>
-      );
-    }
-
-    // monumental (默认)
-    return (
-      <div className="space-y-8">
-        {YearDivider}
-        <div className="relative">
-          <div className="absolute inset-0 -z-10">
-            <div className="absolute inset-0 bg-gradient-to-b from-gray-100/30 via-gray-50/20 to-gray-100/10 rounded-full blur-3xl scale-150" />
+      ),
+      monumental: () => (
+        <div className="space-y-8">
+          {YearDivider}
+          <div className="relative">
+            <div className="absolute inset-0 -z-10">
+              <div className="absolute inset-0 bg-gradient-to-b from-gray-100/30 via-gray-50/20 to-gray-100/10 rounded-full blur-3xl scale-150" />
+            </div>
+            <h1
+              className={`${baseClasses} ${styles.lineHeight}`}
+              style={{
+                textShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08)',
+                backgroundImage: 'linear-gradient(135deg, #374151 0%, #1f2937 50%, #111827 100%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent'
+              }}
+            >
+              邹韬奋
+            </h1>
+            <div className="mt-8 flex justify-center">
+              <div className="w-32 h-1 bg-gradient-to-r from-black/80 to-black/60 rounded-full shadow-lg" />
+            </div>
           </div>
-          <h1
-            className={`font-serif text-gray-900 ${styles.fontSize} ${styles.fontWeight} ${styles.tracking} ${styles.lineHeight}`}
-            style={{
-              textShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08)',
-              backgroundImage: 'linear-gradient(135deg, #374151 0%, #1f2937 50%, #111827 100%)',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
-            }}
-          >
-            邹韬奋
-          </h1>
-          <div className="mt-8 flex justify-center">
-            <div className={`w-32 h-1 bg-gradient-to-r from-black/80 to-black/60 rounded-full shadow-lg`} />
-          </div>
+          {Subtitle}
         </div>
-        {Subtitle}
-      </div>
-    );
+      )
+    };
+
+    return titleConfigs[titleVariant]();
   }, [titleVariant, YearDivider, Subtitle]);
 
-  // 桌面端导航按钮
-  const DesktopNavigationButtons = useMemo(() => (
+  const DesktopNavigation = useMemo(() => (
     <nav className="hidden md:flex items-center gap-8" aria-label="主导航">
       {NAVIGATION_ITEMS.map((item) => (
         <button
@@ -388,45 +414,31 @@ export default function EnhancedHero() {
           className={`relative px-4 py-2 font-medium text-gray-700 hover:text-gray-900 transition-all duration-[${ANIMATION.duration.normal}] focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 group`}
         >
           <span className="relative z-10 group-hover:shadow-sm">{item.label}</span>
-
-          {/* Background hover effect */}
-          <div className={`absolute inset-0 bg-gradient-to-r ${THEME.gradients.primarySubtle} rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-[${ANIMATION.duration.normal}]`} />
-
-          {/* Enhanced underline effect - expands from center */}
-          <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r ${THEME.gradients.primary} group-hover:w-full transition-all duration-[${ANIMATION.duration.normal}] ${ANIMATION.easing.easeOut}`} />
+          <div className={`absolute inset-0 ${createGradientClasses(THEME.gradients.primarySubtle)} rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-[${ANIMATION.duration.normal}]`} />
+          <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 ${createGradientClasses(THEME.gradients.primary)} group-hover:w-full transition-all duration-[${ANIMATION.duration.normal}] ${ANIMATION.easing.easeOut}`} />
         </button>
       ))}
     </nav>
   ), [handleNavigation]);
 
-  // 移动端汉堡菜单按钮
-  const MobileMenuButton = useMemo(() => (
-    <button
-      onClick={() => setIsMenuOpen(!isMenuOpen)}
-      className={`md:hidden relative w-10 h-10 flex flex-col items-center justify-center space-y-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg transition-all duration-[${ANIMATION.duration.normal}] hover:bg-gray-50 hover:shadow-sm`}
-      aria-label="菜单"
-      aria-expanded={isMenuOpen}
-      aria-controls="mobile-menu"
-    >
-      <span
-        className={`block w-6 h-0.5 bg-gray-700 transition-all duration-[${ANIMATION.duration.normal}] ${
-          isMenuOpen ? 'rotate-45 translate-y-2' : ''
-        }`}
-      />
-      <span
-        className={`block w-6 h-0.5 bg-gray-700 transition-all duration-[${ANIMATION.duration.normal}] ${
-          isMenuOpen ? 'opacity-0' : ''
-        }`}
-      />
-      <span
-        className={`block w-6 h-0.5 bg-gray-700 transition-all duration-[${ANIMATION.duration.normal}] ${
-          isMenuOpen ? '-rotate-45 -translate-y-2' : ''
-        }`}
-      />
-    </button>
-  ), [isMenuOpen]);
+  const MobileMenuButton = useMemo(() => {
+    const lineBaseClasses = "block w-6 h-0.5 bg-gray-700 transition-all duration-[${ANIMATION.duration.normal}]";
 
-  // 移动端菜单
+    return (
+      <button
+        onClick={toggleMenu}
+        className={`md:hidden relative w-10 h-10 flex flex-col items-center justify-center space-y-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg transition-all duration-[${ANIMATION.duration.normal}] hover:bg-gray-50 hover:shadow-sm`}
+        aria-label="菜单"
+        aria-expanded={isMenuOpen}
+        aria-controls="mobile-menu"
+      >
+        <span className={`${lineBaseClasses} ${isMenuOpen ? 'rotate-45 translate-y-2' : ''}`} />
+        <span className={`${lineBaseClasses} ${isMenuOpen ? 'opacity-0' : ''}`} />
+        <span className={`${lineBaseClasses} ${isMenuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+      </button>
+    );
+  }, [isMenuOpen, toggleMenu]);
+
   const MobileMenu = useMemo(() => (
     <div
       id="mobile-menu"
@@ -443,16 +455,16 @@ export default function EnhancedHero() {
             <button
               key={item.to}
               onClick={() => handleNavigation(item.to)}
-              className={`group block w-full text-left py-3 px-4 rounded-lg hover:bg-gradient-to-r ${THEME.gradients.primarySubtle} transition-all duration-[${ANIMATION.duration.normal}] focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500`}
+              className={`group block w-full text-left py-3 px-4 rounded-lg hover:${createGradientClasses(THEME.gradients.primarySubtle)} transition-all duration-[${ANIMATION.duration.normal}] focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500`}
               style={{
-                animationDelay: `${index * 50}ms`,
+                animationDelay: `${index * CONSTANTS.ANIMATION_STAGGER_DELAY}ms`,
                 animation: isMenuOpen ? 'slideInFromRight 0.3s ease-out forwards' : 'none'
               }}
             >
               <span className={`text-lg font-medium text-gray-700 group-hover:text-gray-900 group-hover:shadow-sm transition-colors duration-[${ANIMATION.duration.fast}]`}>
                 {item.label}
               </span>
-              <div className={`w-0 h-0.5 bg-gradient-to-r ${THEME.gradients.primary} group-hover:w-full transition-all duration-[${ANIMATION.duration.normal}] mt-1`} />
+              <div className={`w-0 h-0.5 ${createGradientClasses(THEME.gradients.primary)} group-hover:w-full transition-all duration-[${ANIMATION.duration.normal}] mt-1`} />
             </button>
           ))}
         </div>
@@ -460,74 +472,66 @@ export default function EnhancedHero() {
     </div>
   ), [isMenuOpen, handleNavigation]);
 
-  const ModuleCard = useCallback(({ module }: { module: ModuleItem }) => {
-    return (
-      <div className="relative group overflow-visible">
-        {/* Title Section - Centered vertically in the card with transparent background */}
-        <div className="absolute top-1/2 left-0 right-0 z-30 overflow-visible transform -translate-y-1/2">
-          <div className="relative overflow-visible">
-            <div className={`relative inline-block transform -translate-x-5 group-hover:-translate-x-1 transition-all duration-[${ANIMATION.duration.slow}] overflow-visible`}>
-              {/* Title text with always transparent background */}
-              <div className="relative px-18 py-4 bg-transparent">
-                <h3
-                  className={`text-2xl md:text-3xl lg:text-4xl font-black text-white leading-none tracking-tight whitespace-nowrap transition-colors duration-[${ANIMATION.duration.slow}]`}
-                  style={{
-                    textShadow: '2px 2px 8px rgba(0,0,0,0.8), 1px 1px 4px rgba(0,0,0,0.6)',
-                    fontFamily: '"Helvetica Neue", Arial, sans-serif'
-                  }}
-                >
-                  {module.title}
-                </h3>
-              </div>
+  const ModuleCard = useCallback(({ module }: { module: ModuleItem }) => (
+    <div className="relative group overflow-visible">
+      {/* Title Overlay */}
+      <div className="absolute top-1/2 left-0 right-0 z-30 overflow-visible transform -translate-y-1/2">
+        <div className="relative overflow-visible">
+          <div className={`relative inline-block transform -translate-x-5 group-hover:-translate-x-1 transition-all duration-[${ANIMATION.duration.slow}] overflow-visible`}>
+            <div className="relative px-18 py-4 bg-transparent">
+              <h3
+                className={`text-2xl md:text-3xl lg:text-4xl font-black text-white leading-none tracking-tight whitespace-nowrap transition-colors duration-[${ANIMATION.duration.slow}]`}
+                style={{
+                  textShadow: '2px 2px 8px rgba(0,0,0,0.8), 1px 1px 4px rgba(0,0,0,0.6)',
+                  fontFamily: '"Helvetica Neue", Arial, sans-serif'
+                }}
+              >
+                {module.title}
+              </h3>
             </div>
           </div>
-        </div>
-
-        {/* Main Card */}
-        <div
-          className={`relative bg-white shadow-2xl rounded-lg transition-all duration-[${ANIMATION.duration.slow}] cursor-pointer transform group-hover:scale-[1.08] group-hover:-translate-y-1.5 overflow-hidden`}
-          onClick={() => navigate(module.path)}
-          onMouseEnter={() => setActiveModule(module.id)}
-          onMouseLeave={() => setActiveModule(null)}
-          style={{ aspectRatio: '3/2' }}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              navigate(module.path);
-            }
-          }}
-          aria-label={`查看${module.title}详情`}
-        >
-          {/* Background Image */}
-          <div className="absolute inset-0">
-            <img
-              src={module.imageSrc}
-              alt={module.imageAlt}
-              className={`w-full h-full object-cover transition-transform duration-[${ANIMATION.duration.extraSlow}] group-hover:scale-105`}
-              style={{ filter: 'grayscale(20%) sepia(10%)' }}
-              loading="lazy"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-br from-gray-900/15 via-transparent to-gray-900/10" />
-          </div>
-
-          {/* Content */}
-          <div className="relative z-10 flex flex-col justify-end h-full p-8">
-            <div className={`transform transition-all duration-[${ANIMATION.duration.slow}]`}>
-              <p className="text-white/95 text-base md:text-lg leading-relaxed font-light">
-                {module.description}
-              </p>
-            </div>
-          </div>
-
-          {/* Click hint overlay */}
-          <div className={`absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-[${ANIMATION.duration.normal}] pointer-events-none`} />
         </div>
       </div>
-    );
-  }, [navigate, setActiveModule]);
+
+      {/* Main Card */}
+      <div
+        className={`relative bg-white shadow-2xl rounded-lg transition-all duration-[${ANIMATION.duration.slow}] cursor-pointer transform group-hover:scale-[1.08] group-hover:-translate-y-1.5 overflow-hidden`}
+        onClick={() => handleModuleClick(module.path)}
+        onMouseEnter={() => setActiveModule(module.id)}
+        onMouseLeave={() => setActiveModule(null)}
+        style={{ aspectRatio: '3/2' }}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => handleModuleKeyDown(e, module.path)}
+        aria-label={`查看${module.title}详情`}
+      >
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <img
+            src={module.imageSrc}
+            alt={module.imageAlt}
+            className={`w-full h-full object-cover transition-transform duration-[${ANIMATION.duration.extraSlow}] group-hover:scale-105`}
+            style={{ filter: 'grayscale(20%) sepia(10%)' }}
+            loading="lazy"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-900/15 via-transparent to-gray-900/10" />
+        </div>
+
+        {/* Content */}
+        <div className="relative z-10 flex flex-col justify-end h-full p-8">
+          <div className={`transform transition-all duration-[${ANIMATION.duration.slow}]`}>
+            <p className="text-white/95 text-base md:text-lg leading-relaxed font-light">
+              {module.description}
+            </p>
+          </div>
+        </div>
+
+        {/* Hover Overlay */}
+        <div className={`absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-[${ANIMATION.duration.normal}] pointer-events-none`} />
+      </div>
+    </div>
+  ), [handleModuleClick, handleModuleKeyDown, setActiveModule]);
 
   const ScrollCue = useMemo(() => (
     <div className="absolute bottom-8 left-0 right-0 flex justify-center">
@@ -545,7 +549,7 @@ export default function EnhancedHero() {
     </div>
   ), [scrollToModules]);
 
-  // 计算头部样式
+  // ====== 计算样式 ======
   const headerClassName = useMemo(() =>
     `fixed top-0 left-0 right-0 z-50 transition-all duration-[${ANIMATION.duration.slow}] ${
       scrollY > CONSTANTS.SCROLL_THRESHOLD || isMenuOpen
@@ -562,9 +566,10 @@ export default function EnhancedHero() {
     [isVisible]
   );
 
+  // ====== 主渲染 ======
   return (
     <>
-      {/* 跳过到主内容（键盘可见） */}
+      {/* Skip Link */}
       <a
         href="#modules"
         className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[9999] bg-black text-white px-3 py-2 rounded"
@@ -573,7 +578,7 @@ export default function EnhancedHero() {
       </a>
 
       {/* Hero Section */}
-      <section className={`relative min-h-screen flex flex-col justify-center overflow-hidden bg-gradient-to-br ${THEME.gradients.bgHero}`}>
+      <section className={`relative min-h-screen flex flex-col justify-center overflow-hidden ${createGradientClasses(`bg-gradient-to-br ${THEME.gradients.bgHero}`)}`}>
         {/* Header */}
         <header
           className={headerClassName}
@@ -581,7 +586,7 @@ export default function EnhancedHero() {
         >
           <div className="w-full h-full px-4 md:px-8 flex items-center justify-between">
             <SiteLogo onClick={handleLogoClick} />
-            {DesktopNavigationButtons}
+            {DesktopNavigation}
             {MobileMenuButton}
           </div>
         </header>
@@ -589,21 +594,18 @@ export default function EnhancedHero() {
         {/* Mobile Menu */}
         {MobileMenu}
 
-        {/* 渐变遮罩层 */}
+        {/* Background */}
         <div className="absolute inset-0 opacity-40">
           <HeroPageBackdrop scrollY={scrollY} />
         </div>
 
         {/* Content Container */}
         <div className="relative z-10 max-w-7xl mx-auto px-6 py-24">
-          {/* 主标题系统 */}
           <div className="text-center mb-20 md:mb-32">
             <div className={titleAnimationClassName}>
               {TitleSection}
             </div>
           </div>
-
-          {/* Scroll Cue */}
           {ScrollCue}
         </div>
       </section>
@@ -611,7 +613,7 @@ export default function EnhancedHero() {
       {/* Modules Section */}
       <section
         ref={secondSectionRef}
-        className={`relative min-h-screen flex flex-col justify-center bg-gradient-to-b ${THEME.gradients.bgModules} overflow-visible`}
+        className={`relative min-h-screen flex flex-col justify-center ${createGradientClasses(`bg-gradient-to-b ${THEME.gradients.bgModules}`)} overflow-visible`}
         id="modules"
         aria-label="模块展示区域"
       >
