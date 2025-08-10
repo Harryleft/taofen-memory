@@ -4,6 +4,21 @@ import { fetchHeroImages, type MasonryItem as BaseMasonryItem } from '@/services
 type MasonryItem = BaseMasonryItem & { calculatedHeight?: number };
 
 // =============== Utilities ===============
+// Debounce utility to limit the rate at which a function gets called.
+function debounce<T extends (...args: any[]) => any>(func: T, wait: number): (...args: Parameters<T>) => void {
+  let timeout: ReturnType<typeof setTimeout>;
+
+  return function executedFunction(...args: Parameters<T>): void {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
 // 生成稳定的伪随机数（0~1），用于保证每次渲染的“错落感”一致
 function randomUnitFromKey(key: string): number {
   let hash = 2166136261;
@@ -107,7 +122,7 @@ interface HeroBackgroundProps {
 }
 
 export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
-  const DEBUG_HERO = false; // 调试开关
+  const DEBUG_HERO = true; // 调试开关
   const [columns, setColumns] = useState(4);
   const [containerHeight, setContainerHeight] = useState(0);
   const [columnWidth, setColumnWidth] = useState(0);
@@ -133,7 +148,7 @@ export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
       const { width, height } = safeWindowSize();
       const newColumns = computeColumns(width);
       setColumns(newColumns);
-      setContainerHeight(height * 1.5);
+      setContainerHeight(height * 2); // 增加容器高度，提供更长的滚动行程
       const computed = computeColumnWidth(width, newColumns, H_GAP_PX);
       setColumnWidth(computed);
       // 计算四卡横带位置与高度
@@ -145,9 +160,11 @@ export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
       debugLog(DEBUG_HERO, 'layout', { width, height, newColumns, columnWidth: computed });
     };
 
-    updateLayout();
-    window.addEventListener('resize', updateLayout);
-    return () => window.removeEventListener('resize', updateLayout);
+    const debouncedUpdateLayout = debounce(updateLayout, 250);
+
+    debouncedUpdateLayout();
+    window.addEventListener('resize', debouncedUpdateLayout);
+    return () => window.removeEventListener('resize', debouncedUpdateLayout);
   }, []);
 
   // 预加载图片并测量真实宽高比，恢复“最初样式”的自然高低差
@@ -225,7 +242,7 @@ export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
       <div 
         className="flex gap-4 h-full"
         style={{
-          transform: `translateY(${safeScrollY * 0.5}px)`,
+          transform: `translateY(${safeScrollY * 0.3}px)`, // 减缓视差滚动速度
           // 四卡带背后的背景弱化（轻模糊+降饱和+降亮度）
           filter: `saturate(${BAND_SATURATE}) brightness(${BAND_BRIGHTNESS}) blur(${BAND_BLUR_PX}px)`,
         }}
@@ -240,11 +257,9 @@ export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
               return (
                 <div
                   key={`${item.id}-${columnIndex}-${itemIndex}`}
-                  className="relative group overflow-hidden rounded-lg shadow-lg transform hover:scale-105 hover:shadow-2xl transition-transform duration-300 will-change-transform"
+                  className="relative group overflow-hidden rounded-lg shadow-lg transform hover:scale-105 hover:shadow-2xl transition-transform duration-300"
                   style={{
                     height: `${itemWithHeight.calculatedHeight}px`,
-                    transform: `translateY(${Math.sin((safeScrollY + itemIndex * 100) * 0.001) * 10}px)`,
-                    animationDelay: `${itemIndex * 0.1}s`,
                   }}
                 >
                   <img
