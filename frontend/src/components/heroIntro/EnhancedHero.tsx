@@ -185,7 +185,7 @@ export default function EnhancedHero() {
         style={{ height: '56px' }}
       >
         <div className="w-full h-full px-4 md:px-6 flex items-center text-gray-900">
-          <nav className="hidden md:flex items-center gap-6 text-sm ml-auto">
+          <nav className="hidden md:flex items-center gap-8 text-base ml-auto">
             {[
               { label: '岁月行履', to: '/timeline' },
               { label: '生活与书', to: '/bookstore-timeline' },
@@ -195,7 +195,7 @@ export default function EnhancedHero() {
               <button
                 key={item.to}
                 onClick={() => navigate(item.to)}
-                className="relative px-1 py-1 font-medium text-gray-800 hover:text-black transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:bg-black after:w-0 hover:after:w-full after:transition-[width] after:duration-300"
+                className="relative px-3 py-2 font-medium text-gray-800 hover:text-black transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:bg-black after:w-0 hover:after:w-full after:transition-[width] after:duration-300"
               >
                 {item.label}
               </button>
