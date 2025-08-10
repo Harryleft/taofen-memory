@@ -293,11 +293,11 @@ export default function EnhancedHero() {
   const YearDivider = useMemo(() => (
     <div className="mb-12">
       <div className="inline-flex items-center gap-6">
-        <div className="w-16 md:w-24 h-px bg-gradient-to-r from-transparent via-amber-600/70 to-transparent" />
-        <span className="text-sm font-medium tracking-[0.3em] text-amber-800/80 uppercase">
+        <div className="w-16 md:w-24 h-px bg-gradient-to-r from-transparent via-black/70 to-transparent" />
+        <span className="text-sm font-medium tracking-[0.3em] text-black/80 uppercase">
           {CONSTANTS.YEAR_RANGE}
         </span>
-        <div className="w-16 md:w-24 h-px bg-gradient-to-r from-transparent via-amber-600/70 to-transparent" />
+        <div className="w-16 md:w-24 h-px bg-gradient-to-r from-transparent via-black/70 to-transparent" />
       </div>
     </div>
   ), []);
