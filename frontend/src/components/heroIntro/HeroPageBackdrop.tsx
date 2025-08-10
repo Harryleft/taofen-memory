@@ -122,7 +122,7 @@ interface HeroBackgroundProps {
 }
 
 export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
-  const DEBUG_HERO = false; // 调试开关
+  const DEBUG_HERO = true; // 调试开关
   const [columns, setColumns] = useState(4);
   const [containerHeight, setContainerHeight] = useState(0);
   const [columnWidth, setColumnWidth] = useState(0);
