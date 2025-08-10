@@ -16,11 +16,39 @@ function randomUnitFromKey(key: string): number {
   return ((hash >>> 0) % 10000) / 10000;
 }
 
-// 布局与视觉常量（避免魔法数字）
-const GAP_PX = 16;               // 卡片垂直间距
+// 布局与视觉常量
+const H_GAP_PX = 10;             // 列与列之间的横向间距（像素）
+const GAP_PX = 20;               // 卡片垂直间距（纵向）
 const FALLBACK_ASPECT = 0.8;     // 当无法测量图片时的备用宽高比
-const IMAGE_HEIGHT_SCALE = 0.8; // 图片高度缩放（<1 缩小，>1 放大）
+const IMAGE_HEIGHT_SCALE = 0.8;  // 图片高度缩放（<1 缩小，>1 放大）
 const REPEAT_TIMES = 6;          // 背景图重复次数，确保可填满容器
+const VARIATION_INTENSITY = 0.6; // 0~1，错落强度（节奏幅度全局缩放）
+const STABLE_SEED = 'hero-backdrop-v1';
+
+
+// 列节奏模板：轻微高度节奏，依次循环（幅度后续乘以 VARIATION_INTENSITY）
+const RHYTHM_PATTERN = [-0.06, 0.0, 0.05, -0.03, 0.02];
+
+// 基于宽高比的简单分类，用于邻接去重与加权重复
+type AspectCategory = 'portrait' | 'square' | 'landscape';
+const CATEGORY_WEIGHTS: Record<AspectCategory, number> = {
+  portrait: 1,   // 特写类，少量出现
+  square: 3,     // 常规
+  landscape: 4   // 填缝为主
+};
+
+function getAspectCategory(aspect: number): AspectCategory {
+  if (aspect > 1.05) return 'portrait';
+  if (aspect < 0.85) return 'landscape';
+  return 'square';
+}
+
+function stableShuffle<T>(arr: T[], seed: string): T[] {
+  return [...arr]
+    .map((item, index) => ({ item, key: randomUnitFromKey(`${seed}-${index}`) }))
+    .sort((a, b) => a.key - b.key)
+    .map(({ item }) => item);
+}
 
 interface HeroBackgroundProps {
   scrollY: number;
@@ -59,7 +87,8 @@ export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
       
       setColumns(newColumns);
       setContainerHeight(height * 1.5); // 确保背景高度足够覆盖首屏
-      setColumnWidth((width - (newColumns - 1) * GAP_PX) / newColumns); // 计算列宽，减去间距
+      // 使用可配置的横向间距计算列宽
+      setColumnWidth((width - (newColumns - 1) * H_GAP_PX) / newColumns);
     };
 
     updateLayout();
@@ -84,21 +113,48 @@ export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
     const columnArrays: MasonryItem[][] = Array.from({ length: columns }, () => []);
     const columnHeights = new Array(columns).fill(0);
 
-    // 复制并重复图片项目以确保填满屏幕（可通过 REPEAT_TIMES 手动调节）
-    const repeatedItems = Array.from({ length: REPEAT_TIMES }, () => remoteItems).flat();
+    // 分层权重重复 + 稳定洗牌：避免同质连片与死板重复
+    const weightedPool = remoteItems.flatMap((it) => {
+      const measuredAspect = aspectMap[it.id];
+      const aspect = typeof measuredAspect === 'number' && measuredAspect > 0 ? measuredAspect : (it.aspectRatio || FALLBACK_ASPECT);
+      const cat = getAspectCategory(aspect);
+      const weight = CATEGORY_WEIGHTS[cat] || 2;
+      return Array.from({ length: weight }, () => it);
+    });
+    const baseRepeated = Array.from({ length: REPEAT_TIMES }, () => weightedPool).flat();
+    const repeatedItems = stableShuffle(baseRepeated, STABLE_SEED);
+
+    const lastCategoryPerColumn: (AspectCategory | null)[] = new Array(columns).fill(null);
+    const itemCountPerColumn: number[] = new Array(columns).fill(0);
 
     repeatedItems.forEach((item) => {
-      const shortestColumnIndex = columnHeights.indexOf(Math.min(...columnHeights));
       const measuredAspect = aspectMap[item.id];
       const aspect = typeof measuredAspect === 'number' && measuredAspect > 0 ? measuredAspect : (item.aspectRatio || FALLBACK_ASPECT);
-      const calculatedHeight = columnWidth * aspect * IMAGE_HEIGHT_SCALE;
-      
-      columnArrays[shortestColumnIndex].push({
+      const cat = getAspectCategory(aspect);
+
+      // 候选列：按当前高度升序，优先选择与上一张不同类别的列
+      const candidates = columnHeights
+        .map((h, idx) => ({ idx, h }))
+        .sort((a, b) => a.h - b.h);
+
+      let targetColumnIndex = candidates.find(c => lastCategoryPerColumn[c.idx] !== cat)?.idx;
+      if (typeof targetColumnIndex !== 'number') {
+        targetColumnIndex = candidates[0].idx;
+      }
+
+      // 列节奏：对高度做轻微缩放，制造有机节奏
+      const rhythmIdx = itemCountPerColumn[targetColumnIndex] % RHYTHM_PATTERN.length;
+      const rhythmScale = 1 + RHYTHM_PATTERN[rhythmIdx] * VARIATION_INTENSITY;
+      const calculatedHeight = columnWidth * aspect * IMAGE_HEIGHT_SCALE * rhythmScale;
+
+      columnArrays[targetColumnIndex].push({
         ...item,
         calculatedHeight,
       });
-      columnHeights[shortestColumnIndex] += calculatedHeight + GAP_PX;
-      
+      columnHeights[targetColumnIndex] += calculatedHeight + GAP_PX;
+      lastCategoryPerColumn[targetColumnIndex] = cat;
+      itemCountPerColumn[targetColumnIndex] += 1;
+
       // 如果最短列的高度已经超过容器高度，停止添加
       if (Math.min(...columnHeights) > containerHeight) {
         return;
