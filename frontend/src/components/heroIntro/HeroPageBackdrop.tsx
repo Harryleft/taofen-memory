@@ -122,19 +122,28 @@ interface HeroBackgroundProps {
 }
 
 export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
-  const DEBUG_HERO = true; // 调试开关
+  const DEBUG_HERO = false; // 调试开关
   const [columns, setColumns] = useState(4);
   const [containerHeight, setContainerHeight] = useState(0);
   const [columnWidth, setColumnWidth] = useState(0);
   const [remoteItems, setRemoteItems] = useState<BaseMasonryItem[]>([]);
   const [aspectMap, setAspectMap] = useState<Record<number, number>>({});
   const containerRef = useRef<HTMLDivElement>(null);
+  const scrollableContainerRef = useRef<HTMLDivElement>(null); // 新增：用于直接DOM操作的ref
   const [bandTop, setBandTop] = useState(0);
   const [bandHeight, setBandHeight] = useState(0);
   
   // 确保 scrollY 为有效数值，防止 NaN 或 undefined
   const safeScrollY = typeof scrollY === 'number' && !isNaN(scrollY) ? scrollY : 0;
   
+  // 新增：解耦的动画效果
+  // 这个effect只负责监听scrollY的变化，并直接更新DOM，绕过React渲染
+  useEffect(() => {
+    if (scrollableContainerRef.current) {
+      scrollableContainerRef.current.style.transform = `translateY(${safeScrollY * 0.3}px)`;
+    }
+  }, [safeScrollY]);
+
   useEffect(() => {
     // 加载图片数据
     fetchHeroImages()
@@ -240,9 +249,10 @@ export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
         }}
       />
       <div 
+        ref={scrollableContainerRef} // 挂载ref
         className="flex gap-4 h-full"
         style={{
-          transform: `translateY(${safeScrollY * 0.3}px)`, // 减缓视差滚动速度
+          // transform: `translateY(${safeScrollY * 0.3}px)`, // 移除：样式将由useEffect直接控制
           // 四卡带背后的背景弱化（轻模糊+降饱和+降亮度）
           filter: `saturate(${BAND_SATURATE}) brightness(${BAND_BRIGHTNESS}) blur(${BAND_BLUR_PX}px)`,
         }}
