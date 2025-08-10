@@ -1,10 +1,9 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import { fetchHeroImages, type MasonryItem as BaseMasonryItem } from '@/services/heroImageService';
 
-type MasonryItem = BaseMasonryItem & {
-  calculatedHeight?: number;
-};
+type MasonryItem = BaseMasonryItem & { calculatedHeight?: number };
 
+// =============== Utilities ===============
 // 生成稳定的伪随机数（0~1），用于保证每次渲染的“错落感”一致
 function randomUnitFromKey(key: string): number {
   let hash = 2166136261;
@@ -12,7 +11,6 @@ function randomUnitFromKey(key: string): number {
     hash ^= key.charCodeAt(i);
     hash = Math.imul(hash, 16777619);
   }
-  // 归一化到 [0,1)
   return ((hash >>> 0) % 10000) / 10000;
 }
 
@@ -50,12 +48,56 @@ function stableShuffle<T>(arr: T[], seed: string): T[] {
     .map(({ item }) => item);
 }
 
+function debugLog(enabled: boolean, ...args: unknown[]) {
+  if (enabled) {
+    // eslint-disable-next-line no-console
+    console.log('[HeroBackdrop]', ...args);
+  }
+}
+
+function safeWindowSize(): { width: number; height: number } {
+  const width = Number.isFinite(window.innerWidth) ? window.innerWidth : 1280;
+  const height = Number.isFinite(window.innerHeight) ? window.innerHeight : 800;
+  return { width, height };
+}
+
+function computeColumns(width: number): number {
+  if (width < 640) return 2;
+  if (width < 1024) return 3;
+  if (width < 1440) return 4;
+  return 5;
+}
+
+function computeColumnWidth(width: number, columns: number, gapX: number): number {
+  const w = (width - (columns - 1) * gapX) / columns;
+  return Number.isFinite(w) && w > 0 ? w : 0;
+}
+
+function getAspectForItem(item: BaseMasonryItem, aspectMap: Record<number, number>): number {
+  const measured = aspectMap[item.id];
+  return typeof measured === 'number' && measured > 0 ? measured : (item.aspectRatio || FALLBACK_ASPECT);
+}
+
+function buildWeightedPool(items: BaseMasonryItem[], aspectMap: Record<number, number>): BaseMasonryItem[] {
+  return items.flatMap((it) => {
+    const aspect = getAspectForItem(it, aspectMap);
+    const cat = getAspectCategory(aspect);
+    const weight = CATEGORY_WEIGHTS[cat] || 2;
+    return Array.from({ length: weight }, () => it);
+  });
+}
+
+function buildRepeatedItems(items: BaseMasonryItem[], repeat: number, seed: string): BaseMasonryItem[] {
+  const base = Array.from({ length: repeat }, () => items).flat();
+  return stableShuffle(base, seed);
+}
+
 interface HeroBackgroundProps {
   scrollY: number;
 }
 
 export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
-  const DEBUG_HERO = false; // 如需排查，改为 true
+  const DEBUG_HERO = false; // 调试开关
   const [columns, setColumns] = useState(4);
   const [containerHeight, setContainerHeight] = useState(0);
   const [columnWidth, setColumnWidth] = useState(0);
@@ -76,25 +118,13 @@ export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
       });
 
     const updateLayout = () => {
-      const width = Number.isFinite(window.innerWidth) ? window.innerWidth : 1280;
-      const height = Number.isFinite(window.innerHeight) ? window.innerHeight : 800;
-      
-      // 设置列数
-      let newColumns;
-      if (width < 640) newColumns = 2;
-      else if (width < 1024) newColumns = 3;
-      else if (width < 1440) newColumns = 4;
-      else newColumns = 5;
-      
+      const { width, height } = safeWindowSize();
+      const newColumns = computeColumns(width);
       setColumns(newColumns);
-      setContainerHeight(height * 1.5); // 确保背景高度足够覆盖首屏
-      // 使用可配置的横向间距计算列宽
-      const computed = (width - (newColumns - 1) * H_GAP_PX) / newColumns;
-      setColumnWidth(Number.isFinite(computed) && computed > 0 ? computed : 0);
-      if (DEBUG_HERO) {
-        // eslint-disable-next-line no-console
-        console.log('[HeroBackdrop] layout', { width, height, newColumns, columnWidth: computed });
-      }
+      setContainerHeight(height * 1.5);
+      const computed = computeColumnWidth(width, newColumns, H_GAP_PX);
+      setColumnWidth(computed);
+      debugLog(DEBUG_HERO, 'layout', { width, height, newColumns, columnWidth: computed });
     };
 
     updateLayout();
@@ -115,42 +145,25 @@ export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
     });
   }, [remoteItems]);
 
-  const distributeItems = () => {
-    const columnArrays: MasonryItem[][] = Array.from({ length: columns }, () => []);
+  // 预构建素材池与布局（职责拆分，配合 memo 降噪）
+  const weightedPool = useMemo(() => buildWeightedPool(remoteItems, aspectMap), [remoteItems, aspectMap]);
+  const repeatedItems = useMemo(() => buildRepeatedItems(weightedPool, REPEAT_TIMES, STABLE_SEED), [weightedPool]);
+
+  const columnArrays = useMemo(() => {
+    const arrays: MasonryItem[][] = Array.from({ length: columns }, () => []);
     const columnHeights = new Array(columns).fill(0);
     if (columns <= 0 || columnWidth <= 0 || containerHeight <= 0) {
-      if (DEBUG_HERO) {
-        // eslint-disable-next-line no-console
-        console.warn('[HeroBackdrop] early-exit distributeItems', { columns, columnWidth, containerHeight });
-      }
-      return columnArrays;
-    }
-
-    // 分层权重重复 + 稳定洗牌：避免同质连片与死板重复
-    const weightedPool = remoteItems.flatMap((it) => {
-      const measuredAspect = aspectMap[it.id];
-      const aspect = typeof measuredAspect === 'number' && measuredAspect > 0 ? measuredAspect : (it.aspectRatio || FALLBACK_ASPECT);
-      const cat = getAspectCategory(aspect);
-      const weight = CATEGORY_WEIGHTS[cat] || 2;
-      return Array.from({ length: weight }, () => it);
-    });
-    const baseRepeated = Array.from({ length: REPEAT_TIMES }, () => weightedPool).flat();
-    const repeatedItems = stableShuffle(baseRepeated, STABLE_SEED);
-    if (DEBUG_HERO) {
-      // eslint-disable-next-line no-console
-      console.log('[HeroBackdrop] pool', { baseLen: baseRepeated.length, repeatedLen: repeatedItems.length, columns });
+      debugLog(DEBUG_HERO, 'early-exit distributeItems', { columns, columnWidth, containerHeight });
+      return arrays;
     }
 
     const lastCategoryPerColumn: (AspectCategory | null)[] = new Array(columns).fill(null);
     const itemCountPerColumn: number[] = new Array(columns).fill(0);
 
-    try {
-      repeatedItems.forEach((item) => {
-      const measuredAspect = aspectMap[item.id];
-      const aspect = typeof measuredAspect === 'number' && measuredAspect > 0 ? measuredAspect : (item.aspectRatio || FALLBACK_ASPECT);
+    repeatedItems.forEach((item) => {
+      const aspect = getAspectForItem(item, aspectMap);
       const cat = getAspectCategory(aspect);
 
-      // 候选列：按当前高度升序，优先选择与上一张不同类别的列
       const candidates = columnHeights
         .map((h, idx) => ({ idx, h }))
         .sort((a, b) => a.h - b.h);
@@ -160,33 +173,19 @@ export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
         targetColumnIndex = candidates[0].idx;
       }
 
-      // 列节奏：对高度做轻微缩放，制造有机节奏
       const rhythmIdx = itemCountPerColumn[targetColumnIndex] % RHYTHM_PATTERN.length;
       const rhythmScale = 1 + RHYTHM_PATTERN[rhythmIdx] * VARIATION_INTENSITY;
       const calculatedHeight = columnWidth * aspect * IMAGE_HEIGHT_SCALE * rhythmScale;
 
-      columnArrays[targetColumnIndex].push({
-        ...item,
-        calculatedHeight,
-      });
+      arrays[targetColumnIndex].push({ ...item, calculatedHeight });
       columnHeights[targetColumnIndex] += calculatedHeight + GAP_PX;
       lastCategoryPerColumn[targetColumnIndex] = cat;
       itemCountPerColumn[targetColumnIndex] += 1;
+    });
 
-        // 如果最短列的高度已经超过容器高度，停止添加
-        if (Math.min(...columnHeights) > containerHeight) {
-          return;
-        }
-      });
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error('[HeroBackdrop] distributeItems error:', e);
-    }
-
-    return columnArrays;
-  };
-
-  const columnArrays = distributeItems();
+    debugLog(DEBUG_HERO, 'layout-complete', { columns, columnWidth, total: repeatedItems.length });
+    return arrays;
+  }, [repeatedItems, columns, columnWidth, containerHeight, aspectMap]);
 
   return (
     <div 
