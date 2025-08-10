@@ -189,8 +189,8 @@ export default function EnhancedHero() {
           <div className="flex items-center">
             <img 
               src="/images/hero_page/taofen_name.svg" 
-              alt="陶芬" 
-              className="h-8 w-auto opacity-90 hover:opacity-100 transition-opacity duration-200"
+              alt="邹韬奋" 
+              className="h-12 w-auto opacity-90 hover:opacity-100 transition-opacity duration-200"
             />
           </div>
           
