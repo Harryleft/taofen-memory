@@ -101,7 +101,7 @@ const MODULE_ITEMS: ModuleItem[] = [
   },
   {
     id: 1,
-    title: '生活与书',
+    title: '时光书影',
     description: '在纸与铅字之间，重访生活书店的生长与担当',
     imageSrc: '/images/hero_page/shenghuo_first.jpg',
     imageAlt: '生活书店',
@@ -112,12 +112,12 @@ const MODULE_ITEMS: ModuleItem[] = [
     title: '笔下风骨',
     description: '从字里行间，见其思虑与炽热',
     imageSrc: '/images/hero_page/shenghuoxinqikan.jpg',
-    imageAlt: '生活新期刊',
+    imageAlt: '生活新期刊', 
     path: '/handwriting'
   },
   {
     id: 3,
-    title: '同道群像',
+    title: '同行群像',
     description: '以人观史，勾连一个时代的脉络',
     imageSrc: '/images/hero_page/person_21609_3188023555816154777.jpg',
     imageAlt: '同道群像',
