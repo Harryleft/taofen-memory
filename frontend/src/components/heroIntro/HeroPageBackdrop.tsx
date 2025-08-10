@@ -26,11 +26,11 @@ const STABLE_SEED = 'hero-backdrop-v1';
 // 渐进方案：四卡所在横带的前景遮罩与背后弱化参数
 const BAND_CENTER_RATIO = 0.60;     // 四卡带中心（相对于视口高度 0~1）
 const BAND_HEIGHT_RATIO = 0.40;     // 四卡带高度占视口比例
-const BAND_OPACITY_CENTER = 0.20;   // 纸白遮罩在带中心的不透明度
-const BAND_OPACITY_EDGE = 0.08;     // 纸白遮罩在带上下边缘的不透明度
-const BAND_BLUR_PX = 2;             // 带内对背景的轻模糊（px）
-const BAND_SATURATE = 0.78;         // 带内背景饱和度系数（<1 降饱和）
-const BAND_BRIGHTNESS = 0.92;       // 带内背景亮度系数（<1 变暗）
+const BAND_OPACITY_CENTER = 0.14;   // 纸白遮罩在带中心的不透明度（降低灰度感）
+const BAND_OPACITY_EDGE = 0.04;     // 纸白遮罩在带上下边缘的不透明度
+const BAND_BLUR_PX = 1;             // 更轻的模糊，保留纸纹理
+const BAND_SATURATE = 0.90;         // 略降饱和，避免死灰
+const BAND_BRIGHTNESS = 0.96;       // 更亮一些，减轻压暗感
 
 
 // 列节奏模板：轻微高度节奏，依次循环（幅度后续乘以 VARIATION_INTENSITY）
