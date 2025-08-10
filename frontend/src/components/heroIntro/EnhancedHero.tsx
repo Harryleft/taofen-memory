@@ -70,6 +70,11 @@ export default function EnhancedHero() {
 
 
 
+  // 卡片舞台化：更强的前景清晰度与背景分离
+  // 更轻的阴影，避免灰度感过重
+  const CARD_SHADOW = '0 10px 24px rgba(0,0,0,0.10), 0 3px 10px rgba(0,0,0,0.06)';
+  // 手札风格为主，不再使用“报纸”装饰
+
   return (
     <section className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-white to-cream">
       {/* 背景图案层 - 保持适中的透明度以确保背景图片可见 */}
@@ -163,22 +168,72 @@ export default function EnhancedHero() {
         >
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
             {/* Timeline Module */}
-            {/* 导航卡片背景透明度 - 提升透明度以增强文字可读性 */}
+            {/* 舞台化：不透明纸白表面 + 双层阴影 + 左侧色条 + 背景弱化层 */}
             <div 
-              className="group relative bg-white/85 backdrop-blur-md border border-gray-200/60 rounded-2xl p-8 hover:bg-white hover:border-gold/30 hover:shadow-xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
+              className="group relative bg-amber-50/70 border border-amber-200/80 rounded-2xl p-8 transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
               onClick={() => navigate('/timeline')}
               onMouseEnter={() => setActiveModule(0)}
               onMouseLeave={() => setActiveModule(null)}
+              style={{ boxShadow: CARD_SHADOW, isolation: 'isolate' }}
             >
+              {/* 顶部色带：更高饱和度的引导色 */}
+              <div aria-hidden className="absolute top-0 left-0 right-0 h-1.5 rounded-t-2xl bg-amber-600" />
+              {/* 手札装饰：上沿打孔、底部撕边、右上折角、纸张细纹理 */}
+              <div aria-hidden className="absolute left-0 right-0 top-0 h-6 pointer-events-none flex items-center justify-around px-6">
+                {Array.from({ length: 7 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-2.5 h-2.5 rounded-full"
+                    style={{
+                      background:
+                        'radial-gradient(circle at 50% 50%, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0.22) 35%, rgba(0,0,0,0.06) 36%, rgba(0,0,0,0) 62%)',
+                    }}
+                  />
+                ))}
+              </div>
+              <div
+                aria-hidden
+                className="absolute left-0 right-0 bottom-[-6px] h-3 pointer-events-none rounded-b-2xl"
+                style={{
+                  backgroundImage:
+                    'repeating-linear-gradient(135deg, rgba(0,0,0,0.10) 0 2px, rgba(0,0,0,0) 2px 6px)',
+                  opacity: 0.35,
+                  filter: 'blur(0.2px)',
+                }}
+              />
+              <div
+                aria-hidden
+                className="absolute right-0 top-0 w-8 h-8 pointer-events-none transition-transform duration-300 origin-top-right group-hover:-rotate-6 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:shadow-md"
+                style={{
+                  background:
+                    'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.75) 60%, rgba(255,255,255,0) 60%)',
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.08)',
+                  clipPath: 'polygon(100% 0, 0 0, 100% 100%)',
+                }}
+              />
+              <div
+                aria-hidden
+                className="absolute inset-0 rounded-2xl pointer-events-none mix-blend-multiply"
+                style={{
+                  backgroundImage:
+                    'repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0 1px, rgba(0,0,0,0) 1px 3px), radial-gradient(1px 1px at 12% 18%, rgba(0,0,0,0.03) 0 1px, transparent 1px), radial-gradient(1px 1px at 68% 76%, rgba(0,0,0,0.025) 0 1px, transparent 1px), radial-gradient(1px 1px at 32% 62%, rgba(0,0,0,0.02) 0 1px, transparent 1px)',
+                  opacity: 0.8,
+                }}
+              />
+              {/* 半调网点移除，保持更纯粹的手札纸面 */}
+              {/* 背景弱化舞台（仅在卡片区域下方生效） */}
+              <div className="absolute -inset-3 rounded-3xl -z-10 backdrop-blur-sm backdrop-brightness-105 backdrop-saturate-90" />
+              {/* 左侧色条 */}
+              <div className="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl bg-amber-600" />
               <div className="absolute inset-0 bg-gradient-to-br from-gold/5 to-heritage-blue/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="relative z-10 flex flex-col h-full">
-                <div className="w-16 h-16 bg-gradient-to-br from-gold/20 to-gold/10 rounded-2xl flex items-center justify-center mb-6 group-hover:from-gold/30 group-hover:to-gold/20 transition-all duration-300 flex-shrink-0">
-                  <Scroll className="text-gold group-hover:scale-110 transition-transform duration-300" size={24} />
+                <div className="w-16 h-16 bg-gradient-to-br from-amber-500/20 to-amber-400/10 rounded-2xl flex items-center justify-center mb-6 group-hover:from-amber-500/30 group-hover:to-amber-400/20 transition-all duration-300 flex-shrink-0">
+                  <Scroll className="text-gold group-hover:scale-110 transition-transform duration-300" size={26} />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-4 group-hover:text-gold transition-colors duration-300 font-serif flex-shrink-0">
+                <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-gold transition-colors duration-300 font-serif flex-shrink-0">
                   人生大事
                 </h3>
-                <p className="text-gray-600 leading-relaxed mb-6 text-sm flex-grow">
+                <p className="text-gray-800 leading-relaxed mb-6 text-sm flex-grow">
                   追溯邹韬奋先生的人生轨迹，感受文化先驱的成长历程
                 </p>
                 <div className="flex items-center text-gold group-hover:text-gold/80 transition-colors duration-300 flex-shrink-0">
@@ -190,20 +245,36 @@ export default function EnhancedHero() {
 
             {/* Bookstore Module */}
             <div 
-              className="group relative bg-white/85 backdrop-blur-md border border-gray-200/60 rounded-2xl p-8 hover:bg-white hover:border-heritage-blue/30 hover:shadow-xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
+              className="group relative bg-amber-50/70 border border-amber-200/80 rounded-2xl p-8 transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
               onClick={() => navigate('/bookstore-timeline')}
               onMouseEnter={() => setActiveModule(1)}
               onMouseLeave={() => setActiveModule(null)}
+              style={{ boxShadow: CARD_SHADOW, isolation: 'isolate' }}
             >
+              <div aria-hidden className="absolute top-0 left-0 right-0 h-1.5 rounded-t-2xl bg-blue-600" />
+              <div aria-hidden className="absolute left-0 right-0 top-0 h-6 pointer-events-none flex items-center justify-around px-6">
+                {Array.from({ length: 7 }).map((_, i) => (
+                  <div key={i} className="w-2.5 h-2.5 rounded-full" style={{
+                    background:
+                      'radial-gradient(circle at 50% 50%, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0.22) 35%, rgba(0,0,0,0.06) 36%, rgba(0,0,0,0) 62%)',
+                  }} />
+                ))}
+              </div>
+              <div aria-hidden className="absolute left-0 right-0 bottom-[-6px] h-3 pointer-events-none rounded-b-2xl" style={{ backgroundImage:'repeating-linear-gradient(135deg, rgba(0,0,0,0.10) 0 2px, rgba(0,0,0,0) 2px 6px)', opacity:.35, filter:'blur(0.2px)'}} />
+              <div aria-hidden className="absolute right-0 top-0 w-8 h-8 pointer-events-none transition-transform duration-300 origin-top-right group-hover:-rotate-6 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:shadow-md" style={{ background:'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.75) 60%, rgba(255,255,255,0) 60%)', boxShadow:'0 1px 2px rgba(0,0,0,0.08)', clipPath:'polygon(100% 0, 0 0, 100% 100%)'}} />
+              <div aria-hidden className="absolute inset-0 rounded-2xl pointer-events-none mix-blend-multiply" style={{ backgroundImage:'repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0 1px, rgba(0,0,0,0) 1px 3px), radial-gradient(1px 1px at 12% 18%, rgba(0,0,0,0.03) 0 1px, transparent 1px), radial-gradient(1px 1px at 68% 76%, rgba(0,0,0,0.025) 0 1px, transparent 1px), radial-gradient(1px 1px at 32% 62%, rgba(0,0,0,0.02) 0 1px, transparent 1px)', opacity:.8 }} />
+              {/* 半调网点移除 */}
+              <div className="absolute -inset-3 rounded-3xl -z-10 backdrop-blur-sm backdrop-brightness-105 backdrop-saturate-90" />
+              <div className="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl bg-blue-600" />
               <div className="absolute inset-0 bg-gradient-to-br from-heritage-blue/5 to-gold/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="relative z-10 flex flex-col h-full">
-                <div className="w-16 h-16 bg-gradient-to-br from-heritage-blue/20 to-heritage-blue/10 rounded-2xl flex items-center justify-center mb-6 group-hover:from-heritage-blue/30 group-hover:to-heritage-blue/20 transition-all duration-300 flex-shrink-0">
-                  <BookOpen className="text-heritage-blue group-hover:scale-110 transition-transform duration-300" size={24} />
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500/20 to-blue-400/10 rounded-2xl flex items-center justify-center mb-6 group-hover:from-blue-500/30 group-hover:to-blue-400/20 transition-all duration-300 flex-shrink-0">
+                  <BookOpen className="text-heritage-blue group-hover:scale-110 transition-transform duration-300" size={26} />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-4 group-hover:text-heritage-blue transition-colors duration-300 font-serif flex-shrink-0">
+                <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-heritage-blue transition-colors duration-300 font-serif flex-shrink-0">
                   生活书店
                 </h3>
-                <p className="text-gray-600 leading-relaxed mb-6 text-sm flex-grow">
+                <p className="text-gray-800 leading-relaxed mb-6 text-sm flex-grow">
                   探索生活书店的发展历程，了解进步出版事业的光辉足迹
                 </p>
                 <div className="flex items-center text-heritage-blue group-hover:text-heritage-blue/80 transition-colors duration-300 flex-shrink-0">
@@ -215,20 +286,33 @@ export default function EnhancedHero() {
 
             {/* Handwriting Module */}
             <div 
-              className="group relative bg-white/85 backdrop-blur-md border border-gray-200/60 rounded-2xl p-8 hover:bg-white hover:border-sage-green/30 hover:shadow-xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
+              className="group relative bg-amber-50/70 border border-amber-200/80 rounded-2xl p-8 transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
               onClick={() => navigate('/handwriting')}
               onMouseEnter={() => setActiveModule(2)}
               onMouseLeave={() => setActiveModule(null)}
+              style={{ boxShadow: CARD_SHADOW, isolation: 'isolate' }}
             >
+              <div aria-hidden className="absolute top-0 left-0 right-0 h-1.5 rounded-t-2xl bg-emerald-600" />
+              <div aria-hidden className="absolute left-0 right-0 top-0 h-6 pointer-events-none flex items-center justify-around px-6">
+                {Array.from({ length: 7 }).map((_, i) => (
+                  <div key={i} className="w-2.5 h-2.5 rounded-full" style={{ background:'radial-gradient(circle at 50% 50%, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0.22) 35%, rgba(0,0,0,0.06) 36%, rgba(0,0,0,0) 62%)' }} />
+                ))}
+              </div>
+              <div aria-hidden className="absolute left-0 right-0 bottom-[-6px] h-3 pointer-events-none rounded-b-2xl" style={{ backgroundImage:'repeating-linear-gradient(135deg, rgba(0,0,0,0.10) 0 2px, rgba(0,0,0,0) 2px 6px)', opacity:.35, filter:'blur(0.2px)'}} />
+              <div aria-hidden className="absolute right-0 top-0 w-8 h-8 pointer-events-none transition-transform duration-300 origin-top-right group-hover:-rotate-6 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:shadow-md" style={{ background:'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.75) 60%, rgba(255,255,255,0) 60%)', boxShadow:'0 1px 2px rgba(0,0,0,0.08)', clipPath:'polygon(100% 0, 0 0, 100% 100%)'}} />
+              <div aria-hidden className="absolute inset-0 rounded-2xl pointer-events-none mix-blend-multiply" style={{ backgroundImage:'repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0 1px, rgba(0,0,0,0) 1px 3px), radial-gradient(1px 1px at 12% 18%, rgba(0,0,0,0.03) 0 1px, transparent 1px), radial-gradient(1px 1px at 68% 76%, rgba(0,0,0,0.025) 0 1px, transparent 1px), radial-gradient(1px 1px at 32% 62%, rgba(0,0,0,0.02) 0 1px, transparent 1px)', opacity:.8 }} />
+              {/* 半调网点移除 */}
+              <div className="absolute -inset-3 rounded-3xl -z-10 backdrop-blur-sm backdrop-brightness-105 backdrop-saturate-90" />
+              <div className="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl bg-emerald-600" />
               <div className="absolute inset-0 bg-gradient-to-br from-sage-green/5 to-gold/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="relative z-10 flex flex-col h-full">
-                <div className="w-16 h-16 bg-gradient-to-br from-sage-green/20 to-sage-green/10 rounded-2xl flex items-center justify-center mb-6 group-hover:from-sage-green/30 group-hover:to-sage-green/20 transition-all duration-300 flex-shrink-0">
-                  <FileText className="text-sage-green group-hover:scale-110 transition-transform duration-300" size={24} />
+                <div className="w-16 h-16 bg-gradient-to-br from-emerald-500/20 to-emerald-400/10 rounded-2xl flex items-center justify-center mb-6 group-hover:from-emerald-500/30 group-hover:to-emerald-400/20 transition-all duration-300 flex-shrink-0">
+                  <FileText className="text-sage-green group-hover:scale-110 transition-transform duration-300" size={26} />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-4 group-hover:text-sage-green transition-colors duration-300 font-serif flex-shrink-0">
+                <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-sage-green transition-colors duration-300 font-serif flex-shrink-0">
                   韬奋手迹
                 </h3>
-                <p className="text-gray-600 leading-relaxed mb-6 text-sm flex-grow">
+                <p className="text-gray-800 leading-relaxed mb-6 text-sm flex-grow">
                   欣赏邹韬奋先生的珍贵手稿，感受文字背后的思想力量
                 </p>
                 <div className="flex items-center text-sage-green group-hover:text-sage-green/80 transition-colors duration-300 flex-shrink-0">
@@ -240,20 +324,33 @@ export default function EnhancedHero() {
 
             {/* Relationships Module */}
             <div 
-              className="group relative bg-white/85 backdrop-blur-md border border-gray-200/60 rounded-2xl p-8 hover:bg-white hover:border-warm-rose/30 hover:shadow-xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
+              className="group relative bg-amber-50/70 border border-amber-200/80 rounded-2xl p-8 transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
               onClick={() => navigate('/relationships')}
               onMouseEnter={() => setActiveModule(3)}
               onMouseLeave={() => setActiveModule(null)}
+              style={{ boxShadow: CARD_SHADOW, isolation: 'isolate' }}
             >
+              <div aria-hidden className="absolute top-0 left-0 right-0 h-1.5 rounded-t-2xl bg-rose-600" />
+              <div aria-hidden className="absolute left-0 right-0 top-0 h-6 pointer-events-none flex items-center justify-around px-6">
+                {Array.from({ length: 7 }).map((_, i) => (
+                  <div key={i} className="w-2.5 h-2.5 rounded-full" style={{ background:'radial-gradient(circle at 50% 50%, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0.22) 35%, rgba(0,0,0,0.06) 36%, rgba(0,0,0,0) 62%)' }} />
+                ))}
+              </div>
+              <div aria-hidden className="absolute left-0 right-0 bottom-[-6px] h-3 pointer-events-none rounded-b-2xl" style={{ backgroundImage:'repeating-linear-gradient(135deg, rgba(0,0,0,0.10) 0 2px, rgba(0,0,0,0) 2px 6px)', opacity:.35, filter:'blur(0.2px)'}} />
+              <div aria-hidden className="absolute right-0 top-0 w-8 h-8 pointer-events-none transition-transform duration-300 origin-top-right group-hover:-rotate-6 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:shadow-md" style={{ background:'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.75) 60%, rgba(255,255,255,0) 60%)', boxShadow:'0 1px 2px rgba(0,0,0,0.08)', clipPath:'polygon(100% 0, 0 0, 100% 100%)'}} />
+              <div aria-hidden className="absolute inset-0 rounded-2xl pointer-events-none mix-blend-multiply" style={{ backgroundImage:'repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0 1px, rgba(0,0,0,0) 1px 3px), radial-gradient(1px 1px at 12% 18%, rgba(0,0,0,0.03) 0 1px, transparent 1px), radial-gradient(1px 1px at 68% 76%, rgba(0,0,0,0.025) 0 1px, transparent 1px), radial-gradient(1px 1px at 32% 62%, rgba(0,0,0,0.02) 0 1px, transparent 1px)', opacity:.8 }} />
+              {/* 半调网点移除 */}
+              <div className="absolute -inset-3 rounded-3xl -z-10 backdrop-blur-sm backdrop-brightness-105 backdrop-saturate-90" />
+              <div className="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl bg-rose-600" />
               <div className="absolute inset-0 bg-gradient-to-br from-warm-rose/5 to-heritage-blue/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="relative z-10 flex flex-col h-full">
-                <div className="w-16 h-16 bg-gradient-to-br from-warm-rose/20 to-warm-rose/10 rounded-2xl flex items-center justify-center mb-6 group-hover:from-warm-rose/30 group-hover:to-warm-rose/20 transition-all duration-300 flex-shrink-0">
-                  <Users className="text-warm-rose group-hover:scale-110 transition-transform duration-300" size={24} />
+                <div className="w-16 h-16 bg-gradient-to-br from-rose-500/20 to-rose-400/10 rounded-2xl flex items-center justify-center mb-6 group-hover:from-rose-500/30 group-hover:to-rose-400/20 transition-all duration-300 flex-shrink-0">
+                  <Users className="text-warm-rose group-hover:scale-110 transition-transform duration-300" size={26} />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-4 group-hover:text-warm-rose transition-colors duration-300 font-serif flex-shrink-0">
+                <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-warm-rose transition-colors duration-300 font-serif flex-shrink-0">
                   人脉网络
                 </h3>
-                <p className="text-gray-600 leading-relaxed mb-6 text-sm flex-grow">
+                <p className="text-gray-800 leading-relaxed mb-6 text-sm flex-grow">
                   探索邹韬奋先生的社会关系网络，了解其人际交往轨迹
                 </p>
                 <div className="flex items-center text-warm-rose group-hover:text-warm-rose/80 transition-colors duration-300 flex-shrink-0">
