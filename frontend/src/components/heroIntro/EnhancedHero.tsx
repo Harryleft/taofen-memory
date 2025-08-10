@@ -38,13 +38,13 @@ const CONSTANTS = {
 const THEME = {
   colors: {
     primary: {
-      50: '#fffbeb',
-      100: '#fef3c7',
-      500: '#f59e0b',
-      600: '#d97706',
-      700: '#b45309',
-      800: '#92400e',
-      900: '#78350f'
+      50: '#eff6ff',
+      100: '#dbeafe',
+      500: '#3b82f6',
+      600: '#2563eb',
+      700: '#1d4ed8',
+      800: '#1e40af',
+      900: '#1e3a8a'
     },
     neutral: {
       50: '#f9fafb',
@@ -62,10 +62,10 @@ const THEME = {
     black: '#000000'
   },
   gradients: {
-    primary: 'from-amber-500 to-amber-600',
-    primarySubtle: 'from-amber-500/10 to-amber-500/10',
-    bgHero: 'from-slate-50 via-amber-50/30 to-amber-50',
-    bgModules: 'from-white to-amber-50/20'
+    primary: 'from-blue-500 to-blue-600',
+    primarySubtle: 'from-blue-500/10 to-blue-500/10',
+    bgHero: 'from-slate-50 via-blue-50/30 to-blue-50',
+    bgModules: 'from-white to-blue-50/20'
   }
 } as const;
 
@@ -152,7 +152,7 @@ function SiteLogo({ className = "", onClick }: SiteLogoProps) {
   return (
     <button
       onClick={onClick}
-      className={`group flex items-center gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg p-1 transition-all duration-[${ANIMATION.duration.normal}] ${className}`}
+      className={`group flex items-center gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-lg p-1 transition-all duration-[${ANIMATION.duration.normal}] ${className}`}
       aria-label="韬奋纪念馆首页"
     >
       {/* Logo Icon - 灰黑书页 + 琥珀书签（与当前灰黑/金色体系协调） */}
@@ -174,11 +174,11 @@ function SiteLogo({ className = "", onClick }: SiteLogoProps) {
       {/* Logo Text */}
       <div className="flex flex-col items-start">
         <span
-            className={`font-bold text-xl text-gray-900 group-hover:text-amber-800 transition-colors duration-[${ANIMATION.duration.normal}]`}>
+            className={`font-bold text-xl text-gray-900 group-hover:text-blue-800 transition-colors duration-[${ANIMATION.duration.normal}]`}>
           韬奋 · 纪念
         </span>
         <span
-            className={`text-xs text-gray-500 leading-none mt-0.5 group-hover:text-amber-600 transition-colors duration-[${ANIMATION.duration.normal}] font-medium tracking-wide`}>
+            className={`text-xs text-gray-500 leading-none mt-0.5 group-hover:text-blue-600 transition-colors duration-[${ANIMATION.duration.normal}] font-medium tracking-wide`}>
           TAOFEN MEMORIAL
         </span>
       </div>
@@ -385,7 +385,7 @@ export default function EnhancedHero() {
         <button
           key={item.to}
           onClick={() => handleNavigation(item.to)}
-          className={`relative px-4 py-2 font-medium text-gray-700 hover:text-gray-900 transition-all duration-[${ANIMATION.duration.normal}] focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 group`}
+          className={`relative px-4 py-2 font-medium text-gray-700 hover:text-gray-900 transition-all duration-[${ANIMATION.duration.normal}] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 group`}
         >
           <span className="relative z-10">{item.label}</span>
 
@@ -403,7 +403,7 @@ export default function EnhancedHero() {
   const MobileMenuButton = useMemo(() => (
     <button
       onClick={() => setIsMenuOpen(!isMenuOpen)}
-      className={`md:hidden relative w-10 h-10 flex flex-col items-center justify-center space-y-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg transition-all duration-[${ANIMATION.duration.normal}] hover:bg-gray-50`}
+      className={`md:hidden relative w-10 h-10 flex flex-col items-center justify-center space-y-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-lg transition-all duration-[${ANIMATION.duration.normal}] hover:bg-gray-50`}
       aria-label="菜单"
       aria-expanded={isMenuOpen}
       aria-controls="mobile-menu"
@@ -443,7 +443,7 @@ export default function EnhancedHero() {
             <button
               key={item.to}
               onClick={() => handleNavigation(item.to)}
-              className={`group block w-full text-left py-3 px-4 rounded-lg hover:bg-gradient-to-r ${THEME.gradients.primarySubtle} transition-all duration-[${ANIMATION.duration.normal}] focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500`}
+              className={`group block w-full text-left py-3 px-4 rounded-lg hover:bg-gradient-to-r ${THEME.gradients.primarySubtle} transition-all duration-[${ANIMATION.duration.normal}] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500`}
               style={{
                 animationDelay: `${index * 50}ms`,
                 animation: isMenuOpen ? 'slideInFromRight 0.3s ease-out forwards' : 'none'
@@ -534,7 +534,7 @@ export default function EnhancedHero() {
       <button
         aria-label="下滑查看更多"
         onClick={scrollToModules}
-        className={`group flex flex-col items-center text-gray-600 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg transition-colors duration-[${ANIMATION.duration.normal}] p-2`}
+        className={`group flex flex-col items-center text-gray-600 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-lg transition-colors duration-[${ANIMATION.duration.normal}] p-2`}
       >
         <div className="w-12 h-12 rounded-full border-2 border-current opacity-70 group-hover:opacity-100 flex items-center justify-center animate-bounce">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
