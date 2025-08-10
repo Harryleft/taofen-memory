@@ -466,9 +466,9 @@ export default function EnhancedHero() {
         {/* Title Section - Centered vertically in the card with transparent background */}
         <div className="absolute top-1/2 left-0 right-0 z-30 overflow-visible transform -translate-y-1/2">
           <div className="relative overflow-visible">
-            <div className={`relative inline-block transform -translate-x-10 group-hover:-translate-x-6 transition-all duration-[${ANIMATION.duration.slow}] overflow-visible`}>
+            <div className={`relative inline-block transform -translate-x-12 group-hover:-translate-x-8 transition-all duration-[${ANIMATION.duration.slow}] overflow-visible`}>
               {/* Title text with always transparent background */}
-              <div className="relative px-8 py-4 bg-transparent">
+              <div className="relative px-18 py-4 bg-transparent">
                 <h3
                   className={`text-2xl md:text-3xl lg:text-4xl font-black text-white leading-none tracking-tight whitespace-nowrap transition-colors duration-[${ANIMATION.duration.slow}]`}
                   style={{
@@ -485,7 +485,7 @@ export default function EnhancedHero() {
 
         {/* Main Card */}
         <div
-          className={`relative bg-white shadow-2xl rounded-lg transition-all duration-[${ANIMATION.duration.slow}] cursor-pointer transform group-hover:scale-[1.015] group-hover:-translate-y-0.5 overflow-hidden`}
+          className={`relative bg-white shadow-2xl rounded-lg transition-all duration-[${ANIMATION.duration.slow}] cursor-pointer transform group-hover:scale-[1.02] group-hover:-translate-y-1 overflow-hidden`}
           onClick={() => navigate(module.path)}
           onMouseEnter={() => setActiveModule(module.id)}
           onMouseLeave={() => setActiveModule(null)}
