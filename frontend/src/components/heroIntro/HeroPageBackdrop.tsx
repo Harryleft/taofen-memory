@@ -20,7 +20,7 @@ function randomUnitFromKey(key: string): number {
 const H_GAP_PX = 10;             // 列与列之间的横向间距（像素）
 const GAP_PX = 20;               // 卡片垂直间距（纵向）
 const FALLBACK_ASPECT = 0.8;     // 当无法测量图片时的备用宽高比
-const IMAGE_HEIGHT_SCALE = 0.8;  // 图片高度缩放（<1 缩小，>1 放大）
+const IMAGE_HEIGHT_SCALE = 0.7;  // 图片高度缩放（<1 缩小，>1 放大）
 const REPEAT_TIMES = 6;          // 背景图重复次数，确保可填满容器
 const VARIATION_INTENSITY = 0.6; // 0~1，错落强度（节奏幅度全局缩放）
 const STABLE_SEED = 'hero-backdrop-v1';
@@ -55,6 +55,7 @@ interface HeroBackgroundProps {
 }
 
 export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
+  const DEBUG_HERO = false; // 如需排查，改为 true
   const [columns, setColumns] = useState(4);
   const [containerHeight, setContainerHeight] = useState(0);
   const [columnWidth, setColumnWidth] = useState(0);
@@ -71,12 +72,12 @@ export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
       .then(setRemoteItems)
       .catch((err) => {
         // eslint-disable-next-line no-console
-        console.error(err);
+        console.error('[HeroBackdrop] fetchHeroImages error:', err);
       });
 
     const updateLayout = () => {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
+      const width = Number.isFinite(window.innerWidth) ? window.innerWidth : 1280;
+      const height = Number.isFinite(window.innerHeight) ? window.innerHeight : 800;
       
       // 设置列数
       let newColumns;
@@ -88,7 +89,12 @@ export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
       setColumns(newColumns);
       setContainerHeight(height * 1.5); // 确保背景高度足够覆盖首屏
       // 使用可配置的横向间距计算列宽
-      setColumnWidth((width - (newColumns - 1) * H_GAP_PX) / newColumns);
+      const computed = (width - (newColumns - 1) * H_GAP_PX) / newColumns;
+      setColumnWidth(Number.isFinite(computed) && computed > 0 ? computed : 0);
+      if (DEBUG_HERO) {
+        // eslint-disable-next-line no-console
+        console.log('[HeroBackdrop] layout', { width, height, newColumns, columnWidth: computed });
+      }
     };
 
     updateLayout();
@@ -112,6 +118,13 @@ export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
   const distributeItems = () => {
     const columnArrays: MasonryItem[][] = Array.from({ length: columns }, () => []);
     const columnHeights = new Array(columns).fill(0);
+    if (columns <= 0 || columnWidth <= 0 || containerHeight <= 0) {
+      if (DEBUG_HERO) {
+        // eslint-disable-next-line no-console
+        console.warn('[HeroBackdrop] early-exit distributeItems', { columns, columnWidth, containerHeight });
+      }
+      return columnArrays;
+    }
 
     // 分层权重重复 + 稳定洗牌：避免同质连片与死板重复
     const weightedPool = remoteItems.flatMap((it) => {
@@ -123,11 +136,16 @@ export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
     });
     const baseRepeated = Array.from({ length: REPEAT_TIMES }, () => weightedPool).flat();
     const repeatedItems = stableShuffle(baseRepeated, STABLE_SEED);
+    if (DEBUG_HERO) {
+      // eslint-disable-next-line no-console
+      console.log('[HeroBackdrop] pool', { baseLen: baseRepeated.length, repeatedLen: repeatedItems.length, columns });
+    }
 
     const lastCategoryPerColumn: (AspectCategory | null)[] = new Array(columns).fill(null);
     const itemCountPerColumn: number[] = new Array(columns).fill(0);
 
-    repeatedItems.forEach((item) => {
+    try {
+      repeatedItems.forEach((item) => {
       const measuredAspect = aspectMap[item.id];
       const aspect = typeof measuredAspect === 'number' && measuredAspect > 0 ? measuredAspect : (item.aspectRatio || FALLBACK_ASPECT);
       const cat = getAspectCategory(aspect);
@@ -155,11 +173,15 @@ export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
       lastCategoryPerColumn[targetColumnIndex] = cat;
       itemCountPerColumn[targetColumnIndex] += 1;
 
-      // 如果最短列的高度已经超过容器高度，停止添加
-      if (Math.min(...columnHeights) > containerHeight) {
-        return;
-      }
-    });
+        // 如果最短列的高度已经超过容器高度，停止添加
+        if (Math.min(...columnHeights) > containerHeight) {
+          return;
+        }
+      });
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('[HeroBackdrop] distributeItems error:', e);
+    }
 
     return columnArrays;
   };
