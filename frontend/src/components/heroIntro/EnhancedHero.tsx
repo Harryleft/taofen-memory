@@ -169,6 +169,42 @@ export default function EnhancedHero() {
   return (
     <>
     <section className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-white to-cream">
+      {/* Header - fixed, minimal, Bauhaus-style */}
+      <header
+        className={`AFnmuc fixed top-0 left-0 right-0 z-[4504] transition-colors duration-300 ${
+          scrollY > 8 ? 'bg-white/95 border-b border-gray-200' : 'bg-transparent'
+        }`}
+        style={{ height: '56px' }}
+      >
+        <div className="w-full h-full px-4 md:px-6 flex items-center text-gray-900">
+          <div className="flex items-center gap-2 mr-auto">
+            <button aria-label="菜单" className="p-2 text-black/60 hover:text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2">
+              <svg width="24" height="24" viewBox="0 0 48 48" aria-hidden="true">
+                <path d="M6 36h36v-4H6v4zm0-10h36v-4H6v4zm0-14v4h36v-4H6z"></path>
+              </svg>
+            </button>
+            <button aria-label="首页" onClick={() => navigate('/')} className="font-semibold tracking-wide text-sm md:text-base">
+              邹韬奋
+            </button>
+          </div>
+          <nav className="hidden md:flex items-center gap-6 text-sm ml-auto">
+            {[
+              { label: '岁月行履', to: '/timeline' },
+              { label: '生活与书', to: '/bookstore-timeline' },
+              { label: '笔下风骨', to: '/handwriting' },
+              { label: '同道群像', to: '/relationships' },
+            ].map((item) => (
+              <button
+                key={item.to}
+                onClick={() => navigate(item.to)}
+                className="relative px-1 py-1 text-black/80 hover:text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:bg-black after:w-0 hover:after:w-full after:transition-[width] after:duration-300"
+              >
+                {item.label}
+              </button>
+            ))}
+          </nav>
+        </div>
+      </header>
       {/* 背景图案层 - 保持适中的透明度以确保背景图片可见 */}
       <div className="absolute inset-0 opacity-40">
         <HeroPageBackdrop scrollY={scrollY} />
