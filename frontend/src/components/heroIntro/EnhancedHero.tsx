@@ -8,13 +8,8 @@ export default function EnhancedHero() {
   const [scrollY, setScrollY] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [, setActiveModule] = useState<number | null>(null);
-  const [currentSpiritIndex, setCurrentSpiritIndex] = useState(0);
   
-  // 生活书店八大精神
-  const eightSpirits = [
-    '坚定', '虚心', '公正', '负责', 
-    '刻苦', '耐劳', '服务精神', '同志爱'
-  ];
+  // —
 
   // 使用 useLayoutEffect 在浏览器绘制前同步滚动位置，消除首帧闪动
   useLayoutEffect(() => {
@@ -60,13 +55,7 @@ export default function EnhancedHero() {
     console.log('🔍 [EnhancedHero] scrollY 状态变化:', scrollY);
   }, [scrollY]);
   
-  // 轮播效果
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSpiritIndex((prev) => (prev + 1) % eightSpirits.length);
-    }, 2500); // 每2.5秒切换一次
-    return () => clearInterval(interval);
-  }, [eightSpirits.length]);
+  // —
 
 
 
@@ -104,59 +93,28 @@ export default function EnhancedHero() {
           >
             
             {/* Main Title */}
-            <h1 className="text-7xl md:text-9xl font-bold mb-8 leading-none text-primary-dark font-serif" style={{textShadow: '2px 2px 4px rgba(255,255,255,0.8), 0 0 8px rgba(255,255,255,0.6)'}}>
-              <span className="inline-block transform hover:scale-105 transition-all duration-500 hover:text-gold">
-                邹
-              </span>
-              <span className="inline-block transform hover:scale-105 transition-all duration-500 delay-75 hover:text-gold">
-                韬
-              </span>
-              <span className="inline-block transform hover:scale-105 transition-all duration-500 delay-150 hover:text-gold">
-                奋
-              </span>
+            <h1
+              className="font-serif mb-5 leading-none text-primary-dark text-[58px] md:text-[108px] tracking-tight"
+              style={{ textShadow: '0 1px 3px rgba(255,255,255,0.85)', letterSpacing: '-0.01em' }}
+            >
+              邹韬奋
             </h1>
             
-            {/* Decorative Line */}
-            <div className="flex items-center justify-center gap-6 mb-8">
-              <div className="h-px bg-gradient-to-r from-transparent via-gold to-transparent flex-1 max-w-32" />
-              <div className="w-2 h-2 bg-gold rounded-full" />
-              <div className="h-px bg-gradient-to-r from-transparent via-gold to-transparent flex-1 max-w-32" />
+            {/* Title Divider — 灰黑系双细则（去装饰，克制） */}
+            <div className="mx-auto mb-8 flex items-center justify-center" aria-hidden>
+              <div className="w-full max-w-md px-6">
+                <div className="h-px bg-gradient-to-r from-transparent via-black/20 to-transparent" />
+                <div className="mt-1 h-px bg-gradient-to-r from-transparent via-black/15 to-transparent" />
+              </div>
             </div>
             
-            {/* Description - 动态轮播八大精神 */}
-            <div className="text-xl md:text-2xl text-primary-dark leading-relaxed font-serif max-w-3xl mx-auto" style={{textShadow: '2px 2px 4px rgba(255,255,255,0.8), 0 0 8px rgba(255,255,255,0.6)'}}>
-              
-              <div className="relative h-8 overflow-hidden">
-                {eightSpirits.map((spirit, index) => (
-                  <div
-                    key={spirit}
-                    className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ease-in-out transform ${
-                      index === currentSpiritIndex 
-                        ? 'opacity-100 translate-y-0' 
-                        : index === (currentSpiritIndex - 1 + eightSpirits.length) % eightSpirits.length
-                        ? 'opacity-0 -translate-y-full'
-                        : 'opacity-0 translate-y-full'
-                    }`}
-                    style={{
-                      fontWeight: '600',
-                      letterSpacing: '0.1em'
-                    }}
-                  >
-                    {spirit}
-                  </div>
-                ))}
-              </div>
-              <div className="flex justify-center mt-3 space-x-1">
-                {eightSpirits.map((_, index) => (
-                  <div
-                    key={index}
-                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                      index === currentSpiritIndex ? 'bg-gold scale-125' : 'bg-gold/30'
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
+            {/* Subtitle - 静态展示（克制优雅） */}
+            <p
+              className="mx-auto text-center font-serif text-[20px] md:text-[22px] text-primary-dark/80 tracking-wider"
+              style={{ textShadow: '0 1px 2px rgba(255,255,255,0.85)', letterSpacing: '0.2em' }}
+            >
+              新闻记者、出版家
+            </p>
           </div>
         </div>
 
