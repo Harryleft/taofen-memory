@@ -186,13 +186,13 @@ export default function EnhancedHero() {
       >
         <div className="w-full h-full px-4 md:px-6 flex items-center justify-between text-gray-900">
           {/* Logo section */}
-          <div className="flex items-center">
+          {/* <div className="flex items-center">
             <img 
               src="/images/hero_page/taofen_name.svg" 
               alt="邹韬奋" 
-              className="h-12 w-auto opacity-90 hover:opacity-100 transition-opacity duration-200"
+              className="h-20 w-auto opacity-90 hover:opacity-100 transition-opacity duration-200"
             />
-          </div>
+          </div> */}
           
           {/* Navigation section */}
           <nav className="hidden md:flex items-center gap-8 text-base">
@@ -213,15 +213,12 @@ export default function EnhancedHero() {
           </nav>
         </div>
       </header>
-      {/* 背景图案层 - 保持适中的透明度以确保背景图片可见 */}
-      <div className="absolute inset-0 opacity-40">
-        <HeroPageBackdrop scrollY={scrollY} />
-      </div>
-      
+
       {/* 渐变遮罩层 - 为文字内容提供更好的对比度保护 */}
-      {/* <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-white/10 to-white/30" /> */}
-      {/* <div className="absolute inset-0 bg-gradient-to-r from-white/15 via-transparent to-white/15" /> */}
-      
+      <div className="absolute inset-0 opacity-30">
+        <HeroPageBackdrop scrollY={scrollY} />
+      </div>      
+
       {/* 几何装饰元素层 - 优化色彩层次和透明度 */}
       <div className="absolute inset-0">
         <div className="absolute top-20 left-20 w-32 h-32 bg-gradient-to-br from-gold/20 to-gold/5 rounded-full blur-xl" />
@@ -261,44 +258,120 @@ export default function EnhancedHero() {
     {/* Second Screen: Modules */}
     <section ref={secondSectionRef} className="relative min-h-screen flex flex-col justify-center bg-white">
       <div className="max-w-7xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
           {/* Timeline Module */}
-          <div className="group relative bg-white border border-gray-200 rounded-xl p-6 md:p-8 transition-transform duration-300 cursor-pointer hover:-translate-y-1" onClick={() => navigate('/timeline')} onMouseEnter={() => setActiveModule(0)} onMouseLeave={() => setActiveModule(null)} style={{ isolation: 'isolate' }}>
-            <div className="relative z-10 flex flex-col h-full">
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4 flex-shrink-0"><Scroll className="text-black/80" size={24} /></div>
-              <h3 className="text-xl md:text-2xl font-semibold text-gray-900 mb-2 font-sans flex-shrink-0">岁月行履</h3>
-              <p className="text-gray-700 leading-relaxed mb-4 text-sm flex-grow">循迹韬奋足音，见风云际会与初心不改</p>
-              <div className="flex items-center text-black/70 flex-shrink-0"><span className="text-sm font-medium">探索</span><ChevronDown className="ml-2 transform rotate-[-90deg]" size={14} /></div>
+          <div 
+            className="group relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1" 
+            onClick={() => navigate('/timeline')} 
+            onMouseEnter={() => setActiveModule(0)} 
+            onMouseLeave={() => setActiveModule(null)}
+            style={{ aspectRatio: '4/3' }}
+          >
+            {/* Background Image */}
+            <div className="absolute inset-0">
+              <img 
+                src="/images/hero_page/070_韬奋像_70.jpg" 
+                alt="韬奋像" 
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+            </div>
+            
+            {/* Content */}
+            <div className="relative z-10 flex flex-col justify-end h-full p-8">
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-3 leading-tight">
+                岁月行履
+              </h3>
+              <p className="text-white/90 text-base leading-relaxed mb-4">
+                循迹韬奋足音，见风云际会与初心不改
+              </p>
             </div>
           </div>
 
           {/* Bookstore Module */}
-          <div className="group relative bg-white border border-gray-200 rounded-xl p-6 md:p-8 transition-transform duration-300 cursor-pointer hover:-translate-y-1" onClick={() => navigate('/bookstore-timeline')} onMouseEnter={() => setActiveModule(1)} onMouseLeave={() => setActiveModule(null)} style={{ isolation: 'isolate' }}>
-            <div className="relative z-10 flex flex-col h-full">
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4 flex-shrink-0"><BookOpen className="text-black/80" size={24} /></div>
-              <h3 className="text-xl md:text-2xl font-semibold text-gray-900 mb-2 font-sans flex-shrink-0">生活与书</h3>
-              <p className="text-gray-700 leading-relaxed mb-4 text-sm flex-grow">在纸与铅字之间，重访生活书店的生长与担当</p>
-              <div className="flex items-center text-black/70 flex-shrink-0"><span className="text-sm font-medium">重访</span><ChevronDown className="ml-2 transform rotate-[-90deg]" size={14} /></div>
+          <div 
+            className="group relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1" 
+            onClick={() => navigate('/bookstore-timeline')} 
+            onMouseEnter={() => setActiveModule(1)} 
+            onMouseLeave={() => setActiveModule(null)}
+            style={{ aspectRatio: '4/3' }}
+          >
+            {/* Background Image */}
+            <div className="absolute inset-0">
+              <img 
+                src="/images/hero_page/shenghuo_first.jpg" 
+                alt="生活书店" 
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+            </div>
+            
+            {/* Content */}
+            <div className="relative z-10 flex flex-col justify-end h-full p-8">
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-3 leading-tight">
+                生活与书
+              </h3>
+              <p className="text-white/90 text-base leading-relaxed mb-4">
+                在纸与铅字之间，重访生活书店的生长与担当
+              </p>
             </div>
           </div>
 
           {/* Handwriting Module */}
-          <div className="group relative bg-white border border-gray-200 rounded-xl p-6 md:p-8 transition-transform duration-300 cursor-pointer hover:-translate-y-1" onClick={() => navigate('/handwriting')} onMouseEnter={() => setActiveModule(2)} onMouseLeave={() => setActiveModule(null)} style={{ isolation: 'isolate' }}>
-            <div className="relative z-10 flex flex-col h-full">
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4 flex-shrink-0"><FileText className="text-black/80" size={24} /></div>
-              <h3 className="text-xl md:text-2xl font-semibold text-gray-900 mb-2 font-sans flex-shrink-0">笔下风骨</h3>
-              <p className="text-gray-700 leading-relaxed mb-4 text-sm flex-grow">从字里行间，见其思虑与炽热</p>
-              <div className="flex items-center text-black/70 flex-shrink-0"><span className="text-sm font-medium">展开</span><ChevronDown className="ml-2 transform rotate-[-90deg]" size={14} /></div>
+          <div 
+            className="group relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1" 
+            onClick={() => navigate('/handwriting')} 
+            onMouseEnter={() => setActiveModule(2)} 
+            onMouseLeave={() => setActiveModule(null)}
+            style={{ aspectRatio: '4/3' }}
+          >
+            {/* Background Image */}
+            <div className="absolute inset-0">
+              <img 
+                src="/images/hero_page/shenghuoxinqikan.jpg" 
+                alt="生活新期刊" 
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+            </div>
+            
+            {/* Content */}
+            <div className="relative z-10 flex flex-col justify-end h-full p-8">
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-3 leading-tight">
+                笔下风骨
+              </h3>
+              <p className="text-white/90 text-base leading-relaxed mb-4">
+                从字里行间，见其思慮与炽热
+              </p>
             </div>
           </div>
 
           {/* Relationships Module */}
-          <div className="group relative bg-white border border-gray-200 rounded-xl p-6 md:p-8 transition-transform duration-300 cursor-pointer hover:-translate-y-1" onClick={() => navigate('/relationships')} onMouseEnter={() => setActiveModule(3)} onMouseLeave={() => setActiveModule(null)} style={{ isolation: 'isolate' }}>
-            <div className="relative z-10 flex flex-col h-full">
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4 flex-shrink-0"><Users className="text-black/80" size={24} /></div>
-              <h3 className="text-xl md:text-2xl font-semibold text-gray-900 mb-2 font-sans flex-shrink-0">同道群像</h3>
-              <p className="text-gray-700 leading-relaxed mb-4 text-sm flex-grow">以人观史，勾连一个时代的脉络</p>
-              <div className="flex items-center text-black/70 flex-shrink-0"><span className="text-sm font-medium">查看</span><ChevronDown className="ml-2 transform rotate-[-90deg]" size={14} /></div>
+          <div 
+            className="group relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1" 
+            onClick={() => navigate('/relationships')} 
+            onMouseEnter={() => setActiveModule(3)} 
+            onMouseLeave={() => setActiveModule(null)}
+            style={{ aspectRatio: '4/3' }}
+          >
+            {/* Background Image */}
+            <div className="absolute inset-0">
+              <img 
+                src="/images/hero_page/person_21609_3188023555816154777.jpg" 
+                alt="同道群像" 
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+            </div>
+            
+            {/* Content */}
+            <div className="relative z-10 flex flex-col justify-end h-full p-8">
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-3 leading-tight">
+                同道群像
+              </h3>
+              <p className="text-white/90 text-base leading-relaxed mb-4">
+                以人观史，勾连一个时代的脉络
+              </p>
             </div>
           </div>
         </div>
