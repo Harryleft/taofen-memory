@@ -1,4 +1,4 @@
-import { useEffect, useState, useLayoutEffect } from 'react';
+import { useEffect, useState, useLayoutEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ChevronDown, Scroll, Users, BookOpen, FileText } from 'lucide-react';
 import HeroPageBackdrop from './HeroPageBackdrop.tsx';
@@ -10,6 +10,12 @@ export default function EnhancedHero() {
   const [isVisible, setIsVisible] = useState(false);
   const [, setActiveModule] = useState<number | null>(null);
   const [titleVariant, setTitleVariant] = useState<'classic' | 'monumental' | 'editorial'>('monumental');
+  const secondSectionRef = useRef<HTMLDivElement | null>(null);
+  const scrollToModules = () => {
+    if (secondSectionRef.current) {
+      secondSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
   
   // —
 
@@ -89,11 +95,9 @@ export default function EnhancedHero() {
 
   const renderRoles = () => (
     <div className="mt-4">
-      <div className="inline-flex items-center gap-3 text-gray-900">
-        <span className="text-[14px] sm:text-[16px] md:text-[18px] font-semibold tracking-[0.08em]">新闻记者</span>
-        <span className="opacity-90 leading-none text-[18px] sm:text-[20px] md:text-[22px]">·</span>
-        <span className="text-[14px] sm:text-[16px] md:text-[18px] font-semibold tracking-[0.08em]">出版家</span>
-      </div>
+      <h2 className="QYzQ7d flow-root text-[16px] leading-[24px] tracking-[0.1px] text-gray-900 font-medium mb-3 max-h-[24px] overflow-hidden whitespace-nowrap">
+        沿邹韬奋的生活、事业与遗产，洞见时代精神
+      </h2>
     </div>
   );
   const renderTitleSection = () => {
@@ -163,6 +167,7 @@ export default function EnhancedHero() {
   };
 
   return (
+    <>
     <section className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-white to-cream">
       {/* 背景图案层 - 保持适中的透明度以确保背景图片可见 */}
       <div className="absolute inset-0 opacity-40">
@@ -193,156 +198,65 @@ export default function EnhancedHero() {
           </div>
         </div>
 
-        {/* Navigation Modules */}
-        <div 
-          className={`transform transition-all duration-1200 ease-out delay-400 ${
-            isVisible ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'
-          }`}
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
-            {/* Timeline Module */}
-            {/* 舞台化：不透明纸白表面 + 双层阴影 + 左侧色条 + 背景弱化层 */}
-            <div 
-              className="group relative bg-amber-50/70 border border-amber-200/80 rounded-2xl p-8 transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
-              onClick={() => navigate('/timeline')}
-              onMouseEnter={() => setActiveModule(0)}
-              onMouseLeave={() => setActiveModule(null)}
-              style={{ boxShadow: CARD_SHADOW, isolation: 'isolate' }}
-            >
-              {/* 手札装饰：纸张细纹理 */}
-              <div
-                aria-hidden
-                className="absolute inset-0 rounded-2xl pointer-events-none mix-blend-multiply"
-                style={{
-                  backgroundImage:
-                    'repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0 1px, rgba(0,0,0,0) 1px 3px), radial-gradient(1px 1px at 12% 18%, rgba(0,0,0,0.03) 0 1px, transparent 1px), radial-gradient(1px 1px at 68% 76%, rgba(0,0,0,0.025) 0 1px, transparent 1px), radial-gradient(1px 1px at 32% 62%, rgba(0,0,0,0.02) 0 1px, transparent 1px)',
-                  opacity: 0.8,
-                }}
-              />
-              {/* 半调网点移除，保持更纯粹的手札纸面 */}
-              {/* 背景弱化舞台（仅在卡片区域下方生效） */}
-              <div aria-hidden className="absolute left-0 right-0 bottom-[-6px] h-3 pointer-events-none rounded-b-2xl" style={{ backgroundImage:'repeating-linear-gradient(135deg, rgba(0,0,0,0.10) 0 2px, rgba(0,0,0,0) 2px 6px)', opacity:.35, filter:'blur(0.2px)'}} />
-              <div aria-hidden className="absolute inset-0 rounded-2xl pointer-events-none mix-blend-multiply" style={{ backgroundImage:'repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0 1px, rgba(0,0,0,0) 1px 3px), radial-gradient(1px 1px at 12% 18%, rgba(0,0,0,0.03) 0 1px, transparent 1px), radial-gradient(1px 1px at 68% 76%, rgba(0,0,0,0.025) 0 1px, transparent 1px), radial-gradient(1px 1px at 32% 62%, rgba(0,0,0,0.02) 0 1px, transparent 1px)', opacity:.8 }} />
-              {/* 半调网点移除 */}
-              <div className="absolute -inset-3 rounded-3xl -z-10 backdrop-blur-sm backdrop-brightness-105 backdrop-saturate-90" />
-              {/* 左侧色条 */}
-              <div className="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl bg-amber-600" />
-              <div className="absolute inset-0 bg-gradient-to-br from-gold/5 to-heritage-blue/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="relative z-10 flex flex-col h-full">
-                <div className="w-12 h-12 bg-gradient-to-br from-amber-500/20 to-amber-400/10 rounded-2xl flex items-center justify-center mb-6 group-hover:from-amber-500/30 group-hover:to-amber-400/20 transition-all duration-300 flex-shrink-0">
-                  <Scroll className="text-gold group-hover:scale-110 transition-transform duration-300" size={26} />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-gold transition-colors duration-300 font-serif flex-shrink-0">
-                  岁月行履
-                </h3>
-                <p className="text-gray-800 leading-relaxed mb-6 text-sm flex-grow">
-                  循迹韬奋足音，见风云际会与初心不改
-                </p>
-                <div className="flex items-center text-gold group-hover:text-gold/80 transition-colors duration-300 flex-shrink-0">
-                  <span className="text-sm font-medium">探索</span>
-                  <ChevronDown className="ml-2 transform rotate-[-90deg] group-hover:translate-x-1 transition-transform duration-300" size={14} />
-                </div>
-              </div>
-            </div>
-
-            {/* Bookstore Module */}
-            <div 
-              className="group relative bg-amber-50/70 border border-amber-200/80 rounded-2xl p-8 transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
-              onClick={() => navigate('/bookstore-timeline')}
-              onMouseEnter={() => setActiveModule(1)}
-              onMouseLeave={() => setActiveModule(null)}
-              style={{ boxShadow: CARD_SHADOW, isolation: 'isolate' }}
-            >
-              <div aria-hidden className="absolute left-0 right-0 bottom-[-6px] h-3 pointer-events-none rounded-b-2xl" style={{ backgroundImage:'repeating-linear-gradient(135deg, rgba(0,0,0,0.10) 0 2px, rgba(0,0,0,0) 2px 6px)', opacity:.35, filter:'blur(0.2px)'}} />
-              <div aria-hidden className="absolute inset-0 rounded-2xl pointer-events-none mix-blend-multiply" style={{ backgroundImage:'repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0 1px, rgba(0,0,0,0) 1px 3px), radial-gradient(1px 1px at 12% 18%, rgba(0,0,0,0.03) 0 1px, transparent 1px), radial-gradient(1px 1px at 68% 76%, rgba(0,0,0,0.025) 0 1px, transparent 1px), radial-gradient(1px 1px at 32% 62%, rgba(0,0,0,0.02) 0 1px, transparent 1px)', opacity:.8 }} />
-              {/* 半调网点移除 */}
-              <div className="absolute -inset-3 rounded-3xl -z-10 backdrop-blur-sm backdrop-brightness-105 backdrop-saturate-90" />
-              <div className="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl bg-blue-600" />
-              <div className="absolute inset-0 bg-gradient-to-br from-heritage-blue/5 to-gold/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="relative z-10 flex flex-col h-full">
-     
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500/20 to-blue-400/10 rounded-2xl flex items-center justify-center mb-6 group-hover:from-blue-500/30 group-hover:to-blue-400/20 transition-all duration-300 flex-shrink-0">
-                  <BookOpen className="text-heritage-blue group-hover:scale-110 transition-transform duration-300" size={26} />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-heritage-blue transition-colors duration-300 font-serif flex-shrink-0">
-                  生活与书
-                </h3>
-                <p className="text-gray-800 leading-relaxed mb-6 text-sm flex-grow">
-                  在纸与铅字之间，重访生活书店的生长与担当
-                </p>
-                <div className="flex items-center text-heritage-blue group-hover:text-heritage-blue/80 transition-colors duration-300 flex-shrink-0">
-                  <span className="text-sm font-medium">重访</span>
-                  <ChevronDown className="ml-2 transform rotate-[-90deg] group-hover:translate-x-1 transition-transform duration-300" size={14} />
-                </div>
-              </div>
-            </div>
-
-            {/* Handwriting Module */}
-            <div 
-              className="group relative bg-amber-50/70 border border-amber-200/80 rounded-2xl p-8 transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
-              onClick={() => navigate('/handwriting')}
-              onMouseEnter={() => setActiveModule(2)}
-              onMouseLeave={() => setActiveModule(null)}
-              style={{ boxShadow: CARD_SHADOW, isolation: 'isolate' }}
-            >
-              <div aria-hidden className="absolute left-0 right-0 bottom-[-6px] h-3 pointer-events-none rounded-b-2xl" style={{ backgroundImage:'repeating-linear-gradient(135deg, rgba(0,0,0,0.10) 0 2px, rgba(0,0,0,0) 2px 6px)', opacity:.35, filter:'blur(0.2px)'}} />
-              <div aria-hidden className="absolute inset-0 rounded-2xl pointer-events-none mix-blend-multiply" style={{ backgroundImage:'repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0 1px, rgba(0,0,0,0) 1px 3px), radial-gradient(1px 1px at 12% 18%, rgba(0,0,0,0.03) 0 1px, transparent 1px), radial-gradient(1px 1px at 68% 76%, rgba(0,0,0,0.025) 0 1px, transparent 1px), radial-gradient(1px 1px at 32% 62%, rgba(0,0,0,0.02) 0 1px, transparent 1px)', opacity:.8 }} />
-              {/* 半调网点移除 */}
-              <div className="absolute -inset-3 rounded-3xl -z-10 backdrop-blur-sm backdrop-brightness-105 backdrop-saturate-90" />
-              <div className="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl bg-emerald-600" />
-              <div className="absolute inset-0 bg-gradient-to-br from-sage-green/5 to-gold/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="relative z-10 flex flex-col h-full">
-                <div className="w-12 h-12 bg-gradient-to-br from-emerald-500/20 to-emerald-400/10 rounded-2xl flex items-center justify-center mb-6 group-hover:from-emerald-500/30 group-hover:to-emerald-400/20 transition-all duration-300 flex-shrink-0">
-                  <FileText className="text-sage-green group-hover:scale-110 transition-transform duration-300" size={26} />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-sage-green transition-colors duration-300 font-serif flex-shrink-0">
-                  笔下风骨
-                </h3>
-                <p className="text-gray-800 leading-relaxed mb-6 text-sm flex-grow">
-                  从字里行间，见其思虑与炽热
-                </p>
-                <div className="flex items-center text-sage-green group-hover:text-sage-green/80 transition-colors duration-300 flex-shrink-0">
-                  <span className="text-sm font-medium">展开</span>
-                  <ChevronDown className="ml-2 transform rotate-[-90deg] group-hover:translate-x-1 transition-transform duration-300" size={14} />
-                </div>
-              </div>
-            </div>
-
-            {/* Relationships Module */}
-            <div 
-              className="group relative bg-amber-50/70 border border-amber-200/80 rounded-2xl p-8 transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
-              onClick={() => navigate('/relationships')}
-              onMouseEnter={() => setActiveModule(3)}
-              onMouseLeave={() => setActiveModule(null)}
-              style={{ boxShadow: CARD_SHADOW, isolation: 'isolate' }}
-            >
-              <div aria-hidden className="absolute left-0 right-0 bottom-[-6px] h-3 pointer-events-none rounded-b-2xl" style={{ backgroundImage:'repeating-linear-gradient(135deg, rgba(0,0,0,0.10) 0 2px, rgba(0,0,0,0) 2px 6px)', opacity:.35, filter:'blur(0.2px)'}} />
-              <div aria-hidden className="absolute inset-0 rounded-2xl pointer-events-none mix-blend-multiply" style={{ backgroundImage:'repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0 1px, rgba(0,0,0,0) 1px 3px), radial-gradient(1px 1px at 12% 18%, rgba(0,0,0,0.03) 0 1px, transparent 1px), radial-gradient(1px 1px at 68% 76%, rgba(0,0,0,0.025) 0 1px, transparent 1px), radial-gradient(1px 1px at 32% 62%, rgba(0,0,0,0.02) 0 1px, transparent 1px)', opacity:.8 }} />
-              {/* 半调网点移除 */}
-              <div className="absolute -inset-3 rounded-3xl -z-10 backdrop-blur-sm backdrop-brightness-105 backdrop-saturate-90" />
-              <div className="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl bg-rose-600" />
-              <div className="absolute inset-0 bg-gradient-to-br from-warm-rose/5 to-heritage-blue/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="relative z-10 flex flex-col h-full">
-                <div className="w-12 h-12 bg-gradient-to-br from-rose-500/20 to-rose-400/10 rounded-2xl flex items-center justify-center mb-6 group-hover:from-rose-500/30 group-hover:to-rose-400/20 transition-all duration-300 flex-shrink-0">
-                  <Users className="text-warm-rose group-hover:scale-110 transition-transform duration-300" size={26} />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-warm-rose transition-colors duration-300 font-serif flex-shrink-0">
-                  同道群像
-                </h3>
-                <p className="text-gray-800 leading-relaxed mb-6 text-sm flex-grow">
-                  以人观史，勾连一个时代的脉络
-                </p>
-                <div className="flex items-center text-warm-rose group-hover:text-warm-rose/80 transition-colors duration-300 flex-shrink-0">
-                  <span className="text-sm font-medium">查看</span>
-                  <ChevronDown className="ml-2 transform rotate-[-90deg] group-hover:translate-x-1 transition-transform duration-300" size={14} />
-                </div>
-              </div>
-            </div>
-          </div>
+        {/* Scroll Cue */}
+        <div className="absolute bottom-8 left-0 right-0 flex justify-center">
+          <button aria-label="下滑查看更多" onClick={scrollToModules} className="text-black/60 hover:text-black focus:outline-none">
+            <svg width="48" height="48" viewBox="0 0 24 24" style={{ transform: 'matrix3d(1, 0, 0, 0, 0, -1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1)' }}>
+              <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path>
+            </svg>
+          </button>
         </div>
 
 
       </div>
     </section>
+
+    {/* Second Screen: Modules */}
+    <section ref={secondSectionRef} className="relative min-h-screen flex flex-col justify-center bg-white">
+      <div className="max-w-7xl mx-auto px-6 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+          {/* Timeline Module */}
+          <div className="group relative bg-white border border-gray-200 rounded-xl p-6 md:p-8 transition-transform duration-300 cursor-pointer hover:-translate-y-1" onClick={() => navigate('/timeline')} onMouseEnter={() => setActiveModule(0)} onMouseLeave={() => setActiveModule(null)} style={{ isolation: 'isolate' }}>
+            <div className="relative z-10 flex flex-col h-full">
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4 flex-shrink-0"><Scroll className="text-black/80" size={24} /></div>
+              <h3 className="text-xl md:text-2xl font-semibold text-gray-900 mb-2 font-sans flex-shrink-0">岁月行履</h3>
+              <p className="text-gray-700 leading-relaxed mb-4 text-sm flex-grow">循迹韬奋足音，见风云际会与初心不改</p>
+              <div className="flex items-center text-black/70 flex-shrink-0"><span className="text-sm font-medium">探索</span><ChevronDown className="ml-2 transform rotate-[-90deg]" size={14} /></div>
+            </div>
+          </div>
+
+          {/* Bookstore Module */}
+          <div className="group relative bg-white border border-gray-200 rounded-xl p-6 md:p-8 transition-transform duration-300 cursor-pointer hover:-translate-y-1" onClick={() => navigate('/bookstore-timeline')} onMouseEnter={() => setActiveModule(1)} onMouseLeave={() => setActiveModule(null)} style={{ isolation: 'isolate' }}>
+            <div className="relative z-10 flex flex-col h-full">
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4 flex-shrink-0"><BookOpen className="text-black/80" size={24} /></div>
+              <h3 className="text-xl md:text-2xl font-semibold text-gray-900 mb-2 font-sans flex-shrink-0">生活与书</h3>
+              <p className="text-gray-700 leading-relaxed mb-4 text-sm flex-grow">在纸与铅字之间，重访生活书店的生长与担当</p>
+              <div className="flex items-center text-black/70 flex-shrink-0"><span className="text-sm font-medium">重访</span><ChevronDown className="ml-2 transform rotate-[-90deg]" size={14} /></div>
+            </div>
+          </div>
+
+          {/* Handwriting Module */}
+          <div className="group relative bg-white border border-gray-200 rounded-xl p-6 md:p-8 transition-transform duration-300 cursor-pointer hover:-translate-y-1" onClick={() => navigate('/handwriting')} onMouseEnter={() => setActiveModule(2)} onMouseLeave={() => setActiveModule(null)} style={{ isolation: 'isolate' }}>
+            <div className="relative z-10 flex flex-col h-full">
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4 flex-shrink-0"><FileText className="text-black/80" size={24} /></div>
+              <h3 className="text-xl md:text-2xl font-semibold text-gray-900 mb-2 font-sans flex-shrink-0">笔下风骨</h3>
+              <p className="text-gray-700 leading-relaxed mb-4 text-sm flex-grow">从字里行间，见其思虑与炽热</p>
+              <div className="flex items-center text-black/70 flex-shrink-0"><span className="text-sm font-medium">展开</span><ChevronDown className="ml-2 transform rotate-[-90deg]" size={14} /></div>
+            </div>
+          </div>
+
+          {/* Relationships Module */}
+          <div className="group relative bg-white border border-gray-200 rounded-xl p-6 md:p-8 transition-transform duration-300 cursor-pointer hover:-translate-y-1" onClick={() => navigate('/relationships')} onMouseEnter={() => setActiveModule(3)} onMouseLeave={() => setActiveModule(null)} style={{ isolation: 'isolate' }}>
+            <div className="relative z-10 flex flex-col h-full">
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4 flex-shrink-0"><Users className="text-black/80" size={24} /></div>
+              <h3 className="text-xl md:text-2xl font-semibold text-gray-900 mb-2 font-sans flex-shrink-0">同道群像</h3>
+              <p className="text-gray-700 leading-relaxed mb-4 text-sm flex-grow">以人观史，勾连一个时代的脉络</p>
+              <div className="flex items-center text-black/70 flex-shrink-0"><span className="text-sm font-medium">查看</span><ChevronDown className="ml-2 transform rotate-[-90deg]" size={14} /></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    </>
   );
 }
