@@ -155,25 +155,30 @@ function SiteLogo({ className = "", onClick }: SiteLogoProps) {
       className={`group flex items-center gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg p-1 transition-all duration-[${ANIMATION.duration.normal}] ${className}`}
       aria-label="韬奋纪念馆首页"
     >
-      {/* Logo Icon */}
-      <div className="w-8 h-8 bg-gradient-to-br from-amber-600 to-orange-600 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-[${ANIMATION.duration.normal}] transform group-hover:scale-105">
-        <svg
-          className="w-5 h-5 text-white"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-        >
-          <path d="M12 2L2 7v10c0 5.55 3.84 9.739 9 11 5.16-1.261 9-5.45 9-11V7l-10-5z"/>
-          <path d="M12 8v8M8 12l8 0" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+      {/* Logo Icon - 灰黑书页 + 琥珀书签（与当前灰黑/金色体系协调） */}
+      <div
+          className="w-9 h-9 rounded-lg bg-gray-900 text-white ring-1 ring-amber-400/20 flex items-center justify-center shadow-md group-hover:shadow-lg transition-all duration-[${ANIMATION.duration.normal}] transform group-hover:scale-105">
+        <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor"
+             viewBox="0 0 24 24">
+          <rect x="3" y="6" width="18" height="12" rx="2" strokeWidth="1.5"/>
+          <rect x="6" y="3" width="12" height="8" rx="1" strokeWidth="1.5"
+                fill="currentColor" fillOpacity="0.2"/>
+          <circle cx="8" cy="12" r="1" fill="currentColor"/>
+          <circle cx="12" cy="12" r="1" fill="currentColor"/>
+          <circle cx="16" cy="12" r="1" fill="currentColor"/>
+          <circle cx="10" cy="15" r="1" fill="currentColor"/>
+          <circle cx="14" cy="15" r="1" fill="currentColor"/>
         </svg>
       </div>
 
       {/* Logo Text */}
       <div className="flex flex-col items-start">
-        <span className={`font-bold text-xl text-gray-900 group-hover:text-amber-800 transition-colors duration-[${ANIMATION.duration.normal}]`}>
+        <span
+            className={`font-bold text-xl text-gray-900 group-hover:text-amber-800 transition-colors duration-[${ANIMATION.duration.normal}]`}>
           韬奋 · 纪念
         </span>
-        <span className={`text-xs text-gray-500 leading-none mt-0.5 group-hover:text-amber-600 transition-colors duration-[${ANIMATION.duration.normal}] font-medium tracking-wide`}>
+        <span
+            className={`text-xs text-gray-500 leading-none mt-0.5 group-hover:text-amber-600 transition-colors duration-[${ANIMATION.duration.normal}] font-medium tracking-wide`}>
           TAOFEN MEMORIAL
         </span>
       </div>
