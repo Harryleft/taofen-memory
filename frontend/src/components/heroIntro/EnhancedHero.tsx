@@ -177,7 +177,7 @@ export default function EnhancedHero() {
               style={{ boxShadow: CARD_SHADOW, isolation: 'isolate' }}
             >
               {/* 手札装饰：上沿打孔、底部撕边、右上折角、纸张细纹理 */}
-              <div aria-hidden className="absolute left-0 right-0 top-0 h-6 pointer-events-none flex items-center justify-around px-6">
+              {/* <div aria-hidden className="absolute left-0 right-0 top-0 h-6 pointer-events-none flex items-center justify-around px-6">
                 {Array.from({ length: 7 }).map((_, i) => (
                   <div
                     key={i}
@@ -188,7 +188,7 @@ export default function EnhancedHero() {
                     }}
                   />
                 ))}
-              </div>
+              </div> */}
               <div
                 aria-hidden
                 className="absolute left-0 right-0 bottom-[-6px] h-3 pointer-events-none rounded-b-2xl"
@@ -225,7 +225,7 @@ export default function EnhancedHero() {
               <div className="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl bg-amber-600" />
               <div className="absolute inset-0 bg-gradient-to-br from-gold/5 to-heritage-blue/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="relative z-10 flex flex-col h-full">
-                <div className="w-16 h-16 bg-gradient-to-br from-amber-500/20 to-amber-400/10 rounded-2xl flex items-center justify-center mb-6 group-hover:from-amber-500/30 group-hover:to-amber-400/20 transition-all duration-300 flex-shrink-0">
+                <div className="w-12 h-12 bg-gradient-to-br from-amber-500/20 to-amber-400/10 rounded-2xl flex items-center justify-center mb-6 group-hover:from-amber-500/30 group-hover:to-amber-400/20 transition-all duration-300 flex-shrink-0">
                   <Scroll className="text-gold group-hover:scale-110 transition-transform duration-300" size={26} />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-gold transition-colors duration-300 font-serif flex-shrink-0">
@@ -249,14 +249,14 @@ export default function EnhancedHero() {
               onMouseLeave={() => setActiveModule(null)}
               style={{ boxShadow: CARD_SHADOW, isolation: 'isolate' }}
             >
-              <div aria-hidden className="absolute left-0 right-0 top-0 h-6 pointer-events-none flex items-center justify-around px-6">
+              {/* <div aria-hidden className="absolute left-0 right-0 top-0 h-6 pointer-events-none flex items-center justify-around px-6">
                 {Array.from({ length: 7 }).map((_, i) => (
                   <div key={i} className="w-2.5 h-2.5 rounded-full" style={{
                     background:
                       'radial-gradient(circle at 50% 50%, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0.22) 35%, rgba(0,0,0,0.06) 36%, rgba(0,0,0,0) 62%)',
                   }} />
                 ))}
-              </div>
+              </div> */}
               <div aria-hidden className="absolute left-0 right-0 bottom-[-6px] h-3 pointer-events-none rounded-b-2xl" style={{ backgroundImage:'repeating-linear-gradient(135deg, rgba(0,0,0,0.10) 0 2px, rgba(0,0,0,0) 2px 6px)', opacity:.35, filter:'blur(0.2px)'}} />
               <div aria-hidden className="absolute right-0 top-0 w-8 h-8 pointer-events-none transition-transform duration-300 origin-top-right group-hover:-rotate-6 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:shadow-md" style={{ background:'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.75) 60%, rgba(255,255,255,0) 60%)', boxShadow:'0 1px 2px rgba(0,0,0,0.08)', clipPath:'polygon(100% 0, 0 0, 100% 100%)'}} />
               <div aria-hidden className="absolute inset-0 rounded-2xl pointer-events-none mix-blend-multiply" style={{ backgroundImage:'repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0 1px, rgba(0,0,0,0) 1px 3px), radial-gradient(1px 1px at 12% 18%, rgba(0,0,0,0.03) 0 1px, transparent 1px), radial-gradient(1px 1px at 68% 76%, rgba(0,0,0,0.025) 0 1px, transparent 1px), radial-gradient(1px 1px at 32% 62%, rgba(0,0,0,0.02) 0 1px, transparent 1px)', opacity:.8 }} />
@@ -265,7 +265,7 @@ export default function EnhancedHero() {
               <div className="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl bg-blue-600" />
               <div className="absolute inset-0 bg-gradient-to-br from-heritage-blue/5 to-gold/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="relative z-10 flex flex-col h-full">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500/20 to-blue-400/10 rounded-2xl flex items-center justify-center mb-6 group-hover:from-blue-500/30 group-hover:to-blue-400/20 transition-all duration-300 flex-shrink-0">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500/20 to-blue-400/10 rounded-2xl flex items-center justify-center mb-6 group-hover:from-blue-500/30 group-hover:to-blue-400/20 transition-all duration-300 flex-shrink-0">
                   <BookOpen className="text-heritage-blue group-hover:scale-110 transition-transform duration-300" size={26} />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-heritage-blue transition-colors duration-300 font-serif flex-shrink-0">
@@ -289,11 +289,11 @@ export default function EnhancedHero() {
               onMouseLeave={() => setActiveModule(null)}
               style={{ boxShadow: CARD_SHADOW, isolation: 'isolate' }}
             >
-              <div aria-hidden className="absolute left-0 right-0 top-0 h-6 pointer-events-none flex items-center justify-around px-6">
+              {/* <div aria-hidden className="absolute left-0 right-0 top-0 h-6 pointer-events-none flex items-center justify-around px-6">
                 {Array.from({ length: 7 }).map((_, i) => (
                   <div key={i} className="w-2.5 h-2.5 rounded-full" style={{ background:'radial-gradient(circle at 50% 50%, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0.22) 35%, rgba(0,0,0,0.06) 36%, rgba(0,0,0,0) 62%)' }} />
                 ))}
-              </div>
+              </div> */}
               <div aria-hidden className="absolute left-0 right-0 bottom-[-6px] h-3 pointer-events-none rounded-b-2xl" style={{ backgroundImage:'repeating-linear-gradient(135deg, rgba(0,0,0,0.10) 0 2px, rgba(0,0,0,0) 2px 6px)', opacity:.35, filter:'blur(0.2px)'}} />
               <div aria-hidden className="absolute right-0 top-0 w-8 h-8 pointer-events-none transition-transform duration-300 origin-top-right group-hover:-rotate-6 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:shadow-md" style={{ background:'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.75) 60%, rgba(255,255,255,0) 60%)', boxShadow:'0 1px 2px rgba(0,0,0,0.08)', clipPath:'polygon(100% 0, 0 0, 100% 100%)'}} />
               <div aria-hidden className="absolute inset-0 rounded-2xl pointer-events-none mix-blend-multiply" style={{ backgroundImage:'repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0 1px, rgba(0,0,0,0) 1px 3px), radial-gradient(1px 1px at 12% 18%, rgba(0,0,0,0.03) 0 1px, transparent 1px), radial-gradient(1px 1px at 68% 76%, rgba(0,0,0,0.025) 0 1px, transparent 1px), radial-gradient(1px 1px at 32% 62%, rgba(0,0,0,0.02) 0 1px, transparent 1px)', opacity:.8 }} />
@@ -302,7 +302,7 @@ export default function EnhancedHero() {
               <div className="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl bg-emerald-600" />
               <div className="absolute inset-0 bg-gradient-to-br from-sage-green/5 to-gold/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="relative z-10 flex flex-col h-full">
-                <div className="w-16 h-16 bg-gradient-to-br from-emerald-500/20 to-emerald-400/10 rounded-2xl flex items-center justify-center mb-6 group-hover:from-emerald-500/30 group-hover:to-emerald-400/20 transition-all duration-300 flex-shrink-0">
+                <div className="w-12 h-12 bg-gradient-to-br from-emerald-500/20 to-emerald-400/10 rounded-2xl flex items-center justify-center mb-6 group-hover:from-emerald-500/30 group-hover:to-emerald-400/20 transition-all duration-300 flex-shrink-0">
                   <FileText className="text-sage-green group-hover:scale-110 transition-transform duration-300" size={26} />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-sage-green transition-colors duration-300 font-serif flex-shrink-0">
@@ -326,11 +326,11 @@ export default function EnhancedHero() {
               onMouseLeave={() => setActiveModule(null)}
               style={{ boxShadow: CARD_SHADOW, isolation: 'isolate' }}
             >
-              <div aria-hidden className="absolute left-0 right-0 top-0 h-6 pointer-events-none flex items-center justify-around px-6">
+              {/* <div aria-hidden className="absolute left-0 right-0 top-0 h-6 pointer-events-none flex items-center justify-around px-6">
                 {Array.from({ length: 7 }).map((_, i) => (
                   <div key={i} className="w-2.5 h-2.5 rounded-full" style={{ background:'radial-gradient(circle at 50% 50%, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0.22) 35%, rgba(0,0,0,0.06) 36%, rgba(0,0,0,0) 62%)' }} />
                 ))}
-              </div>
+              </div> */}
               <div aria-hidden className="absolute left-0 right-0 bottom-[-6px] h-3 pointer-events-none rounded-b-2xl" style={{ backgroundImage:'repeating-linear-gradient(135deg, rgba(0,0,0,0.10) 0 2px, rgba(0,0,0,0) 2px 6px)', opacity:.35, filter:'blur(0.2px)'}} />
               <div aria-hidden className="absolute right-0 top-0 w-8 h-8 pointer-events-none transition-transform duration-300 origin-top-right group-hover:-rotate-6 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:shadow-md" style={{ background:'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.75) 60%, rgba(255,255,255,0) 60%)', boxShadow:'0 1px 2px rgba(0,0,0,0.08)', clipPath:'polygon(100% 0, 0 0, 100% 100%)'}} />
               <div aria-hidden className="absolute inset-0 rounded-2xl pointer-events-none mix-blend-multiply" style={{ backgroundImage:'repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0 1px, rgba(0,0,0,0) 1px 3px), radial-gradient(1px 1px at 12% 18%, rgba(0,0,0,0.03) 0 1px, transparent 1px), radial-gradient(1px 1px at 68% 76%, rgba(0,0,0,0.025) 0 1px, transparent 1px), radial-gradient(1px 1px at 32% 62%, rgba(0,0,0,0.02) 0 1px, transparent 1px)', opacity:.8 }} />
@@ -339,7 +339,7 @@ export default function EnhancedHero() {
               <div className="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl bg-rose-600" />
               <div className="absolute inset-0 bg-gradient-to-br from-warm-rose/5 to-heritage-blue/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="relative z-10 flex flex-col h-full">
-                <div className="w-16 h-16 bg-gradient-to-br from-rose-500/20 to-rose-400/10 rounded-2xl flex items-center justify-center mb-6 group-hover:from-rose-500/30 group-hover:to-rose-400/20 transition-all duration-300 flex-shrink-0">
+                <div className="w-12 h-12 bg-gradient-to-br from-rose-500/20 to-rose-400/10 rounded-2xl flex items-center justify-center mb-6 group-hover:from-rose-500/30 group-hover:to-rose-400/20 transition-all duration-300 flex-shrink-0">
                   <Users className="text-warm-rose group-hover:scale-110 transition-transform duration-300" size={26} />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-warm-rose transition-colors duration-300 font-serif flex-shrink-0">
