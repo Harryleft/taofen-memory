@@ -176,8 +176,6 @@ export default function EnhancedHero() {
               onMouseLeave={() => setActiveModule(null)}
               style={{ boxShadow: CARD_SHADOW, isolation: 'isolate' }}
             >
-              {/* 顶部色带：更高饱和度的引导色 */}
-              <div aria-hidden className="absolute top-0 left-0 right-0 h-1.5 rounded-t-2xl bg-amber-600" />
               {/* 手札装饰：上沿打孔、底部撕边、右上折角、纸张细纹理 */}
               <div aria-hidden className="absolute left-0 right-0 top-0 h-6 pointer-events-none flex items-center justify-around px-6">
                 {Array.from({ length: 7 }).map((_, i) => (
@@ -251,7 +249,6 @@ export default function EnhancedHero() {
               onMouseLeave={() => setActiveModule(null)}
               style={{ boxShadow: CARD_SHADOW, isolation: 'isolate' }}
             >
-              <div aria-hidden className="absolute top-0 left-0 right-0 h-1.5 rounded-t-2xl bg-blue-600" />
               <div aria-hidden className="absolute left-0 right-0 top-0 h-6 pointer-events-none flex items-center justify-around px-6">
                 {Array.from({ length: 7 }).map((_, i) => (
                   <div key={i} className="w-2.5 h-2.5 rounded-full" style={{
@@ -292,7 +289,6 @@ export default function EnhancedHero() {
               onMouseLeave={() => setActiveModule(null)}
               style={{ boxShadow: CARD_SHADOW, isolation: 'isolate' }}
             >
-              <div aria-hidden className="absolute top-0 left-0 right-0 h-1.5 rounded-t-2xl bg-emerald-600" />
               <div aria-hidden className="absolute left-0 right-0 top-0 h-6 pointer-events-none flex items-center justify-around px-6">
                 {Array.from({ length: 7 }).map((_, i) => (
                   <div key={i} className="w-2.5 h-2.5 rounded-full" style={{ background:'radial-gradient(circle at 50% 50%, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0.22) 35%, rgba(0,0,0,0.06) 36%, rgba(0,0,0,0) 62%)' }} />
@@ -330,7 +326,6 @@ export default function EnhancedHero() {
               onMouseLeave={() => setActiveModule(null)}
               style={{ boxShadow: CARD_SHADOW, isolation: 'isolate' }}
             >
-              <div aria-hidden className="absolute top-0 left-0 right-0 h-1.5 rounded-t-2xl bg-rose-600" />
               <div aria-hidden className="absolute left-0 right-0 top-0 h-6 pointer-events-none flex items-center justify-around px-6">
                 {Array.from({ length: 7 }).map((_, i) => (
                   <div key={i} className="w-2.5 h-2.5 rounded-full" style={{ background:'radial-gradient(circle at 50% 50%, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0.22) 35%, rgba(0,0,0,0.06) 36%, rgba(0,0,0,0) 62%)' }} />
