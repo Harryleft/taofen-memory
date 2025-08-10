@@ -69,14 +69,6 @@ const THEME = {
   }
 } as const;
 
-// 响应式断点配置（为将来扩展预留）
-const BREAKPOINTS = {
-  sm: '640px',
-  md: '768px',
-  lg: '1024px',
-  xl: '1280px'
-} as const;
-
 // 动画配置
 const ANIMATION = {
   duration: {
@@ -469,7 +461,7 @@ export default function EnhancedHero() {
         {/* Title Section - Centered vertically in the card with transparent background */}
         <div className="absolute top-1/2 left-0 right-0 z-30 overflow-visible transform -translate-y-1/2">
           <div className="relative overflow-visible">
-            <div className={`relative inline-block transform -translate-x-12 group-hover:-translate-x-8 transition-all duration-[${ANIMATION.duration.slow}] overflow-visible`}>
+            <div className={`relative inline-block transform -translate-x-10 group-hover:-translate-x-6 transition-all duration-[${ANIMATION.duration.slow}] overflow-visible`}>
               {/* Title text with always transparent background */}
               <div className="relative px-8 py-4 bg-transparent">
                 <h3
@@ -488,7 +480,7 @@ export default function EnhancedHero() {
 
         {/* Main Card */}
         <div
-          className={`relative bg-white shadow-2xl rounded-lg transition-all duration-[${ANIMATION.duration.slow}] cursor-pointer transform group-hover:scale-[1.02] group-hover:-translate-y-1 overflow-hidden`}
+          className={`relative bg-white shadow-2xl rounded-lg transition-all duration-[${ANIMATION.duration.slow}] cursor-pointer transform group-hover:scale-[1.015] group-hover:-translate-y-0.5 overflow-hidden`}
           onClick={() => navigate(module.path)}
           onMouseEnter={() => setActiveModule(module.id)}
           onMouseLeave={() => setActiveModule(null)}
@@ -539,9 +531,6 @@ export default function EnhancedHero() {
         onClick={scrollToModules}
         className={`group flex flex-col items-center text-gray-600 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg transition-colors duration-[${ANIMATION.duration.normal}] p-2`}
       >
-        <span className={`text-sm font-medium mb-2 opacity-80 group-hover:opacity-100 transition-opacity duration-[${ANIMATION.duration.normal}]`}>
-          探索更多
-        </span>
         <div className="w-12 h-12 rounded-full border-2 border-current opacity-70 group-hover:opacity-100 flex items-center justify-center animate-bounce">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
@@ -631,7 +620,7 @@ export default function EnhancedHero() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-20 max-w-6xl mx-auto overflow-visible">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-20 max-w-6xl mx-auto overflow-visible -ml-2.5">
             {MODULE_ITEMS.map((module) => (
               <ModuleCard key={module.id} module={module} />
             ))}
