@@ -233,8 +233,11 @@ export default function EnhancedHero() {
         </div>
 
         {/* Scroll Cue */}
-        <div className="absolute bottom-8 left-0 right-0 flex justify-center">
-          <button aria-label="下滑查看更多" onClick={scrollToModules} className="text-black/60 hover:text-black focus:outline-none">
+        <div className="absolute bottom-4 left-0 right-0 flex justify-center">
+          <button
+            aria-label="下滑查看更多"
+            onClick={scrollToModules}
+            className="text-black/60 hover:text-black focus:outline-none animate-subtle-float hover:animate-none">
             <svg width="48" height="48" viewBox="0 0 24 24" style={{ transform: 'matrix3d(1, 0, 0, 0, 0, -1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1)' }}>
               <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path>
             </svg>
