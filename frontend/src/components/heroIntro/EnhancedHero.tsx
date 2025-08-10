@@ -176,39 +176,7 @@ export default function EnhancedHero() {
               onMouseLeave={() => setActiveModule(null)}
               style={{ boxShadow: CARD_SHADOW, isolation: 'isolate' }}
             >
-              {/* 手札装饰：上沿打孔、底部撕边、右上折角、纸张细纹理 */}
-              {/* <div aria-hidden className="absolute left-0 right-0 top-0 h-6 pointer-events-none flex items-center justify-around px-6">
-                {Array.from({ length: 7 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="w-2.5 h-2.5 rounded-full"
-                    style={{
-                      background:
-                        'radial-gradient(circle at 50% 50%, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0.22) 35%, rgba(0,0,0,0.06) 36%, rgba(0,0,0,0) 62%)',
-                    }}
-                  />
-                ))}
-              </div> */}
-              <div
-                aria-hidden
-                className="absolute left-0 right-0 bottom-[-6px] h-3 pointer-events-none rounded-b-2xl"
-                style={{
-                  backgroundImage:
-                    'repeating-linear-gradient(135deg, rgba(0,0,0,0.10) 0 2px, rgba(0,0,0,0) 2px 6px)',
-                  opacity: 0.35,
-                  filter: 'blur(0.2px)',
-                }}
-              />
-              <div
-                aria-hidden
-                className="absolute right-0 top-0 w-8 h-8 pointer-events-none transition-transform duration-300 origin-top-right group-hover:-rotate-6 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:shadow-md"
-                style={{
-                  background:
-                    'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.75) 60%, rgba(255,255,255,0) 60%)',
-                  boxShadow: '0 1px 2px rgba(0,0,0,0.08)',
-                  clipPath: 'polygon(100% 0, 0 0, 100% 100%)',
-                }}
-              />
+              {/* 手札装饰：纸张细纹理 */}
               <div
                 aria-hidden
                 className="absolute inset-0 rounded-2xl pointer-events-none mix-blend-multiply"
@@ -249,16 +217,7 @@ export default function EnhancedHero() {
               onMouseLeave={() => setActiveModule(null)}
               style={{ boxShadow: CARD_SHADOW, isolation: 'isolate' }}
             >
-              {/* <div aria-hidden className="absolute left-0 right-0 top-0 h-6 pointer-events-none flex items-center justify-around px-6">
-                {Array.from({ length: 7 }).map((_, i) => (
-                  <div key={i} className="w-2.5 h-2.5 rounded-full" style={{
-                    background:
-                      'radial-gradient(circle at 50% 50%, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0.22) 35%, rgba(0,0,0,0.06) 36%, rgba(0,0,0,0) 62%)',
-                  }} />
-                ))}
-              </div> */}
               <div aria-hidden className="absolute left-0 right-0 bottom-[-6px] h-3 pointer-events-none rounded-b-2xl" style={{ backgroundImage:'repeating-linear-gradient(135deg, rgba(0,0,0,0.10) 0 2px, rgba(0,0,0,0) 2px 6px)', opacity:.35, filter:'blur(0.2px)'}} />
-              <div aria-hidden className="absolute right-0 top-0 w-8 h-8 pointer-events-none transition-transform duration-300 origin-top-right group-hover:-rotate-6 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:shadow-md" style={{ background:'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.75) 60%, rgba(255,255,255,0) 60%)', boxShadow:'0 1px 2px rgba(0,0,0,0.08)', clipPath:'polygon(100% 0, 0 0, 100% 100%)'}} />
               <div aria-hidden className="absolute inset-0 rounded-2xl pointer-events-none mix-blend-multiply" style={{ backgroundImage:'repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0 1px, rgba(0,0,0,0) 1px 3px), radial-gradient(1px 1px at 12% 18%, rgba(0,0,0,0.03) 0 1px, transparent 1px), radial-gradient(1px 1px at 68% 76%, rgba(0,0,0,0.025) 0 1px, transparent 1px), radial-gradient(1px 1px at 32% 62%, rgba(0,0,0,0.02) 0 1px, transparent 1px)', opacity:.8 }} />
               {/* 半调网点移除 */}
               <div className="absolute -inset-3 rounded-3xl -z-10 backdrop-blur-sm backdrop-brightness-105 backdrop-saturate-90" />
@@ -289,13 +248,7 @@ export default function EnhancedHero() {
               onMouseLeave={() => setActiveModule(null)}
               style={{ boxShadow: CARD_SHADOW, isolation: 'isolate' }}
             >
-              {/* <div aria-hidden className="absolute left-0 right-0 top-0 h-6 pointer-events-none flex items-center justify-around px-6">
-                {Array.from({ length: 7 }).map((_, i) => (
-                  <div key={i} className="w-2.5 h-2.5 rounded-full" style={{ background:'radial-gradient(circle at 50% 50%, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0.22) 35%, rgba(0,0,0,0.06) 36%, rgba(0,0,0,0) 62%)' }} />
-                ))}
-              </div> */}
               <div aria-hidden className="absolute left-0 right-0 bottom-[-6px] h-3 pointer-events-none rounded-b-2xl" style={{ backgroundImage:'repeating-linear-gradient(135deg, rgba(0,0,0,0.10) 0 2px, rgba(0,0,0,0) 2px 6px)', opacity:.35, filter:'blur(0.2px)'}} />
-              <div aria-hidden className="absolute right-0 top-0 w-8 h-8 pointer-events-none transition-transform duration-300 origin-top-right group-hover:-rotate-6 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:shadow-md" style={{ background:'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.75) 60%, rgba(255,255,255,0) 60%)', boxShadow:'0 1px 2px rgba(0,0,0,0.08)', clipPath:'polygon(100% 0, 0 0, 100% 100%)'}} />
               <div aria-hidden className="absolute inset-0 rounded-2xl pointer-events-none mix-blend-multiply" style={{ backgroundImage:'repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0 1px, rgba(0,0,0,0) 1px 3px), radial-gradient(1px 1px at 12% 18%, rgba(0,0,0,0.03) 0 1px, transparent 1px), radial-gradient(1px 1px at 68% 76%, rgba(0,0,0,0.025) 0 1px, transparent 1px), radial-gradient(1px 1px at 32% 62%, rgba(0,0,0,0.02) 0 1px, transparent 1px)', opacity:.8 }} />
               {/* 半调网点移除 */}
               <div className="absolute -inset-3 rounded-3xl -z-10 backdrop-blur-sm backdrop-brightness-105 backdrop-saturate-90" />
@@ -326,13 +279,7 @@ export default function EnhancedHero() {
               onMouseLeave={() => setActiveModule(null)}
               style={{ boxShadow: CARD_SHADOW, isolation: 'isolate' }}
             >
-              {/* <div aria-hidden className="absolute left-0 right-0 top-0 h-6 pointer-events-none flex items-center justify-around px-6">
-                {Array.from({ length: 7 }).map((_, i) => (
-                  <div key={i} className="w-2.5 h-2.5 rounded-full" style={{ background:'radial-gradient(circle at 50% 50%, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0.22) 35%, rgba(0,0,0,0.06) 36%, rgba(0,0,0,0) 62%)' }} />
-                ))}
-              </div> */}
-              <div aria-hidden className="absolute left-0 right-0 bottom-[-6px] h-3 pointer-events-none rounded-b-2xl" style={{ backgroundImage:'repeating-linear-gradient(135deg, rgba(0,0,0,0.10) 0 2px, rgba(0,0,0,0) 2px 6px)', opacity:.35, filter:'blur(0.2px)'}} />
-              <div aria-hidden className="absolute right-0 top-0 w-8 h-8 pointer-events-none transition-transform duration-300 origin-top-right group-hover:-rotate-6 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:shadow-md" style={{ background:'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.75) 60%, rgba(255,255,255,0) 60%)', boxShadow:'0 1px 2px rgba(0,0,0,0.08)', clipPath:'polygon(100% 0, 0 0, 100% 100%)'}} />
+
               <div aria-hidden className="absolute inset-0 rounded-2xl pointer-events-none mix-blend-multiply" style={{ backgroundImage:'repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0 1px, rgba(0,0,0,0) 1px 3px), radial-gradient(1px 1px at 12% 18%, rgba(0,0,0,0.03) 0 1px, transparent 1px), radial-gradient(1px 1px at 68% 76%, rgba(0,0,0,0.025) 0 1px, transparent 1px), radial-gradient(1px 1px at 32% 62%, rgba(0,0,0,0.02) 0 1px, transparent 1px)', opacity:.8 }} />
               {/* 半调网点移除 */}
               <div className="absolute -inset-3 rounded-3xl -z-10 backdrop-blur-sm backdrop-brightness-105 backdrop-saturate-90" />
@@ -359,11 +306,6 @@ export default function EnhancedHero() {
 
 
       </div>
-
-      {/* Decorative Elements */}
-      <div className="absolute top-10 left-10 w-20 h-20 border border-gold/30 rounded-full animate-pulse" />
-      <div className="absolute bottom-20 right-20 w-16 h-16 border border-gold/20 rounded-full animate-pulse delay-1000" />
-      <div className="absolute top-1/3 right-10 w-12 h-12 border border-gold/25 rounded-full animate-pulse delay-500" />
     </section>
   );
 }
