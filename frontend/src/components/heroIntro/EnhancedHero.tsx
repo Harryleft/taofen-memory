@@ -337,7 +337,7 @@ export default function EnhancedHero() {
             >
               邹韬奋
             </h1>
-            <div className={`absolute -bottom-3 left-0 right-0 h-1 bg-gradient-to-r ${THEME.gradients.primary} rounded-full`} />
+            <div className={`absolute -bottom-3 left-0 right-0 h-1 bg-gradient-to-r from-black/80 to-black/60 rounded-full`} />
           </div>
           {Subtitle}
         </div>
@@ -346,7 +346,7 @@ export default function EnhancedHero() {
 
     // monumental (默认)
     return (
-      <div className="space-y-12">
+      <div className="space-y-8">
         {YearDivider}
         <div className="relative">
           <div className="absolute inset-0 -z-10">
@@ -365,7 +365,7 @@ export default function EnhancedHero() {
             邹韬奋
           </h1>
           <div className="mt-8 flex justify-center">
-            <div className={`w-32 h-1 bg-gradient-to-r ${THEME.gradients.primary} rounded-full shadow-lg`} />
+            <div className={`w-32 h-1 bg-gradient-to-r from-black/80 to-black/60 rounded-full shadow-lg`} />
           </div>
         </div>
         {Subtitle}
