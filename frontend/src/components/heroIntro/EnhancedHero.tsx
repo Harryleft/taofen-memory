@@ -304,7 +304,7 @@ export default function EnhancedHero() {
 
   const Subtitle = useMemo(() => (
     <div className="mt-8 max-w-2xl mx-auto">
-      <p className="text-lg md:text-xl text-gray-700/90 font-light leading-relaxed tracking-wide">
+      <p className="text-lg md:text-xl text-gray-800 font-light leading-relaxed tracking-wide">
         {CONSTANTS.SUBTITLE}
       </p>
     </div>
