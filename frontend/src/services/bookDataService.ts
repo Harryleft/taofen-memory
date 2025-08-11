@@ -6,7 +6,7 @@ let allBooksCache: BookItem[] | null = null;
 export const loadAllBooksData = async (): Promise<BookItem[]> => {
   if (allBooksCache) return allBooksCache;
   
-  const response = await fetch('/data/books_clean.json');
+  const response = await fetch('/data/json/books.json');
   if (!response.ok) {
     throw new Error(`Failed to fetch books data: ${response.status}`);
   }
