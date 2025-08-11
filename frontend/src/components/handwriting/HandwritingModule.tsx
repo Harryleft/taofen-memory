@@ -10,6 +10,7 @@ interface HandwritingItem {
   时间: string;
   注释: string;
   数据来源: string;
+  标签: string;
   图片位置: Array<{
     remote_url: string;
     local_path: string;
@@ -73,7 +74,9 @@ const determineCategory = (item: HandwritingItem): 'letter' | 'manuscript' | 'no
 // 工具函数：生成标签
 const generateTags = (item: HandwritingItem, year: number): string[] => {
   const tags: string[] = [];
-  if (item.数据来源) tags.push(item.数据来源);
+  // 使用真实的【标签】字段
+  if (item.标签) tags.push(item.标签);
+  // 保留年份标签
   if (year) tags.push(`${year}年`);
   return tags;
 };
@@ -230,10 +233,11 @@ const filterHandwritingItems = (
     selectedCategory: string;
     selectedYear: string;
     selectedSource: string;
+    selectedTag: string;
     sortOrder: string;
   }
 ): TransformedHandwritingItem[] => {
-  const { searchTerm, selectedCategory, selectedYear, selectedSource, sortOrder } = filters;
+  const { searchTerm, selectedCategory, selectedYear, selectedSource, selectedTag, sortOrder } = filters;
   
   // 先搜索
   let filteredItems = items;
@@ -253,8 +257,9 @@ const filterHandwritingItems = (
     const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
     const matchesYear = selectedYear === 'all' || item.year.toString() === selectedYear;
     const matchesSource = selectedSource === 'all' || item.originalData.数据来源 === selectedSource;
+    const matchesTag = selectedTag === 'all' || item.originalData.标签 === selectedTag;
     
-    return matchesCategory && matchesYear && matchesSource;
+    return matchesCategory && matchesYear && matchesSource && matchesTag;
   });
   
   // 最后排序
@@ -308,6 +313,7 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
     selectedCategory: 'all',
     selectedYear: 'all',
     selectedSource: 'all',
+    selectedTag: 'all',
     sortOrder: 'year_desc'
   });
   
@@ -400,6 +406,7 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
       selectedCategory: filters.selectedCategory,
       selectedYear: filters.selectedYear,
       selectedSource: filters.selectedSource,
+      selectedTag: filters.selectedTag,
       sortOrder: filters.sortOrder
     });
   }, [handwritingItems, filters]);
@@ -488,6 +495,11 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
     return [...new Set(handwritingItems.map(item => item.originalData.数据来源).filter(Boolean))].sort();
   }, [handwritingItems]);
   
+  // 使用useMemo优化标签计算
+  const uniqueTags = useMemo(() => {
+    return [...new Set(handwritingItems.map(item => item.originalData.标签).filter(Boolean))].sort();
+  }, [handwritingItems]);
+  
   // 更新过滤器状态
   const updateFilters = useCallback((key: string, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
@@ -563,6 +575,17 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
           <option value="all">全部来源</option>
           {uniqueSources.map(source => (
             <option key={source} value={source}>{source}</option>
+          ))}
+        </select>
+        
+        <select
+          value={filters.selectedTag}
+          onChange={(e) => updateFilters('selectedTag', e.target.value)}
+          className="px-4 py-2 bg-white border border-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50"
+        >
+          <option value="all">全部标签</option>
+          {uniqueTags.map(tag => (
+            <option key={tag} value={tag}>{tag}</option>
           ))}
         </select>
         
