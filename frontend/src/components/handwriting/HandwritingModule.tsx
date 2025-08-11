@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo, memo } from 'react';
 import { Search, ZoomIn, Download, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import AppHeader from '../layout/header/AppHeader.tsx';
 
@@ -113,7 +113,7 @@ const transformHandwritingData = (data: HandwritingItem[]): TransformedHandwriti
   });
 };
 
-// 工具函数：高亮搜索文本
+// 工具函数：高亮搜索文本 - 使用useMemo优化
 const highlightSearchText = (text: string, searchTerm: string): JSX.Element => {
   if (!searchTerm) return <>{text}</>;
   
@@ -134,6 +134,77 @@ const highlightSearchText = (text: string, searchTerm: string): JSX.Element => {
     </>
   );
 };
+
+// Memoized手迹卡片组件
+const HandwritingCard = memo(({ 
+  item, 
+  isVisible, 
+  columnIndex, 
+  searchTerm, 
+  onCardClick 
+}: { 
+  item: TransformedHandwritingItem; 
+  isVisible: boolean; 
+  columnIndex: number; 
+  searchTerm: string; 
+  onCardClick: (item: TransformedHandwritingItem) => void;
+}) => {
+  const highlightedTitle = useMemo(() => highlightSearchText(item.title, searchTerm), [item.title, searchTerm]);
+  const highlightedDescription = useMemo(() => highlightSearchText(item.description, searchTerm), [item.description, searchTerm]);
+  
+  return (
+    <div
+      data-item-id={item.id}
+      className={`group cursor-pointer transform transition-all duration-700 ${
+        isVisible
+          ? 'translate-y-0 opacity-100'
+          : 'translate-y-8 opacity-0'
+      }`}
+      onClick={() => onCardClick(item)}
+      style={{
+        animationDelay: `${columnIndex * 100}ms`
+      }}
+    >
+      <div className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500">
+        <div className="relative overflow-hidden">
+          <img
+            src={item.image}
+            alt={item.title}
+            className="w-full object-cover group-hover:scale-110 transition-transform duration-700"
+            style={{ height: `${item.dimensions.height}px` }}
+            loading="lazy"
+          />
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+            <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={32} />
+          </div>
+        </div>
+        <div className="p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <span className={`px-2 py-1 rounded-full text-xs text-white ${categoryColors[item.category]}`}>
+              {categoryLabels[item.category]}
+            </span>
+            <span className="text-xs text-charcoal/60">{item.year}年</span>
+          </div>
+          <h3 className="font-bold text-charcoal mb-2 group-hover:text-gold transition-colors">
+            {highlightedTitle}
+          </h3>
+          <p className="text-sm text-charcoal/70 mb-2 line-clamp-2">
+            {highlightedDescription}
+          </p>
+          <div className="flex flex-wrap gap-1">
+            {item.tags.slice(0, 2).map((tag, index) => (
+              <span key={index} className="text-xs bg-gold/10 text-gold px-2 py-1 rounded">
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+});
+
+HandwritingCard.displayName = 'HandwritingCard';
 
 // 工具函数：搜索性能优化 - 使用useMemo缓存搜索结果
 const useSearchResults = (items: TransformedHandwritingItem[], searchTerm: string) => {
@@ -256,9 +327,20 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
   const observerRef = useRef<IntersectionObserver | null>(null);
   const masonryRef = useRef<HTMLDivElement>(null);
 
-  // Responsive columns
+  // Responsive columns - 使用防抖优化
   useEffect(() => {
-    const updateColumns = () => {
+    const debouncedUpdateColumns = debounce(() => {
+      const width = window.innerWidth;
+      let newColumns = 4;
+      if (width < 640) newColumns = 1;
+      else if (width < 768) newColumns = 2;
+      else if (width < 1024) newColumns = 3;
+      
+      setLayout(prev => ({ ...prev, columns: newColumns }));
+    }, 150);
+
+    // 初始调用
+    const initialUpdate = () => {
       const width = window.innerWidth;
       let newColumns = 4;
       if (width < 640) newColumns = 1;
@@ -267,31 +349,100 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
       
       setLayout(prev => ({ ...prev, columns: newColumns }));
     };
-
-    updateColumns();
-    window.addEventListener('resize', updateColumns);
-    return () => window.removeEventListener('resize', updateColumns);
+    
+    initialUpdate();
+    window.addEventListener('resize', debouncedUpdateColumns);
+    return () => {
+      window.removeEventListener('resize', debouncedUpdateColumns);
+      debouncedUpdateColumns.cancel?.();
+    };
   }, []);
 
-  // Intersection Observer for lazy loading
+  // 防抖函数
+  const debounce = <T extends (...args: any[]) => void>(func: T, wait: number): T => {
+    let timeout: NodeJS.Timeout | null = null;
+    
+    const debounced = (...args: Parameters<T>) => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+      timeout = setTimeout(() => {
+        timeout = null;
+        func(...args);
+      }, wait);
+    };
+    
+    debounced.cancel = () => {
+      if (timeout) {
+        clearTimeout(timeout);
+        timeout = null;
+      }
+    };
+    
+    return debounced as T;
+  };
+
+  // Intersection Observer for lazy loading - 使用节流优化
   useEffect(() => {
+    const throttledUpdateLayout = throttle((itemId: string) => {
+      setLayout(prev => ({
+        ...prev,
+        visibleItems: new Set([...prev.visibleItems, itemId])
+      }));
+    }, 100);
+
     observerRef.current = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             const itemId = entry.target.getAttribute('data-item-id') || '';
-            setLayout(prev => ({
-              ...prev,
-              visibleItems: new Set([...prev.visibleItems, itemId])
-            }));
+            throttledUpdateLayout(itemId);
           }
         });
       },
       { threshold: 0.1, rootMargin: '50px' }
     );
 
-    return () => observerRef.current?.disconnect();
+    return () => {
+      observerRef.current?.disconnect();
+      throttledUpdateLayout.cancel?.();
+    };
   }, []);
+
+  // 节流函数
+  const throttle = <T extends (...args: any[]) => void>(func: T, wait: number): T => {
+    let timeout: NodeJS.Timeout | null = null;
+    let previous = 0;
+    
+    const throttled = (...args: Parameters<T>) => {
+      const now = Date.now();
+      const remaining = wait - (now - previous);
+      
+      if (remaining <= 0 || remaining > wait) {
+        if (timeout) {
+          clearTimeout(timeout);
+          timeout = null;
+        }
+        previous = now;
+        func(...args);
+      } else if (!timeout) {
+        timeout = setTimeout(() => {
+          previous = Date.now();
+          timeout = null;
+          func(...args);
+        }, remaining);
+      }
+    };
+    
+    throttled.cancel = () => {
+      if (timeout) {
+        clearTimeout(timeout);
+        timeout = null;
+      }
+    };
+    
+    return throttled as T;
+  };
 
   // 使用工具函数进行过滤 - 使用useMemo优化
   const filteredItems = useMemo(() => {
@@ -489,57 +640,16 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
     </div>
   );
   
-  // 渲染手迹卡片
+  // 渲染手迹卡片 - 使用memoized组件
   const renderHandwritingCard = (item: TransformedHandwritingItem, columnIndex: number) => (
-    <div
+    <HandwritingCard
       key={item.id}
-      data-item-id={item.id}
-      className={`group cursor-pointer transform transition-all duration-700 ${
-        layout.visibleItems.has(item.id)
-          ? 'translate-y-0 opacity-100'
-          : 'translate-y-8 opacity-0'
-      }`}
-      onClick={() => openLightbox(item)}
-      style={{
-        animationDelay: `${columnIndex * 100}ms`
-      }}
-    >
-      <div className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500">
-        <div className="relative overflow-hidden">
-          <img
-            src={item.image}
-            alt={item.title}
-            className="w-full object-cover group-hover:scale-110 transition-transform duration-700"
-            style={{ height: `${item.dimensions.height}px` }}
-            loading="lazy"
-          />
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
-            <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={32} />
-          </div>
-        </div>
-        <div className="p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <span className={`px-2 py-1 rounded-full text-xs text-white ${categoryColors[item.category]}`}>
-              {categoryLabels[item.category]}
-            </span>
-            <span className="text-xs text-charcoal/60">{item.year}年</span>
-          </div>
-          <h3 className="font-bold text-charcoal mb-2 group-hover:text-gold transition-colors">
-            {highlightSearchText(item.title, filters.searchTerm)}
-          </h3>
-          <p className="text-sm text-charcoal/70 mb-2 line-clamp-2">
-            {highlightSearchText(item.description, filters.searchTerm)}
-          </p>
-          <div className="flex flex-wrap gap-1">
-            {item.tags.slice(0, 2).map((tag, index) => (
-              <span key={index} className="text-xs bg-gold/10 text-gold px-2 py-1 rounded">
-                {tag}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
+      item={item}
+      isVisible={layout.visibleItems.has(item.id)}
+      columnIndex={columnIndex}
+      searchTerm={filters.searchTerm}
+      onCardClick={openLightbox}
+    />
   );
   
   // 渲染瀑布流网格
@@ -553,30 +663,48 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
     </div>
   );
   
-  // 渲染Lightbox
-  const renderLightbox = () => {
-    if (!lightbox.selectedItem) return null;
-    
+  // Memoized Lightbox组件
+  const Lightbox = memo(({ 
+    selectedItem, 
+    currentIndex, 
+    totalItems, 
+    searchTerm, 
+    onClose, 
+    onPrev, 
+    onNext 
+  }: { 
+    selectedItem: TransformedHandwritingItem; 
+    currentIndex: number; 
+    totalItems: number; 
+    searchTerm: string; 
+    onClose: () => void; 
+    onPrev: () => void; 
+    onNext: () => void;
+  }) => {
+    const highlightedTitle = useMemo(() => highlightSearchText(selectedItem.title, searchTerm), [selectedItem.title, searchTerm]);
+    const highlightedContent = useMemo(() => highlightSearchText(selectedItem.originalData.原文, searchTerm), [selectedItem.originalData.原文, searchTerm]);
+    const highlightedNotes = useMemo(() => highlightSearchText(selectedItem.originalData.注释, searchTerm), [selectedItem.originalData.注释, searchTerm]);
+
     return (
       <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
         <div className="relative max-w-6xl max-h-[90vh] bg-white rounded-lg overflow-hidden">
           {/* Navigation */}
           <button
-            onClick={() => setLightbox(prev => ({ ...prev, selectedItem: null }))}
+            onClick={onClose}
             className="absolute top-4 right-4 z-10 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
           >
             <X size={24} />
           </button>
           
           <button
-            onClick={prevItem}
+            onClick={onPrev}
             className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
           >
             <ChevronLeft size={32} />
           </button>
           
           <button
-            onClick={nextItem}
+            onClick={onNext}
             className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
           >
             <ChevronRight size={32} />
@@ -587,57 +715,58 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
             {/* Image */}
             <div className="flex-1 flex items-center justify-center bg-gray-100 p-4">
               <img
-                src={lightbox.selectedItem.highResImage}
-                alt={lightbox.selectedItem.title}
+                src={selectedItem.highResImage}
+                alt={selectedItem.title}
                 className="max-w-full max-h-full object-contain"
+                loading="lazy"
               />
             </div>
             
             {/* Details */}
             <div className="w-full lg:w-96 p-6 overflow-y-auto">
               <div className="flex items-center gap-3 mb-4">
-                <span className={`px-3 py-1 rounded-full text-sm text-white ${categoryColors[lightbox.selectedItem.category]}`}>
-                  {categoryLabels[lightbox.selectedItem.category]}
+                <span className={`px-3 py-1 rounded-full text-sm text-white ${categoryColors[selectedItem.category]}`}>
+                  {categoryLabels[selectedItem.category]}
                 </span>
-                <span className="text-gold font-bold">{lightbox.selectedItem.year}年</span>
+                <span className="text-gold font-bold">{selectedItem.year}年</span>
               </div>
               
               <h3 className="text-2xl font-bold text-charcoal mb-2 font-serif">
-                {highlightSearchText(lightbox.selectedItem.title, filters.searchTerm)}
+                {highlightedTitle}
               </h3>
               
-              <p className="text-charcoal/60 mb-4">{lightbox.selectedItem.originalData.时间}</p>
+              <p className="text-charcoal/60 mb-4">{selectedItem.originalData.时间}</p>
               
               <div className="mb-6">
                 <h4 className="font-bold text-charcoal mb-2">原文</h4>
                 <p className="text-charcoal/80 leading-relaxed bg-gray-50 p-4 rounded-lg whitespace-pre-wrap">
-                  {highlightSearchText(lightbox.selectedItem.originalData.原文, filters.searchTerm)}
+                  {highlightedContent}
                 </p>
               </div>
               
               <div className="mb-6">
                 <h4 className="font-bold text-charcoal mb-2">注释</h4>
                 <p className="text-charcoal/80 leading-relaxed bg-gray-50 p-4 rounded-lg whitespace-pre-wrap">
-                  {highlightSearchText(lightbox.selectedItem.originalData.注释, filters.searchTerm)}
+                  {highlightedNotes}
                 </p>
               </div>
               
               <div className="mb-6">
                 <h4 className="font-bold text-charcoal mb-2">数据来源</h4>
-                {lightbox.selectedItem.originalData.图片位置 && 
-                 lightbox.selectedItem.originalData.图片位置.length > 0 && 
-                 lightbox.selectedItem.originalData.图片位置[0].remote_url ? (
+                {selectedItem.originalData.图片位置 && 
+                 selectedItem.originalData.图片位置.length > 0 && 
+                 selectedItem.originalData.图片位置[0].remote_url ? (
                   <a 
-                    href={lightbox.selectedItem.originalData.图片位置[0].remote_url}
+                    href={selectedItem.originalData.图片位置[0].remote_url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-gold hover:text-gold/80 underline transition-colors"
                   >
-                    {lightbox.selectedItem.originalData.数据来源}
+                    {selectedItem.originalData.数据来源}
                   </a>
                 ) : (
                   <p className="text-charcoal/60">
-                    {lightbox.selectedItem.originalData.数据来源}
+                    {selectedItem.originalData.数据来源}
                   </p>
                 )}
               </div>
@@ -645,7 +774,7 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
               <div className="mb-6">
                 <h4 className="font-bold text-charcoal mb-2">标签</h4>
                 <div className="flex flex-wrap gap-2">
-                  {lightbox.selectedItem.tags.map((tag, index) => (
+                  {selectedItem.tags.map((tag, index) => (
                     <span key={index} className="bg-gold/10 text-gold px-3 py-1 rounded-full text-sm">
                       {tag}
                     </span>
@@ -661,12 +790,31 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
               </div>
               
               <div className="mt-4 text-sm text-charcoal/60 text-center">
-                {lightbox.currentIndex + 1} / {filteredItems.length}
+                {currentIndex + 1} / {totalItems}
               </div>
             </div>
           </div>
         </div>
       </div>
+    );
+  });
+
+  Lightbox.displayName = 'Lightbox';
+
+  // 渲染Lightbox - 使用memoized组件
+  const renderLightbox = () => {
+    if (!lightbox.selectedItem) return null;
+    
+    return (
+      <Lightbox
+        selectedItem={lightbox.selectedItem}
+        currentIndex={lightbox.currentIndex}
+        totalItems={filteredItems.length}
+        searchTerm={filters.searchTerm}
+        onClose={() => setLightbox(prev => ({ ...prev, selectedItem: null }))}
+        onPrev={prevItem}
+        onNext={nextItem}
+      />
     );
   };
 
