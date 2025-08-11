@@ -23,7 +23,9 @@
       "Bash(git commit:*)",
       "Bash(sed:*)",
       "Bash(npm run typecheck:*)",
-      "Bash(npm run)"
+      "Bash(npm run)",
+      "Bash(npm run lint:*)",
+      "Bash(npx eslint:*)"
     ],
     "deny": []
   },
