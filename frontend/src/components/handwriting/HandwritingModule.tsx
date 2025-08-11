@@ -289,11 +289,6 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [lightbox.selectedItem, nextItem, prevItem]);
 
-  // 数据加载
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
-
   // Observe items when they mount
   useEffect(() => {
     const items = document.querySelectorAll('[data-item-id]');
@@ -325,6 +320,11 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
       setLoading(false);
     }
   }, []);
+
+  // 数据加载
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
   
   // 渲染过滤器控件
   const renderFilterControls = () => (
