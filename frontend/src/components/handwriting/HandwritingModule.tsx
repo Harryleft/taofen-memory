@@ -113,6 +113,44 @@ const transformHandwritingData = (data: HandwritingItem[]): TransformedHandwriti
   });
 };
 
+// 工具函数：高亮搜索文本
+const highlightSearchText = (text: string, searchTerm: string): JSX.Element => {
+  if (!searchTerm) return <>{text}</>;
+  
+  const regex = new RegExp(`(${searchTerm})`, 'gi');
+  const parts = text.split(regex);
+  
+  return (
+    <>
+      {parts.map((part, index) => 
+        regex.test(part) ? (
+          <span key={index} className="bg-yellow-200 text-charcoal font-bold">
+            {part}
+          </span>
+        ) : (
+          part
+        )
+      )}
+    </>
+  );
+};
+
+// 工具函数：搜索性能优化 - 使用useMemo缓存搜索结果
+const useSearchResults = (items: TransformedHandwritingItem[], searchTerm: string) => {
+  return useMemo(() => {
+    if (!searchTerm) return items;
+    
+    const searchLower = searchTerm.toLowerCase();
+    return items.filter(item => (
+      item.title.toLowerCase().includes(searchLower) ||
+      item.description.toLowerCase().includes(searchLower) ||
+      item.tags.some(tag => tag.toLowerCase().includes(searchLower)) ||
+      item.originalData.原文.toLowerCase().includes(searchLower) ||
+      item.originalData.注释.toLowerCase().includes(searchLower)
+    ));
+  }, [items, searchTerm]);
+};
+
 // 工具函数：过滤手迹项目
 const filterHandwritingItems = (
   items: TransformedHandwritingItem[],
@@ -120,22 +158,52 @@ const filterHandwritingItems = (
     searchTerm: string;
     selectedCategory: string;
     selectedYear: string;
+    selectedSource: string;
+    sortOrder: string;
   }
 ): TransformedHandwritingItem[] => {
-  const { searchTerm, selectedCategory, selectedYear } = filters;
+  const { searchTerm, selectedCategory, selectedYear, selectedSource, sortOrder } = filters;
   
-  return items.filter(item => {
-    const matchesSearch = !searchTerm || (
-      item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      item.originalData.原文.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    
+  // 先搜索
+  let filteredItems = items;
+  if (searchTerm) {
+    const searchLower = searchTerm.toLowerCase();
+    filteredItems = items.filter(item => (
+      item.title.toLowerCase().includes(searchLower) ||
+      item.description.toLowerCase().includes(searchLower) ||
+      item.tags.some(tag => tag.toLowerCase().includes(searchLower)) ||
+      item.originalData.原文.toLowerCase().includes(searchLower) ||
+      item.originalData.注释.toLowerCase().includes(searchLower)
+    ));
+  }
+  
+  // 再筛选
+  filteredItems = filteredItems.filter(item => {
     const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
     const matchesYear = selectedYear === 'all' || item.year.toString() === selectedYear;
+    const matchesSource = selectedSource === 'all' || item.originalData.数据来源 === selectedSource;
     
-    return matchesSearch && matchesCategory && matchesYear;
+    return matchesCategory && matchesYear && matchesSource;
+  });
+  
+  // 最后排序
+  return filteredItems.sort((a, b) => {
+    switch (sortOrder) {
+      case 'year_asc':
+        return a.year - b.year;
+      case 'year_desc':
+        return b.year - a.year;
+      case 'name_asc':
+        return a.title.localeCompare(b.title);
+      case 'name_desc':
+        return b.title.localeCompare(a.title);
+      case 'id_asc':
+        return a.id.localeCompare(b.id);
+      case 'id_desc':
+        return b.id.localeCompare(a.id);
+      default:
+        return 0;
+    }
   });
 };
 
@@ -167,7 +235,9 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
   const [filters, setFilters] = useState({
     searchTerm: '',
     selectedCategory: 'all',
-    selectedYear: 'all'
+    selectedYear: 'all',
+    selectedSource: 'all',
+    sortOrder: 'year_desc'
   });
   
   // 布局状态
@@ -228,7 +298,9 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
     return filterHandwritingItems(handwritingItems, {
       searchTerm: filters.searchTerm,
       selectedCategory: filters.selectedCategory,
-      selectedYear: filters.selectedYear
+      selectedYear: filters.selectedYear,
+      selectedSource: filters.selectedSource,
+      sortOrder: filters.sortOrder
     });
   }, [handwritingItems, filters]);
 
@@ -300,6 +372,11 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
     return [...new Set(handwritingItems.map(item => item.year))].sort();
   }, [handwritingItems]);
   
+  // 使用useMemo优化数据来源计算
+  const uniqueSources = useMemo(() => {
+    return [...new Set(handwritingItems.map(item => item.originalData.数据来源))].sort();
+  }, [handwritingItems]);
+  
   // 更新过滤器状态
   const updateFilters = useCallback((key: string, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
@@ -328,39 +405,69 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
   
   // 渲染过滤器控件
   const renderFilterControls = () => (
-    <div className="flex flex-wrap gap-4 mb-8 justify-center">
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-charcoal/60" size={20} />
-        <input
-          type="text"
-          placeholder="搜索手迹..."
-          value={filters.searchTerm}
-          onChange={(e) => updateFilters('searchTerm', e.target.value)}
-          className="pl-10 pr-4 py-2 bg-white border border-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50 w-64"
-        />
+    <div className="space-y-4 mb-8">
+      {/* 搜索栏 */}
+      <div className="flex justify-center">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-charcoal/60" size={20} />
+          <input
+            type="text"
+            placeholder="搜索手迹（名称、原文、注释）..."
+            value={filters.searchTerm}
+            onChange={(e) => updateFilters('searchTerm', e.target.value)}
+            className="pl-10 pr-4 py-2 bg-white border border-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50 w-80"
+          />
+        </div>
       </div>
       
-      <select
-        value={filters.selectedCategory}
-        onChange={(e) => updateFilters('selectedCategory', e.target.value)}
-        className="px-4 py-2 bg-white border border-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50"
-      >
-        <option value="all">全部类型</option>
-        {Object.entries(categoryLabels).map(([key, label]) => (
-          <option key={key} value={key}>{label}</option>
-        ))}
-      </select>
+      {/* 筛选和排序控件 */}
+      <div className="flex flex-wrap gap-4 justify-center">
+        <select
+          value={filters.selectedCategory}
+          onChange={(e) => updateFilters('selectedCategory', e.target.value)}
+          className="px-4 py-2 bg-white border border-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50"
+        >
+          <option value="all">全部类型</option>
+          {Object.entries(categoryLabels).map(([key, label]) => (
+            <option key={key} value={key}>{label}</option>
+          ))}
+        </select>
 
-      <select
-        value={filters.selectedYear}
-        onChange={(e) => updateFilters('selectedYear', e.target.value)}
-        className="px-4 py-2 bg-white border border-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50"
-      >
-        <option value="all">全部年份</option>
-        {uniqueYears.map(year => (
-          <option key={year} value={year.toString()}>{year}年</option>
-        ))}
-      </select>
+        <select
+          value={filters.selectedYear}
+          onChange={(e) => updateFilters('selectedYear', e.target.value)}
+          className="px-4 py-2 bg-white border border-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50"
+        >
+          <option value="all">全部年份</option>
+          {uniqueYears.map(year => (
+            <option key={year} value={year.toString()}>{year}年</option>
+          ))}
+        </select>
+        
+        <select
+          value={filters.selectedSource}
+          onChange={(e) => updateFilters('selectedSource', e.target.value)}
+          className="px-4 py-2 bg-white border border-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50"
+        >
+          <option value="all">全部来源</option>
+          {uniqueSources.map(source => (
+            <option key={source} value={source}>{source}</option>
+          ))}
+        </select>
+        
+        <select
+          value={filters.sortOrder}
+          onChange={(e) => updateFilters('sortOrder', e.target.value)}
+          className="px-4 py-2 bg-white border border-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50"
+        >
+          <option value="year_desc">时间（新到旧）</option>
+          <option value="year_asc">时间（旧到新）</option>
+          <option value="name_asc">名称（A-Z）</option>
+          <option value="name_desc">名称（Z-A）</option>
+          <option value="id_asc">ID（升序）</option>
+          <option value="id_desc">ID（降序）</option>
+        </select>
+      </div>
     </div>
   );
   
@@ -418,10 +525,10 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
             <span className="text-xs text-charcoal/60">{item.year}年</span>
           </div>
           <h3 className="font-bold text-charcoal mb-2 group-hover:text-gold transition-colors">
-            {item.title}
+            {highlightSearchText(item.title, filters.searchTerm)}
           </h3>
           <p className="text-sm text-charcoal/70 mb-2 line-clamp-2">
-            {item.description}
+            {highlightSearchText(item.description, filters.searchTerm)}
           </p>
           <div className="flex flex-wrap gap-1">
             {item.tags.slice(0, 2).map((tag, index) => (
@@ -496,7 +603,7 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
               </div>
               
               <h3 className="text-2xl font-bold text-charcoal mb-2 font-serif">
-                {lightbox.selectedItem.title}
+                {highlightSearchText(lightbox.selectedItem.title, filters.searchTerm)}
               </h3>
               
               <p className="text-charcoal/60 mb-4">{lightbox.selectedItem.originalData.时间}</p>
@@ -504,14 +611,14 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
               <div className="mb-6">
                 <h4 className="font-bold text-charcoal mb-2">原文</h4>
                 <p className="text-charcoal/80 leading-relaxed bg-gray-50 p-4 rounded-lg whitespace-pre-wrap">
-                  {lightbox.selectedItem.originalData.原文}
+                  {highlightSearchText(lightbox.selectedItem.originalData.原文, filters.searchTerm)}
                 </p>
               </div>
               
               <div className="mb-6">
                 <h4 className="font-bold text-charcoal mb-2">注释</h4>
                 <p className="text-charcoal/80 leading-relaxed bg-gray-50 p-4 rounded-lg whitespace-pre-wrap">
-                  {lightbox.selectedItem.originalData.注释}
+                  {highlightSearchText(lightbox.selectedItem.originalData.注释, filters.searchTerm)}
                 </p>
               </div>
               
