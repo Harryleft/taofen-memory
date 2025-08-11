@@ -499,27 +499,40 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
                 {lightbox.selectedItem.title}
               </h3>
               
-              <p className="text-charcoal/60 mb-4">{lightbox.selectedItem.date}</p>
-              
-              <div className="mb-6">
-                <h4 className="font-bold text-charcoal mb-2">简介</h4>
-                <p className="text-charcoal/80 leading-relaxed">
-                  {lightbox.selectedItem.description}
-                </p>
-              </div>
+              <p className="text-charcoal/60 mb-4">{lightbox.selectedItem.originalData.时间}</p>
               
               <div className="mb-6">
                 <h4 className="font-bold text-charcoal mb-2">原文</h4>
-                <p className="text-charcoal/80 leading-relaxed bg-gray-50 p-4 rounded-lg">
+                <p className="text-charcoal/80 leading-relaxed bg-gray-50 p-4 rounded-lg whitespace-pre-wrap">
                   {lightbox.selectedItem.originalData.原文}
                 </p>
               </div>
               
               <div className="mb-6">
-                <h4 className="font-bold text-charcoal mb-2">数据来源</h4>
-                <p className="text-charcoal/60">
-                  {lightbox.selectedItem.originalData.数据来源}
+                <h4 className="font-bold text-charcoal mb-2">注释</h4>
+                <p className="text-charcoal/80 leading-relaxed bg-gray-50 p-4 rounded-lg whitespace-pre-wrap">
+                  {lightbox.selectedItem.originalData.注释}
                 </p>
+              </div>
+              
+              <div className="mb-6">
+                <h4 className="font-bold text-charcoal mb-2">数据来源</h4>
+                {lightbox.selectedItem.originalData.图片位置 && 
+                 lightbox.selectedItem.originalData.图片位置.length > 0 && 
+                 lightbox.selectedItem.originalData.图片位置[0].remote_url ? (
+                  <a 
+                    href={lightbox.selectedItem.originalData.图片位置[0].remote_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gold hover:text-gold/80 underline transition-colors"
+                  >
+                    {lightbox.selectedItem.originalData.数据来源}
+                  </a>
+                ) : (
+                  <p className="text-charcoal/60">
+                    {lightbox.selectedItem.originalData.数据来源}
+                  </p>
+                )}
               </div>
               
               <div className="mb-6">
