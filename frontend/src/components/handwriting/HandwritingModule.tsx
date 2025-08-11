@@ -2,8 +2,23 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, ZoomIn, Download, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import AppHeader from '../layout/header/AppHeader.tsx';
 
+// 真实数据接口定义
 interface HandwritingItem {
-  id: number;
+  id: string;
+  名称: string;
+  原文: string;
+  时间: string;
+  注释: string;
+  数据来源: string;
+  图片位置: Array<{
+    remote_url: string;
+    local_path: string;
+  }>;
+}
+
+// 转换后的数据接口（适配现有组件）
+interface TransformedHandwritingItem {
+  id: string;
   title: string;
   year: number;
   date: string;
@@ -16,106 +31,78 @@ interface HandwritingItem {
     width: number;
     height: number;
   };
+  originalData: HandwritingItem;
 }
 
-const handwritingItems: HandwritingItem[] = [
-  {
-    id: 1,
-    title: '致友人书信',
-    year: 1925,
-    date: '1925年3月15日',
-    category: 'letter',
-    description: '邹韬奋写给友人的私人书信，展现其真挚的友谊和人文关怀',
-    image: 'https://images.pexels.com/photos/261763/pexels-photo-261763.jpeg?auto=compress&cs=tinysrgb&w=400',
-    highResImage: 'https://images.pexels.com/photos/261763/pexels-photo-261763.jpeg?auto=compress&cs=tinysrgb&w=1200',
-    tags: ['友谊', '私人通信', '早期作品'],
-    dimensions: { width: 300, height: 400 }
-  },
-  {
-    id: 2,
-    title: '《生活》周刊创刊词草稿',
-    year: 1926,
-    date: '1926年10月',
-    category: 'manuscript',
-    description: '《生活》周刊创刊词的手稿，记录了邹韬奋的办刊理念',
-    image: 'https://images.pexels.com/photos/1070945/pexels-photo-1070945.jpeg?auto=compress&cs=tinysrgb&w=400',
-    highResImage: 'https://images.pexels.com/photos/1070945/pexels-photo-1070945.jpeg?auto=compress&cs=tinysrgb&w=1200',
-    tags: ['创刊词', '办刊理念', '历史文献'],
-    dimensions: { width: 350, height: 280 }
-  },
-  {
-    id: 3,
-    title: '读书笔记',
-    year: 1928,
-    date: '1928年7月',
-    category: 'note',
-    description: '邹韬奋阅读马克思主义著作时的读书笔记',
-    image: 'https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg?auto=compress&cs=tinysrgb&w=400',
-    highResImage: 'https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg?auto=compress&cs=tinysrgb&w=1200',
-    tags: ['读书笔记', '马克思主义', '思想发展'],
-    dimensions: { width: 280, height: 350 }
-  },
-  {
-    id: 4,
-    title: '抗战文章草稿',
-    year: 1937,
-    date: '1937年8月',
-    category: 'article',
-    description: '抗日战争爆发后，邹韬奋撰写的抗战文章手稿',
-    image: 'https://images.pexels.com/photos/1148820/pexels-photo-1148820.jpeg?auto=compress&cs=tinysrgb&w=400',
-    highResImage: 'https://images.pexels.com/photos/1148820/pexels-photo-1148820.jpeg?auto=compress&cs=tinysrgb&w=1200',
-    tags: ['抗战', '爱国主义', '时事评论'],
-    dimensions: { width: 320, height: 420 }
-  },
-  {
-    id: 5,
-    title: '家书',
-    year: 1940,
-    date: '1940年12月',
-    category: 'letter',
-    description: '邹韬奋写给家人的书信，表达对家人的思念',
-    image: 'https://images.pexels.com/photos/789555/pexels-photo-789555.jpeg?auto=compress&cs=tinysrgb&w=400',
-    highResImage: 'https://images.pexels.com/photos/789555/pexels-photo-789555.jpeg?auto=compress&cs=tinysrgb&w=1200',
-    tags: ['家书', '亲情', '个人生活'],
-    dimensions: { width: 290, height: 380 }
-  },
-  {
-    id: 6,
-    title: '出版计划草案',
-    year: 1935,
-    date: '1935年5月',
-    category: 'manuscript',
-    description: '生活书店出版计划的手写草案',
-    image: 'https://images.pexels.com/photos/2041540/pexels-photo-2041540.jpeg?auto=compress&cs=tinysrgb&w=400',
-    highResImage: 'https://images.pexels.com/photos/2041540/pexels-photo-2041540.jpeg?auto=compress&cs=tinysrgb&w=1200',
-    tags: ['出版计划', '商业文档', '书店经营'],
-    dimensions: { width: 360, height: 300 }
-  },
-  {
-    id: 7,
-    title: '演讲稿',
-    year: 1933,
-    date: '1933年11月',
-    category: 'manuscript',
-    description: '邹韬奋在大学演讲的手稿',
-    image: 'https://images.pexels.com/photos/1370295/pexels-photo-1370295.jpeg?auto=compress&cs=tinysrgb&w=400',
-    highResImage: 'https://images.pexels.com/photos/1370295/pexels-photo-1370295.jpeg?auto=compress&cs=tinysrgb&w=1200',
-    tags: ['演讲稿', '教育理念', '青年指导'],
-    dimensions: { width: 310, height: 390 }
-  },
-  {
-    id: 8,
-    title: '日记片段',
-    year: 1942,
-    date: '1942年6月',
-    category: 'note',
-    description: '邹韬奋晚年的日记片段，记录其内心感受',
-    image: 'https://images.pexels.com/photos/1029141/pexels-photo-1029141.jpeg?auto=compress&cs=tinysrgb&w=400',
-    highResImage: 'https://images.pexels.com/photos/1029141/pexels-photo-1029141.jpeg?auto=compress&cs=tinysrgb&w=1200',
-    tags: ['日记', '内心独白', '晚年思考'],
-    dimensions: { width: 270, height: 360 }
+// 数据获取函数
+const fetchHandwritingData = async (): Promise<HandwritingItem[]> => {
+  try {
+    const response = await fetch('/data/json/taofen_handwriting_details.json');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching handwriting data:', error);
+    throw error;
   }
-];
+};
+
+// 数据转换函数
+const transformHandwritingData = (data: HandwritingItem[]): TransformedHandwritingItem[] => {
+  return data.map(item => {
+    // 从时间字符串中提取年份
+    const yearMatch = item.时间.match(/(\d{4})年/);
+    const year = yearMatch ? parseInt(yearMatch[1]) : 1937;
+    
+    // 根据注释内容判断类别
+    let category: 'letter' | 'manuscript' | 'note' | 'article' = 'manuscript';
+    const content = (item.名称 + item.注释 + item.原文).toLowerCase();
+    if (content.includes('信') || content.includes('书') || content.includes('致')) {
+      category = 'letter';
+    } else if (content.includes('笔记') || content.includes('日记') || content.includes('记录')) {
+      category = 'note';
+    } else if (content.includes('文章') || content.includes('稿') || content.includes('撰')) {
+      category = 'article';
+    }
+    
+    // 生成标签
+    const tags: string[] = [];
+    if (item.数据来源) tags.push(item.数据来源);
+    if (year) tags.push(`${year}年`);
+    
+    // 获取图片路径
+    const imagePath = item.图片位置 && item.图片位置.length > 0 
+      ? item.图片位置[0].local_path.replace('public/', '/')
+      : '/images/placeholder.png';
+    
+    return {
+      id: item.id,
+      title: item.名称,
+      year,
+      date: item.时间,
+      category,
+      description: item.注释 || item.原文.substring(0, 100) + '...',
+      image: imagePath,
+      highResImage: imagePath,
+      tags,
+      dimensions: {
+        width: 320,
+        height: Math.floor(Math.random() * 200) + 300 // 随机高度，模拟真实图片
+      },
+      originalData: item
+    };
+  });
+};
+
+// 图片路径转换函数
+const getImagePath = (item: HandwritingItem): string => {
+  if (item.图片位置 && item.图片位置.length > 0) {
+    return item.图片位置[0].local_path.replace('public/', '/');
+  }
+  return '/images/placeholder.png';
+};
 
 const categoryLabels = {
   letter: '书信',
@@ -139,10 +126,13 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedYear, setSelectedYear] = useState<string>('all');
-  const [selectedItem, setSelectedItem] = useState<HandwritingItem | null>(null);
+  const [selectedItem, setSelectedItem] = useState<TransformedHandwritingItem | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [visibleItems, setVisibleItems] = useState<Set<number>>(new Set());
+  const [visibleItems, setVisibleItems] = useState<Set<string>>(new Set());
   const [columns, setColumns] = useState(4);
+  const [handwritingItems, setHandwritingItems] = useState<TransformedHandwritingItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   const observerRef = useRef<IntersectionObserver | null>(null);
   const masonryRef = useRef<HTMLDivElement>(null);
@@ -168,7 +158,7 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const itemId = parseInt(entry.target.getAttribute('data-item-id') || '0');
+            const itemId = entry.target.getAttribute('data-item-id') || '';
             setVisibleItems(prev => new Set([...prev, itemId]));
           }
         });
@@ -183,7 +173,8 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
   const filteredItems = handwritingItems.filter(item => {
     const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+                         item.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                         item.originalData.原文.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
     const matchesYear = selectedYear === 'all' || item.year.toString() === selectedYear;
     
@@ -192,7 +183,7 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
 
   // Masonry layout calculation
   const distributeItems = useCallback(() => {
-    const columnArrays: HandwritingItem[][] = Array.from({ length: columns }, () => []);
+    const columnArrays: TransformedHandwritingItem[][] = Array.from({ length: columns }, () => []);
     const columnHeights = new Array(columns).fill(0);
 
     filteredItems.forEach((item) => {
@@ -207,7 +198,7 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
   const columnArrays = distributeItems();
 
   // Lightbox navigation
-  const openLightbox = (item: HandwritingItem) => {
+  const openLightbox = (item: TransformedHandwritingItem) => {
     setSelectedItem(item);
     setCurrentIndex(filteredItems.findIndex(i => i.id === item.id));
   };
@@ -237,6 +228,26 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedItem, currentIndex]);
+
+  // 数据加载
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const rawData = await fetchHandwritingData();
+        const transformedData = transformHandwritingData(rawData);
+        setHandwritingItems(transformedData);
+      } catch (err) {
+        setError('加载手迹数据失败，请刷新页面重试');
+        console.error('Failed to load handwriting data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
 
   // Observe items when they mount
   useEffect(() => {
@@ -296,7 +307,8 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
         </div>
 
         {/* Masonry Grid */}
-        <div ref={masonryRef} className="flex gap-5">
+        {!loading && !error && (
+          <div ref={masonryRef} className="flex gap-5">
           {columnArrays.map((column, columnIndex) => (
             <div key={columnIndex} className="flex-1 flex flex-col gap-5">
               {column.map((item) => (
@@ -353,9 +365,10 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
             </div>
           ))}
         </div>
+        )}
 
         {/* Empty state */}
-        {filteredItems.length === 0 && (
+        {!loading && !error && filteredItems.length === 0 && (
           <div className="text-center py-12">
             <div className="text-6xl mb-4">📜</div>
             <h3 className="text-xl font-bold text-charcoal mb-2">未找到相关手迹</h3>
@@ -416,9 +429,26 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
                 
                 <p className="text-charcoal/60 mb-4">{selectedItem.date}</p>
                 
-                <p className="text-charcoal/80 mb-6 leading-relaxed">
-                  {selectedItem.description}
-                </p>
+                <div className="mb-6">
+                  <h4 className="font-bold text-charcoal mb-2">简介</h4>
+                  <p className="text-charcoal/80 leading-relaxed">
+                    {selectedItem.description}
+                  </p>
+                </div>
+                
+                <div className="mb-6">
+                  <h4 className="font-bold text-charcoal mb-2">原文</h4>
+                  <p className="text-charcoal/80 leading-relaxed bg-gray-50 p-4 rounded-lg">
+                    {selectedItem.originalData.原文}
+                  </p>
+                </div>
+                
+                <div className="mb-6">
+                  <h4 className="font-bold text-charcoal mb-2">数据来源</h4>
+                  <p className="text-charcoal/60">
+                    {selectedItem.originalData.数据来源}
+                  </p>
+                </div>
                 
                 <div className="mb-6">
                   <h4 className="font-bold text-charcoal mb-2">标签</h4>
