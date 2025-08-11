@@ -382,67 +382,16 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
     return debounced as T;
   };
 
-  // Intersection Observer for lazy loading - 使用节流优化
+  // Intersection Observer for future lazy loading - 目前禁用，所有卡片初始显示
   useEffect(() => {
-    const throttledUpdateLayout = throttle((itemId: string) => {
-      setLayout(prev => ({
-        ...prev,
-        visibleItems: new Set([...prev.visibleItems, itemId])
-      }));
-    }, 100);
-
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const itemId = entry.target.getAttribute('data-item-id') || '';
-            throttledUpdateLayout(itemId);
-          }
-        });
-      },
-      { threshold: 0.1, rootMargin: '50px' }
-    );
-
+    // 暂时禁用IntersectionObserver，因为所有卡片初始时就应该显示
+    // 如果需要实现真正的懒加载（分页加载），可以重新启用这个逻辑
     return () => {
-      observerRef.current?.disconnect();
-      throttledUpdateLayout.cancel?.();
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
     };
   }, []);
-
-  // 节流函数
-  const throttle = <T extends (...args: any[]) => void>(func: T, wait: number): T => {
-    let timeout: NodeJS.Timeout | null = null;
-    let previous = 0;
-    
-    const throttled = (...args: Parameters<T>) => {
-      const now = Date.now();
-      const remaining = wait - (now - previous);
-      
-      if (remaining <= 0 || remaining > wait) {
-        if (timeout) {
-          clearTimeout(timeout);
-          timeout = null;
-        }
-        previous = now;
-        func(...args);
-      } else if (!timeout) {
-        timeout = setTimeout(() => {
-          previous = Date.now();
-          timeout = null;
-          func(...args);
-        }, remaining);
-      }
-    };
-    
-    throttled.cancel = () => {
-      if (timeout) {
-        clearTimeout(timeout);
-        timeout = null;
-      }
-    };
-    
-    return throttled as T;
-  };
 
   // 使用工具函数进行过滤 - 使用useMemo优化
   const filteredItems = useMemo(() => {
@@ -454,6 +403,17 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
       sortOrder: filters.sortOrder
     });
   }, [handwritingItems, filters]);
+
+  // 初始化时显示所有卡片
+  useEffect(() => {
+    if (filteredItems.length > 0 && layout.visibleItems.size === 0) {
+      const allItemIds = filteredItems.map(item => item.id);
+      setLayout(prev => ({
+        ...prev,
+        visibleItems: new Set(allItemIds)
+      }));
+    }
+  }, [filteredItems, layout.visibleItems.size]);
 
   // Masonry layout calculation
   // 使用useMemo优化布局计算
@@ -512,11 +472,11 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [lightbox.selectedItem, nextItem, prevItem]);
 
-  // Observe items when they mount
-  useEffect(() => {
-    const items = document.querySelectorAll('[data-item-id]');
-    items.forEach(item => observerRef.current?.observe(item));
-  }, [filteredItems]);
+  // Observe items when they mount - 目前禁用，所有卡片初始显示
+  // useEffect(() => {
+  //   const items = document.querySelectorAll('[data-item-id]');
+  //   items.forEach(item => observerRef.current?.observe(item));
+  // }, [filteredItems]);
 
   // 使用useMemo优化年份计算
   const uniqueYears = useMemo(() => {
