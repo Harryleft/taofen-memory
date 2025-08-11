@@ -124,11 +124,11 @@ const highlightSearchText = (text: string, searchTerm: string): JSX.Element => {
     <>
       {parts.map((part, index) => 
         regex.test(part) ? (
-          <span key={index} className="bg-yellow-200 text-charcoal font-bold">
+          <span key={`${index}-${part}`} className="bg-yellow-200 text-charcoal font-bold">
             {part}
           </span>
         ) : (
-          part
+          <span key={`${index}-${part}`}>{part}</span>
         )
       )}
     </>
@@ -369,12 +369,12 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
 
   // 使用useMemo优化年份计算
   const uniqueYears = useMemo(() => {
-    return [...new Set(handwritingItems.map(item => item.year))].sort();
+    return [...new Set(handwritingItems.map(item => item.year))].sort((a, b) => a - b);
   }, [handwritingItems]);
   
   // 使用useMemo优化数据来源计算
   const uniqueSources = useMemo(() => {
-    return [...new Set(handwritingItems.map(item => item.originalData.数据来源))].sort();
+    return [...new Set(handwritingItems.map(item => item.originalData.数据来源).filter(Boolean))].sort();
   }, [handwritingItems]);
   
   // 更新过滤器状态
