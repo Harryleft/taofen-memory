@@ -1,10 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Person } from '../types/Person';
 
-interface RelationshipsData {
-  persons: Person[];
-}
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 // 韬奋先生的ID，用于从关系数据中过滤掉他本人
 const TAOFEN_ID = 499;
 
@@ -17,7 +14,7 @@ export function useRelationshipsData() {
     const loadData = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/data/relationships.json');
+        const response = await fetch('/data/json/relationships.json');
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
