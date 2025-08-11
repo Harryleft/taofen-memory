@@ -6,7 +6,7 @@ type MasonryItem = BaseMasonryItem & { calculatedHeight?: number };
 type AspectCategory = 'portrait' | 'square' | 'landscape';
 
 interface HeroBackgroundProps {
-  scrollY: number;
+  scrollY?: number; // 保持向后兼容，但不再使用
 }
 
 interface LayoutConfig {
@@ -278,62 +278,34 @@ class MasonryLayouter {
 
 // =============== 主组件 ===============
 export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
-  // State
-  const [layoutConfig, setLayoutConfig] = useState<LayoutConfig>(() => 
-    LayoutCalculator.getLayoutConfig()
-  );
+  // State - 静态布局配置，在组件挂载时计算一次
+  const [layoutConfig, setLayoutConfig] = useState<LayoutConfig | null>(null);
   const [remoteItems, setRemoteItems] = useState<BaseMasonryItem[]>([]);
   const [aspectMap, setAspectMap] = useState<Record<number, number>>({});
 
   // Refs
   const containerRef = useRef<HTMLDivElement>(null);
-  const scrollableContainerRef = useRef<HTMLDivElement>(null);
 
-  // 安全的scrollY值
-  const safeScrollY = Utils.safeNumber(scrollY, 0);
-
-  // 视差滚动效果（直接DOM操作，避免频繁重渲染）
-  useEffect(() => {
-    if (scrollableContainerRef.current) {
-      scrollableContainerRef.current.style.transform = 
-        `translateY(${safeScrollY * CONFIG.PARALLAX_SPEED}px)`;
-    }
-  }, [safeScrollY]);
+  // 移除视差滚动效果，保持静态展示
 
   // 宽高比测量回调
   const handleAspectMeasured = useCallback((id: number, aspect: number) => {
     setAspectMap((prev) => (prev[id] ? prev : { ...prev, [id]: aspect }));
   }, []);
 
-  // 布局更新函数
-  const updateLayout = useCallback(() => {
-    const newConfig = LayoutCalculator.getLayoutConfig();
-    setLayoutConfig(newConfig);
-    Utils.debugLog(CONFIG.DEBUG, 'Layout updated', newConfig);
-  }, []);
-
-  // 防抖的布局更新
-  const debouncedUpdateLayout = useMemo(
-    () => Utils.debounce(updateLayout, CONFIG.DEBOUNCE_DELAY),
-    [updateLayout]
-  );
-
-  // 初始化和窗口尺寸监听
+  // 初始化数据加载和布局计算
   useEffect(() => {
+    // 计算初始布局配置
+    const initialConfig = LayoutCalculator.getLayoutConfig();
+    setLayoutConfig(initialConfig);
+    
     // 加载图片数据
     fetchHeroImages()
       .then(setRemoteItems)
       .catch((err) => {
         console.error('[HeroBackdrop] fetchHeroImages error:', err);
       });
-
-    // 初始布局计算
-    debouncedUpdateLayout();
-
-    // 监听窗口尺寸变化
-    window.addEventListener('resize', debouncedUpdateLayout);
-    return () => window.removeEventListener('resize', debouncedUpdateLayout);
-  }, [debouncedUpdateLayout]);
+  }, []);
 
   // 预加载图片并测量真实宽高比
   useEffect(() => {
@@ -355,13 +327,13 @@ export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
 
   // 计算列布局
   const columnArrays = useMemo(() => 
-    MasonryLayouter.distributeItems(
+    layoutConfig ? MasonryLayouter.distributeItems(
       repeatedItems,
       layoutConfig.columns,
       layoutConfig.columnWidth,
       aspectMap
-    ),
-    [repeatedItems, layoutConfig.columns, layoutConfig.columnWidth, aspectMap]
+    ) : [],
+    [repeatedItems, layoutConfig, aspectMap]
   );
 
   // 图片项目组件
@@ -376,20 +348,15 @@ export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
   }) => (
     <div
       key={`${item.id}-${columnIndex}-${itemIndex}`}
-      className="relative group overflow-hidden rounded-lg shadow-lg transform hover:scale-105 hover:shadow-2xl transition-transform duration-300"
+      className="relative overflow-hidden rounded-lg shadow-lg"
       style={{ height: `${item.calculatedHeight}px` }}
     >
       <img
         src={item.src}
         alt={item.title}
-        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+        className="w-full h-full object-cover"
         loading="lazy"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      <div className="absolute bottom-0 left-0 right-0 p-4 text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-        <h3 className="text-sm font-medium mb-1">{item.title}</h3>
-        <p className="text-xs opacity-80">{item.year}</p>
-      </div>
     </div>
   ), []);
 
@@ -418,8 +385,8 @@ export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
 
   // 容器样式
   const containerStyle = useMemo(() => ({
-    height: `${layoutConfig.height}px`
-  }), [layoutConfig.height]);
+    height: layoutConfig ? `${layoutConfig.height}px` : '100vh'
+  }), [layoutConfig]);
 
   const scrollableStyle = useMemo(() => ({
     filter: `saturate(${CONFIG.BAND_SATURATE}) brightness(${CONFIG.BAND_BRIGHTNESS}) blur(${CONFIG.BAND_BLUR_PX}px)`
@@ -432,7 +399,6 @@ export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
       style={containerStyle}
     >
       <div 
-        ref={scrollableContainerRef}
         className="flex gap-4 h-full"
         style={scrollableStyle}
       >
