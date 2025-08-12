@@ -72,8 +72,11 @@ const determineCategory = (item: HandwritingItem): 'letter' | 'manuscript' | 'no
 // 工具函数：生成标签
 const generateTags = (item: HandwritingItem, year: number): string[] => {
   const tags: string[] = [];
-  // 使用真实的【标签】字段
-  if (item.标签) tags.push(item.标签);
+  // 使用真实的【标签】字段，支持多个标签（用逗号分隔）
+  if (item.标签) {
+    const tagArray = item.标签.split(',').map(tag => tag.trim()).filter(Boolean);
+    tags.push(...tagArray);
+  }
   // 保留年份标签
   if (year) tags.push(`${year}年`);
   return tags;
