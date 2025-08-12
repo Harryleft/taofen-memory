@@ -48,51 +48,37 @@
 
 .animate-float {
   animation: float 3s ease-in-out infinite;
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .animate-float-delayed {
   animation: float 4s ease-in-out infinite;
   animation-delay: 1s;
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .animate-float-slow {
   animation: float 5s ease-in-out infinite;
   animation-delay: 2s;
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
-/* Header相关动画 */
-@keyframes slideInFromRight {
-  from {
-    opacity: 0;
-    transform: translateX(100%);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
+/* Header相关动画 - 使用 Tailwind 统一动画 */
 .animate-blob {
   animation: blob 7s infinite;
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .animation-delay-2000 {
   animation-delay: 2s;
-}
-
-@keyframes blob {
-  0% {
-    transform: translate(0px, 0px) scale(1);
-  }
-  33% {
-    transform: translate(30px, -50px) scale(1.1);
-  }
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
-  }
-  100% {
-    transform: translate(0px, 0px) scale(1);
-  }
 }
 
 /* Custom scrollbar - Dark theme */
@@ -128,6 +114,9 @@
   transform-origin: center;
   transition: transform 0.15s ease-out;
   outline-offset: 2px;
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
 }
 .x-axis .domain, .x-axis .tick line {
   stroke: #ccc;
