@@ -1,54 +1,229 @@
-import { FooterConfig, defaultFooterConfig } from '../components/layout/footer/types';
+import { FooterConfig } from '../components/layout/footer/types';
 
-// 统一的 Footer 配置 - 目前所有页面使用相同的配置
+// 统一的 Footer 配置 - 所有页面使用相同的简化配置
 export const footerConfigs: Record<string, FooterConfig> = {
-  // 首页
+  // 所有页面使用统一的简化配置
   home: {
-    ...defaultFooterConfig,
     brand: {
-      ...defaultFooterConfig.brand,
-      description: '传承韬奋精神，弘扬文化传统 - 全面了解邹韬奋先生的生平、事业与精神',
+      name: '韬奋纪念馆',
+      description: '',
+      copyright: '© 2025 韬奋纪念馆. 保留所有权利.',
+    },
+    
+    // 只保留必要的链接
+    navigation: {
+      quickLinks: [
+        { label: '韬奋纪念馆', to: 'https://www.shmog.org/', external: true },
+      ],
+    },
+    
+    // 移除法律信息
+    legal: {
+      items: [],
+      additionalText: '第十届上海图书馆开放数据竞赛作品',
+    },
+    
+    // 只显示品牌和竞赛说明
+    sections: [
+      { id: 'brand', title: '', visible: true, order: 1 },
+      { id: 'legal', title: '', visible: true, order: 2 },
+    ],
+    
+    style: {
+      backgroundColor: 'dark',
+      textColor: 'light',
+      accentColor: 'gold',
+    },
+    
+    features: {
+      showBackToTop: false,
+      showCurrentYear: false,
+      showLastUpdated: false,
     },
   },
 
-  // 生平时光轴
+  // 所有页面使用相同的简化配置
   timeline: {
-    ...defaultFooterConfig,
     brand: {
-      ...defaultFooterConfig.brand,
-      description: '以时间为线索，梳理呈现韬奋先生一生的重要事迹与思想演变',
+      name: '韬奋纪念馆',
+      description: '',
+      copyright: '© 2025 韬奋纪念馆. 保留所有权利.',
+    },
+    
+    navigation: {
+      quickLinks: [
+        { label: '韬奋纪念馆', to: 'https://www.shmog.org/', external: true },
+      ],
+    },
+    
+    legal: {
+      items: [],
+      additionalText: '第十届上海图书馆开放数据竞赛作品',
+    },
+    
+    sections: [
+      { id: 'brand', title: '', visible: true, order: 1 },
+      { id: 'legal', title: '', visible: true, order: 2 },
+    ],
+    
+    style: {
+      backgroundColor: 'dark',
+      textColor: 'light',
+      accentColor: 'gold',
+    },
+    
+    features: {
+      showBackToTop: false,
+      showCurrentYear: false,
+      showLastUpdated: false,
     },
   },
 
-  // 人物关系
+  // 人物关系 - 使用相同的简化配置
   relationships: {
-    ...defaultFooterConfig,
     brand: {
-      ...defaultFooterConfig.brand,
-      description: '探索韬奋先生在其时代背景下的社会网络与思想传承',
+      name: '韬奋纪念馆',
+      description: '',
+      copyright: '© 2025 韬奋纪念馆. 保留所有权利.',
+    },
+    
+    navigation: {
+      quickLinks: [
+        { label: '韬奋纪念馆', to: 'https://www.shmog.org/', external: true },
+      ],
+    },
+    
+    legal: {
+      items: [],
+      additionalText: '第十届上海图书馆开放数据竞赛作品',
+    },
+    
+    sections: [
+      { id: 'brand', title: '', visible: true, order: 1 },
+      { id: 'legal', title: '', visible: true, order: 2 },
+    ],
+    
+    style: {
+      backgroundColor: 'dark',
+      textColor: 'light',
+      accentColor: 'gold',
+    },
+    
+    features: {
+      showBackToTop: false,
+      showCurrentYear: false,
+      showLastUpdated: false,
     },
   },
 
-  // 手稿文献
+  // 手稿文献 - 使用相同的简化配置
   handwriting: {
-    ...defaultFooterConfig,
     brand: {
-      ...defaultFooterConfig.brand,
-      description: '展出珍贵的韬奋手稿、书信及相关历史文献',
+      name: '韬奋纪念馆',
+      description: '',
+      copyright: '© 2025 韬奋纪念馆. 保留所有权利.',
+    },
+    
+    navigation: {
+      quickLinks: [
+        { label: '韬奋纪念馆', to: 'https://www.shmog.org/', external: true },
+      ],
+    },
+    
+    legal: {
+      items: [],
+      additionalText: '第十届上海图书馆开放数据竞赛作品',
+    },
+    
+    sections: [
+      { id: 'brand', title: '', visible: true, order: 1 },
+      { id: 'legal', title: '', visible: true, order: 2 },
+    ],
+    
+    style: {
+      backgroundColor: 'dark',
+      textColor: 'light',
+      accentColor: 'gold',
+    },
+    
+    features: {
+      showBackToTop: false,
+      showCurrentYear: false,
+      showLastUpdated: false,
     },
   },
 
-  // 书店经营
+  // 书店经营 - 使用相同的简化配置
   bookstore: {
-    ...defaultFooterConfig,
     brand: {
-      ...defaultFooterConfig.brand,
-      description: '聚焦韬奋先生作为卓越出版家的一面，回顾生活书店的发展历程',
+      name: '韬奋纪念馆',
+      description: '',
+      copyright: '© 2025 韬奋纪念馆. 保留所有权利.',
+    },
+    
+    navigation: {
+      quickLinks: [
+        { label: '韬奋纪念馆', to: 'https://www.shmog.org/', external: true },
+      ],
+    },
+    
+    legal: {
+      items: [],
+      additionalText: '第十届上海图书馆开放数据竞赛作品',
+    },
+    
+    sections: [
+      { id: 'brand', title: '', visible: true, order: 1 },
+      { id: 'legal', title: '', visible: true, order: 2 },
+    ],
+    
+    style: {
+      backgroundColor: 'dark',
+      textColor: 'light',
+      accentColor: 'gold',
+    },
+    
+    features: {
+      showBackToTop: false,
+      showCurrentYear: false,
+      showLastUpdated: false,
     },
   },
 
-  // 默认或未知模块
+  // 默认或未知模块 - 使用相同的简化配置
   default: {
-    ...defaultFooterConfig,
+    brand: {
+      name: '韬奋纪念馆',
+      description: '',
+      copyright: '© 2025 韬奋纪念馆. 保留所有权利.',
+    },
+    
+    navigation: {
+      quickLinks: [
+        { label: '韬奋纪念馆', to: 'https://www.shmog.org/', external: true },
+      ],
+    },
+    
+    legal: {
+      items: [],
+      additionalText: '第十届上海图书馆开放数据竞赛作品',
+    },
+    
+    sections: [
+      { id: 'brand', title: '', visible: true, order: 1 },
+      { id: 'legal', title: '', visible: true, order: 2 },
+    ],
+    
+    style: {
+      backgroundColor: 'dark',
+      textColor: 'light',
+      accentColor: 'gold',
+    },
+    
+    features: {
+      showBackToTop: false,
+      showCurrentYear: false,
+      showLastUpdated: false,
+    },
   },
 };

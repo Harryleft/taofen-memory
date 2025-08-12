@@ -34,31 +34,16 @@ const LegalSection: React.FC<{
   additionalText?: string;
 }> = ({ items, additionalText }) => {
   return (
-    <FooterSection title="法律信息">
-      <div className="legal-content space-y-4">
-        {/* 法律链接 */}
-        {items.length > 0 && (
-          <div className="legal-links">
-            <ul className="legal-links-list flex flex-wrap gap-4">
-              {items.map((item, index) => (
-                <li key={index}>
-                  <LegalLink item={item} />
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-        
-        {/* 额外文本 */}
-        {additionalText && (
-          <div className="legal-additional-text">
-            <p className="text-sm text-gray-400 leading-relaxed">
-              {additionalText}
-            </p>
-          </div>
-        )}
-      </div>
-    </FooterSection>
+    <div className="legal-content text-center mt-4">
+      {/* 额外文本 */}
+      {additionalText && (
+        <div className="legal-additional-text">
+          <p className="text-sm text-gray-400 leading-relaxed">
+            {additionalText}
+          </p>
+        </div>
+      )}
+    </div>
   );
 };
 
