@@ -183,14 +183,8 @@ const BaseFooter: React.FC<FooterProps> = ({ config, className = '' }) => {
             </div>
           </div>
 
-          {/* 底部栏 */}
-          <div className="footer-bottom-bar border-t border-gray-700 mt-8 pt-6">
-            <div className="footer-bottom-content text-center">
-              {/* 版权信息 */}
-              <div className="footer-copyright text-sm text-gray-400">
-                {brand.copyright}
-              </div>
-            </div>
+          {/* 底部分隔线 */}
+          <div className="footer-bottom-bar border-t border-gray-700 mt-4 pt-4">
           </div>
         </div>
       </footer>
