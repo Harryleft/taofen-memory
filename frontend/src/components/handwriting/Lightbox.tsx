@@ -1,5 +1,6 @@
 import { useMemo, memo } from 'react';
 import { X, ChevronLeft, ChevronRight, Download } from 'lucide-react';
+import { categoryLabels, categoryColors } from '@/utils/handwritingUtils.ts';
 
 // 转换后的数据接口
 interface TransformedHandwritingItem {
@@ -50,19 +51,7 @@ const highlightSearchText = (text: string, searchTerm: string): JSX.Element => {
   );
 };
 
-const categoryLabels = {
-  letter: '书信',
-  manuscript: '手稿',
-  note: '笔记',
-  article: '文章'
-};
-
-const categoryColors = {
-  letter: 'bg-blue-500',
-  manuscript: 'bg-gold',
-  note: 'bg-green-500',
-  article: 'bg-purple-500'
-};
+// 分类标签和颜色从工具函数导入
 
 interface LightboxProps {
   selectedItem: TransformedHandwritingItem;

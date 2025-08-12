@@ -21,7 +21,7 @@ export interface TransformedHandwritingItem {
   title: string;
   year: number;
   date: string;
-  category: 'letter' | 'manuscript' | 'note' | 'article';
+  category: string;
   description: string;
   image: string;
   highResImage: string;
@@ -54,19 +54,13 @@ const extractYearFromDateString = (dateString: string): number => {
   return yearMatch ? parseInt(yearMatch[1]) : 1937;
 };
 
-// 工具函数：判断手迹类别
-const determineCategory = (item: HandwritingItem): 'letter' | 'manuscript' | 'note' | 'article' => {
-  const content = (item.名称 + item.注释 + item.原文).toLowerCase();
-  
-  if (content.includes('信') || content.includes('书') || content.includes('致')) {
-    return 'letter';
-  } else if (content.includes('笔记') || content.includes('日记') || content.includes('记录')) {
-    return 'note';
-  } else if (content.includes('文章') || content.includes('稿') || content.includes('撰')) {
-    return 'article';
+// 工具函数：从标签获取主分类
+const getMainCategory = (item: HandwritingItem): string => {
+  // 使用JSON中的标签作为分类，如果没有标签则使用默认分类
+  if (item.标签) {
+    return item.标签.trim();
   }
-  
-  return 'manuscript';
+  return '其他';
 };
 
 // 工具函数：生成标签
@@ -98,7 +92,7 @@ const getImagePath = (item: HandwritingItem): string => {
 const transformHandwritingData = (data: HandwritingItem[]): TransformedHandwritingItem[] => {
   return data.map(item => {
     const year = extractYearFromDateString(item.时间);
-    const category = determineCategory(item);
+    const category = getMainCategory(item);
     const tags = generateTags(item, year);
     const imagePath = getImagePath(item);
     
