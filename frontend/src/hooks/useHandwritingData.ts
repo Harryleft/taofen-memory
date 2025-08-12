@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 // 真实数据接口定义
 export interface HandwritingItem {
@@ -122,11 +122,15 @@ export const useHandwritingData = () => {
 
   // 数据加载函数
   const loadData = useCallback(async () => {
+    console.log('🔍 [useHandwritingData] Starting to load data...');
     try {
       setLoading(true);
       setError(null);
+      console.log('🔍 [useHandwritingData] Fetching data from /data/json/taofen_handwriting_details.json');
       const rawData = await fetchHandwritingData();
+      console.log('🔍 [useHandwritingData] Raw data received:', rawData);
       const transformedData = transformHandwritingData(rawData);
+      console.log('🔍 [useHandwritingData] Transformed data:', transformedData);
       setHandwritingItems(transformedData);
     } catch (err) {
       setError('加载手迹数据失败，请刷新页面重试');
@@ -138,6 +142,12 @@ export const useHandwritingData = () => {
 
   // 重新加载数据
   const refetch = useCallback(() => {
+    loadData();
+  }, [loadData]);
+
+  // 组件挂载时自动加载数据
+  useEffect(() => {
+    console.log('🔍 [useHandwritingData] Hook mounted, calling loadData...');
     loadData();
   }, [loadData]);
 
