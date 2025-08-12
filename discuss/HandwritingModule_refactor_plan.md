@@ -28,7 +28,7 @@
 - `HandwritingModule` 主函数过长（524行）
 - `filterHandwritingItems` 函数55行
 - `renderFilterControls` 函数76行
-- `Lightbox` 组件133行
+- `HandwritingLightbox` 组件133行
 
 ### 4. 重复代码（中优先级）
 **问题描述**: 

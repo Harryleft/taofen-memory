@@ -13,7 +13,7 @@ interface LightboxProps {
   onNext: () => void;
 }
 
-const Lightbox = memo(({ 
+const HandwritingLightbox = memo(({
   selectedItem, 
   currentIndex, 
   totalItems, 
@@ -133,6 +133,6 @@ const Lightbox = memo(({
   );
 });
 
-Lightbox.displayName = 'Lightbox';
+HandwritingLightbox.displayName = 'HandwritingLightbox';
 
-export default Lightbox;
+export default HandwritingLightbox;

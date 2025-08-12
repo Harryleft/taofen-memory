@@ -15,7 +15,7 @@
 | HandwritingModule.tsx | 8.5 | 9.0 | 8.0 | 9.0 | 8.6 |
 | useHandwritingFilters.ts | 9.0 | 9.5 | 9.0 | 9.5 | 9.3 |
 | handwritingUtils.ts | 8.5 | 8.0 | 8.5 | 8.5 | 8.4 |
-| Lightbox.tsx | 8.0 | 7.5 | 8.0 | 8.5 | 8.0 |
+| HandwritingLightbox.tsx | 8.0 | 7.5 | 8.0 | 8.5 | 8.0 |
 | HandwritingCard.tsx | 9.0 | 8.5 | 8.5 | 9.0 | 8.8 |
 | SkeletonGrid.tsx | 8.5 | 8.0 | 8.0 | 7.5 | 8.0 |
 | imagePreloader.ts | 9.5 | 9.5 | 9.0 | 9.5 | 9.4 |
@@ -143,7 +143,7 @@ const FilterControls = memo(({ filters, options, onUpdate }) => {
 });
 ```
 
-#### 2. Lightbox.tsx优化
+#### 2. HandwritingLightbox.tsx优化
 
 **问题**: 缺少图片加载状态处理
 ```typescript

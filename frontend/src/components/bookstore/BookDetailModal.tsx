@@ -1,6 +1,6 @@
 /**
  * @file BookDetailModal.tsx
- * @description 书籍详情弹窗（Lightbox）组件，用于展示单本书的详细信息和大图。
+ * @description 书籍详情弹窗（HandwritingLightbox）组件，用于展示单本书的详细信息和大图。
  * @module components/bookstore/BookDetailModal
  */
 
