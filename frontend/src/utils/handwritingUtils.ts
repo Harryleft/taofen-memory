@@ -73,20 +73,20 @@ export const calculateMasonryLayout = (
   return columnArrays;
 };
 
-// 类别标签映射
-export const categoryLabels = {
-  letter: '书信',
-  manuscript: '手稿',
-  note: '笔记',
-  article: '文章'
+// 类别标签映射 - 使用JSON中的真实标签
+export const categoryLabels: Record<string, string> = {
+  '题词': '题词',
+  '文稿': '文稿', 
+  '书简': '书简',
+  '其他': '其他'
 };
 
-// 类别颜色映射
-export const categoryColors = {
-  letter: 'bg-blue-500',
-  manuscript: 'bg-gold',
-  note: 'bg-green-500',
-  article: 'bg-purple-500'
+// 类别颜色映射 - 为真实标签分配颜色
+export const categoryColors: Record<string, string> = {
+  '题词': 'bg-blue-500',
+  '文稿': 'bg-gold',
+  '书简': 'bg-green-500',
+  '其他': 'bg-gray-500'
 };
 
 // Hook：使用防抖的响应式列数
