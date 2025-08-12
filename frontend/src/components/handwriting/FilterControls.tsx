@@ -72,34 +72,7 @@ const FilterControls = memo(({
             ))}
           </select>
         </div>
-
-        <div className="relative">
-          <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-charcoal/60" size={16} />
-          <select
-            value={filters.selectedSource}
-            onChange={(e) => onFilterChange('selectedSource', e.target.value)}
-            className="pl-10 pr-8 py-2 bg-white border border-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50 appearance-none"
-          >
-            <option value="all">全部来源</option>
-            {uniqueSources.map(source => (
-              <option key={source} value={source}>{source}</option>
-            ))}
-          </select>
-        </div>
-
-        <div className="relative">
-          <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-charcoal/60" size={16} />
-          <select
-            value={filters.selectedTag}
-            onChange={(e) => onFilterChange('selectedTag', e.target.value)}
-            className="pl-10 pr-8 py-2 bg-white border border-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50 appearance-none"
-          >
-            <option value="all">全部时间</option>
-            {uniqueTags.map(tag => (
-              <option key={tag} value={tag}>{tag}</option>
-            ))}
-          </select>
-        </div>
+        
 
         <div className="relative">
           <SortAsc className="absolute left-3 top-1/2 transform -translate-y-1/2 text-charcoal/60" size={16} />
