@@ -234,7 +234,7 @@ export default function TimelinePage() {
       </div>
       
       {/* Footer */}
-      <AppFooter moduleId="timeline" />
+      <AppFooter />
     </>
   );
 }

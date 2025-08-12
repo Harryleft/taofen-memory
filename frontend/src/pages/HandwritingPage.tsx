@@ -8,7 +8,7 @@ function HandwritingPage() {
       <HandwritingModule />
       
       {/* Footer */}
-      <AppFooter moduleId="handwriting" />
+      <AppFooter />
     </div>
   );
 }
