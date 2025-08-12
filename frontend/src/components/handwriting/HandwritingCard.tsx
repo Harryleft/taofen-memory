@@ -17,7 +17,17 @@ interface TransformedHandwritingItem {
     height: number;
   };
   originalData: {
+    id: string;
+    名称: string;
+    原文: string;
+    时间: string;
+    注释: string;
+    数据来源: string;
     标签: string;
+    图片位置: Array<{
+      remote_url: string;
+      local_path: string;
+    }>;
   };
 }
 
@@ -75,6 +85,7 @@ const HandwritingCard = memo(({
   const highlightedTitle = useMemo(() => highlightSearchText(item.title, searchTerm), [item.title, searchTerm]);
   const highlightedDescription = useMemo(() => highlightSearchText(item.description, searchTerm), [item.description, searchTerm]);
   
+    
   return (
     <div
       data-item-id={item.id}
@@ -115,7 +126,7 @@ const HandwritingCard = memo(({
             {highlightedDescription}
           </p>
           <div className="flex flex-wrap gap-1">
-            {item.tags.slice(0, 2).map((tag, index) => (
+            {item.tags.filter(tag => !tag.includes('年')).slice(0, 2).map((tag, index) => (
               <span key={index} className="text-xs bg-gold/10 text-gold px-2 py-1 rounded">
                 {tag}
               </span>

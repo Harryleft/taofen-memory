@@ -79,6 +79,10 @@ const generateTags = (item: HandwritingItem, year: number): string[] => {
   }
   // 保留年份标签
   if (year) tags.push(`${year}年`);
+  
+  // 调试信息：输出标签生成过程
+  console.log('🔍 [generateTags] Item:', item.名称, 'Original tag:', item.标签, 'Generated tags:', tags);
+  
   return tags;
 };
 
