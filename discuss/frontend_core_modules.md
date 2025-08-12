@@ -13,7 +13,7 @@
 - `components/`
   - `bookstore/`: 生活书店模块（筛选/瀑布流/详情）
   - `timeline/`: 人生大事时间轴模块
-  - `handwriting/`: 韬奋手迹模块（示例数据、瀑布流、Lightbox）
+  - `handwriting/`: 韬奋手迹模块（示例数据、瀑布流、HandwritingLightbox）
   - `relationships/`: 人物关系模块（瀑布流+详情弹窗）
   - `heroIntro/`: 首页 Hero（拼贴背景、视差动画）
   - `layout/header/`: 头部导航（`AppHeader`）
@@ -60,7 +60,7 @@
 ### 3) 韬奋手迹（手迹/手稿/文献）
 - 页面与组件
   - `pages/HandwritingPage.tsx`: 页面容器
-  - `components/handwriting/HandwritingModule.tsx`: 内置演示数据 + Masonry 瀑布流 + Lightbox
+  - `components/handwriting/HandwritingModule.tsx`: 内置演示数据 + Masonry 瀑布流 + HandwritingLightbox
   - `components/handwriting/HandwritingHeader.tsx`: 模块头部（与 `AppHeader`配合）
 - 关键交互
   - 关键词/类型/年份筛选；懒加载入场；高清图预览与左右切换

@@ -6,7 +6,7 @@
 // src/components/handwriting/HandwritingModule.tsx
 import { useState } from 'react';
 import AppHeader from '../layout/header/AppHeader';
-import Lightbox from './Lightbox';
+import HandwritingLightbox from './HandwritingLightbox';
 import { useHandwritingData } from '@/hooks/useHandwritingData';
 import { useHandwritingFilters } from '@/hooks/useHandwritingFilters';
 import { useHandwritingPagination } from '@/hooks/useHandwritingPagination';
@@ -125,9 +125,9 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
           )}
         </div>
         
-        {/* Lightbox */}
+        {/* HandwritingLightbox */}
         {lightbox.selectedItem && (
-          <Lightbox
+          <HandwritingLightbox
             selectedItem={lightbox.selectedItem}
             currentIndex={lightbox.currentIndex}
             totalItems={filteredItems.length}
@@ -867,7 +867,7 @@ src/
 │       ├── LoadingIndicator.tsx            # 加载指示器
 │       ├── PaginationTrigger.tsx           # 分页触发器
 │       ├── HandwritingCard.tsx             # 手迹卡片 (现有)
-│       ├── Lightbox.tsx                    # 图片预览 (现有)
+│       ├── HandwritingLightbox.tsx                    # 图片预览 (现有)
 │       └── SkeletonGrid.tsx                # 骨架屏 (现有)
 ├── hooks/
 │   ├── useHandwritingData.ts               # 数据获取 (现有)

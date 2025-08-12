@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import AppHeader from '../layout/header/AppHeader';
-import Lightbox from './Lightbox';
+import HandwritingLightbox from './HandwritingLightbox.tsx';
 import { useHandwritingData } from '@/hooks/useHandwritingData';
 import { useHandwritingFilters } from '@/hooks/useHandwritingFilters';
 import { useHandwritingPagination } from '@/hooks/useHandwritingPagination';
@@ -271,9 +271,9 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
           )}
         </div>
         
-        {/* Lightbox */}
+        {/* HandwritingLightbox */}
         {lightbox.selectedItem && (
-          <Lightbox
+          <HandwritingLightbox
             selectedItem={lightbox.selectedItem}
             currentIndex={lightbox.currentIndex}
             totalItems={filteredItems.length}

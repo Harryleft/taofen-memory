@@ -272,7 +272,7 @@ const useHandwritingPreloader = (items: TransformedHandwritingItem[], currentPag
 
 ### 1. 状态分类
 - **全局状态**: 数据获取、错误处理 (通过 useHandwritingData)
-- **局部状态**: 过滤器、分页、布局、Lightbox (通过各个Hook管理)
+- **局部状态**: 过滤器、分页、布局、HandwritingLightbox (通过各个Hook管理)
 - **派生状态**: 过滤后的项目、分页后的项目、布局计算 (通过useMemo计算)
 
 ### 2. 状态提升
