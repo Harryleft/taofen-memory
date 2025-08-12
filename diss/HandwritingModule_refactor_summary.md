@@ -30,8 +30,8 @@
 1. **HandwritingFilterControls** - 搜索和过滤器控件
 2. **ResultsHeader** - 结果统计头部
 3. **HandwritingMasonryGrid** - 瀑布流网格布局
-4. **EmptyState** - 空状态显示
-5. **ErrorState** - 错误状态显示
+4. **HandwritingEmptyState** - 空状态显示
+5. **HandwritingErrorState** - 错误状态显示
 6. **HandwritingLoadingIndicator** - 加载指示器
 7. **HandwritingPaginationTrigger** - 分页触发器
 

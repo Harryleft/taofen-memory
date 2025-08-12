@@ -17,8 +17,8 @@ import { useHandwritingPreloader } from '@/hooks/useHandwritingPreloader';
 import HandwritingFilterControls from './HandwritingFilterControls';
 import ResultsHeader from './ResultsHeader';
 import HandwritingMasonryGrid from './HandwritingMasonryGrid';
-import EmptyState from './EmptyState';
-import ErrorState from './ErrorState';
+import HandwritingEmptyState from './HandwritingEmptyState';
+import HandwritingErrorState from './HandwritingErrorState';
 import HandwritingLoadingIndicator from './HandwritingLoadingIndicator';
 
 interface HandwritingModuleProps {
@@ -102,13 +102,13 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
           {loading && <HandwritingLoadingIndicator />}
           
           {/* 错误状态 */}
-          {error && <ErrorState error={error} onRetry={refetch} />}
+          {error && <HandwritingErrorState error={error} onRetry={refetch} />}
           
           {/* 瀑布流网格 */}
           {!loading && !error && (
             <>
               {filteredItems.length === 0 ? (
-                <EmptyState />
+                <HandwritingEmptyState />
               ) : (
                 <HandwritingMasonryGrid
                   items={paginatedItems}
@@ -727,14 +727,14 @@ ResultsHeader.displayName = 'ResultsHeader';
 
 export default ResultsHeader;
 
-// src/components/handwriting/EmptyState.tsx
+// src/components/handwriting/HandwritingEmptyState.tsx
 import { memo } from 'react';
 
 interface EmptyStateProps {
   message?: string;
 }
 
-const EmptyState = memo(({ message = "未找到相关手迹" }: EmptyStateProps) => (
+const HandwritingEmptyState = memo(({ message = "未找到相关手迹" }: EmptyStateProps) => (
   <div className="text-center py-12">
     <div className="text-6xl mb-4">📜</div>
     <h3 className="text-xl font-bold text-charcoal mb-2">{message}</h3>
@@ -742,11 +742,11 @@ const EmptyState = memo(({ message = "未找到相关手迹" }: EmptyStateProps)
   </div>
 ));
 
-EmptyState.displayName = 'EmptyState';
+HandwritingEmptyState.displayName = 'HandwritingEmptyState';
 
-export default EmptyState;
+export default HandwritingEmptyState;
 
-// src/components/handwriting/ErrorState.tsx
+// src/components/handwriting/HandwritingErrorState.tsx
 import { memo } from 'react';
 
 interface ErrorStateProps {
@@ -754,7 +754,7 @@ interface ErrorStateProps {
   onRetry: () => void;
 }
 
-const ErrorState = memo(({ error, onRetry }: ErrorStateProps) => (
+const HandwritingErrorState = memo(({ error, onRetry }: ErrorStateProps) => (
   <div className="text-center py-12">
     <div className="text-6xl mb-4">❌</div>
     <h3 className="text-xl font-bold text-charcoal mb-2">加载失败</h3>
@@ -768,9 +768,9 @@ const ErrorState = memo(({ error, onRetry }: ErrorStateProps) => (
   </div>
 ));
 
-ErrorState.displayName = 'ErrorState';
+HandwritingErrorState.displayName = 'HandwritingErrorState';
 
-export default ErrorState;
+export default HandwritingErrorState;
 
 // src/components/handwriting/HandwritingLoadingIndicator.tsx
 import { memo } from 'react';
@@ -862,8 +862,8 @@ src/
 │       ├── HandwritingFilterControls.tsx              # 过滤器控件
 │       ├── ResultsHeader.tsx               # 结果头部
 │       ├── HandwritingMasonryGrid.tsx                 # 瀑布流网格
-│       ├── EmptyState.tsx                  # 空状态
-│       ├── ErrorState.tsx                  # 错误状态
+│       ├── HandwritingEmptyState.tsx                  # 空状态
+│       ├── HandwritingErrorState.tsx                  # 错误状态
 │       ├── HandwritingLoadingIndicator.tsx            # 加载指示器
 │       ├── HandwritingPaginationTrigger.tsx           # 分页触发器
 │       ├── HandwritingCard.tsx             # 手迹卡片 (现有)

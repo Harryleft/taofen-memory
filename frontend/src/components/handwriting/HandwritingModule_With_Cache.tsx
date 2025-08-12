@@ -10,8 +10,8 @@ import { useHandwritingSearch } from '@/hooks/useHandwritingSearch';
 import { useHandwritingPreloader } from '@/hooks/useHandwritingPreloader';
 import HandwritingFilterControls from './HandwritingFilterControls.tsx';
 import HandwritingMasonryGrid from './HandwritingMasonryGrid.tsx';
-import EmptyState from './EmptyState';
-import ErrorState from './ErrorState';
+import HandwritingEmptyState from './HandwritingEmptyState.tsx';
+import HandwritingErrorState from './HandwritingErrorState.tsx';
 import HandwritingLoadingIndicator from './HandwritingLoadingIndicator.tsx';
 
 interface HandwritingModuleProps {
@@ -248,13 +248,13 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
           {loading && <HandwritingLoadingIndicator />}
           
           {/* 错误状态 */}
-          {error && <ErrorState error={error} onRetry={refetch} />}
+          {error && <HandwritingErrorState error={error} onRetry={refetch} />}
           
           {/* 瀑布流网格 */}
           {!loading && !error && (
             <>
               {filteredItems.length === 0 ? (
-                <EmptyState />
+                <HandwritingEmptyState />
               ) : (
                 <HandwritingMasonryGrid
                   items={paginatedItems}
