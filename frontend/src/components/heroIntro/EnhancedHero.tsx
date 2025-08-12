@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import HeroPageBackdrop from './HeroPageBackdrop.tsx';
 import BaseHeader from '../layout/header/BaseHeader';
 import { headerConfigs } from '../../constants/header.configs';
+import { CONFIG } from '../../constants/config';
 
 // ====== 类型定义 ======
 type TitleVariant = 'classic' | 'monumental' | 'editorial';
@@ -15,13 +16,6 @@ interface ModuleItem {
   imageAlt: string;
   path: string;
 }
-
-// ====== 常量配置 ======
-const CONSTANTS = {
-  ENTRANCE_ANIMATION_DELAY: 300,
-  YEAR_RANGE: '1895 - 1944',
-  SUBTITLE: '沿邹韬奋的生活、事业与遗产，洞见时代精神',
-} as const;
 
 const THEME = {
   colors: {
@@ -187,7 +181,7 @@ export default function EnhancedHero() {
 
   // ====== Effects ======
   useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(true), CONSTANTS.ENTRANCE_ANIMATION_DELAY);
+    const timer = setTimeout(() => setIsVisible(true), CONFIG.ANIMATION.DELAY.ENTRANCE);
     return () => clearTimeout(timer);
   }, []);
 
@@ -204,7 +198,7 @@ export default function EnhancedHero() {
       <div className="inline-flex items-center gap-6">
         <div className="w-16 md:w-24 h-px bg-gradient-to-r from-transparent via-black/70 to-transparent" />
         <span className="text-sm font-medium tracking-[0.3em] text-black/80 uppercase">
-          {CONSTANTS.YEAR_RANGE}
+          {CONFIG.META.YEAR_RANGE}
         </span>
         <div className="w-16 md:w-24 h-px bg-gradient-to-r from-transparent via-black/70 to-transparent" />
       </div>
@@ -214,7 +208,7 @@ export default function EnhancedHero() {
   const Subtitle = useMemo(() => (
     <div className="mt-8 max-w-2xl mx-auto">
       <p className="text-lg md:text-xl text-gray-800 font-light leading-relaxed tracking-wide">
-        {CONSTANTS.SUBTITLE}
+        {CONFIG.META.SUBTITLE}
       </p>
     </div>
   ), []);
