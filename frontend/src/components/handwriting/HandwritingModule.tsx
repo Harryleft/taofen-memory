@@ -102,7 +102,13 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
     console.log('- uniqueYears:', uniqueYears);
     console.log('- uniqueSources:', uniqueSources);
     console.log('- uniqueTags:', uniqueTags);
+    console.log('- uniqueTags length:', uniqueTags.length);
     console.log('- current filters:', filters);
+    console.log('- contains real tags:', {
+      '题词': uniqueTags.includes('题词'),
+      '文稿': uniqueTags.includes('文稿'),
+      '书简': uniqueTags.includes('书简')
+    });
   }, [filteredItems, uniqueYears, uniqueSources, uniqueTags, filters]);
 
   // 初始化时显示所有卡片
@@ -246,7 +252,7 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
           onChange={(e) => updateFilters('selectedTag', e.target.value)}
           className="px-4 py-2 bg-white border border-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50"
         >
-          <option value="all">全部标签</option>
+          <option value="all">全部标签 ({uniqueTags.length})</option>
           {uniqueTags.map(tag => (
             <option key={tag} value={tag}>{tag}</option>
           ))}
