@@ -1,10 +1,10 @@
 .timeline-page-root {
-  --bg-cream: #FAF7F0;
-  --text-charcoal: #1F2937;
-  --text-muted: #6B7280;
-  --accent-gold: #B8860B;
-  --surface: #FFFFFF;
-  --border: rgba(0, 0, 0, 0.08);
+  --bg-cream: var(--brand-cream);
+  --text-charcoal: var(--text-primary);
+  --text-muted: var(--text-muted);
+  --accent-gold: var(--brand-gold);
+  --surface: var(--background-card);
+  --border: var(--border-light);
   --radius: 12px;
   --radius-sm: 8px;
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
@@ -62,6 +62,9 @@
 
 .animate-fadeIn {
   animation: fadeIn 0.6s ease-out;
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
 }
 
 
@@ -86,7 +89,7 @@
 
 .core-event-title {
   position: relative;
-  background: #FAF7F0;
+  background: var(--brand-cream);
   padding: 20px 0;
   margin-bottom: 24px;
   z-index: 1;
@@ -102,6 +105,9 @@
   overflow: visible;
   width: 100%;
   text-align: left;
+  transform: translateZ(0);
+  will-change: transform, box-shadow;
+  backface-visibility: hidden;
 }
 
 .first-event-clickable::after {
@@ -117,8 +123,12 @@
   pointer-events: none;
 }
 
-.first-event-clickable:not(.expanded)::after {
+.first-event-clickable::after {
   opacity: 1;
+}
+
+.first-event-clickable.expanded::after {
+  opacity: 0;
 }
 
 .first-event-clickable:hover {
@@ -131,6 +141,9 @@
   animation: staggerIn 0.6s ease-out forwards;
   opacity: 0;
   transform: translateY(20px);
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
 }
 
 /* 事件卡片骨架（占位样式，先定义，后续可按需启用） */
@@ -306,16 +319,7 @@
   }
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+/* 动画使用 Tailwind 统一定义 */
 
 /* 首事件标题在桌面端隐藏（TOC 已提供导航）；移动端保留 */
 @media (min-width: 1024px) {
@@ -345,9 +349,3 @@
   }
 }
 
-@keyframes staggerIn {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}

@@ -12,11 +12,11 @@
   }
 
   .bookstore-header-title {
-    @apply text-5xl font-bold text-charcoal mb-6;
+    @apply text-5xl font-bold text-primary mb-6;
   }
 
   .bookstore-header-subtitle {
-    @apply text-lg text-charcoal/70 mb-2;
+    @apply text-lg text-primary/70 mb-2;
   }
 
   .bookstore-filters-container {
@@ -28,19 +28,19 @@
   }
 
   .bookstore-search-input-icon {
-    @apply absolute left-3 top-1/2 transform -translate-y-1/2 text-charcoal/60;
+    @apply absolute left-3 top-1/2 transform -translate-y-1/2 text-primary/60;
   }
 
   .bookstore-search-input {
-    @apply pl-10 pr-4 py-2 bg-white border border-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50 w-80;
+    @apply pl-10 pr-4 py-2 bg-white border border-brand-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-gold/50 w-80;
   }
 
   .bookstore-select {
-    @apply px-4 py-2 bg-white border border-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50;
+    @apply px-4 py-2 bg-white border border-brand-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-gold/50;
   }
 
   .bookstore-download-button {
-    @apply flex items-center gap-2 px-4 py-2 bg-white border-2 border-gold/30 text-charcoal rounded-lg hover:bg-gold/5 hover:border-gold/60 focus:outline-none focus:ring-2 focus:ring-gold/30 transition-all duration-300 shadow-sm hover:shadow-md;
+    @apply flex items-center gap-2 px-4 py-2 bg-white border-2 border-brand-gold/30 text-primary rounded-lg hover:bg-brand-gold/5 hover:border-brand-gold/60 focus:outline-none focus:ring-2 focus:ring-brand-gold/30 transition-all duration-300 shadow-sm hover:shadow-md;
   }
 
   .bookstore-grid-container {
@@ -53,6 +53,9 @@
 
   .bookstore-card-container {
     @apply group cursor-pointer transform transition-all duration-500;
+    transform: translateZ(0);
+    will-change: transform, opacity;
+    backface-visibility: hidden;
   }
 
   .bookstore-card-container.visible {
@@ -73,6 +76,9 @@
 
   .bookstore-card-image {
     @apply w-full h-full object-cover transition-all duration-500;
+    transform: translateZ(0);
+    will-change: transform;
+    backface-visibility: hidden;
   }
 
   .bookstore-card-image.loaded {
@@ -140,7 +146,7 @@
   }
 
   .bookstore-lightbox-title {
-    @apply text-2xl font-bold text-charcoal mb-4;
+    @apply text-2xl font-bold text-primary mb-4;
   }
 
   .bookstore-lightbox-details {
@@ -148,11 +154,11 @@
   }
 
   .bookstore-lightbox-detail-item {
-    @apply text-charcoal/80;
+    @apply text-primary/80;
   }
 
   .bookstore-lightbox-counter {
-    @apply mt-4 text-sm text-charcoal/60 text-center;
+    @apply mt-4 text-sm text-primary/60 text-center;
   }
 
   .bookstore-loading-container {
@@ -160,11 +166,11 @@
   }
 
   .bookstore-loading-spinner {
-    @apply animate-spin rounded-full h-8 w-8 border-b-2 border-gold;
+    @apply animate-spin rounded-full h-8 w-8 border-b-2 border-brand-gold;
   }
 
   .bookstore-loading-text {
-    @apply ml-3 text-charcoal/60;
+    @apply ml-3 text-primary/60;
   }
 
   .bookstore-load-more-container {
@@ -176,11 +182,11 @@
   }
 
   .bookstore-load-more-spinner {
-    @apply animate-spin rounded-full h-6 w-6 border-b-2 border-gold mr-3;
+    @apply animate-spin rounded-full h-6 w-6 border-b-2 border-brand-gold mr-3;
   }
 
   .bookstore-load-more-text {
-    @apply text-charcoal/60;
+    @apply text-primary/60;
   }
 
   .bookstore-empty-container {
@@ -192,10 +198,10 @@
   }
 
   .bookstore-empty-title {
-    @apply text-xl font-bold text-charcoal mb-2;
+    @apply text-xl font-bold text-primary mb-2;
   }
 
   .bookstore-empty-description {
-    @apply text-charcoal/60;
+    @apply text-primary/60;
   }
 }
