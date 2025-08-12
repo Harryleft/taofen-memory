@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import * as React from 'react';
+import type { TransformedHandwritingItem } from '@/hooks/useHandwritingData.ts';
 
 // 工具函数：高亮搜索文本
 export const highlightSearchText = (text: string, searchTerm: string): React.ReactElement => {
@@ -26,11 +27,16 @@ export const highlightSearchText = (text: string, searchTerm: string): React.Rea
   return React.createElement(React.Fragment, null, ...children);
 };
 
+// 防抖函数类型
+type DebouncedFunction<T extends (...args: unknown[]) => void> = T & {
+  cancel: () => void;
+};
+
 // 工具函数：防抖
-export const debounce = <T extends (...args: unknown[]) => void>(func: T, wait: number): T => {
+export const debounce = <T extends (...args: unknown[]) => void>(func: T, wait: number): DebouncedFunction<T> => {
   let timeout: ReturnType<typeof setTimeout> | null = null;
   
-  const debounced = (...args: Parameters<T>) => {
+  const debounced = ((...args: Parameters<T>) => {
     if (timeout) {
       clearTimeout(timeout);
     }
@@ -38,7 +44,7 @@ export const debounce = <T extends (...args: unknown[]) => void>(func: T, wait: 
       timeout = null;
       func(...args);
     }, wait);
-  };
+  }) as DebouncedFunction<T>;
   
   debounced.cancel = () => {
     if (timeout) {
@@ -47,7 +53,7 @@ export const debounce = <T extends (...args: unknown[]) => void>(func: T, wait: 
     }
   };
   
-  return debounced as unknown as T;
+  return debounced;
 };
 
 // 工具函数：响应式列数计算
@@ -60,22 +66,10 @@ export const getResponsiveColumns = (width: number): number => {
 
 // 工具函数：计算瀑布流布局
 export const calculateMasonryLayout = (
-  items: Array<{
-    dimensions: {
-      height: number;
-    };
-  }>,
+  items: TransformedHandwritingItem[],
   columns: number
-): Array<Array<{
-  dimensions: {
-    height: number;
-  };
-}>> => {
-  const columnArrays: Array<Array<{
-    dimensions: {
-      height: number;
-    };
-  }>> = Array.from({ length: columns }, () => []);
+): TransformedHandwritingItem[][] => {
+  const columnArrays: TransformedHandwritingItem[][] = Array.from({ length: columns }, () => []);
   const columnHeights = new Array(columns).fill(0);
 
   items.forEach((item) => {
