@@ -1,7 +1,7 @@
 import { memo, useRef, useCallback } from 'react';
 import HandwritingCard from './HandwritingCard';
-import SkeletonGrid from './SkeletonGrid';
-import PaginationTrigger from './PaginationTrigger';
+import HandwritingSkeletonGrid from './HandwritingSkeletonGrid.tsx';
+import HandwritingPaginationTrigger from './HandwritingPaginationTrigger.tsx';
 import type { TransformedHandwritingItem } from '@/hooks/useHandwritingData';
 
 interface MasonryGridProps {
@@ -15,7 +15,7 @@ interface MasonryGridProps {
   onLoadMore: () => void;
 }
 
-const MasonryGrid = memo(({
+const HandwritingMasonryGrid = memo(({
   items,
   columns,
   columnArrays,
@@ -43,7 +43,7 @@ const MasonryGrid = memo(({
     <>
       {/* 骨架屏加载效果 */}
       {loading && (
-        <SkeletonGrid 
+        <HandwritingSkeletonGrid
           columns={columns}
           itemsPerColumn={3}
           heights={[]}
@@ -63,7 +63,7 @@ const MasonryGrid = memo(({
       
       {/* 分页触发器 */}
       {hasMore && !loading && (
-        <PaginationTrigger
+        <HandwritingPaginationTrigger
           hasMore={hasMore}
           isLoading={loading}
           onLoadMore={onLoadMore}
@@ -80,6 +80,6 @@ const MasonryGrid = memo(({
   );
 });
 
-MasonryGrid.displayName = 'MasonryGrid';
+HandwritingMasonryGrid.displayName = 'HandwritingMasonryGrid';
 
-export default MasonryGrid;
+export default HandwritingMasonryGrid;

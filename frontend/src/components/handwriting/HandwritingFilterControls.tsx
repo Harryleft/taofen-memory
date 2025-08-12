@@ -18,7 +18,7 @@ interface FilterControlsProps {
   onFilterChange: (key: string, value: string) => void;
 }
 
-const FilterControls = memo(({
+const HandwritingFilterControls = memo(({
   searchTerm,
   filters,
   uniqueYears,
@@ -90,6 +90,6 @@ const FilterControls = memo(({
   );
 });
 
-FilterControls.displayName = 'FilterControls';
+HandwritingFilterControls.displayName = 'HandwritingFilterControls';
 
-export default FilterControls;
+export default HandwritingFilterControls;

@@ -8,11 +8,11 @@ import { useHandwritingLayout } from '@/hooks/useHandwritingLayout';
 import { useHandwritingLightbox } from '@/hooks/useHandwritingLightbox';
 import { useHandwritingSearch } from '@/hooks/useHandwritingSearch';
 import { useHandwritingPreloader } from '@/hooks/useHandwritingPreloader';
-import FilterControls from './FilterControls';
-import MasonryGrid from './MasonryGrid';
+import HandwritingFilterControls from './HandwritingFilterControls.tsx';
+import HandwritingMasonryGrid from './HandwritingMasonryGrid.tsx';
 import EmptyState from './EmptyState';
 import ErrorState from './ErrorState';
-import LoadingIndicator from './LoadingIndicator';
+import HandwritingLoadingIndicator from './HandwritingLoadingIndicator.tsx';
 
 interface HandwritingModuleProps {
   className?: string;
@@ -234,7 +234,7 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
           />
           
           {/* 过滤器控件 */}
-          <FilterControls
+          <HandwritingFilterControls
             searchTerm={searchTerm}
             filters={filters}
             uniqueYears={uniqueYears}
@@ -245,7 +245,7 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
           />
           
           {/* 加载状态 */}
-          {loading && <LoadingIndicator />}
+          {loading && <HandwritingLoadingIndicator />}
           
           {/* 错误状态 */}
           {error && <ErrorState error={error} onRetry={refetch} />}
@@ -256,7 +256,7 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
               {filteredItems.length === 0 ? (
                 <EmptyState />
               ) : (
-                <MasonryGrid
+                <HandwritingMasonryGrid
                   items={paginatedItems}
                   columns={columns}
                   columnArrays={columnArrays}
