@@ -1,4 +1,4 @@
-import { memo, useRef, useEffect, useCallback } from 'react';
+import { memo, useRef, useCallback } from 'react';
 import HandwritingCard from './HandwritingCard';
 import SkeletonGrid from './SkeletonGrid';
 import PaginationTrigger from './PaginationTrigger';

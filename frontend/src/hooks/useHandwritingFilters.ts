@@ -39,69 +39,11 @@ export const useHandwritingFilters = (
     initCache();
   }, []);
 
-  // 生成过滤器哈希键
-  const generateFilterHash = useCallback((filters: any, searchTerm: string) => {
-    const filterString = JSON.stringify({
-      searchTerm,
-      selectedCategory: filters.selectedCategory,
-      selectedYear: filters.selectedYear,
-      selectedSource: filters.selectedSource,
-      selectedTag: filters.selectedTag,
-      sortOrder: filters.sortOrder,
-    });
-    // 简单哈希函数
-    let hash = 0;
-    for (let i = 0; i < filterString.length; i++) {
-      const char = filterString.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // Convert to 32-bit integer
-    }
-    return Math.abs(hash).toString(36);
-  }, []);
-
-  // 缓存的搜索和过滤函数
-  const getCachedFilteredItems = useCallback(async (
-    items: TransformedHandwritingItem[],
-    filters: any,
-    searchTerm: string
-  ): Promise<TransformedHandwritingItem[]> => {
-    if (!cacheManager || !cacheEnabled) {
-      // 如果缓存未启用，直接计算
-      return computeFilteredItems(items, filters, searchTerm);
-    }
-
-    const filterHash = generateFilterHash(filters, searchTerm);
-    const cacheKey = `handwriting:filtered:${filterHash}`;
-
-    try {
-      // 尝试从缓存获取
-      const cached = await cacheManager.get<TransformedHandwritingItem[]>(cacheKey);
-      if (cached) {
-        console.log('✅ Filter cache hit:', cacheKey);
-        return cached;
-      }
-
-      // 计算结果
-      const result = computeFilteredItems(items, filters, searchTerm);
-      
-      // 缓存结果（5分钟TTL）
-      await cacheManager.set(cacheKey, result, {
-        ttl: 5 * 60 * 1000,
-        level: 'redis',
-      });
-      console.log('❌ Filter cache miss, cached result:', cacheKey);
-
-      return result;
-    } catch (error) {
-      console.warn('Cache operation failed, computing directly:', error);
-      return computeFilteredItems(items, filters, searchTerm);
-    }
-  }, [cacheManager, cacheEnabled, generateFilterHash]);
-
+  
   // 实际的过滤计算函数
   const computeFilteredItems = useCallback((
     items: TransformedHandwritingItem[],
-    filters: any,
+    filters: Record<string, unknown>,
     searchTerm: string
   ): TransformedHandwritingItem[] => {
     // 搜索过滤
@@ -172,7 +114,7 @@ export const useHandwritingFilters = (
 
     try {
       // 尝试从缓存获取
-      const cached = await cacheManager.get<any[]>(cacheKey);
+      const cached = await cacheManager.get<TransformedHandwritingItem[]>(cacheKey);
       if (cached) {
         console.log(`✅ Metadata cache hit: ${type}`);
         return cached;
@@ -193,7 +135,7 @@ export const useHandwritingFilters = (
       console.warn('Metadata cache operation failed, computing directly:', error);
       return computeMetadata(type, items);
     }
-  }, [cacheManager, cacheEnabled]);
+  }, [cacheManager, cacheEnabled, computeMetadata]);
 
   // 实际的元数据计算函数
   const computeMetadata = useCallback((
@@ -207,14 +149,52 @@ export const useHandwritingFilters = (
       case 'sources':
         return [...new Set(items.map(item => item.originalData.数据来源).filter(Boolean))].sort();
       
-      case 'tags':
+      case 'tags': {
         const allTags = items.flatMap(item => item.tags).filter(tag => tag && tag.trim());
         return [...new Set(allTags)].sort();
+      }
       
       default:
         return [];
     }
   }, []);
+
+  // 获取缓存的元数据
+  const getCachedMetadata = useCallback(async (
+    type: 'years' | 'sources' | 'tags',
+    items: TransformedHandwritingItem[]
+  ) => {
+    if (!cacheManager || !cacheEnabled) {
+      // 如果缓存未启用，直接计算
+      return computeMetadata(type, items);
+    }
+
+    const cacheKey = `handwriting:metadata:${type}`;
+
+    try {
+      // 尝试从缓存获取
+      const cached = await cacheManager.get<TransformedHandwritingItem[]>(cacheKey);
+      if (cached) {
+        console.log(`✅ Metadata cache hit: ${type}`);
+        return cached;
+      }
+
+      // 计算结果
+      const result = computeMetadata(type, items);
+      
+      // 缓存结果（1小时TTL）
+      await cacheManager.set(cacheKey, result, {
+        ttl: 60 * 60 * 1000,
+        level: 'both',
+      });
+      console.log(`❌ Metadata cache miss, cached result: ${type}`);
+
+      return result;
+    } catch (error) {
+      console.warn('Metadata cache operation failed, computing directly:', error);
+      return computeMetadata(type, items);
+    }
+  }, [cacheManager, cacheEnabled, computeMetadata]);
 
   // 主要的过滤结果 - 使用useMemo优化
   const filteredAndSortedItems = useMemo(() => {
@@ -284,7 +264,7 @@ export const useHandwritingFilters = (
 // 工具函数：计算过滤结果（导出供测试使用）
 export const computeFilteredItems = (
   items: TransformedHandwritingItem[],
-  filters: any,
+  filters: Record<string, unknown>,
   searchTerm: string
 ): TransformedHandwritingItem[] => {
   // 搜索过滤
