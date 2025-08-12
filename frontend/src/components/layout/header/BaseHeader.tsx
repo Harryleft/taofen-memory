@@ -169,9 +169,8 @@ function MobileMenu({ isOpen, items, onClose, onNavigate }: {
 }
 
 // Hero布局组件 - 现在是唯一的布局
-function HeroLayout({ config, accentColorClass, onLogoClick, onNavigation, onMenuToggle, isMenuOpen }: { 
+function HeroLayout({ config, onLogoClick, onNavigation, onMenuToggle, isMenuOpen }: { 
   config: HeaderConfig; 
-  accentColorClass: string;
   onLogoClick?: () => void;
   onNavigation?: (path: string) => void;
   onMenuToggle?: () => void;
@@ -193,10 +192,7 @@ const BaseHeader: React.FC<BaseHeaderProps> = ({ config }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   const {
-    layout = 'hero',
     navigation,
-    logo,
-    showNavigation = false,
     showMobileMenu = false,
     backgroundColor = 'transparent'
   } = config;
@@ -236,7 +232,6 @@ const BaseHeader: React.FC<BaseHeaderProps> = ({ config }) => {
       <header className={headerClassName}>
         <HeroLayout 
           config={config} 
-          accentColorClass=""
           onLogoClick={handleLogoClick}
           onNavigation={handleNavigation}
           onMenuToggle={toggleMenu}

@@ -1,4 +1,4 @@
-import { useEffect, useState, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
+import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import HeroPageBackdrop from './HeroPageBackdrop.tsx';
 import BaseHeader from '../layout/header/BaseHeader';
