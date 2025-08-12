@@ -83,7 +83,7 @@ const FilterControls = memo(({
           onChange={(e) => onFilterChange('selectedTag', e.target.value)}
           className="px-4 py-2 bg-white border border-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50"
         >
-          <option value="all">时间 ({uniqueTags.length})</option>
+          <option value="all">全部标签 ({uniqueTags.length})</option>
           {uniqueTags.map(tag => (
             <option key={tag} value={tag}>{tag}</option>
           ))}
