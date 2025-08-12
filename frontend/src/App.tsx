@@ -5,8 +5,6 @@ import TimelinePage from './pages/TimelinePage';
 import HandwritingPage from './pages/HandwritingPage';
 import RelationshipsPage from './pages/RelationshipsPage';
 import DebugTagsPage from './pages/DebugTagsPage';
-import TestTagsPage from './pages/TestTagsPage';
-import SimpleTestPage from './pages/SimpleTestPage';
 
 function App() {
   return (
@@ -17,8 +15,6 @@ function App() {
       <Route path="/handwriting" element={<HandwritingPage />} />
       <Route path="/relationships" element={<RelationshipsPage />} />
       <Route path="/debug-tags" element={<DebugTagsPage />} />
-      <Route path="/test-tags" element={<TestTagsPage />} />
-      <Route path="/simple-test" element={<SimpleTestPage />} />
     </Routes>
   );
 }
