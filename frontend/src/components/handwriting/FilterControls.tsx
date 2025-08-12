@@ -87,8 +87,6 @@ const FilterControls = memo(({
           <option value="year_asc">时间（旧到新）</option>
           <option value="name_asc">名称（A-Z）</option>
           <option value="name_desc">名称（Z-A）</option>
-          <option value="id_asc">ID（升序）</option>
-          <option value="id_desc">ID（降序）</option>
         </select>
       </div>
     </div>
