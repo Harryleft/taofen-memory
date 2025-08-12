@@ -1,19 +1,9 @@
 import { HeaderConfig } from '../components/layout/header/BaseHeader';
-
-// 生平时光轴模块的专属装饰元素
-const TimelineDecorativeElement = (
-  <div className="absolute top-1/2 left-0 w-full h-px bg-gray-200 -z-10" />
-);
-
-// 人物关系模块的专属装饰元素
-const RelationshipsDecorativeElement = (
-  <div className="absolute top-1/4 right-1/4 w-32 h-32 bg-blue-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob" />
-);
-
-// 手稿文献模块的专属装饰元素
-const HandwritingDecorativeElement = (
-  <div className="absolute bottom-0 left-1/4 w-24 h-24 bg-green-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000" />
-);
+import { 
+  TimelineDecorativeElement, 
+  RelationshipsDecorativeElement, 
+  HandwritingDecorativeElement 
+} from './DecorativeElements';
 
 // 定义所有模块的 Header 配置
 export const headerConfigs: Record<string, HeaderConfig> = {
@@ -28,7 +18,7 @@ export const headerConfigs: Record<string, HeaderConfig> = {
       text: '流光一瞬，思想永恒',
       position: 'top',
     },
-    decorativeElement: TimelineDecorativeElement,
+    decorativeElement: <TimelineDecorativeElement />,
   },
 
   // 人物关系
@@ -42,7 +32,7 @@ export const headerConfigs: Record<string, HeaderConfig> = {
       text: '观其友，知其人',
       position: 'bottom',
     },
-    decorativeElement: RelationshipsDecorativeElement,
+    decorativeElement: <RelationshipsDecorativeElement />,
   },
 
   // 手稿文献
@@ -56,7 +46,7 @@ export const headerConfigs: Record<string, HeaderConfig> = {
       text: '字里行间，尽是风骨',
       position: 'top',
     },
-    decorativeElement: HandwritingDecorativeElement,
+    decorativeElement: <HandwritingDecorativeElement />,
   },
 
   // 书店经营

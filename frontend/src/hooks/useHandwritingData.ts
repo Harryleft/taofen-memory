@@ -179,7 +179,7 @@ export const useHandwritingData = () => {
     } finally {
       setLoading(false);
     }
-  }, [cacheManager]);
+  }, [cacheManager, loadDataWithoutCache]);
 
   // 无缓存的数据加载函数（作为回退方案）
   const loadDataWithoutCache = useCallback(async () => {

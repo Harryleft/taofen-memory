@@ -1,4 +1,4 @@
-import { memo, useRef, useEffect, useCallback } from 'react';
+import { memo, useRef, useEffect } from 'react';
 
 interface PaginationTriggerProps {
   hasMore: boolean;

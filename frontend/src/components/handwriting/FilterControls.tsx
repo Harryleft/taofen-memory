@@ -12,7 +12,6 @@ interface FilterControlsProps {
     sortOrder: string;
   };
   uniqueYears: number[];
-  uniqueSources: string[];
   uniqueTags: string[];
   onSearchChange: (term: string) => void;
   onFilterChange: (key: string, value: string) => void;
@@ -22,7 +21,6 @@ const FilterControls = memo(({
   searchTerm,
   filters,
   uniqueYears,
-  uniqueSources,
   uniqueTags,
   onSearchChange,
   onFilterChange

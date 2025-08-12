@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { debounce } from '@/utils/handwritingUtils';
 import type { TransformedHandwritingItem } from './useHandwritingData';
 
