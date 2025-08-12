@@ -10,10 +10,92 @@
 
 .relationships-filter-container {
   @apply flex flex-wrap justify-center gap-4 mt-12;
+  /* 移动端优化 */
+  gap: 12px;
+}
+
+/* 移动端筛选按钮样式 */
+@media (max-width: 640px) {
+  .relationships-filter-container {
+    gap: 8px;
+    margin-top: 8px;
+  }
+  
+  .relationships-category-button {
+    @apply px-4 py-2 text-sm;
+    min-width: 80px;
+    max-width: 120px;
+  }
+  
+  .relationships-category-button span {
+    @apply text-xs;
+  }
+}
+
+/* 平板端筛选按钮样式 */
+@media (min-width: 641px) and (max-width: 768px) {
+  .relationships-filter-container {
+    gap: 10px;
+  }
+  
+  .relationships-category-button {
+    @apply px-5 py-2.5;
+  }
+}
+
+/* 移动端横向滚动筛选器样式 */
+.relationships-filter-container-mobile {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.relationships-filter-container-mobile::-webkit-scrollbar {
+  display: none;
+}
+
+.relationships-category-button-mobile {
+  @apply relative flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 font-medium text-sm backdrop-blur-sm;
+  min-width: fit-content;
+}
+
+.relationships-category-button-mobile.selected {
+  @apply text-white shadow-lg shadow-black/10 scale-105 ring-2 ring-white/20;
+}
+
+.relationships-category-button-mobile.not-selected {
+  @apply bg-white/80 text-gray-700 hover:bg-white hover:shadow-md hover:shadow-black/5 hover:scale-105 border border-gray-200/60 hover:border-gray-300/60;
+}
+
+/* 移动端滚动提示 */
+.relationships-filter-container-mobile::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  background: linear-gradient(to right, transparent, white);
+  pointer-events: none;
+  z-index: 10;
 }
 
 .relationships-stats-container {
   @apply flex justify-center gap-8 mt-8;
+}
+
+/* 移动端统计信息样式 */
+@media (max-width: 640px) {
+  .relationships-stats-container {
+    @apply gap-6 mt-6;
+  }
+  
+  .relationships-stat-number {
+    @apply text-xl;
+  }
+  
+  .relationships-stat-label {
+    @apply text-xs;
+  }
 }
 
 .relationships-stat-item {
@@ -550,5 +632,124 @@
   .masonry-card-base:active {
     transform: scale(0.98);
     background: rgba(250, 247, 240, 0.8);
+  }
+  
+  /* 增强触摸反馈 */
+  .masonry-card-base {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    touch-action: manipulation;
+  }
+  
+  /* 触摸时的波纹效果 */
+  .masonry-card-base::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.05);
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s;
+  }
+  
+  .masonry-card-base:active::after {
+    width: 200px;
+    height: 200px;
+  }
+}
+
+/* 移动端卡片触摸优化 */
+@media (max-width: 768px) {
+  .masonry-card-base {
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .masonry-card-base:hover {
+    transform: translateY(-2px);
+  }
+  
+  /* 增大点击区域 */
+  .masonry-card-content {
+    position: relative;
+  }
+  
+  .masonry-card-content::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    z-index: -1;
+  }
+}
+
+/* 平板设备优化 */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .masonry-card-base {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  
+  .masonry-card-base:hover {
+    transform: translateY(-3px);
+  }
+}
+
+/* 移动端性能优化 */
+@media (max-width: 768px) {
+  /* 减少动画和阴影效果 */
+  .masonry-card-base {
+    box-shadow: 
+      0 1px 2px rgba(0, 0, 0, 0.04),
+      0 2px 4px rgba(0, 0, 0, 0.06);
+    will-change: transform;
+  }
+  
+  .masonry-card-base:hover {
+    box-shadow: 
+      0 2px 4px rgba(0, 0, 0, 0.08),
+      0 4px 8px rgba(0, 0, 0, 0.12);
+  }
+  
+  /* 优化图片加载 */
+  .masonry-avatar-image {
+    transition: none;
+  }
+  
+  /* 减少渐变和复杂效果 */
+  .masonry-card-content {
+    background: rgba(255, 255, 255, 0.95);
+  }
+  
+  /* 简化动画 */
+  .masonry-card-base.animate-in {
+    animation-duration: 0.3s;
+  }
+  
+  /* 优化滚动性能 */
+  .masonry-container {
+    -webkit-overflow-scrolling: touch;
+    overflow-scrolling: touch;
+  }
+  
+  /* 防止iOS橡皮筋效果 */
+  .relationships-page-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .relationships-main-content-container {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }

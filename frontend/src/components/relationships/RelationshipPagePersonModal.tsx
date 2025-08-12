@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { BookOpen, ExternalLink, FileText, X } from 'lucide-react';
 import { Person } from '../../types/Person.ts';
 import { getCategoryClass } from '../../constants/relationshipsConstants';
@@ -10,7 +10,12 @@ interface PersonDetailModalProps {
 }
 
 const RelationshipPagePersonModal: React.FC<PersonDetailModalProps> = ({ person, isOpen, onClose }) => {
-  // 处理ESC键关闭
+  const modalRef = useRef<HTMLDivElement>(null);
+  const touchStartY = useRef(0);
+  const modalStartY = useRef(0);
+  const isDragging = useRef(false);
+
+  // 处理ESC键关闭和背景滚动
   React.useEffect(() => {
     if (!isOpen) return;
 
@@ -20,9 +25,71 @@ const RelationshipPagePersonModal: React.FC<PersonDetailModalProps> = ({ person,
       }
     };
 
+    // 禁用背景滚动
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+    document.body.style.top = `-${window.scrollY}px`;
+
     document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      
+      // 恢复背景滚动
+      const scrollY = document.body.style.top;
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.top = '';
+      window.scrollTo(0, parseInt(scrollY || '0') * -1);
+    };
   }, [onClose, isOpen]);
+
+  // 处理触摸开始事件
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!modalRef.current) return;
+    
+    const touch = e.touches[0];
+    touchStartY.current = touch.clientY;
+    modalStartY.current = 0;
+    isDragging.current = true;
+    
+    // 阻止背景滚动
+    e.preventDefault();
+  };
+
+  // 处理触摸移动事件
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging.current || !modalRef.current) return;
+    
+    const touch = e.touches[0];
+    const deltaY = touch.clientY - touchStartY.current;
+    
+    // 只允许向下拖动
+    if (deltaY > 0) {
+      modalStartY.current = deltaY;
+      modalRef.current.style.transform = `translateY(${deltaY}px)`;
+      modalRef.current.style.transition = 'none';
+      modalRef.current.style.opacity = `${1 - deltaY / 300}`;
+    }
+  };
+
+  // 处理触摸结束事件
+  const handleTouchEnd = () => {
+    if (!isDragging.current || !modalRef.current) return;
+    
+    isDragging.current = false;
+    
+    // 如果拖动距离超过100px，则关闭模态框
+    if (modalStartY.current > 100) {
+      onClose();
+    } else {
+      // 重置位置
+      modalRef.current.style.transform = '';
+      modalRef.current.style.opacity = '';
+      modalRef.current.style.transition = 'all 0.3s ease';
+    }
+  };
 
   if (!person || !isOpen) return null;
 
@@ -35,17 +102,24 @@ const RelationshipPagePersonModal: React.FC<PersonDetailModalProps> = ({ person,
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 md:p-8"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div 
+    ref={modalRef}
+    className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto md:my-8 my-0"
+    onTouchStart={handleTouchStart}
+    onTouchMove={handleTouchMove}
+    onTouchEnd={handleTouchEnd}
+  >
         {/* Header */}
         <div className="relative p-6 text-center border-b border-gray-200">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-5 hover:bg-gray-100 rounded-full transition-colors z-10"
+            className="absolute top-4 right-4 p-4 md:p-5 hover:bg-gray-100 rounded-full transition-colors z-10 active:bg-gray-200"
+            aria-label="关闭"
           >
-            <X size={20} className="text-gray-500" />
+            <X size={24} className="text-gray-500 md:w-5 md:h-5" />
           </button>
 
           {person.img ? (
@@ -141,6 +215,16 @@ const RelationshipPagePersonModal: React.FC<PersonDetailModalProps> = ({ person,
               </div>
             </div>
           )}
+        </div>
+        
+        {/* 移动端底部操作栏 */}
+        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+          <button
+            onClick={onClose}
+            className="w-full py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors active:bg-gray-300"
+          >
+            关闭
+          </button>
         </div>
       </div>
     </div>

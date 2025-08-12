@@ -53,7 +53,8 @@
       "Bash(curl:*)",
       "mcp__playwright__browser_evaluate",
       "mcp__playwright__browser_wait_for",
-      "Bash(\"bash\" \"S:\\vibe_coding\\taofen_web\\scripts\\test-masonry-fix.sh\")"
+      "Bash(\"bash\" \"S:\\vibe_coding\\taofen_web\\scripts\\test-masonry-fix.sh\")",
+      "Bash(bash:*)"
     ],
     "deny": []
   },
