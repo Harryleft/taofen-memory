@@ -263,8 +263,8 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
           const avatarPosition = 'position-center'; // 所有头像统一居中
           const textAlign = 'text-align-center'; // 所有文字统一居中
           
-          // 添加延迟动画
-          const animationDelay = (index * 0.1) % 2;
+          // 添加动画类名和延迟
+          const shouldAnimate = index < visibleItems;
           
           return (
             <div
@@ -276,12 +276,11 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
                   cardRefs.current.delete(person.id);
                 }
               }}
-              className={`masonry-card-base ${getCategoryClass(person.category)}`}
+              className={`masonry-card-base ${getCategoryClass(person.category)} ${shouldAnimate ? 'animate-in' : ''}`}
               style={{
                 left: `${left}px`,
                 top: `${top}px`,
                 width: `${columnWidth}px`,
-                animationDelay: `${animationDelay}s`
               }}
               onClick={() => onItemClick(person)}
             >
