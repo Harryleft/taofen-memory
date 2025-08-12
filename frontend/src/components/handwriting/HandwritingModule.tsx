@@ -218,6 +218,25 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
     }));
   }, [filters]);
   
+  // 加载更多
+  const loadMore = useCallback(() => {
+    if (pagination.hasMore && !pagination.isLoading) {
+      setPagination(prev => ({
+        ...prev,
+        isLoading: true,
+        currentPage: prev.currentPage + 1
+      }));
+      
+      // 模拟加载延迟
+      setTimeout(() => {
+        setPagination(prev => ({
+          ...prev,
+          isLoading: false
+        }));
+      }, 300);
+    }
+  }, [pagination.hasMore, pagination.isLoading]);
+
   // 图片预加载策略
   useEffect(() => {
     if (filteredItems.length === 0) return;
@@ -242,37 +261,6 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
       retryCount: 1
     });
   }, [filteredItems, pagination.currentPage, pagination.itemsPerPage]);
-
-  // 加载更多
-  const loadMore = useCallback(() => {
-    if (pagination.hasMore && !pagination.isLoading) {
-      setPagination(prev => ({
-        ...prev,
-        isLoading: true,
-        currentPage: prev.currentPage + 1
-      }));
-      
-      // 模拟加载延迟
-      setTimeout(() => {
-        setPagination(prev => ({
-          ...prev,
-          isLoading: false
-        }));
-      }, 300);
-    }
-  }, [pagination.hasMore, pagination.isLoading]);
-
-  // Masonry layout calculation
-  // 使用useMemo优化布局计算
-  const columnArrays = useMemo(() => {
-    const result = calculateMasonryLayout(filteredItems, layout.columns);
-    console.log('🔍 [HandwritingModule] Masonry Debug Info:');
-    console.log('- filteredItems length:', filteredItems.length);
-    console.log('- layout columns:', layout.columns);
-    console.log('- columnArrays length:', result.length);
-    console.log('- columnArrays:', result.map(col => col.length));
-    return result;
-  }, [filteredItems, layout.columns]);
 
   // Lightbox navigation
   const openLightbox = useCallback((item: TransformedHandwritingItem) => {
@@ -315,6 +303,18 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [lightbox.selectedItem, nextItem, prevItem]);
+
+  // Masonry layout calculation
+  // 使用useMemo优化布局计算
+  const columnArrays = useMemo(() => {
+    const result = calculateMasonryLayout(filteredItems, layout.columns);
+    console.log('🔍 [HandwritingModule] Masonry Debug Info:');
+    console.log('- filteredItems length:', filteredItems.length);
+    console.log('- layout columns:', layout.columns);
+    console.log('- columnArrays length:', result.length);
+    console.log('- columnArrays:', result.map(col => col.length));
+    return result;
+  }, [filteredItems, layout.columns]);
 
   // Observe items when they mount - 目前禁用，所有卡片初始显示
   // useEffect(() => {
