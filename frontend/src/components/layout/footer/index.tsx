@@ -86,7 +86,7 @@ const BrandSection: React.FC<{ config: FooterConfig['brand'] }> = ({ config }) =
 const LegalSection: React.FC<{ 
   items: LegalInfo[];
   additionalText?: string;
-}> = ({ items, additionalText }) => {
+}> = ({ additionalText }) => {
   return (
     <div className="legal-content text-center mt-4">
       {additionalText && (
