@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Search, FolderOpen, Calendar, MapPin, Clock, SortAsc } from 'lucide-react';
+import { Search, FolderOpen, Calendar, SortAsc } from 'lucide-react';
 import { categoryLabels } from '@/utils/handwritingUtils';
 
 interface FilterControlsProps {
@@ -22,8 +22,6 @@ const FilterControls = memo(({
   searchTerm,
   filters,
   uniqueYears,
-  uniqueSources,
-  uniqueTags,
   onSearchChange,
   onFilterChange
 }: FilterControlsProps) => {
@@ -72,7 +70,7 @@ const FilterControls = memo(({
             ))}
           </select>
         </div>
-        
+
 
         <div className="relative">
           <SortAsc className="absolute left-3 top-1/2 transform -translate-y-1/2 text-charcoal/60" size={16} />
