@@ -482,7 +482,7 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
   const renderLightbox = useMemo(() => {
     if (!lightbox.selectedItem) return null;
     
-    return () => (
+    return (
       <Lightbox
         selectedItem={lightbox.selectedItem}
         currentIndex={lightbox.currentIndex}
@@ -532,7 +532,7 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
         </div>
 
         {/* Lightbox */}
-        {renderLightbox()}
+        {renderLightbox}
       </section>
     </>
   );
