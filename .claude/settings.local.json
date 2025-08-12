@@ -43,7 +43,9 @@
       "mcp__browsermcp__browser_snapshot",
       "mcp__browsermcp__browser_navigate",
       "mcp__filesystem__create_directory",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(npm test:*)"
     ],
     "deny": []
   },
