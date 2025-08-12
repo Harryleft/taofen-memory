@@ -21,7 +21,7 @@ const MASONRY_CONFIG = {
     GAP: 16,
     CARD_WIDTH: 280,
     MIN_COLUMNS: 2,
-    MAX_COLUMNS: 5,
+    MAX_COLUMNS: 8,
     BASE_HEIGHT: 200,
     MIN_HEIGHT: 150,
     MAX_HEIGHT: 400,
@@ -83,10 +83,12 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
   // 记录每张卡当前高度，用于比较变化
   const measuredHeights = useRef<Map<number, number>>(new Map());
 
-  // 计算列数
+  // 计算列数 - 优化以充分利用屏幕空间
   const getColumnCount = useCallback((width: number) => {
     const availableWidth = width - MASONRY_CONFIG.layout.GAP;
-    const possibleColumns = Math.floor(availableWidth / (MASONRY_CONFIG.layout.CARD_WIDTH + MASONRY_CONFIG.layout.GAP));
+    // 动态计算最小卡片宽度，根据屏幕大小调整
+    const minCardWidth = Math.min(MASONRY_CONFIG.layout.CARD_WIDTH, Math.max(240, width / 6));
+    const possibleColumns = Math.floor(availableWidth / (minCardWidth + MASONRY_CONFIG.layout.GAP));
     return Math.max(MASONRY_CONFIG.layout.MIN_COLUMNS, Math.min(MASONRY_CONFIG.layout.MAX_COLUMNS, possibleColumns));
   }, []);
 
@@ -160,20 +162,36 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
     return layoutItems;
   }, [estimateCardHeight, getColumnCount]);
 
-  // 更新 container 宽度
+  // 更新 container 宽度 - 增强获取方式
   useEffect(() => {
     const updateContainerWidth = () => {
+      let width = 0;
+      
       if (containerRef.current) {
-        const width = containerRef.current.offsetWidth;
+        // 尝试多种方式获取容器宽度
+        const offsetWidth = containerRef.current.offsetWidth;
+        const clientWidth = containerRef.current.clientWidth;
+        const scrollWidth = containerRef.current.scrollWidth;
+        const rectWidth = containerRef.current.getBoundingClientRect().width;
+        
+        // 使用最大的有效宽度
+        width = Math.max(offsetWidth, clientWidth, scrollWidth, rectWidth);
+        
         console.log('Masonry Debug: Container width updated:', {
           width,
-          clientWidth: containerRef.current.clientWidth,
-          scrollWidth: containerRef.current.scrollWidth,
-          offsetWidth: containerRef.current.offsetWidth
+          offsetWidth,
+          clientWidth,
+          scrollWidth,
+          rectWidth
         });
-        setContainerWidth(width);
       } else {
-        console.warn('Masonry Debug: Container ref is null');
+        // 如果容器ref不存在，使用窗口宽度作为后备
+        width = window.innerWidth - 48; // 减去页面padding
+        console.log('Masonry Debug: Using window width as fallback:', width);
+      }
+      
+      if (width > 0) {
+        setContainerWidth(width);
       }
     };
     
@@ -185,10 +203,16 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
       updateContainerWidth();
     }, 100);
     
+    // 再次延迟更新，确保所有样式都已应用
+    const timeoutId2 = setTimeout(() => {
+      updateContainerWidth();
+    }, 300);
+    
     window.addEventListener('resize', updateContainerWidth);
     return () => {
       window.removeEventListener('resize', updateContainerWidth);
       clearTimeout(timeoutId);
+      clearTimeout(timeoutId2);
     };
   }, []);
 

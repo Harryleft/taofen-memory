@@ -29,7 +29,7 @@
 }
 
 .relationships-main-content-container {
-  @apply max-w-7xl mx-auto px-6 py-12;
+  @apply w-full px-6 py-12;
 }
 
 .relationships-empty-state-container {
@@ -121,11 +121,11 @@
 
 /* Masonry Grid Styles - Enhanced Design */
 .masonry-container {
-  @apply w-full min-w-[300px];
+  @apply w-full min-w-[300px] max-w-full;
 }
 
 .masonry-grid-container {
-  @apply relative w-full;
+  @apply relative w-full max-w-full;
 }
 
 .masonry-card-base {
