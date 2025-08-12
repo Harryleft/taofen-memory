@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import React from 'react';
+import * as React from 'react';
 
 // 工具函数：高亮搜索文本
 export const highlightSearchText = (text: string, searchTerm: string): React.ReactElement => {
@@ -28,7 +28,7 @@ export const highlightSearchText = (text: string, searchTerm: string): React.Rea
 
 // 工具函数：防抖
 export const debounce = <T extends (...args: unknown[]) => void>(func: T, wait: number): T => {
-  let timeout: NodeJS.Timeout | null = null;
+  let timeout: ReturnType<typeof setTimeout> | null = null;
   
   const debounced = (...args: Parameters<T>) => {
     if (timeout) {
@@ -47,7 +47,7 @@ export const debounce = <T extends (...args: unknown[]) => void>(func: T, wait: 
     }
   };
   
-  return debounced as T;
+  return debounced as unknown as T;
 };
 
 // 工具函数：响应式列数计算
