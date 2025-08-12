@@ -1,71 +1,7 @@
 import { useMemo, memo } from 'react';
 import { ZoomIn } from 'lucide-react';
-
-// 转换后的数据接口
-interface TransformedHandwritingItem {
-  id: string;
-  title: string;
-  year: number;
-  date: string;
-  category: 'letter' | 'manuscript' | 'note' | 'article';
-  description: string;
-  image: string;
-  highResImage: string;
-  tags: string[];
-  dimensions: {
-    width: number;
-    height: number;
-  };
-  originalData: {
-    id: string;
-    名称: string;
-    原文: string;
-    时间: string;
-    注释: string;
-    数据来源: string;
-    标签: string;
-    图片位置: Array<{
-      remote_url: string;
-      local_path: string;
-    }>;
-  };
-}
-
-// 工具函数：高亮搜索文本
-const highlightSearchText = (text: string, searchTerm: string): JSX.Element => {
-  if (!searchTerm) return <>{text}</>;
-  
-  const regex = new RegExp(`(${searchTerm})`, 'gi');
-  const parts = text.split(regex);
-  
-  return (
-    <>
-      {parts.map((part, index) => 
-        regex.test(part) ? (
-          <span key={`${index}-${part}`} className="bg-yellow-200 text-charcoal font-bold">
-            {part}
-          </span>
-        ) : (
-          <span key={`${index}-${part}`}>{part}</span>
-        )
-      )}
-    </>
-  );
-};
-
-const categoryLabels = {
-  letter: '书信',
-  manuscript: '手稿',
-  note: '笔记',
-  article: '文章'
-};
-
-const categoryColors = {
-  letter: 'bg-blue-500',
-  manuscript: 'bg-gold',
-  note: 'bg-green-500',
-  article: 'bg-purple-500'
-};
+import { highlightSearchText, categoryLabels, categoryColors } from '@/utils/handwritingUtils.ts';
+import type { TransformedHandwritingItem } from '@/hooks/useHandwritingData.ts';
 
 interface HandwritingCardProps {
   item: TransformedHandwritingItem;
@@ -141,4 +77,3 @@ const HandwritingCard = memo(({
 HandwritingCard.displayName = 'HandwritingCard';
 
 export default HandwritingCard;
-export type { TransformedHandwritingItem };
