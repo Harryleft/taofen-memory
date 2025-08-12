@@ -1,14 +1,11 @@
 import { useEffect, useState, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import HeroPageBackdrop from './HeroPageBackdrop.tsx';
+import BaseHeader from '../layout/header/BaseHeader';
+import { headerConfigs } from '../../constants/header.configs';
 
 // ====== 类型定义 ======
 type TitleVariant = 'classic' | 'monumental' | 'editorial';
-
-interface NavigationItem {
-  label: string;
-  to: string;
-}
 
 interface ModuleItem {
   id: number;
@@ -19,20 +16,11 @@ interface ModuleItem {
   path: string;
 }
 
-interface SiteLogoProps {
-  className?: string;
-  onClick?: () => void;
-}
-
 // ====== 常量配置 ======
 const CONSTANTS = {
-  HEADER_HEIGHT: 64,
-  SCROLL_THRESHOLD: 8,
   ENTRANCE_ANIMATION_DELAY: 300,
-  SMOOTH_SCROLL_RESTORE_DELAY: 100,
   YEAR_RANGE: '1895 - 1944',
   SUBTITLE: '沿邹韬奋的生活、事业与遗产，洞见时代精神',
-  ANIMATION_STAGGER_DELAY: 50, // 移动端菜单动画延迟
 } as const;
 
 const THEME = {
@@ -83,12 +71,6 @@ const ANIMATION = {
 } as const;
 
 // ====== 数据配置 ======
-const NAVIGATION_ITEMS: NavigationItem[] = [
-  { label: '岁月行履', to: '/timeline' },
-  { label: '生活与书', to: '/bookstore-timeline' },
-  { label: '笔下风骨', to: '/handwriting' },
-  { label: '同道群像', to: '/relationships' }
-];
 
 const MODULE_ITEMS: ModuleItem[] = [
   {
@@ -152,80 +134,8 @@ const createGradientClasses = (gradient: string, opacity?: string) =>
   `bg-gradient-to-r ${gradient}${opacity ? `/${opacity}` : ''}`;
 
 // ====== 子组件 ======
-function SiteLogo({ className = "", onClick }: SiteLogoProps) {
-  const logoClasses = useMemo(() =>
-    `group flex items-center gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg p-1 transition-all duration-[${ANIMATION.duration.normal}] ${className}`,
-    [className]
-  );
-
-  return (
-    <button
-      onClick={onClick}
-      className={logoClasses}
-      aria-label="韬奋纪念馆首页"
-    >
-      <div className="w-9 h-9 rounded-lg bg-gray-900 text-white ring-1 ring-amber-400/20 flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-[${ANIMATION.duration.normal}] transform">
-        <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <rect x="3" y="6" width="18" height="12" rx="2" strokeWidth="1.5"/>
-          <rect x="6" y="3" width="12" height="8" rx="1" strokeWidth="1.5"
-                fill="currentColor" fillOpacity="0.2"/>
-          <circle cx="8" cy="12" r="1" fill="currentColor"/>
-          <circle cx="12" cy="12" r="1" fill="currentColor"/>
-          <circle cx="16" cy="12" r="1" fill="currentColor"/>
-          <circle cx="10" cy="15" r="1" fill="currentColor"/>
-          <circle cx="14" cy="15" r="1" fill="currentColor"/>
-        </svg>
-      </div>
-      <div className="flex flex-col items-start">
-        <span className={`font-bold text-xl text-gray-900 transition-all duration-[${ANIMATION.duration.normal}] group-hover:shadow-sm`}>
-          韬奋 · 纪念
-        </span>
-        <span className={`text-xs text-gray-500 leading-none mt-0.5 transition-all duration-[${ANIMATION.duration.normal}] font-medium tracking-wide group-hover:shadow-sm`}>
-          TAOFEN MEMORIAL
-        </span>
-      </div>
-    </button>
-  );
-}
 
 // ====== Custom Hooks ======
-function useScrollHandler() {
-  const [scrollY, setScrollY] = useState(0);
-
-  const handleScroll = useCallback(() => {
-    let ticking = false;
-    return () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          setScrollY(window.scrollY);
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-  }, []);
-
-  return { scrollY, handleScroll };
-}
-
-function useScrollPosition() {
-  const resetScrollPosition = useCallback(() => {
-    const originalScrollBehavior = document.documentElement.style.scrollBehavior;
-    document.documentElement.style.scrollBehavior = 'auto';
-
-    // 多重保险重置滚动位置
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-    window.scrollTo(0, 0);
-
-    setTimeout(() => {
-      document.documentElement.style.scrollBehavior = originalScrollBehavior;
-    }, CONSTANTS.SMOOTH_SCROLL_RESTORE_DELAY);
-  }, []);
-
-  return { resetScrollPosition };
-}
-
 function useReducedMotion() {
   const [reducedMotion, setReducedMotion] = useState(false);
 
@@ -241,28 +151,6 @@ function useReducedMotion() {
   return reducedMotion;
 }
 
-function useMobileMenu() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const toggleMenu = useCallback(() => {
-    setIsMenuOpen(prev => !prev);
-  }, []);
-
-  const closeMenu = useCallback(() => {
-    setIsMenuOpen(false);
-  }, []);
-
-  // 阻止菜单打开时的背景滚动
-  useEffect(() => {
-    document.body.style.overflow = isMenuOpen ? 'hidden' : 'unset';
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isMenuOpen]);
-
-  return { isMenuOpen, toggleMenu, closeMenu };
-}
-
 // ====== 主组件 ======
 export default function EnhancedHero() {
   // ====== Hooks ======
@@ -271,10 +159,7 @@ export default function EnhancedHero() {
   const secondSectionRef = useRef<HTMLDivElement | null>(null);
 
   // Custom hooks
-  const { scrollY, handleScroll } = useScrollHandler();
-  const { resetScrollPosition } = useScrollPosition();
   const reducedMotion = useReducedMotion();
-  const { isMenuOpen, toggleMenu, closeMenu } = useMobileMenu();
 
   // ====== State ======
   const [isVisible, setIsVisible] = useState(false);
@@ -289,16 +174,6 @@ export default function EnhancedHero() {
     });
   }, [reducedMotion]);
 
-  const handleNavigation = useCallback((path: string) => {
-    navigate(path);
-    closeMenu();
-  }, [navigate, closeMenu]);
-
-  const handleLogoClick = useCallback(() => {
-    navigate('/');
-    closeMenu();
-  }, [navigate, closeMenu]);
-
   const handleModuleClick = useCallback((path: string) => {
     navigate(path);
   }, [navigate]);
@@ -311,13 +186,6 @@ export default function EnhancedHero() {
   }, [navigate]);
 
   // ====== Effects ======
-  useLayoutEffect(() => {
-    resetScrollPosition();
-    const scrollHandler = handleScroll();
-    window.addEventListener('scroll', scrollHandler, { passive: true });
-    return () => window.removeEventListener('scroll', scrollHandler);
-  }, [resetScrollPosition, handleScroll]);
-
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), CONSTANTS.ENTRANCE_ANIMATION_DELAY);
     return () => clearTimeout(timer);
@@ -404,73 +272,6 @@ export default function EnhancedHero() {
     return titleConfigs[titleVariant]();
   }, [titleVariant, YearDivider, Subtitle]);
 
-  const DesktopNavigation = useMemo(() => (
-    <nav className="hidden md:flex items-center gap-8" aria-label="主导航">
-      {NAVIGATION_ITEMS.map((item) => (
-        <button
-          key={item.to}
-          onClick={() => handleNavigation(item.to)}
-          className={`relative px-4 py-2 font-medium text-gray-700 hover:text-gray-900 transition-all duration-[${ANIMATION.duration.normal}] focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 group`}
-        >
-          <span className="relative z-10 group-hover:shadow-sm">{item.label}</span>
-          <div className={`absolute inset-0 ${createGradientClasses(THEME.gradients.primarySubtle)} rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-[${ANIMATION.duration.normal}]`} />
-          <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 ${createGradientClasses(THEME.gradients.primary)} group-hover:w-full transition-all duration-[${ANIMATION.duration.normal}] ${ANIMATION.easing.easeOut}`} />
-        </button>
-      ))}
-    </nav>
-  ), [handleNavigation]);
-
-  const MobileMenuButton = useMemo(() => {
-    const lineBaseClasses = "block w-6 h-0.5 bg-gray-700 transition-all duration-[${ANIMATION.duration.normal}]";
-
-    return (
-      <button
-        onClick={toggleMenu}
-        className={`md:hidden relative w-10 h-10 flex flex-col items-center justify-center space-y-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg transition-all duration-[${ANIMATION.duration.normal}] hover:bg-gray-50 hover:shadow-sm`}
-        aria-label="菜单"
-        aria-expanded={isMenuOpen}
-        aria-controls="mobile-menu"
-      >
-        <span className={`${lineBaseClasses} ${isMenuOpen ? 'rotate-45 translate-y-2' : ''}`} />
-        <span className={`${lineBaseClasses} ${isMenuOpen ? 'opacity-0' : ''}`} />
-        <span className={`${lineBaseClasses} ${isMenuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
-      </button>
-    );
-  }, [isMenuOpen, toggleMenu]);
-
-  const MobileMenu = useMemo(() => (
-    <div
-      id="mobile-menu"
-      className={`md:hidden fixed top-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200/80 shadow-xl transition-all duration-[${ANIMATION.duration.normal}] ${
-        isMenuOpen 
-          ? 'transform translate-y-0 opacity-100' 
-          : 'transform -translate-y-full opacity-0 pointer-events-none'
-      }`}
-      style={{ paddingTop: `${CONSTANTS.HEADER_HEIGHT}px` }}
-    >
-      <nav className="px-6 py-8" aria-label="移动端导航">
-        <div className="space-y-6">
-          {NAVIGATION_ITEMS.map((item, index) => (
-            <button
-              key={item.to}
-              onClick={() => handleNavigation(item.to)}
-              className={`group block w-full text-left py-3 px-4 rounded-lg hover:${createGradientClasses(THEME.gradients.primarySubtle)} transition-all duration-[${ANIMATION.duration.normal}] focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500`}
-              style={{
-                animationDelay: `${index * CONSTANTS.ANIMATION_STAGGER_DELAY}ms`,
-                animation: isMenuOpen ? 'slideInFromRight 0.3s ease-out forwards' : 'none'
-              }}
-            >
-              <span className={`text-lg font-medium text-gray-700 group-hover:text-gray-900 group-hover:shadow-sm transition-colors duration-[${ANIMATION.duration.fast}]`}>
-                {item.label}
-              </span>
-              <div className={`w-0 h-0.5 ${createGradientClasses(THEME.gradients.primary)} group-hover:w-full transition-all duration-[${ANIMATION.duration.normal}] mt-1`} />
-            </button>
-          ))}
-        </div>
-      </nav>
-    </div>
-  ), [isMenuOpen, handleNavigation]);
-
   const ModuleCard = useCallback(({ module }: { module: ModuleItem }) => (
     <div className="relative group overflow-visible">
       {/* Title Overlay */}
@@ -549,15 +350,6 @@ export default function EnhancedHero() {
   ), [scrollToModules]);
 
   // ====== 计算样式 ======
-  const headerClassName = useMemo(() =>
-    `fixed top-0 left-0 right-0 z-50 transition-all duration-[${ANIMATION.duration.slow}] ${
-      scrollY > CONSTANTS.SCROLL_THRESHOLD || isMenuOpen
-        ? 'bg-white/95 backdrop-blur-md border-b border-gray-200/80 shadow-sm' 
-        : 'bg-transparent'
-    }`,
-    [scrollY, isMenuOpen]
-  );
-
   const titleAnimationClassName = useMemo(() =>
     `transform transition-all duration-1000 ease-out ${
       isVisible ? 'translate-y-0 opacity-100' : 'translate-y-16 opacity-0'
@@ -568,6 +360,9 @@ export default function EnhancedHero() {
   // ====== 主渲染 ======
   return (
     <>
+      {/* 使用统一的Header组件 */}
+      <BaseHeader config={headerConfigs.home} />
+
       {/* Skip Link */}
       <a
         href="#modules"
@@ -578,24 +373,9 @@ export default function EnhancedHero() {
 
       {/* Hero Section */}
       <section className={`relative min-h-screen flex flex-col justify-center overflow-hidden ${createGradientClasses(`bg-gradient-to-br ${THEME.gradients.bgHero}`)}`}>
-        {/* Header */}
-        <header
-          className={headerClassName}
-          style={{ height: `${CONSTANTS.HEADER_HEIGHT}px` }}
-        >
-          <div className="w-full h-full px-4 md:px-8 flex items-center justify-between">
-            <SiteLogo onClick={handleLogoClick} />
-            {DesktopNavigation}
-            {MobileMenuButton}
-          </div>
-        </header>
-
-        {/* Mobile Menu */}
-        {MobileMenu}
-
         {/* Background */}
         <div className="absolute inset-0 opacity-40">
-          <HeroPageBackdrop scrollY={scrollY} />
+          <HeroPageBackdrop />
         </div>
 
         {/* Content Container */}
