@@ -8,13 +8,28 @@ import {
 } from '../types/timelineTypes';
 import { PersonData, PersonTimelineEvent } from '../types/personTypes';
 
+// 原始数据类型定义
+interface RawTimelineEvent {
+  time: string;
+  experience: string;
+  location?: string;
+  image: string;
+  timespot?: number;
+}
+
+
+interface RawTimelineData {
+  core_event: string;
+  timeline: RawTimelineEvent[];
+}
+
 // 静态JSON数据转换器
-export class StaticJsonTransformer implements DataTransformer<any[]> {
-  transform(rawData: any[]): TimelineData {
+export class StaticJsonTransformer implements DataTransformer<RawTimelineData[]> {
+  transform(rawData: RawTimelineData[]): TimelineData {
     const groups: CoreEventGroup[] = rawData.map((group, index) => ({
       id: `group_${index}`,
       core_event: group.core_event,
-      timeline: group.timeline.map((event: any, eventIndex: number) => ({
+      timeline: group.timeline.map((event: RawTimelineEvent, eventIndex: number) => ({
         id: `${index}_${eventIndex}`,
         time: event.time,
         experience: event.experience,
@@ -79,7 +94,7 @@ export class PersonApiTransformer implements DataTransformer<PersonData> {
           id: event.id,
           time: event.redater || `${yearData.year}年`,
           date: event.redate,
-          title: this.extractTitle(event, yearData.year),
+          title: this.extractTitle(event),
           experience: event.sub,
           location: this.extractLocation(event.sub),
           image: event.pic,
@@ -114,7 +129,7 @@ export class PersonApiTransformer implements DataTransformer<PersonData> {
     );
   }
 
-  private extractTitle(event: PersonTimelineEvent, year: number): string {
+  private extractTitle(event: PersonTimelineEvent): string {
     const description = event.sub;
     const firstSentence = description.split('。')[0];
     

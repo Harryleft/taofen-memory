@@ -1,7 +1,7 @@
 import { PersonData, PersonTimelineEvent, TimelineEvent } from '../types/personTypes';
 
 // 提取事件标题
-const extractTitle = (event: PersonTimelineEvent, year: number): string => {
+const extractTitle = (event: PersonTimelineEvent): string => {
   const description = event.sub;
   
   // 按句号分割，取第一句作为标题
@@ -77,7 +77,7 @@ export const personDataService = {
           return;
         }
         
-        const title = extractTitle(event, yearData.year);
+        const title = extractTitle(event);
         const location = extractLocation(event.sub);
         const details = extractDetails(event.sub);
         

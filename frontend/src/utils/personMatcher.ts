@@ -47,7 +47,7 @@ export class PersonMatcher {
     
     try {
       const startAt = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
-      const base = (import.meta as any).env?.BASE_URL || '/';
+      const base = (import.meta as { env?: { BASE_URL?: string } }).env?.BASE_URL || '/';
       const normalizedBase = base.replace(/\/$/, '');
       const candidates = [
         `${normalizedBase}/data/json/relationships.json`, // 实际存在
@@ -64,7 +64,7 @@ export class PersonMatcher {
             ok: response.ok,
             status: response.status,
             redirected: response.redirected,
-            finalURL: (response as any).url
+            finalURL: response.url
           });
           if (!response.ok) {
             throw new Error(`HTTP ${response.status} when GET ${url}`);

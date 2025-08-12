@@ -1,7 +1,7 @@
 import React from 'react';
 import { BookOpen, ExternalLink, FileText, X } from 'lucide-react';
 import { Person } from '../../types/Person.ts';
-import { getCategoryClass, getCategoryBgTailwindClassByName, getCategoryTailwindClassByName } from '../../constants/relationshipsConstants';
+import { getCategoryClass } from '../../constants/relationshipsConstants';
 
 interface PersonDetailModalProps {
   person: Person | null;
