@@ -1,5 +1,5 @@
-import { useMemo, memo } from 'react';
-import { ZoomIn } from 'lucide-react';
+import { useMemo, memo, useState } from 'react';
+import { ZoomIn, Image } from 'lucide-react';
 import { highlightSearchText, categoryLabels, categoryColors } from '@/utils/handwritingUtils.ts';
 import type { TransformedHandwritingItem } from '@/hooks/useHandwritingData.ts';
 
@@ -18,6 +18,9 @@ const HandwritingCard = memo(({
   searchTerm, 
   onCardClick 
 }: HandwritingCardProps) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  
   const highlightedTitle = useMemo(() => highlightSearchText(item.title, searchTerm), [item.title, searchTerm]);
   const highlightedDescription = useMemo(() => highlightSearchText(item.description, searchTerm), [item.description, searchTerm]);
   
@@ -37,13 +40,45 @@ const HandwritingCard = memo(({
     >
       <div className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500">
         <div className="relative overflow-hidden">
+          {/* 图片占位符 */}
+          {!imageLoaded && !imageError && (
+            <div 
+              className="w-full bg-gray-100 flex items-center justify-center"
+              style={{ height: `${item.dimensions.height}px` }}
+            >
+              <div className="text-gray-400">
+                <Image size={32} className="animate-pulse" />
+              </div>
+            </div>
+          )}
+          
+          {/* 图片加载失败占位符 */}
+          {imageError && (
+            <div 
+              className="w-full bg-gray-200 flex items-center justify-center"
+              style={{ height: `${item.dimensions.height}px` }}
+            >
+              <div className="text-gray-500 text-center">
+                <Image size={32} />
+                <p className="text-xs mt-1">图片加载失败</p>
+              </div>
+            </div>
+          )}
+          
+          {/* 实际图片 */}
           <img
             src={item.image}
             alt={item.title}
-            className="w-full object-cover group-hover:scale-110 transition-transform duration-700"
+            className={`w-full object-cover group-hover:scale-110 transition-transform duration-700 ${
+              imageLoaded ? 'opacity-100' : 'opacity-0'
+            }`}
             style={{ height: `${item.dimensions.height}px` }}
             loading="lazy"
+            onLoad={() => setImageLoaded(true)}
+            onError={() => setImageError(true)}
           />
+          
+          {/* 悬停效果 */}
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
             <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={32} />
           </div>

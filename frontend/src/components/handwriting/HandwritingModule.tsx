@@ -3,8 +3,10 @@ import { Search } from 'lucide-react';
 import AppHeader from '../layout/header/AppHeader.tsx';
 import HandwritingCard from './HandwritingCard.tsx';
 import Lightbox from './Lightbox.tsx';
+import SkeletonGrid from './SkeletonGrid.tsx';
 import { useHandwritingData, type TransformedHandwritingItem } from '@/hooks/useHandwritingData.ts';
 import { useHandwritingFilters } from '@/hooks/useHandwritingFilters.ts';
+import { ImagePreloader } from '@/utils/imagePreloader.ts';
 import { 
   debounce,
   getResponsiveColumns, 
@@ -42,10 +44,22 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
     sortOrder: 'year_desc'
   });
   
+  // 搜索防抖和缓存
+  const [searchCache, setSearchCache] = useState<Map<string, TransformedHandwritingItem[]>>(new Map());
+  const debouncedSearchRef = useRef<NodeJS.Timeout | null>(null);
+  
   // 布局状态
   const [layout, setLayout] = useState({
     columns: 4,
     visibleItems: new Set<string>()
+  });
+  
+  // 分页状态
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    itemsPerPage: 20,
+    hasMore: true,
+    isLoading: false
   });
   
   // Lightbox状态
@@ -57,6 +71,15 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
   // Refs
   const observerRef = useRef<IntersectionObserver | null>(null);
   const masonryRef = useRef<HTMLDivElement>(null);
+  
+  // 清理防抖定时器
+  useEffect(() => {
+    return () => {
+      if (debouncedSearchRef.current) {
+        clearTimeout(debouncedSearchRef.current);
+      }
+    };
+  }, []);
 
   // Responsive columns - 使用防抖优化
   useEffect(() => {
@@ -81,17 +104,64 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
     };
   }, []);
 
-  // Intersection Observer for future lazy loading - 目前禁用，所有卡片初始显示
+  // Intersection Observer for infinite scroll
   useEffect(() => {
-    // 暂时禁用IntersectionObserver，因为所有卡片初始时就应该显示
-    // 如果需要实现真正的懒加载（分页加载），可以重新启用这个逻辑
-    const currentObserver = observerRef.current;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && pagination.hasMore && !pagination.isLoading) {
+            loadMore();
+          }
+        });
+      },
+      {
+        root: null,
+        rootMargin: '100px',
+        threshold: 0.1
+      }
+    );
+
+    observerRef.current = observer;
+
     return () => {
-      if (currentObserver) {
-        currentObserver.disconnect();
+      if (observerRef.current) {
+        observerRef.current.disconnect();
       }
     };
-  }, []);
+  }, [pagination.hasMore, pagination.isLoading, loadMore]);
+
+  // 优化的搜索处理函数
+  const optimizedSearch = useCallback((searchTerm: string, items: TransformedHandwritingItem[]): TransformedHandwritingItem[] => {
+    if (!searchTerm.trim()) return items;
+    
+    const cacheKey = searchTerm.toLowerCase();
+    
+    // 检查缓存
+    if (searchCache.has(cacheKey)) {
+      return searchCache.get(cacheKey)!;
+    }
+    
+    // 执行搜索
+    const searchResults = items.filter(item => {
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        item.title.toLowerCase().includes(searchLower) ||
+        item.description.toLowerCase().includes(searchLower) ||
+        item.originalData.原文?.toLowerCase().includes(searchLower) ||
+        item.originalData.注释?.toLowerCase().includes(searchLower) ||
+        item.tags.some(tag => tag.toLowerCase().includes(searchLower))
+      );
+    });
+    
+    // 更新缓存
+    setSearchCache(prev => {
+      const newCache = new Map(prev);
+      newCache.set(cacheKey, searchResults);
+      return newCache;
+    });
+    
+    return searchResults;
+  }, [searchCache]);
 
   // 使用过滤Hook
   const { filteredItems, uniqueYears, uniqueSources, uniqueTags } = useHandwritingFilters(handwritingItems, filters);
@@ -112,22 +182,85 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
     });
   }, [filteredItems, uniqueYears, uniqueSources, uniqueTags, filters]);
 
-  // 初始化时显示所有卡片
+  // 分页逻辑
   useEffect(() => {
-    console.log('🔍 [HandwritingModule] Layout Debug Info:');
+    console.log('🔍 [HandwritingModule] Pagination Debug Info:');
     console.log('- filteredItems length:', filteredItems.length);
-    console.log('- visibleItems size:', layout.visibleItems.size);
-    console.log('- columns:', layout.columns);
+    console.log('- currentPage:', pagination.currentPage);
+    console.log('- itemsPerPage:', pagination.itemsPerPage);
+    console.log('- hasMore:', pagination.hasMore);
     
-    if (filteredItems.length > 0 && layout.visibleItems.size === 0) {
-      const allItemIds = filteredItems.map(item => item.id);
-      console.log('- Setting visible items:', allItemIds);
-      setLayout(prev => ({
+    const startIndex = 0;
+    const endIndex = pagination.currentPage * pagination.itemsPerPage;
+    const paginatedItems = filteredItems.slice(startIndex, endIndex);
+    
+    // 更新可见项目
+    const visibleItemIds = paginatedItems.map(item => item.id);
+    setLayout(prev => ({
+      ...prev,
+      visibleItems: new Set(visibleItemIds)
+    }));
+    
+    // 更新是否有更多数据
+    const hasMore = endIndex < filteredItems.length;
+    setPagination(prev => ({
+      ...prev,
+      hasMore
+    }));
+  }, [filteredItems, pagination.currentPage, pagination.itemsPerPage]);
+  
+  // 过滤器变化时重置分页
+  useEffect(() => {
+    setPagination(prev => ({
+      ...prev,
+      currentPage: 1,
+      hasMore: true
+    }));
+  }, [filters]);
+  
+  // 图片预加载策略
+  useEffect(() => {
+    if (filteredItems.length === 0) return;
+    
+    const startIndex = 0;
+    const endIndex = pagination.currentPage * pagination.itemsPerPage;
+    const currentItems = filteredItems.slice(startIndex, endIndex);
+    
+    // 预加载当前页面的图片
+    const currentImages = currentItems.map(item => item.image);
+    
+    // 预加载下一页的图片（预取）
+    const nextStartIndex = endIndex;
+    const nextEndIndex = endIndex + pagination.itemsPerPage;
+    const nextItems = filteredItems.slice(nextStartIndex, nextEndIndex);
+    const nextImages = nextItems.map(item => item.image);
+    
+    // 执行智能预加载
+    ImagePreloader.smartPreload(currentImages, nextImages, {
+      priority: true,
+      timeout: 3000,
+      retryCount: 1
+    });
+  }, [filteredItems, pagination.currentPage, pagination.itemsPerPage]);
+
+  // 加载更多
+  const loadMore = useCallback(() => {
+    if (pagination.hasMore && !pagination.isLoading) {
+      setPagination(prev => ({
         ...prev,
-        visibleItems: new Set(allItemIds)
+        isLoading: true,
+        currentPage: prev.currentPage + 1
       }));
+      
+      // 模拟加载延迟
+      setTimeout(() => {
+        setPagination(prev => ({
+          ...prev,
+          isLoading: false
+        }));
+      }, 300);
     }
-  }, [filteredItems, layout.visibleItems.size, layout.columns]);
+  }, [pagination.hasMore, pagination.isLoading]);
 
   // Masonry layout calculation
   // 使用useMemo优化布局计算
@@ -190,15 +323,29 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
   // }, [filteredItems]);
 
     
-  // 更新过滤器状态
+  // 更新过滤器状态 - 带防抖处理
   const updateFilters = useCallback((key: string, value: string) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    // 清除之前的防抖定时器
+    if (debouncedSearchRef.current) {
+      clearTimeout(debouncedSearchRef.current);
+    }
+    
+    // 如果是搜索词，使用防抖
+    if (key === 'searchTerm') {
+      debouncedSearchRef.current = setTimeout(() => {
+        setFilters(prev => ({ ...prev, [key]: value }));
+      }, 300);
+    } else {
+      // 其他过滤器立即更新
+      setFilters(prev => ({ ...prev, [key]: value }));
+    }
   }, []);
   
     
-  // 渲染过滤器控件
-  const renderFilterControls = () => (
-    <div className="space-y-4 mb-8">
+  // 渲染过滤器控件 - 使用useMemo优化
+  const renderFilterControls = useMemo(() => {
+    return () => (
+      <div className="space-y-4 mb-8">
       {/* 搜索栏 */}
       <div className="flex justify-center">
         <div className="relative">
@@ -253,7 +400,7 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
           onChange={(e) => updateFilters('selectedTag', e.target.value)}
           className="px-4 py-2 bg-white border border-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50"
         >
-          <option value="all">全部标签 ({uniqueTags.length})</option>
+          <option value="all">时间 ({uniqueTags.length})</option>
           {uniqueTags.map(tag => (
             <option key={tag} value={tag}>{tag}</option>
           ))}
@@ -273,28 +420,29 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
         </select>
       </div>
     </div>
-  );
+    );
+  }, [filters, uniqueYears, uniqueSources, uniqueTags, updateFilters, categoryLabels]);
   
-  // 渲染结果头部
-  const renderResultsHeader = () => (
+  // 渲染结果头部 - 使用useMemo优化
+  const renderResultsHeader = useMemo(() => () => (
     <div className="text-center mb-8">
       <p className="text-charcoal/60">
         找到 <span className="font-bold text-gold">{filteredItems.length}</span> 件手迹
       </p>
     </div>
-  );
+  ), [filteredItems.length]);
   
-  // 渲染空状态
-  const renderEmptyState = () => (
+  // 渲染空状态 - 使用useMemo优化
+  const renderEmptyState = useMemo(() => () => (
     <div className="text-center py-12">
       <div className="text-6xl mb-4">📜</div>
       <h3 className="text-xl font-bold text-charcoal mb-2">未找到相关手迹</h3>
       <p className="text-charcoal/60">请尝试调整搜索条件</p>
     </div>
-  );
+  ), []);
   
-  // 渲染手迹卡片 - 使用memoized组件
-  const renderHandwritingCard = (item: TransformedHandwritingItem, columnIndex: number) => (
+  // 渲染手迹卡片 - 使用useMemo优化
+  const renderHandwritingCard = useCallback((item: TransformedHandwritingItem, columnIndex: number) => (
     <HandwritingCard
       key={item.id}
       item={item}
@@ -303,25 +451,65 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
       searchTerm={filters.searchTerm}
       onCardClick={openLightbox}
     />
-  );
+  ), [layout.visibleItems, filters.searchTerm, openLightbox]);
   
-  // 渲染瀑布流网格
-  const renderMasonryGrid = () => (
-    <div ref={masonryRef} className="flex gap-5">
-      {columnArrays.map((column, columnIndex) => (
-        <div key={columnIndex} className="flex-1 flex flex-col gap-5">
-          {column.map((item) => renderHandwritingCard(item, columnIndex))}
+  // 渲染瀑布流网格 - 使用useMemo优化
+  const renderMasonryGrid = useMemo(() => () => (
+    <>
+      {/* 骨架屏加载效果 */}
+      {loading && (
+        <SkeletonGrid 
+          columns={layout.columns}
+          itemsPerColumn={3}
+          heights={[]}
+        />
+      )}
+      
+      {/* 实际内容 */}
+      {!loading && (
+        <div ref={masonryRef} className="flex gap-5">
+          {columnArrays.map((column, columnIndex) => (
+            <div key={columnIndex} className="flex-1 flex flex-col gap-5">
+              {column.map((item) => renderHandwritingCard(item, columnIndex))}
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
-  );
+      )}
+      
+      {/* 加载更多触发器 */}
+      {pagination.hasMore && !loading && (
+        <div 
+          ref={(el) => {
+            if (el && observerRef.current) {
+              observerRef.current.observe(el);
+            }
+          }}
+          className="flex justify-center items-center py-8"
+        >
+          {pagination.isLoading && (
+            <div className="flex items-center gap-2 text-charcoal/60">
+              <div className="w-4 h-4 border-2 border-gold border-t-transparent rounded-full animate-spin"></div>
+              <span>加载更多...</span>
+            </div>
+          )}
+        </div>
+      )}
+      
+      {/* 显示当前加载状态 */}
+      {!loading && (
+        <div className="text-center py-4 text-sm text-charcoal/50">
+          已显示 {layout.visibleItems.size} / {filteredItems.length} 项
+        </div>
+      )}
+    </>
+  ), [columnArrays, renderHandwritingCard, pagination.hasMore, pagination.isLoading, layout.visibleItems.size, filteredItems.length, loading, layout.columns]);
   
   
-  // 渲染Lightbox - 使用memoized组件
-  const renderLightbox = () => {
+  // 渲染Lightbox - 使用useMemo优化
+  const renderLightbox = useMemo(() => {
     if (!lightbox.selectedItem) return null;
     
-    return (
+    return () => (
       <Lightbox
         selectedItem={lightbox.selectedItem}
         currentIndex={lightbox.currentIndex}
@@ -332,7 +520,7 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
         onNext={nextItem}
       />
     );
-  };
+  }, [lightbox.selectedItem, lightbox.currentIndex, filteredItems.length, filters.searchTerm, prevItem, nextItem]);
 
   return (
     <>
@@ -346,14 +534,7 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
         {/* Results count */}
         {renderResultsHeader()}
 
-        {/* Loading state */}
-        {loading && (
-          <div className="text-center py-12">
-            <div className="text-6xl mb-4">⏳</div>
-            <h3 className="text-xl font-bold text-charcoal mb-2">加载中...</h3>
-            <p className="text-charcoal/60">正在加载手迹数据</p>
-          </div>
-        )}
+        {/* Loading state handled by skeleton grid */}
 
         {/* Error state */}
         {error && (

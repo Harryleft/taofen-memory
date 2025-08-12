@@ -29,7 +29,8 @@
       "Bash(timeout:*)",
       "Bash(chmod:*)",
       "Bash(\"S:\\vibe_coding\\taofen_web\\scripts\\fix_handwriting_tags.sh\")",
-      "Bash(taskkill //F //PID 33084 //PID 19708 //PID 34020 //PID 34112 //PID 36988)"
+      "Bash(taskkill //F //PID 33084 //PID 19708 //PID 34020 //PID 34112 //PID 36988)",
+      "mcp__filesystem__get_file_info"
     ],
     "deny": []
   },
