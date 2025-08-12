@@ -59,7 +59,7 @@ export interface DataTransformer<T> {
 export interface TimelineError {
   code: string;
   message: string;
-  details?: any;
+  details?: unknown;
 }
 
 // 加载状态

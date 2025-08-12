@@ -64,7 +64,7 @@ const CATEGORY_WEIGHTS: Record<AspectCategory, number> = {
 // =============== 工具函数 ===============
 class Utils {
   // Debounce工具函数
-  static debounce<T extends (...args: any[]) => any>(
+  static debounce<T extends (...args: unknown[]) => void>(
     func: T, 
     wait: number
   ): (...args: Parameters<T>) => void {
@@ -277,7 +277,7 @@ class MasonryLayouter {
 }
 
 // =============== 主组件 ===============
-export default function HeroPageBackdrop({ scrollY }: HeroBackgroundProps) {
+export default function HeroPageBackdrop(_props: HeroBackgroundProps) {
   // State - 静态布局配置，在组件挂载时计算一次
   const [layoutConfig, setLayoutConfig] = useState<LayoutConfig | null>(null);
   const [remoteItems, setRemoteItems] = useState<BaseMasonryItem[]>([]);

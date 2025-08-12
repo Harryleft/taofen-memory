@@ -24,7 +24,7 @@ export function useTimelineData() {
     const loadTimelineData = async () => {
       try {
         // 调试：候选路径（优先使用 Vite BASE_URL + public 真实路径）
-        const base = (import.meta as any).env?.BASE_URL || '/';
+        const base = (import.meta as { env?: { BASE_URL?: string } }).env?.BASE_URL || '/';
         const candidates = [
           `${base.replace(/\/$/, '')}/data/json/timeline.json`, // 实际存在的路径
           `${base.replace(/\/$/, '')}/data/timeline.json`       // 兼容旧路径
@@ -39,7 +39,7 @@ export function useTimelineData() {
               ok: response.ok,
               status: response.status,
               redirected: response.redirected,
-              finalURL: (response as any).url
+              finalURL: response.url
             });
             if (!response.ok) {
               throw new Error(`HTTP ${response.status} when GET ${url}`);

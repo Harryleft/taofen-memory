@@ -32,7 +32,7 @@ export interface PersonTimelineEvent {
   redate: string;       // 事件日期（ISO格式）
   type: number;         // 事件类型
   data: string;         // 数据类型
-  child: any[];         // 子事件
+  child: unknown[];     // 子事件
   text: string;         // 事件文本
   pic: string;          // 事件图片
   sub: string;          // 事件详细描述

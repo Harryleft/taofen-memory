@@ -7,8 +7,7 @@ import {
   DataLoadConfig, 
   TimelineError,
   LoadingState,
-  BaseTimelineEvent,
-  CoreEventGroup
+  BaseTimelineEvent
 } from '../types/timelineTypes';
 import { timelineDataService } from '../services/timelineDataService';
 
