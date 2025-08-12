@@ -30,7 +30,18 @@
       "Bash(chmod:*)",
       "Bash(\"S:\\vibe_coding\\taofen_web\\scripts\\fix_handwriting_tags.sh\")",
       "Bash(taskkill //F //PID 33084 //PID 19708 //PID 34020 //PID 34112 //PID 36988)",
-      "mcp__filesystem__get_file_info"
+      "mcp__filesystem__get_file_info",
+      "Bash(claude mcp add:*)",
+      "WebFetch(domain:localhost)",
+      "Bash(claude mcp list:*)",
+      "Bash(cp:*)",
+      "mcp__filesystem__list_directory",
+      "mcp__browser-tools-mcp__runDebuggerMode",
+      "mcp__browser-tools-mcp__getConsoleLogs",
+      "mcp__browser-tools-mcp__getConsoleErrors",
+      "mcp__browser-tools-mcp__getNetworkLogs",
+      "mcp__browsermcp__browser_snapshot",
+      "mcp__browsermcp__browser_navigate"
     ],
     "deny": []
   },

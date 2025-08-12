@@ -100,43 +100,6 @@ export const useHandwritingFilters = (
     });
   }, []);
 
-  // 获取缓存的元数据
-  const getCachedMetadata = useCallback(async (
-    type: 'years' | 'sources' | 'tags',
-    items: TransformedHandwritingItem[]
-  ) => {
-    if (!cacheManager || !cacheEnabled) {
-      // 如果缓存未启用，直接计算
-      return computeMetadata(type, items);
-    }
-
-    const cacheKey = `handwriting:metadata:${type}`;
-
-    try {
-      // 尝试从缓存获取
-      const cached = await cacheManager.get<TransformedHandwritingItem[]>(cacheKey);
-      if (cached) {
-        console.log(`✅ Metadata cache hit: ${type}`);
-        return cached;
-      }
-
-      // 计算结果
-      const result = computeMetadata(type, items);
-      
-      // 缓存结果（1小时TTL）
-      await cacheManager.set(cacheKey, result, {
-        ttl: 60 * 60 * 1000,
-        level: 'both',
-      });
-      console.log(`❌ Metadata cache miss, cached result: ${type}`);
-
-      return result;
-    } catch (error) {
-      console.warn('Metadata cache operation failed, computing directly:', error);
-      return computeMetadata(type, items);
-    }
-  }, [cacheManager, cacheEnabled, computeMetadata]);
-
   // 实际的元数据计算函数
   const computeMetadata = useCallback((
     type: 'years' | 'sources' | 'tags',
@@ -222,9 +185,6 @@ export const useHandwritingFilters = (
     if (!cacheManager || !cacheEnabled) return;
 
     try {
-      // 预缓存当前过滤器结果
-      await getCachedFilteredItems(items, filters, filters.searchTerm);
-      
       // 预缓存元数据
       await getCachedMetadata('years', items);
       await getCachedMetadata('sources', items);
@@ -234,7 +194,7 @@ export const useHandwritingFilters = (
     } catch (error) {
       console.warn('Precaching failed:', error);
     }
-  }, [items, filters, cacheManager, cacheEnabled, getCachedFilteredItems, getCachedMetadata]);
+  }, [items, cacheManager, cacheEnabled, getCachedMetadata]);
 
   // 清理过滤器缓存
   const clearFilterCache = useCallback(async () => {
@@ -262,6 +222,7 @@ export const useHandwritingFilters = (
 };
 
 // 工具函数：计算过滤结果（导出供测试使用）
+// 注意：这个函数与内部的computeFilteredItems函数重复，为了保持向后兼容性而保留
 export const computeFilteredItems = (
   items: TransformedHandwritingItem[],
   filters: Record<string, unknown>,
