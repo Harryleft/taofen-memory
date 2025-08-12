@@ -1,5 +1,5 @@
 import { useMemo, memo } from 'react';
-import { X, ChevronLeft, ChevronRight, Download } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { categoryLabels, categoryColors, highlightSearchText } from '@/utils/handwritingUtils.ts';
 import type { TransformedHandwritingItem } from '@/hooks/useHandwritingData.ts';
 
@@ -121,13 +121,6 @@ const Lightbox = memo(({
                   </span>
                 ))}
               </div>
-            </div>
-            
-            <div className="flex gap-2">
-              <button className="flex-1 bg-gold text-cream px-4 py-2 rounded-lg hover:bg-gold/90 transition-colors flex items-center justify-center gap-2">
-                <Download size={16} />
-                下载高清图
-              </button>
             </div>
             
             <div className="mt-4 text-sm text-charcoal/60 text-center">
