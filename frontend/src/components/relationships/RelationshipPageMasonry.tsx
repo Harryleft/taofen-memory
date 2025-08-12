@@ -164,19 +164,66 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
   useEffect(() => {
     const updateContainerWidth = () => {
       if (containerRef.current) {
-        setContainerWidth(containerRef.current.offsetWidth);
+        const width = containerRef.current.offsetWidth;
+        console.log('Masonry Debug: Container width updated:', {
+          width,
+          clientWidth: containerRef.current.clientWidth,
+          scrollWidth: containerRef.current.scrollWidth,
+          offsetWidth: containerRef.current.offsetWidth
+        });
+        setContainerWidth(width);
+      } else {
+        console.warn('Masonry Debug: Container ref is null');
       }
     };
+    
+    // 初始更新
     updateContainerWidth();
+    
+    // 延迟再次更新，确保DOM完全渲染
+    const timeoutId = setTimeout(() => {
+      updateContainerWidth();
+    }, 100);
+    
     window.addEventListener('resize', updateContainerWidth);
-    return () => window.removeEventListener('resize', updateContainerWidth);
+    return () => {
+      window.removeEventListener('resize', updateContainerWidth);
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   // 防抖的重新布局
   const triggerLayout = useDebouncedCallback(() => {
-    if (containerWidth <= 0) return;
+    console.log('Masonry Debug: Trigger layout called with:', {
+      containerWidth,
+      itemsLength: items.length,
+      visibleItems,
+      columnCount: getColumnCount(containerWidth)
+    });
+    
+    if (containerWidth <= 0) {
+      console.warn('Masonry Debug: Container width is 0, attempting to recalculate');
+      // 强制重新计算宽度
+      if (containerRef.current) {
+        const newWidth = containerRef.current.offsetWidth;
+        if (newWidth > 0) {
+          console.log('Masonry Debug: Found new width:', newWidth);
+          setContainerWidth(newWidth);
+          return;
+        }
+      }
+      return;
+    }
+    
     const visiblePersons = items.slice(0, visibleItems);
-    const layoutItems = calculateMasonryLayout(visiblePersons, containerWidth);
+    const effectiveWidth = containerWidth > 0 ? containerWidth : 1200; // 默认宽度
+    const layoutItems = calculateMasonryLayout(visiblePersons, effectiveWidth);
+    console.log('Masonry Debug: Layout calculated:', {
+      visiblePersonsLength: visiblePersons.length,
+      layoutItemsLength: layoutItems.length,
+      containerHeight: Math.max(...layoutItems.map(item => item.top + item.height)) + MASONRY_CONFIG.layout.VERTICAL_GAP,
+      effectiveWidth
+    });
     setMasonryItems(layoutItems);
   }, 80);
 
@@ -184,6 +231,41 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
   useEffect(() => {
     triggerLayout();
   }, [items, containerWidth, visibleItems, calculateMasonryLayout, triggerLayout]);
+
+  // 专门处理容器宽度为0的情况
+  useEffect(() => {
+    if (containerWidth <= 0 && containerRef.current) {
+      console.log('Masonry Debug: Container width is 0, trying to recover...');
+      
+      // 尝试多种方式获取宽度
+      const recoverWidth = () => {
+        if (!containerRef.current) return;
+        
+        const width = containerRef.current.offsetWidth;
+        const clientWidth = containerRef.current.clientWidth;
+        const scrollWidth = containerRef.current.scrollWidth;
+        
+        console.log('Masonry Debug: Width recovery attempt:', {
+          width,
+          clientWidth,
+          scrollWidth
+        });
+        
+        // 使用任何可用的宽度
+        const availableWidth = Math.max(width, clientWidth, scrollWidth);
+        if (availableWidth > 0) {
+          setContainerWidth(availableWidth);
+        }
+      };
+      
+      // 立即尝试
+      recoverWidth();
+      
+      // 延迟再尝试
+      const timeoutId = setTimeout(recoverWidth, 200);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [containerWidth]);
 
   // 监听每个卡片尺寸变化
   useLayoutEffect(() => {
@@ -241,9 +323,11 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
     ? Math.max(...masonryItems.map(item => item.top + item.height)) + MASONRY_CONFIG.layout.VERTICAL_GAP
     : 0;
 
-  const columnCount = getColumnCount(containerWidth);
-  const columnWidth = containerWidth > 0
-    ? (containerWidth - MASONRY_CONFIG.layout.GAP * (columnCount + 1)) / columnCount
+  // 确保有一个有效的容器宽度，即使计算失败
+  const effectiveContainerWidth = containerWidth > 0 ? containerWidth : 1200; // 默认宽度
+  const columnCount = getColumnCount(effectiveContainerWidth);
+  const columnWidth = effectiveContainerWidth > 0
+    ? (effectiveContainerWidth - MASONRY_CONFIG.layout.GAP * (columnCount + 1)) / columnCount
     : MASONRY_CONFIG.layout.CARD_WIDTH;
 
   return (
