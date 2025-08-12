@@ -9,7 +9,6 @@ import { useHandwritingLightbox } from '@/hooks/useHandwritingLightbox';
 import { useHandwritingSearch } from '@/hooks/useHandwritingSearch';
 import { useHandwritingPreloader } from '@/hooks/useHandwritingPreloader';
 import FilterControls from './FilterControls';
-import ResultsHeader from './ResultsHeader';
 import MasonryGrid from './MasonryGrid';
 import EmptyState from './EmptyState';
 import ErrorState from './ErrorState';
@@ -84,12 +83,6 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
             uniqueTags={uniqueTags}
             onSearchChange={handleSearchChange}
             onFilterChange={handleFilterChange}
-          />
-          
-          {/* 结果头部 */}
-          <ResultsHeader
-            totalItems={filteredItems.length}
-            visibleItems={paginatedItems.length}
           />
           
           {/* 加载状态 */}
