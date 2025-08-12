@@ -74,9 +74,7 @@ const generateTags = (item: HandwritingItem, year: number): string[] => {
   // 保留年份标签
   if (year) tags.push(`${year}年`);
   
-  // 调试信息：输出标签生成过程
-  console.log('🔍 [generateTags] Item:', item.名称, 'Original tag:', item.标签, 'Generated tags:', tags);
-  
+    
   return tags;
 };
 
@@ -123,15 +121,11 @@ export const useHandwritingData = () => {
 
   // 数据加载函数
   const loadData = useCallback(async () => {
-    console.log('🔍 [useHandwritingData] Starting to load data...');
     try {
       setLoading(true);
       setError(null);
-      console.log('🔍 [useHandwritingData] Fetching data from /data/json/taofen_handwriting_details.json');
       const rawData = await fetchHandwritingData();
-      console.log('🔍 [useHandwritingData] Raw data received:', rawData);
       const transformedData = transformHandwritingData(rawData);
-      console.log('🔍 [useHandwritingData] Transformed data:', transformedData);
       setHandwritingItems(transformedData);
     } catch (err) {
       setError('加载手迹数据失败，请刷新页面重试');
@@ -148,7 +142,6 @@ export const useHandwritingData = () => {
 
   // 组件挂载时自动加载数据
   useEffect(() => {
-    console.log('🔍 [useHandwritingData] Hook mounted, calling loadData...');
     loadData();
   }, [loadData]);
 
