@@ -1,18 +1,16 @@
-import { useState, useEffect, useRef, useCallback, useMemo, memo } from 'react';
-import { Search, Download } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { Search } from 'lucide-react';
 import AppHeader from '../layout/header/AppHeader.tsx';
 import HandwritingCard from './HandwritingCard.tsx';
 import Lightbox from './Lightbox.tsx';
-import { useHandwritingData, type TransformedHandwritingItem } from '../../hooks/useHandwritingData.ts';
-import { useHandwritingFilters } from '../../hooks/useHandwritingFilters.ts';
+import { useHandwritingData, type TransformedHandwritingItem } from '@/hooks/useHandwritingData.ts';
+import { useHandwritingFilters } from '@/hooks/useHandwritingFilters.ts';
 import { 
-  highlightSearchText, 
-  debounce, 
+  debounce,
   getResponsiveColumns, 
   calculateMasonryLayout,
-  categoryLabels,
-  categoryColors
-} from '../../utils/handwritingUtils.ts';
+  categoryLabels
+} from '@/utils/handwritingUtils.ts';
 
 
 
@@ -24,6 +22,15 @@ interface HandwritingModuleProps {
 export default function HandwritingModule({ className = '' }: HandwritingModuleProps) {
   // 使用数据获取Hook
   const { handwritingItems, loading, error, refetch } = useHandwritingData();
+  
+  // Debug: 监控数据加载状态
+  useEffect(() => {
+    console.log('🔍 [HandwritingModule] Debug Info:');
+    console.log('- loading:', loading);
+    console.log('- error:', error);
+    console.log('- handwritingItems length:', handwritingItems.length);
+    console.log('- handwritingItems:', handwritingItems);
+  }, [loading, error, handwritingItems]);
   
   // 过滤器状态
   const [filters, setFilters] = useState({
@@ -87,22 +94,44 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
 
   // 使用过滤Hook
   const { filteredItems, uniqueYears, uniqueSources, uniqueTags } = useHandwritingFilters(handwritingItems, filters);
+  
+  // Debug: 监控过滤结果
+  useEffect(() => {
+    console.log('🔍 [HandwritingModule] Filter Debug Info:');
+    console.log('- filteredItems length:', filteredItems.length);
+    console.log('- uniqueYears:', uniqueYears);
+    console.log('- uniqueSources:', uniqueSources);
+    console.log('- uniqueTags:', uniqueTags);
+    console.log('- current filters:', filters);
+  }, [filteredItems, uniqueYears, uniqueSources, uniqueTags, filters]);
 
   // 初始化时显示所有卡片
   useEffect(() => {
+    console.log('🔍 [HandwritingModule] Layout Debug Info:');
+    console.log('- filteredItems length:', filteredItems.length);
+    console.log('- visibleItems size:', layout.visibleItems.size);
+    console.log('- columns:', layout.columns);
+    
     if (filteredItems.length > 0 && layout.visibleItems.size === 0) {
       const allItemIds = filteredItems.map(item => item.id);
+      console.log('- Setting visible items:', allItemIds);
       setLayout(prev => ({
         ...prev,
         visibleItems: new Set(allItemIds)
       }));
     }
-  }, [filteredItems, layout.visibleItems.size]);
+  }, [filteredItems, layout.visibleItems.size, layout.columns]);
 
   // Masonry layout calculation
   // 使用useMemo优化布局计算
   const columnArrays = useMemo(() => {
-    return calculateMasonryLayout(filteredItems, layout.columns);
+    const result = calculateMasonryLayout(filteredItems, layout.columns);
+    console.log('🔍 [HandwritingModule] Masonry Debug Info:');
+    console.log('- filteredItems length:', filteredItems.length);
+    console.log('- layout columns:', layout.columns);
+    console.log('- columnArrays length:', result.length);
+    console.log('- columnArrays:', result.map(col => col.length));
+    return result;
   }, [filteredItems, layout.columns]);
 
   // Lightbox navigation
@@ -309,6 +338,30 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
 
         {/* Results count */}
         {renderResultsHeader()}
+
+        {/* Loading state */}
+        {loading && (
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">⏳</div>
+            <h3 className="text-xl font-bold text-charcoal mb-2">加载中...</h3>
+            <p className="text-charcoal/60">正在加载手迹数据</p>
+          </div>
+        )}
+
+        {/* Error state */}
+        {error && (
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">❌</div>
+            <h3 className="text-xl font-bold text-charcoal mb-2">加载失败</h3>
+            <p className="text-charcoal/60 mb-4">{error}</p>
+            <button 
+              onClick={refetch}
+              className="bg-gold text-cream px-6 py-2 rounded-lg hover:bg-gold/90 transition-colors"
+            >
+              重新加载
+            </button>
+          </div>
+        )}
 
         {/* Masonry Grid */}
         {!loading && !error && renderMasonryGrid()}
