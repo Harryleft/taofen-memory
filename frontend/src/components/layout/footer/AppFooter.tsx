@@ -1,5 +1,6 @@
 import React from 'react';
-import BaseFooter, { FooterConfig } from './BaseFooter';
+import BaseFooter from './BaseFooter';
+import { FooterConfig } from './types';
 import { footerConfigs } from '@/constants/footer.configs';
 
 interface AppFooterProps {
