@@ -86,7 +86,6 @@ export const categoryLabels: Record<string, string> = {
   '题词': '题词',
   '文稿': '文稿', 
   '书简': '书简',
-  '其他': '其他'
 };
 
 // 类别颜色映射 - 为真实标签分配颜色
@@ -94,7 +93,6 @@ export const categoryColors: Record<string, string> = {
   '题词': 'bg-blue-500',
   '文稿': 'bg-gold',
   '书简': 'bg-green-500',
-  '其他': 'bg-gray-500'
 };
 
 // Hook：使用防抖的响应式列数
