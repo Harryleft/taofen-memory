@@ -6,7 +6,7 @@ interface PaginationTriggerProps {
   onLoadMore: () => void;
 }
 
-const PaginationTrigger = memo(({ hasMore, isLoading, onLoadMore }: PaginationTriggerProps) => {
+const HandwritingPaginationTrigger = memo(({ hasMore, isLoading, onLoadMore }: PaginationTriggerProps) => {
   const triggerRef = useRef<HTMLDivElement>(null);
   
   // Intersection Observer for infinite scroll
@@ -52,6 +52,6 @@ const PaginationTrigger = memo(({ hasMore, isLoading, onLoadMore }: PaginationTr
   );
 });
 
-PaginationTrigger.displayName = 'PaginationTrigger';
+HandwritingPaginationTrigger.displayName = 'HandwritingPaginationTrigger';
 
-export default PaginationTrigger;
+export default HandwritingPaginationTrigger;

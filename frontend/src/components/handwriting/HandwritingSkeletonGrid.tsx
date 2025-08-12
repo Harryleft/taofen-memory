@@ -50,7 +50,7 @@ interface SkeletonGridProps {
   heights: number[][];
 }
 
-export const SkeletonGrid: React.FC<SkeletonGridProps> = ({ 
+export const HandwritingSkeletonGrid: React.FC<SkeletonGridProps> = ({
   columns, 
   itemsPerColumn, 
   heights 
@@ -91,4 +91,4 @@ export const SkeletonGrid: React.FC<SkeletonGridProps> = ({
   );
 };
 
-export default SkeletonGrid;
+export default HandwritingSkeletonGrid;

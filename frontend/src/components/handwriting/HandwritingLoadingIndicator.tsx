@@ -4,7 +4,7 @@ interface LoadingIndicatorProps {
   message?: string;
 }
 
-const LoadingIndicator = memo(({ message = "加载中..." }: LoadingIndicatorProps) => (
+const HandwritingLoadingIndicator = memo(({ message = "加载中..." }: LoadingIndicatorProps) => (
   <div className="flex justify-center items-center py-12">
     <div className="flex items-center gap-2 text-charcoal/60">
       <div className="w-4 h-4 border-2 border-gold border-t-transparent rounded-full animate-spin"></div>
@@ -13,6 +13,6 @@ const LoadingIndicator = memo(({ message = "加载中..." }: LoadingIndicatorPro
   </div>
 ));
 
-LoadingIndicator.displayName = 'LoadingIndicator';
+HandwritingLoadingIndicator.displayName = 'HandwritingLoadingIndicator';
 
-export default LoadingIndicator;
+export default HandwritingLoadingIndicator;

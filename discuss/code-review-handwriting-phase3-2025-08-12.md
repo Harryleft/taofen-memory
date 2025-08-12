@@ -17,7 +17,7 @@
 | handwritingUtils.ts | 8.5 | 8.0 | 8.5 | 8.5 | 8.4 |
 | HandwritingLightbox.tsx | 8.0 | 7.5 | 8.0 | 8.5 | 8.0 |
 | HandwritingCard.tsx | 9.0 | 8.5 | 8.5 | 9.0 | 8.8 |
-| SkeletonGrid.tsx | 8.5 | 8.0 | 8.0 | 7.5 | 8.0 |
+| HandwritingSkeletonGrid.tsx | 8.5 | 8.0 | 8.0 | 7.5 | 8.0 |
 | imagePreloader.ts | 9.5 | 9.5 | 9.0 | 9.5 | 9.4 |
 
 ## 二、架构设计分析
@@ -138,7 +138,7 @@ const [state, dispatch] = useReducer(handwritingReducer, {
 **问题2**: 渲染函数抽取
 ```typescript
 // 将renderFilterControls拆分为独立组件
-const FilterControls = memo(({ filters, options, onUpdate }) => {
+const HandwritingFilterControls = memo(({ filters, options, onUpdate }) => {
   // ...
 });
 ```
