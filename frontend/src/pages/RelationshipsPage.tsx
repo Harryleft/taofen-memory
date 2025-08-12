@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import RelationshipPageMasonry from '../components/relationships/RelationshipPageMasonry.tsx';
 import RelationshipPagePersonModal from '../components/relationships/RelationshipPagePersonModal.tsx';
 import AppHeader from '../components/layout/header/AppHeader.tsx';
 import { AppFooter } from '../components/layout/footer';
+import BackToTop from '../components/relationships/BackToTop.tsx';
+import PullToRefresh from '../components/relationships/PullToRefresh.tsx';
 import { Person } from '../types/Person';
 import { useRelationshipsData } from '../hooks/useRelationshipsData';
 import {
@@ -15,7 +17,19 @@ import '../styles/relationships.css';
 export default function RelationshipsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
-  const { persons, loading, error } = useRelationshipsData();
+  const { persons, loading, error, refetch } = useRelationshipsData();
+  const filterContainerRef = useRef<HTMLDivElement>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // 处理下拉刷新
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await refetch();
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   // ESC键关闭详情卡片
   useEffect(() => {
@@ -81,27 +95,90 @@ export default function RelationshipsPage() {
 
       {/* Category Filter */}
       <div className="relationships-main-content-container">
-        <div className="relationships-filter-container">
-          {RELATIONSHIPS_CATEGORIES.map((category) => {
-            const Icon = category.icon;
-            const isSelected = selectedCategory === category.id;
-            return (
-              <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`relationships-category-button ${isSelected ? 'selected' : 'not-selected'} ${isSelected ? getCategoryBgClass(category.color) : ''}`}
-              >
-                <Icon
-                  size={RELATIONSHIPS_CONFIG.ui.iconSizes.CATEGORY_BUTTON}
-                  className={`transition-transform duration-200 ${
-                    isSelected ? 'scale-110' : 'group-hover:scale-110'
-                  }`}
-                />
-                <span className="relative z-10">{category.name}</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full"></div>
-              </button>
-            );
-          })}
+        {/* 移动端筛选器头部 */}
+        <div className="md:hidden mb-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-gray-800">人物分类</h2>
+            <div className="text-sm text-gray-500">
+              {filteredPersons.length} / {persons.length}
+            </div>
+          </div>
+        </div>
+        
+        {/* 桌面端筛选器 */}
+        <div className="hidden md:block">
+          <div className="relationships-filter-container">
+            {RELATIONSHIPS_CATEGORIES.map((category) => {
+              const Icon = category.icon;
+              const isSelected = selectedCategory === category.id;
+              return (
+                <button
+                  key={category.id}
+                  onClick={() => setSelectedCategory(category.id)}
+                  className={`relationships-category-button ${isSelected ? 'selected' : 'not-selected'} ${isSelected ? getCategoryBgClass(category.color) : ''}`}
+                >
+                  <Icon
+                    size={RELATIONSHIPS_CONFIG.ui.iconSizes.CATEGORY_BUTTON}
+                    className={`transition-transform duration-200 ${
+                      isSelected ? 'scale-110' : 'group-hover:scale-110'
+                    }`}
+                  />
+                  <span className="relative z-10">{category.name}</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full"></div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        
+        {/* 移动端横向滚动筛选器 */}
+        <div className="md:hidden">
+          <div 
+            ref={filterContainerRef}
+            className="relationships-filter-container-mobile overflow-x-auto scrollbar-hide -mx-6 px-6"
+          >
+            <div className="flex gap-2 pb-2">
+              {RELATIONSHIPS_CATEGORIES.map((category) => {
+                const Icon = category.icon;
+                const isSelected = selectedCategory === category.id;
+                return (
+                  <button
+                    key={category.id}
+                    onClick={() => {
+                      setSelectedCategory(category.id);
+                      // 滚动到选中项
+                      setTimeout(() => {
+                        const container = filterContainerRef.current;
+                        if (container) {
+                          const buttons = container.querySelectorAll('button');
+                          const selectedButton = buttons[category.id === 'all' ? 0 : 
+                            category.id === 'family' ? 1 :
+                            category.id === 'media' ? 2 :
+                            category.id === 'academic' ? 3 : 4];
+                          if (selectedButton) {
+                            selectedButton.scrollIntoView({
+                              behavior: 'smooth',
+                              block: 'nearest',
+                              inline: 'center'
+                            });
+                          }
+                        }
+                      }, 100);
+                    }}
+                    className={`relationships-category-button-mobile flex-shrink-0 ${isSelected ? 'selected' : 'not-selected'} ${isSelected ? getCategoryBgClass(category.color) : ''}`}
+                  >
+                    <Icon
+                      size={16}
+                      className={`transition-transform duration-200 ${
+                        isSelected ? 'scale-110' : ''
+                      }`}
+                    />
+                    <span className="relative z-10 text-sm">{category.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
 
         {/* Statistics */}
@@ -118,19 +195,21 @@ export default function RelationshipsPage() {
       </div>
 
       {/* Main Content */}
-      <div className="relationships-main-content-container">
-        {filteredPersons.length === 0 ? (
-          <div className="relationships-empty-state-container">
-            <div className="relationships-empty-state-title">暂无相关人物</div>
-            <div className="relationships-empty-state-subtitle">请尝试选择其他分类</div>
-          </div>
-        ) : (
-          <RelationshipPageMasonry
-            items={filteredPersons}
-            onItemClick={setSelectedPerson}
-            categories={adaptedCategories}
-          />
-        )}
+      <div className="relationships-main-content-container flex-1">
+        <PullToRefresh onRefresh={handleRefresh}>
+          {filteredPersons.length === 0 ? (
+            <div className="relationships-empty-state-container">
+              <div className="relationships-empty-state-title">暂无相关人物</div>
+              <div className="relationships-empty-state-subtitle">请尝试选择其他分类</div>
+            </div>
+          ) : (
+            <RelationshipPageMasonry
+              items={filteredPersons}
+              onItemClick={setSelectedPerson}
+              categories={adaptedCategories}
+            />
+          )}
+        </PullToRefresh>
       </div>
 
       <RelationshipPagePersonModal
@@ -141,6 +220,9 @@ export default function RelationshipsPage() {
       
       {/* Footer */}
       <AppFooter />
+      
+      {/* 移动端功能组件 */}
+      <BackToTop />
     </div>
   );
 }
