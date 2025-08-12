@@ -13,7 +13,7 @@ function BookstoreTimelinePage() {
       </main>
       
       {/* Footer */}
-      <AppFooter moduleId="bookstore" />
+      <AppFooter />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { FooterConfig } from '../components/layout/footer/types';
+import { FooterConfig } from '../components/layout/footer';
 
 // 统一的简化 Footer 配置
 const simplifiedFooterConfig: FooterConfig = {

@@ -140,7 +140,7 @@ export default function RelationshipsPage() {
       />
       
       {/* Footer */}
-      <AppFooter moduleId="relationships" />
+      <AppFooter />
     </div>
   );
 }

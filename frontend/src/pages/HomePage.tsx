@@ -12,7 +12,7 @@ function HomePage() {
       <main className="flex-1">
       </main>
       {/* Footer */}
-      <AppFooter moduleId="home" />
+      <AppFooter />
     </div>
   );
 }
