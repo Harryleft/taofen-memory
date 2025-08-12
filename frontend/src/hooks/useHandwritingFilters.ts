@@ -75,13 +75,13 @@ export const useHandwritingFilters = (
   
   // 获取唯一的标签列表 - 使用useMemo优化
   const uniqueTags = useMemo(() => {
-    const allTags = items.flatMap(item => item.tags).filter(tag => tag && !tag.includes('年'));
+    const allTags = items.flatMap(item => item.tags).filter(tag => tag && tag.trim());
     const uniqueTags = [...new Set(allTags)].sort();
     console.log('🔍 [useHandwritingFilters] Unique tags calculation:', {
       totalItems: items.length,
       allTags,
       uniqueTags,
-      filteredTags: uniqueTags.filter(tag => !tag.includes('年'))
+      itemsWithTags: items.filter(item => item.tags.length > 0).length
     });
     return uniqueTags;
   }, [items]);
