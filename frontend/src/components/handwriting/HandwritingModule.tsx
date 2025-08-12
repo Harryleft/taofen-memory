@@ -85,9 +85,10 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
   useEffect(() => {
     // 暂时禁用IntersectionObserver，因为所有卡片初始时就应该显示
     // 如果需要实现真正的懒加载（分页加载），可以重新启用这个逻辑
+    const currentObserver = observerRef.current;
     return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
+      if (currentObserver) {
+        currentObserver.disconnect();
       }
     };
   }, []);
