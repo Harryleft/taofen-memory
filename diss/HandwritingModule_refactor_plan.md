@@ -105,23 +105,23 @@ const HandwritingMasonryGrid: React.FC<MasonryGridProps> = ({ items, columns, lo
 }
 ```
 
-### 4. EmptyState 组件
+### 4. HandwritingEmptyState 组件
 **职责**: 空状态显示
-**文件路径**: `src/components/handwriting/EmptyState.tsx`
+**文件路径**: `src/components/handwriting/HandwritingEmptyState.tsx`
 
 ```typescript
 interface EmptyStateProps {
   message?: string;
 }
 
-const EmptyState: React.FC<EmptyStateProps> = ({ message }) => {
+const HandwritingEmptyState: React.FC<EmptyStateProps> = ({ message }) => {
   // 空状态UI
 }
 ```
 
-### 5. ErrorState 组件
+### 5. HandwritingErrorState 组件
 **职责**: 错误状态显示
-**文件路径**: `src/components/handwriting/ErrorState.tsx`
+**文件路径**: `src/components/handwriting/HandwritingErrorState.tsx`
 
 ```typescript
 interface ErrorStateProps {
@@ -129,7 +129,7 @@ interface ErrorStateProps {
   onRetry: () => void;
 }
 
-const ErrorState: React.FC<ErrorStateProps> = ({ error, onRetry }) => {
+const HandwritingErrorState: React.FC<ErrorStateProps> = ({ error, onRetry }) => {
   // 错误状态UI
   // 重试按钮
 }
@@ -324,8 +324,8 @@ const useHandwritingPreloader = (items: TransformedHandwritingItem[], currentPag
    - 可见项目计数
 
 4. **创建状态组件**
-   - EmptyState
-   - ErrorState
+   - HandwritingEmptyState
+   - HandwritingErrorState
    - HandwritingLoadingIndicator
    - HandwritingPaginationTrigger
 

@@ -5,7 +5,7 @@ interface ErrorStateProps {
   onRetry: () => void;
 }
 
-const ErrorState = memo(({ error, onRetry }: ErrorStateProps) => (
+const HandwritingErrorState = memo(({ error, onRetry }: ErrorStateProps) => (
   <div className="text-center py-12">
     <div className="text-6xl mb-4">❌</div>
     <h3 className="text-xl font-bold text-charcoal mb-2">加载失败</h3>
@@ -19,6 +19,6 @@ const ErrorState = memo(({ error, onRetry }: ErrorStateProps) => (
   </div>
 ));
 
-ErrorState.displayName = 'ErrorState';
+HandwritingErrorState.displayName = 'HandwritingErrorState';
 
-export default ErrorState;
+export default HandwritingErrorState;
