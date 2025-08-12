@@ -9,7 +9,7 @@ interface UseHandwritingSearchReturn {
 export const useHandwritingSearch = (debounceMs: number = 300): UseHandwritingSearchReturn => {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<number | null>(null);
   
   // 更新搜索词
   const updateSearchTerm = useCallback((term: string) => {
