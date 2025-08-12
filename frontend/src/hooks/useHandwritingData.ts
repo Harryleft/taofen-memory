@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { HandwritingCacheManager, createHandwritingCacheManager } from '@/lib/cache/RedisCacheManager';
 
 // 真实数据接口定义
 export interface HandwritingItem {
@@ -113,14 +114,75 @@ const transformHandwritingData = (data: HandwritingItem[]): TransformedHandwriti
   });
 };
 
-// 数据获取Hook
+// 带缓存的数据获取Hook
 export const useHandwritingData = () => {
   const [handwritingItems, setHandwritingItems] = useState<TransformedHandwritingItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [cacheManager, setCacheManager] = useState<HandwritingCacheManager | null>(null);
 
-  // 数据加载函数
+  // 初始化缓存管理器
+  useEffect(() => {
+    try {
+      const manager = createHandwritingCacheManager();
+      setCacheManager(manager);
+      
+      return () => {
+        // 清理资源
+        manager.close();
+      };
+    } catch (err) {
+      console.warn('Failed to initialize cache manager:', err);
+      // 缓存管理器初始化失败时继续使用无缓存模式
+    }
+  }, []);
+
+  // 数据加载函数（带缓存）
   const loadData = useCallback(async () => {
+    if (!cacheManager) {
+      // 如果缓存管理器未初始化，使用原始逻辑
+      return loadDataWithoutCache();
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      // 尝试从缓存获取转换后的数据
+      const cachedData = await cacheManager.getTransformedData();
+      if (cachedData) {
+        console.log('✅ Cache hit: Loaded transformed data from cache');
+        setHandwritingItems(cachedData);
+        setLoading(false);
+        return;
+      }
+
+      console.log('❌ Cache miss: Fetching data from API');
+      
+      // 从API获取原始数据
+      const rawData = await fetchHandwritingData();
+      
+      // 缓存原始数据
+      await cacheManager.setRawData(rawData);
+      
+      // 转换数据
+      const transformedData = transformHandwritingData(rawData);
+      
+      // 缓存转换后的数据
+      await cacheManager.setTransformedData(transformedData);
+      
+      setHandwritingItems(transformedData);
+    } catch (err) {
+      // 缓存失败时回退到无缓存模式
+      console.warn('Cache loading failed, falling back to direct API call:', err);
+      await loadDataWithoutCache();
+    } finally {
+      setLoading(false);
+    }
+  }, [cacheManager]);
+
+  // 无缓存的数据加载函数（作为回退方案）
+  const loadDataWithoutCache = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -135,10 +197,25 @@ export const useHandwritingData = () => {
     }
   }, []);
 
-  // 重新加载数据
-  const refetch = useCallback(() => {
-    loadData();
-  }, [loadData]);
+  // 带缓存清理的重新加载
+  const refetch = useCallback(async () => {
+    if (cacheManager) {
+      // 清理相关缓存
+      await cacheManager.clearDataCache();
+      console.log('🗑️ Cache cleared for data refresh');
+    }
+    await loadData();
+  }, [loadData, cacheManager]);
+
+  // 强制刷新（忽略缓存）
+  const forceRefresh = useCallback(async () => {
+    if (cacheManager) {
+      // 清理所有手稿相关缓存
+      await cacheManager.clearHandwritingCache();
+      console.log('🔄 Force refresh: All cache cleared');
+    }
+    await loadData();
+  }, [loadData, cacheManager]);
 
   // 组件挂载时自动加载数据
   useEffect(() => {
@@ -149,7 +226,9 @@ export const useHandwritingData = () => {
     handwritingItems,
     loading,
     error,
-    refetch
+    refetch,
+    forceRefresh, // 新增：强制刷新方法
+    cacheStats: cacheManager?.getStats() // 新增：缓存统计信息
   };
 };
 
