@@ -22,8 +22,8 @@ const FilterControls = memo(({
   searchTerm,
   filters,
   uniqueYears,
-  uniqueSources,
-  uniqueTags,
+  // uniqueSources,
+  // uniqueTags,
   onSearchChange,
   onFilterChange
 }: FilterControlsProps) => {
@@ -66,28 +66,9 @@ const FilterControls = memo(({
             <option key={year} value={year.toString()}>{year}年</option>
           ))}
         </select>
+
         
-        <select
-          value={filters.selectedSource}
-          onChange={(e) => onFilterChange('selectedSource', e.target.value)}
-          className="px-4 py-2 bg-white border border-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50"
-        >
-          <option value="all">全部来源</option>
-          {uniqueSources.map(source => (
-            <option key={source} value={source}>{source}</option>
-          ))}
-        </select>
-        
-        <select
-          value={filters.selectedTag}
-          onChange={(e) => onFilterChange('selectedTag', e.target.value)}
-          className="px-4 py-2 bg-white border border-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/50"
-        >
-          <option value="all">全部时间</option>
-          {uniqueTags.map(tag => (
-            <option key={tag} value={tag}>{tag}</option>
-          ))}
-        </select>
+
         
         <select
           value={filters.sortOrder}
