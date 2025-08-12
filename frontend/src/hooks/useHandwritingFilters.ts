@@ -37,7 +37,7 @@ export const useHandwritingFilters = (
       const matchesCategory = filters.selectedCategory === 'all' || item.category === filters.selectedCategory;
       const matchesYear = filters.selectedYear === 'all' || item.year.toString() === filters.selectedYear;
       const matchesSource = filters.selectedSource === 'all' || item.originalData.数据来源 === filters.selectedSource;
-      const matchesTag = filters.selectedTag === 'all' || item.originalData.标签 === filters.selectedTag;
+      const matchesTag = filters.selectedTag === 'all' || item.tags.includes(filters.selectedTag);
       
       return matchesCategory && matchesYear && matchesSource && matchesTag;
     });
@@ -75,7 +75,8 @@ export const useHandwritingFilters = (
   
   // 获取唯一的标签列表 - 使用useMemo优化
   const uniqueTags = useMemo(() => {
-    return [...new Set(items.map(item => item.originalData.标签).filter(Boolean))].sort();
+    const allTags = items.flatMap(item => item.tags).filter(tag => tag && !tag.includes('年'));
+    return [...new Set(allTags)].sort();
   }, [items]);
 
   return {
