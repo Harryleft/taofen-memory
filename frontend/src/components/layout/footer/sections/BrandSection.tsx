@@ -24,22 +24,12 @@ const FooterLogo = () => {
 
 // 品牌区域组件
 const BrandSection: React.FC<{ config: FooterConfig['brand'] }> = ({ config }) => {
-  const currentYear = new Date().getFullYear();
-  
   return (
-    <FooterSection title={config.name}>
-      <div className="brand-content">
-        <FooterLogo />
-        
-        <p className="brand-description text-gray-300 mb-4 leading-relaxed">
-          {config.description}
-        </p>
-        
-        <div className="brand-copyright text-sm text-gray-400 border-t border-gray-700 pt-4">
-          <p>{config.copyright.replace('2024', currentYear.toString())}</p>
-        </div>
+    <div className="brand-content text-center">
+      <div className="brand-copyright text-sm text-gray-400">
+        <p>{config.copyright}</p>
       </div>
-    </FooterSection>
+    </div>
   );
 };
 

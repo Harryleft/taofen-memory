@@ -7,42 +7,42 @@ import ContactSection from './sections/ContactSection';
 import LegalSection from './sections/LegalSection';
 
 // 默认社交媒体图标
-const defaultSocialLinks = [
-  {
-    platform: '微信',
-    url: '#',
-    icon: <span className="text-lg">💬</span>,
-    ariaLabel: '关注我们微信公众号'
-  },
-  {
-    platform: '微博',
-    url: '#',
-    icon: <span className="text-lg">📱</span>,
-    ariaLabel: '关注我们微博'
-  },
-  {
-    platform: '邮箱',
-    url: 'mailto:info@taofen.org',
-    icon: <FaEnvelope className="text-sm" />,
-    ariaLabel: '发送邮件联系我们'
-  }
-];
+// const defaultSocialLinks = [
+//   {
+//     platform: '微信',
+//     url: '#',
+//     icon: <span className="text-lg">💬</span>,
+//     ariaLabel: '关注我们微信公众号'
+//   },
+//   {
+//     platform: '微博',
+//     url: '#',
+//     icon: <span className="text-lg">📱</span>,
+//     ariaLabel: '关注我们微博'
+//   },
+//   {
+//     platform: '邮箱',
+//     url: 'mailto:info@taofen.org',
+//     icon: <FaEnvelope className="text-sm" />,
+//     ariaLabel: '发送邮件联系我们'
+//   }
+// ];
 
 // 默认联系信息图标
-const getContactIcon = (label: string) => {
-  switch (label) {
-    case '地址':
-      return <FaMapMarkerAlt />;
-    case '电话':
-      return <FaPhone />;
-    case '邮箱':
-      return <FaEnvelope />;
-    case '开放时间':
-      return <FaClock />;
-    default:
-      return null;
-  }
-};
+// const getContactIcon = (label: string) => {
+//   switch (label) {
+//     case '地址':
+//       return <FaMapMarkerAlt />;
+//     case '电话':
+//       return <FaPhone />;
+//     case '邮箱':
+//       return <FaEnvelope />;
+//     case '开放时间':
+//       return <FaClock />;
+//     default:
+//       return null;
+//   }
+// };
 
 // 回到顶部按钮组件
 const BackToTopButton: React.FC = () => {
@@ -58,24 +58,24 @@ const BackToTopButton: React.FC = () => {
     return () => window.removeEventListener('scroll', toggleVisibility);
   }, []);
 
-  const scrollToTop = useCallback(() => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  }, []);
+  // const scrollToTop = useCallback(() => {
+  //   window.scrollTo({
+  //     top: 0,
+  //     behavior: 'smooth'
+  //   });
+  // }, []);
 
   if (!isVisible) return null;
 
-  return (
-    <button
-      onClick={scrollToTop}
-      className="back-to-top fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-amber-500 hover:bg-amber-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
-      aria-label="回到顶部"
-    >
-      <FaArrowUp className="group-hover:scale-110 transition-transform duration-200" />
-    </button>
-  );
+  // return (
+  //   <button
+  //     onClick={scrollToTop}
+  //     className="back-to-top fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-amber-500 hover:bg-amber-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
+  //     aria-label="回到顶部"
+  //   >
+  //     <FaArrowUp className="group-hover:scale-110 transition-transform duration-200" />
+  //   </button>
+  // );
 };
 
 const BaseFooter: React.FC<FooterProps> = ({ config, className = '' }) => {
@@ -108,14 +108,14 @@ const BaseFooter: React.FC<FooterProps> = ({ config, className = '' }) => {
   const textColorClass = textColorClasses[style?.textColor || 'light'];
 
   // 处理联系信息，添加图标
-  const processedContact = contact ? {
-    ...contact,
-    items: contact.items.map(item => ({
-      ...item,
-      icon: getContactIcon(item.label)
-    })),
-    socialLinks: contact.socialLinks || defaultSocialLinks
-  } : undefined;
+  // const processedContact = contact ? {
+  //   ...contact,
+  //   items: contact.items.map(item => ({
+  //     ...item,
+  //     icon: getContactIcon(item.label)
+  //   })),
+  //   socialLinks: contact.socialLinks || defaultSocialLinks
+  // } : undefined;
 
   // 过滤并排序显示的区域
   const visibleSections = sections
@@ -132,13 +132,13 @@ const BaseFooter: React.FC<FooterProps> = ({ config, className = '' }) => {
           quickLinks={navigation?.quickLinks}
           siteMap={navigation?.siteMap}
         />;
-      case 'contact':
-        return processedContact ? (
-          <ContactSection 
-            items={processedContact.items}
-            socialLinks={processedContact.socialLinks}
-          />
-        ) : null;
+      // case 'contact':
+        // return processedContact ? (
+        //   <ContactSection
+        //     items={processedContact.items}
+        //     socialLinks={processedContact.socialLinks}
+        //   />
+        // ) : null;
       case 'legal':
         return legal ? (
           <LegalSection 
@@ -171,32 +171,24 @@ const BaseFooter: React.FC<FooterProps> = ({ config, className = '' }) => {
         <div className="footer-container">
           {/* 主要内容区域 */}
           <div className="footer-main-content">
-            <div className="footer-content-wrapper">
-              {/* 网格布局 */}
-              <div className="footer-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                {visibleSections.map(section => {
-                  const component = getSectionComponent(section.id);
-                  return component ? (
-                    <div key={section.id} className="footer-column">
-                      {component}
-                    </div>
-                  ) : null;
-                })}
-              </div>
+            <div className="footer-content-wrapper text-center py-8">
+              {visibleSections.map(section => {
+                const component = getSectionComponent(section.id);
+                return component ? (
+                  <div key={section.id} className="footer-section mb-6">
+                    {component}
+                  </div>
+                ) : null;
+              })}
             </div>
           </div>
 
           {/* 底部栏 */}
-          <div className="footer-bottom-bar border-t border-gray-700 mt-12 pt-8">
-            <div className="footer-bottom-content flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="footer-bottom-bar border-t border-gray-700 mt-8 pt-6">
+            <div className="footer-bottom-content text-center">
               {/* 版权信息 */}
               <div className="footer-copyright text-sm text-gray-400">
                 {brand.copyright}
-              </div>
-
-              {/* 技术信息 */}
-              <div className="footer-tech-info text-sm text-gray-400">
-                <span>Powered by React & TypeScript</span>
               </div>
             </div>
           </div>
