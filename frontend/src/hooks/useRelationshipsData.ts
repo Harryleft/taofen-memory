@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Person } from '../types/Person';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 // 韬奋先生的ID，用于从关系数据中过滤掉他本人
 const TAOFEN_ID = 499;
 

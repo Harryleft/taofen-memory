@@ -5,9 +5,7 @@ import { fetchHeroImages, type MasonryItem as BaseMasonryItem } from '@/services
 type MasonryItem = BaseMasonryItem & { calculatedHeight?: number };
 type AspectCategory = 'portrait' | 'square' | 'landscape';
 
-interface HeroBackgroundProps {
-  scrollY?: number; // 保持向后兼容，但不再使用
-}
+// HeroBackgroundProps 接口已移除，因为不再需要 scrollY 参数
 
 interface LayoutConfig {
   width: number;
@@ -277,7 +275,7 @@ class MasonryLayouter {
 }
 
 // =============== 主组件 ===============
-export default function HeroPageBackdrop(_props: HeroBackgroundProps) {
+export default function HeroPageBackdrop() {
   // State - 静态布局配置，在组件挂载时计算一次
   const [layoutConfig, setLayoutConfig] = useState<LayoutConfig | null>(null);
   const [remoteItems, setRemoteItems] = useState<BaseMasonryItem[]>([]);

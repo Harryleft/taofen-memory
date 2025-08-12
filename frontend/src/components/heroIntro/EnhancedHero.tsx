@@ -148,7 +148,6 @@ const TITLE_STYLES = {
 } as const;
 
 // ====== 工具函数 ======
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const createGradientClasses = (gradient: string, opacity?: string) =>
   `bg-gradient-to-r ${gradient}${opacity ? `/${opacity}` : ''}`;
 
