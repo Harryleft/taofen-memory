@@ -137,6 +137,22 @@ export const useHandwritingData = () => {
     }
   }, []);
 
+  // 无缓存的数据加载函数（作为回退方案）
+  const loadDataWithoutCache = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const rawData = await fetchHandwritingData();
+      const transformedData = transformHandwritingData(rawData);
+      setHandwritingItems(transformedData);
+    } catch (err) {
+      setError('加载手迹数据失败，请刷新页面重试');
+      console.error('Failed to load handwriting data:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   // 数据加载函数（带缓存）
   const loadData = useCallback(async () => {
     if (!cacheManager) {
@@ -180,22 +196,6 @@ export const useHandwritingData = () => {
       setLoading(false);
     }
   }, [cacheManager, loadDataWithoutCache]);
-
-  // 无缓存的数据加载函数（作为回退方案）
-  const loadDataWithoutCache = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const rawData = await fetchHandwritingData();
-      const transformedData = transformHandwritingData(rawData);
-      setHandwritingItems(transformedData);
-    } catch (err) {
-      setError('加载手迹数据失败，请刷新页面重试');
-      console.error('Failed to load handwriting data:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
 
   // 带缓存清理的重新加载
   const refetch = useCallback(async () => {

@@ -1,4 +1,18 @@
-import { createHash } from 'crypto';
+// 浏览器环境中的简单哈希函数
+const createHash = () => ({
+  update: (str: string) => ({
+    digest: () => {
+      // 简单的哈希函数
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32-bit integer
+      }
+      return Math.abs(hash).toString(16);
+    }
+  })
+});
 
 // 缓存策略接口
 interface CacheStrategy {
@@ -109,7 +123,7 @@ export class CacheKeyGenerator {
   
   // 字符串哈希
   private static hashString(str: string): string {
-    return createHash('md5').update(str).digest('hex').substring(0, 8);
+    return createHash().update(str).digest().substring(0, 8);
   }
 }
 
@@ -191,7 +205,7 @@ export class MemoryCacheManager {
   }
   
   // 获取缓存数据
-  async get<T>(key: string, strategy: CacheStrategy = CACHE_STRATEGIES.RAW_DATA): Promise<T | null> {
+  async get<T>(key: string): Promise<T | null> {
     const startTime = Date.now();
     this.stats.totalRequests++;
     
@@ -357,6 +371,11 @@ export class HandwritingCacheManager extends MemoryCacheManager {
   async clearHandwritingCache(): Promise<void> {
     await this.deleteByPattern('handwriting:*');
   }
+
+  // 检查Redis连接状态（前端专用，总是返回false）
+  async isRedisConnected(): Promise<boolean> {
+    return false;
+  }
   
   // 清理数据相关缓存（数据更新时调用）
   async clearDataCache(): Promise<void> {
@@ -364,6 +383,11 @@ export class HandwritingCacheManager extends MemoryCacheManager {
     await this.deleteByPattern('handwriting:filtered:*');
     await this.deleteByPattern('handwriting:search:*');
     await this.deleteByPattern('handwriting:metadata:*');
+  }
+  
+  // 关闭缓存管理器（前端专用，空实现）
+  close(): void {
+    // 前端内存缓存无需特殊清理
   }
 }
 
