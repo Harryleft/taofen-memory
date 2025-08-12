@@ -3,6 +3,7 @@ import { useTimelineData } from '@/hooks/useTimelineData';
 import TimelineCoreEventSection from '@/components/timeline/TimelineCoreEventSection.tsx';
 import TimelineProgressBar from '@/components/timeline/TimelineProgressBar.tsx';
 import AppHeader from '@/components/layout/header/AppHeader.tsx';
+import { AppFooter } from '@/components/layout/footer';
 import '@/styles/timeline.css';
 
 type TimelineEvent = {
@@ -124,7 +125,7 @@ export default function TimelinePage() {
   return (
     <>
       <TimelineProgressBar />
-      <div className="min-h-screen bg-cream">
+      <div className="min-h-screen bg-cream flex flex-col">
         <AppHeader moduleId="timeline" />
         <div className="max-w-6xl mx-auto px-6 py-20">
           {/* 顶部统计（Phase 3，可选显示） */}
@@ -231,6 +232,9 @@ export default function TimelinePage() {
           </button>
         </div>
       </div>
+      
+      {/* Footer */}
+      <AppFooter moduleId="timeline" />
     </>
   );
 }

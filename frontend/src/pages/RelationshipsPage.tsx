@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import RelationshipPageMasonry from '../components/relationships/RelationshipPageMasonry.tsx';
 import RelationshipPagePersonModal from '../components/relationships/RelationshipPagePersonModal.tsx';
 import AppHeader from '../components/layout/header/AppHeader.tsx';
+import { AppFooter } from '../components/layout/footer';
 import { Person } from '../types/Person';
 import { useRelationshipsData } from '../hooks/useRelationshipsData';
 import {
@@ -75,7 +76,7 @@ export default function RelationshipsPage() {
   }
 
   return (
-    <div className="relationships-page-container">
+    <div className="relationships-page-container flex flex-col min-h-screen">
       <AppHeader moduleId="relationships" />
 
       {/* Category Filter */}
@@ -137,6 +138,9 @@ export default function RelationshipsPage() {
         isOpen={!!selectedPerson}
         onClose={() => setSelectedPerson(null)}
       />
+      
+      {/* Footer */}
+      <AppFooter moduleId="relationships" />
     </div>
   );
 }

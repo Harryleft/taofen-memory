@@ -41,7 +41,9 @@
       "mcp__browser-tools-mcp__getConsoleErrors",
       "mcp__browser-tools-mcp__getNetworkLogs",
       "mcp__browsermcp__browser_snapshot",
-      "mcp__browsermcp__browser_navigate"
+      "mcp__browsermcp__browser_navigate",
+      "mcp__filesystem__create_directory",
+      "Bash(npm install:*)"
     ],
     "deny": []
   },
