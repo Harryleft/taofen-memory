@@ -1,57 +1,7 @@
 import { useMemo, memo } from 'react';
 import { X, ChevronLeft, ChevronRight, Download } from 'lucide-react';
-import { categoryLabels, categoryColors } from '@/utils/handwritingUtils.ts';
-
-// 转换后的数据接口
-interface TransformedHandwritingItem {
-  id: string;
-  title: string;
-  year: number;
-  date: string;
-  category: 'letter' | 'manuscript' | 'note' | 'article';
-  description: string;
-  image: string;
-  highResImage: string;
-  tags: string[];
-  dimensions: {
-    width: number;
-    height: number;
-  };
-  originalData: {
-    时间: string;
-    原文: string;
-    注释: string;
-    数据来源: string;
-    图片位置: Array<{
-      remote_url: string;
-      local_path: string;
-    }>;
-  };
-}
-
-// 工具函数：高亮搜索文本
-const highlightSearchText = (text: string, searchTerm: string): JSX.Element => {
-  if (!searchTerm) return <>{text}</>;
-  
-  const regex = new RegExp(`(${searchTerm})`, 'gi');
-  const parts = text.split(regex);
-  
-  return (
-    <>
-      {parts.map((part, index) => 
-        regex.test(part) ? (
-          <span key={`${index}-${part}`} className="bg-yellow-200 text-charcoal font-bold">
-            {part}
-          </span>
-        ) : (
-          <span key={`${index}-${part}`}>{part}</span>
-        )
-      )}
-    </>
-  );
-};
-
-// 分类标签和颜色从工具函数导入
+import { categoryLabels, categoryColors, highlightSearchText } from '@/utils/handwritingUtils.ts';
+import type { TransformedHandwritingItem } from '@/hooks/useHandwritingData.ts';
 
 interface LightboxProps {
   selectedItem: TransformedHandwritingItem;
@@ -193,4 +143,3 @@ const Lightbox = memo(({
 Lightbox.displayName = 'Lightbox';
 
 export default Lightbox;
-export type { TransformedHandwritingItem };
