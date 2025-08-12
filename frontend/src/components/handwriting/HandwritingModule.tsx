@@ -25,16 +25,7 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
   // 使用数据获取Hook
   const { handwritingItems, loading, error, refetch } = useHandwritingData();
   
-  // Debug: 监控数据加载状态
-  useEffect(() => {
-    console.log('🔍 [HandwritingModule] Debug Info:');
-    console.log('- loading:', loading);
-    console.log('- error:', error);
-    console.log('- handwritingItems length:', handwritingItems.length);
-    console.log('- handwritingItems:', handwritingItems);
-  }, [loading, error, handwritingItems]);
-  
-  // 过滤器状态
+  // 状态定义 - 集中管理
   const [filters, setFilters] = useState({
     searchTerm: '',
     selectedCategory: 'all',
@@ -44,17 +35,14 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
     sortOrder: 'year_desc'
   });
   
-  // 搜索防抖和缓存
-  const [searchCache, setSearchCache] = useState<Map<string, TransformedHandwritingItem[]>>(new Map());
+  // searchCache 已移除，搜索功能通过 useHandwritingFilters Hook 处理
   const debouncedSearchRef = useRef<NodeJS.Timeout | null>(null);
   
-  // 布局状态
   const [layout, setLayout] = useState({
     columns: 4,
     visibleItems: new Set<string>()
   });
   
-  // 分页状态
   const [pagination, setPagination] = useState({
     currentPage: 1,
     itemsPerPage: 20,
@@ -62,7 +50,6 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
     isLoading: false
   });
   
-  // Lightbox状态
   const [lightbox, setLightbox] = useState({
     selectedItem: null as TransformedHandwritingItem | null,
     currentIndex: 0
@@ -72,6 +59,57 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
   const observerRef = useRef<IntersectionObserver | null>(null);
   const masonryRef = useRef<HTMLDivElement>(null);
   
+  // 搜索功能已通过 useHandwritingFilters Hook 处理
+  
+  // 过滤器变化时重置分页
+  const resetPagination = useCallback(() => {
+    setPagination(prev => ({
+      ...prev,
+      currentPage: 1,
+      hasMore: true
+    }));
+  }, []);
+  
+  // 加载更多函数 - 移到前面解决初始化问题
+  const loadMore = useCallback(() => {
+    if (pagination.hasMore && !pagination.isLoading) {
+      setPagination(prev => ({
+        ...prev,
+        isLoading: true,
+        currentPage: prev.currentPage + 1
+      }));
+      
+      // 模拟加载延迟
+      setTimeout(() => {
+        setPagination(prev => ({
+          ...prev,
+          isLoading: false
+        }));
+      }, 300);
+    }
+  }, [pagination.hasMore, pagination.isLoading]);
+  
+  // 更新过滤器状态 - 带防抖处理
+  const updateFilters = useCallback((key: string, value: string) => {
+    // 清除之前的防抖定时器
+    if (debouncedSearchRef.current) {
+      clearTimeout(debouncedSearchRef.current);
+    }
+    
+    // 如果是搜索词，使用防抖
+    if (key === 'searchTerm') {
+      debouncedSearchRef.current = setTimeout(() => {
+        setFilters(prev => ({ ...prev, [key]: value }));
+      }, 300);
+    } else {
+      // 其他过滤器立即更新
+      setFilters(prev => ({ ...prev, [key]: value }));
+    }
+  }, []);
+  
+  // 使用过滤Hook
+  const { filteredItems, uniqueYears, uniqueSources, uniqueTags } = useHandwritingFilters(handwritingItems, filters);
+  
   // 清理防抖定时器
   useEffect(() => {
     return () => {
@@ -80,6 +118,36 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
       }
     };
   }, []);
+
+  // 过滤器变化时重置分页
+  useEffect(() => {
+    resetPagination();
+  }, [filters, resetPagination]);
+
+  // Debug: 监控数据加载状态
+  useEffect(() => {
+    console.log('🔍 [HandwritingModule] Debug Info:');
+    console.log('- loading:', loading);
+    console.log('- error:', error);
+    console.log('- handwritingItems length:', handwritingItems.length);
+    console.log('- handwritingItems:', handwritingItems);
+  }, [loading, error, handwritingItems]);
+  
+  // Debug: 监控过滤结果
+  useEffect(() => {
+    console.log('🔍 [HandwritingModule] Filter Debug Info:');
+    console.log('- filteredItems length:', filteredItems.length);
+    console.log('- uniqueYears:', uniqueYears);
+    console.log('- uniqueSources:', uniqueSources);
+    console.log('- uniqueTags:', uniqueTags);
+    console.log('- uniqueTags length:', uniqueTags.length);
+    console.log('- current filters:', filters);
+    console.log('- contains real tags:', {
+      '题词': uniqueTags.includes('题词'),
+      '文稿': uniqueTags.includes('文稿'),
+      '书简': uniqueTags.includes('书简')
+    });
+  }, [filteredItems, uniqueYears, uniqueSources, uniqueTags, filters]);
 
   // Responsive columns - 使用防抖优化
   useEffect(() => {
@@ -104,7 +172,7 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
     };
   }, []);
 
-  // Intersection Observer for infinite scroll
+  // Intersection Observer for infinite scroll - 修复依赖问题
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -130,59 +198,7 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
     };
   }, [pagination.hasMore, pagination.isLoading, loadMore]);
 
-  // 优化的搜索处理函数
-  const optimizedSearch = useCallback((searchTerm: string, items: TransformedHandwritingItem[]): TransformedHandwritingItem[] => {
-    if (!searchTerm.trim()) return items;
-    
-    const cacheKey = searchTerm.toLowerCase();
-    
-    // 检查缓存
-    if (searchCache.has(cacheKey)) {
-      return searchCache.get(cacheKey)!;
-    }
-    
-    // 执行搜索
-    const searchResults = items.filter(item => {
-      const searchLower = searchTerm.toLowerCase();
-      return (
-        item.title.toLowerCase().includes(searchLower) ||
-        item.description.toLowerCase().includes(searchLower) ||
-        item.originalData.原文?.toLowerCase().includes(searchLower) ||
-        item.originalData.注释?.toLowerCase().includes(searchLower) ||
-        item.tags.some(tag => tag.toLowerCase().includes(searchLower))
-      );
-    });
-    
-    // 更新缓存
-    setSearchCache(prev => {
-      const newCache = new Map(prev);
-      newCache.set(cacheKey, searchResults);
-      return newCache;
-    });
-    
-    return searchResults;
-  }, [searchCache]);
-
-  // 使用过滤Hook
-  const { filteredItems, uniqueYears, uniqueSources, uniqueTags } = useHandwritingFilters(handwritingItems, filters);
-  
-  // Debug: 监控过滤结果
-  useEffect(() => {
-    console.log('🔍 [HandwritingModule] Filter Debug Info:');
-    console.log('- filteredItems length:', filteredItems.length);
-    console.log('- uniqueYears:', uniqueYears);
-    console.log('- uniqueSources:', uniqueSources);
-    console.log('- uniqueTags:', uniqueTags);
-    console.log('- uniqueTags length:', uniqueTags.length);
-    console.log('- current filters:', filters);
-    console.log('- contains real tags:', {
-      '题词': uniqueTags.includes('题词'),
-      '文稿': uniqueTags.includes('文稿'),
-      '书简': uniqueTags.includes('书简')
-    });
-  }, [filteredItems, uniqueYears, uniqueSources, uniqueTags, filters]);
-
-  // 分页逻辑
+  // 分页逻辑 - 优化状态更新
   useEffect(() => {
     console.log('🔍 [HandwritingModule] Pagination Debug Info:');
     console.log('- filteredItems length:', filteredItems.length);
@@ -203,39 +219,13 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
     
     // 更新是否有更多数据
     const hasMore = endIndex < filteredItems.length;
-    setPagination(prev => ({
-      ...prev,
-      hasMore
-    }));
-  }, [filteredItems, pagination.currentPage, pagination.itemsPerPage]);
-  
-  // 过滤器变化时重置分页
-  useEffect(() => {
-    setPagination(prev => ({
-      ...prev,
-      currentPage: 1,
-      hasMore: true
-    }));
-  }, [filters]);
-  
-  // 加载更多
-  const loadMore = useCallback(() => {
-    if (pagination.hasMore && !pagination.isLoading) {
+    if (hasMore !== pagination.hasMore) {
       setPagination(prev => ({
         ...prev,
-        isLoading: true,
-        currentPage: prev.currentPage + 1
+        hasMore
       }));
-      
-      // 模拟加载延迟
-      setTimeout(() => {
-        setPagination(prev => ({
-          ...prev,
-          isLoading: false
-        }));
-      }, 300);
     }
-  }, [pagination.hasMore, pagination.isLoading]);
+  }, [filteredItems, pagination.currentPage, pagination.itemsPerPage, pagination.hasMore]);
 
   // 图片预加载策略
   useEffect(() => {
@@ -322,24 +312,7 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
   //   items.forEach(item => observerRef.current?.observe(item));
   // }, [filteredItems]);
 
-    
-  // 更新过滤器状态 - 带防抖处理
-  const updateFilters = useCallback((key: string, value: string) => {
-    // 清除之前的防抖定时器
-    if (debouncedSearchRef.current) {
-      clearTimeout(debouncedSearchRef.current);
-    }
-    
-    // 如果是搜索词，使用防抖
-    if (key === 'searchTerm') {
-      debouncedSearchRef.current = setTimeout(() => {
-        setFilters(prev => ({ ...prev, [key]: value }));
-      }, 300);
-    } else {
-      // 其他过滤器立即更新
-      setFilters(prev => ({ ...prev, [key]: value }));
-    }
-  }, []);
+  // updateFilters 已在文件顶部定义
   
     
   // 渲染过滤器控件 - 使用useMemo优化
@@ -421,7 +394,7 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
       </div>
     </div>
     );
-  }, [filters, uniqueYears, uniqueSources, uniqueTags, updateFilters, categoryLabels]);
+  }, [filters, uniqueYears, uniqueSources, uniqueTags, updateFilters]);
   
   // 渲染结果头部 - 使用useMemo优化
   const renderResultsHeader = useMemo(() => () => (
