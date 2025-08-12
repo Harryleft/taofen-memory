@@ -201,12 +201,12 @@ const AppFooter: React.FC<AppFooterProps> = ({
     brand: {
       name: '韬奋纪念馆',
       description: '',
-      copyright: '© 2025 韬奋纪念馆. 保留所有权利.',
+      copyright: '© 2025 不知道起什么名字团队. 保留所有权利.',
     },
     
     navigation: {
       quickLinks: [
-        { label: '韬奋纪念馆', to: 'https://www.shmog.org/', external: true },
+        { label: '韬奋纪念馆', to: 'https://www.zoutaofen.com/', external: true },
       ],
     },
     
@@ -239,5 +239,4 @@ const AppFooter: React.FC<AppFooterProps> = ({
 // ================ 导出 ================
 
 export { AppFooter };
-export type { FooterConfig, FooterProps, LegalInfo, FooterSection };
 export default Footer;
