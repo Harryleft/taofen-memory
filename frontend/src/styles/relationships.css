@@ -370,6 +370,13 @@
   animation: cardEnter 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
+/* 确保动画完成后卡片保持可见状态 */
+.masonry-card-base.animate-in,
+.masonry-card-base.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
 /* 交错动画延迟 */
 .masonry-card-base:nth-child(1) { animation-delay: 0.1s; }
 .masonry-card-base:nth-child(2) { animation-delay: 0.2s; }
