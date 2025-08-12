@@ -1,9 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useHandwritingData } from '@/hooks/useHandwritingData.ts';
 
+interface TestResult {
+  id: string;
+  title: string;
+  originalTag: string;
+  transformedTags: string[];
+  hasRealTags: boolean;
+}
+
 const TestTagsPage = () => {
   const { handwritingItems, loading, error } = useHandwritingData();
-  const [testResults, setTestResults] = useState<any>(null);
+  const [testResults, setTestResults] = useState<TestResult[] | null>(null);
   
   useEffect(() => {
     if (handwritingItems.length > 0) {
@@ -31,7 +39,7 @@ const TestTagsPage = () => {
       
       {testResults && (
         <div className="space-y-4">
-          {testResults.map((result: any) => (
+          {testResults.map((result) => (
             <div key={result.id} className="p-4 border rounded">
               <h3 className="font-bold">{result.title}</h3>
               <p><strong>原始标签:</strong> {result.originalTag}</p>

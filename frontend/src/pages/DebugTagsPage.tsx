@@ -2,23 +2,38 @@ import React, { useEffect, useState } from 'react';
 import { useHandwritingData } from '@/hooks/useHandwritingData.ts';
 import { useHandwritingFilters } from '@/hooks/useHandwritingFilters.ts';
 
+interface DebugInfo {
+  totalItems: number;
+  rawTags: {
+    all: string[];
+    unique: string[];
+    count: number;
+  };
+  transformedTags: {
+    all: string[];
+    unique: string[];
+    count: number;
+  };
+  filterTags: string[];
+}
+
 const DebugTagsPage = () => {
   const { handwritingItems, loading, error } = useHandwritingData();
-  const [debugInfo, setDebugInfo] = useState<any>(null);
+  const [debugInfo, setDebugInfo] = useState<DebugInfo | null>(null);
+  
+  // 在组件顶层调用Hook
+  const filters = {
+    searchTerm: '',
+    selectedCategory: 'all',
+    selectedYear: 'all',
+    selectedSource: 'all',
+    selectedTag: 'all',
+    sortOrder: 'year_desc'
+  };
+  const { uniqueTags } = useHandwritingFilters(handwritingItems, filters);
   
   useEffect(() => {
     if (handwritingItems.length > 0) {
-      const filters = {
-        searchTerm: '',
-        selectedCategory: 'all',
-        selectedYear: 'all',
-        selectedSource: 'all',
-        selectedTag: 'all',
-        sortOrder: 'year_desc'
-      };
-      
-      const { uniqueTags } = useHandwritingFilters(handwritingItems, filters);
-      
       // 分析原始数据中的标签
       const rawTags = handwritingItems.map(item => item.originalData.标签).filter(Boolean);
       const uniqueRawTags = [...new Set(rawTags)];
@@ -48,7 +63,7 @@ const DebugTagsPage = () => {
       console.log('🔍 [DebugTagsPage] Unique transformed tags:', uniqueTransformedTags);
       console.log('🔍 [DebugTagsPage] Filter tags:', uniqueTags);
     }
-  }, [handwritingItems]);
+  }, [handwritingItems, uniqueTags]);
   
   if (loading) return <div>加载中...</div>;
   if (error) return <div>错误: {error}</div>;
@@ -83,7 +98,7 @@ const DebugTagsPage = () => {
           
           <div>
             <h2 className="text-xl font-semibold mb-2">前10个条目的详细标签信息</h2>
-            {handwritingItems.slice(0, 10).map((item, index) => (
+            {handwritingItems.slice(0, 10).map((item) => (
               <div key={item.id} className="mb-2 p-2 border rounded">
                 <p><strong>ID:</strong> {item.id}</p>
                 <p><strong>名称:</strong> {item.title}</p>

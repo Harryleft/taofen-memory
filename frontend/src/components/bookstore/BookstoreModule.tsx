@@ -14,7 +14,7 @@
  */
 
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { BookItem, FilterOptions } from '../../types/bookTypes';
+import { BookItem } from '../../types/bookTypes';
 import { downloadCSV } from '../../utils/bookUtils';
 
 
@@ -50,7 +50,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   
   // 构建筛选条件对象
-  const filters: FilterOptions = { searchTerm, category: selectedCategory, year: selectedYear };
+  const filters = useMemo(() => ({ searchTerm, category: selectedCategory, year: selectedYear }), [searchTerm, selectedCategory, selectedYear]);
   
   // 数据管理：书籍数据获取、分页、筛选
   const {
@@ -103,7 +103,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
     }, SEARCH_DEBOUNCE_DELAY);
 
     return () => clearTimeout(debounceTimer);
-  }, [searchTerm, selectedCategory, selectedYear]); // 【优化】依赖项简化为只包含筛选条件
+  }, [filters, isInitialLoading, resetAndReload]); // 【优化】依赖项简化为只包含筛选条件
 
   
   // 【修复】这个新的 useEffect 只在“筛选/重置”加载完成后执行一次，而不会在“加载更多”时执行

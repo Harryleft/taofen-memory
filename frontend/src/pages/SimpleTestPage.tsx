@@ -2,22 +2,30 @@ import React, { useEffect, useState } from 'react';
 import { useHandwritingData } from '@/hooks/useHandwritingData.ts';
 import { useHandwritingFilters } from '@/hooks/useHandwritingFilters.ts';
 
+interface FilterResults {
+  totalItems: number;
+  uniqueTags: string[];
+  filteredItemsCount: number;
+  sampleTags: string[];
+}
+
 const SimpleTestPage = () => {
   const { handwritingItems, loading, error } = useHandwritingData();
-  const [filterResults, setFilterResults] = useState<any>(null);
+  const [filterResults, setFilterResults] = useState<FilterResults | null>(null);
+  
+  // 在组件顶层调用Hook
+  const filters = {
+    searchTerm: '',
+    selectedCategory: 'all',
+    selectedYear: 'all',
+    selectedSource: 'all',
+    selectedTag: 'all',
+    sortOrder: 'year_desc'
+  };
+  const { uniqueTags, filteredItems } = useHandwritingFilters(handwritingItems, filters);
   
   useEffect(() => {
     if (handwritingItems.length > 0) {
-      const filters = {
-        searchTerm: '',
-        selectedCategory: 'all',
-        selectedYear: 'all',
-        selectedSource: 'all',
-        selectedTag: 'all',
-        sortOrder: 'year_desc'
-      };
-      
-      const { uniqueTags, filteredItems } = useHandwritingFilters(handwritingItems, filters);
       
       setFilterResults({
         totalItems: handwritingItems.length,
@@ -32,7 +40,7 @@ const SimpleTestPage = () => {
         filteredItemsCount: filteredItems.length
       });
     }
-  }, [handwritingItems]);
+  }, [handwritingItems, uniqueTags, filteredItems]);
   
   if (loading) return <div>加载中...</div>;
   if (error) return <div>错误: {error}</div>;
