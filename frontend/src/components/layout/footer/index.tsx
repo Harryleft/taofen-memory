@@ -201,7 +201,7 @@ const AppFooter: React.FC<AppFooterProps> = ({
     brand: {
       name: '韬奋纪念馆',
       description: '',
-      copyright: '© 2025 不知道起什么名字团队. 保留所有权利.',
+      copyright: '© 2025 不知道起什么名字团队',
     },
     
     navigation: {
