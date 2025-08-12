@@ -104,7 +104,7 @@ export const useHandwritingFilters = (
   const computeMetadata = useCallback((
     type: 'years' | 'sources' | 'tags',
     items: TransformedHandwritingItem[]
-  ) => {
+  ): number[] | string[] => {
     switch (type) {
       case 'years':
         return [...new Set(items.map(item => item.year))].sort((a, b) => a - b);
@@ -126,7 +126,7 @@ export const useHandwritingFilters = (
   const getCachedMetadata = useCallback(async (
     type: 'years' | 'sources' | 'tags',
     items: TransformedHandwritingItem[]
-  ) => {
+  ): Promise<number[] | string[]> => {
     if (!cacheManager || !cacheEnabled) {
       // 如果缓存未启用，直接计算
       return computeMetadata(type, items);
@@ -136,7 +136,7 @@ export const useHandwritingFilters = (
 
     try {
       // 尝试从缓存获取
-      const cached = await cacheManager.get<TransformedHandwritingItem[]>(cacheKey);
+      const cached = await cacheManager.get<number[] | string[]>(cacheKey);
       if (cached) {
         console.log(`✅ Metadata cache hit: ${type}`);
         return cached;
@@ -169,15 +169,15 @@ export const useHandwritingFilters = (
 
   // 元数据 - 使用useMemo优化
   const uniqueYears = useMemo(() => {
-    return computeMetadata('years', items);
+    return computeMetadata('years', items) as number[];
   }, [items, computeMetadata]);
 
   const uniqueSources = useMemo(() => {
-    return computeMetadata('sources', items);
+    return computeMetadata('sources', items) as string[];
   }, [items, computeMetadata]);
 
   const uniqueTags = useMemo(() => {
-    return computeMetadata('tags', items);
+    return computeMetadata('tags', items) as string[];
   }, [items, computeMetadata]);
 
   // 异步预缓存功能
