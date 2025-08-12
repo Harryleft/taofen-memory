@@ -121,7 +121,7 @@
 
 /* Masonry Grid Styles - Enhanced Design */
 .masonry-container {
-  @apply w-full;
+  @apply w-full min-w-[300px];
 }
 
 .masonry-grid-container {
