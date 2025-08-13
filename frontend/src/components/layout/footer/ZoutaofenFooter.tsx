@@ -1,5 +1,122 @@
 import React from 'react';
 
+// ================ 常量配置 ================
+
+// 通用的导航分类配置
+const COMMON_NAVIGATION_CATEGORIES: NavigationCategory[] = [
+  {
+    id: 'life-journey',
+    title: '岁月行履',
+    links: [{ label: '岁月行履', to: '/timeline', external: false }]
+  },
+  {
+    id: 'books-times',
+    title: '时光书影',
+    links: [{ label: '时光书影', to: '/bookstore-timeline', external: false }]
+  },
+  {
+    id: 'writing-style',
+    title: '笔下风骨',
+    links: [{ label: '笔下风骨', to: '/handwriting', external: false }]
+  },
+  {
+    id: 'contemporary-figures',
+    title: '同行群像',
+    links: [{ label: '同行群像', to: '/relationships', external: false }]
+  }
+];
+
+// 桌面端版本使用的导航分类（使用不同的路径）
+const DESKTOP_NAVIGATION_CATEGORIES: NavigationCategory[] = [
+  {
+    id: 'life-journey',
+    title: '岁月行履',
+    links: [{ label: '岁月行履', to: '/life-journey', external: false }]
+  },
+  {
+    id: 'books-times',
+    title: '时光书影',
+    links: [{ label: '时光书影', to: '/books-times', external: false }]
+  },
+  {
+    id: 'writing-style',
+    title: '笔下风骨',
+    links: [{ label: '笔下风骨', to: '/writing-style', external: false }]
+  },
+  {
+    id: 'contemporary-figures',
+    title: '同行群像',
+    links: [{ label: '同行群像', to: '/contemporary-figures', external: false }]
+  }
+];
+
+// 通用的外部资源配置
+const COMMON_EXTERNAL_RESOURCES: ExternalResource[] = [
+  {
+    label: '韬奋纪念馆',
+    url: 'https://zoutaofen.com',
+    icon: '🏛️',
+    description: '官方网站与数字档案'
+  },
+  {
+    label: '上海图书馆',
+    url: 'https://data.library.sh.cn',
+    icon: '📚',
+    description: '开放数据平台与研究资源'
+  },
+  {
+    label: '维基百科',
+    url: 'https://zh.wikipedia.org/wiki/邹韬奋',
+    icon: '📖',
+    description: '百科资料与参考文献'
+  }
+];
+
+// 完整版本的外部资源配置
+const FULL_EXTERNAL_RESOURCES: ExternalResource[] = [
+  ...COMMON_EXTERNAL_RESOURCES,
+  {
+    label: '国家图书馆',
+    url: 'https://www.nlc.cn',
+    icon: '🏛️',
+    description: '数字资源与古籍档案'
+  },
+  {
+    label: '学术研究',
+    url: 'https://scholar.google.com',
+    icon: '🎓',
+    description: '学术论文与研究资料'
+  }
+];
+
+// 简化版本的外部资源配置
+const MINIMAL_EXTERNAL_RESOURCES: ExternalResource[] = [
+  {
+    label: '韬奋纪念馆',
+    url: 'https://zoutaofen.com',
+    icon: '🏛️'
+  },
+  {
+    label: '上海图书馆',
+    url: 'https://data.library.sh.cn',
+    icon: '📚'
+  }
+];
+
+// 默认样式配置
+const DEFAULT_STYLE = {
+  backgroundColor: 'dark' as const,
+  textColor: 'light' as const,
+  themeColor: 'gold' as const
+};
+
+// 默认法律信息配置
+const DEFAULT_LEGAL_CONFIG = {
+  copyright: '© 2025 不知道起什么名字团队',
+  competitionInfo: '本作品为第十届上海图书馆开放数据竞赛作品',
+  teamName: '不知道起什么名字团队'
+};
+
 // ================ 类型定义 ================
 
 // 导航链接配置
@@ -76,8 +193,7 @@ export interface FooterProps {
 const LegalSection: React.FC<{ 
   copyright: string;
   competitionInfo: string;
-  teamName: string;
-}> = ({ copyright, competitionInfo, teamName }) => {
+}> = ({ copyright, competitionInfo }) => {
   return (
     <footer className="legal-section">
       <div className="legal-content text-center space-y-2">
@@ -180,7 +296,6 @@ const Footer: React.FC<FooterProps> = ({
           <LegalSection 
             copyright={legal.copyright}
             competitionInfo={legal.competitionInfo}
-            teamName={legal.teamName}
           />
         </section>
       </div>
@@ -202,70 +317,14 @@ const ZoutaofenFooterResponsive: React.FC<AppFooterProps> = ({
 }) => {
   const config: FooterConfig = {
     primaryNavigation: {
-      categories: [
-        {
-          id: 'life-journey',
-          title: '岁月行履',
-          links: [
-            { label: '岁月行履', to: '/life-journey', external: false }
-          ]
-        },
-        {
-          id: 'books-times',
-          title: '时光书影',
-          links: [
-            { label: '时光书影', to: '/books-times', external: false }
-          ]
-        },
-        {
-          id: 'writing-style',
-          title: '笔下风骨',
-          links: [
-            { label: '笔下风骨', to: '/writing-style', external: false }
-          ]
-        },
-        {
-          id: 'contemporary-figures',
-          title: '同行群像',
-          links: [
-            { label: '同行群像', to: '/contemporary-figures', external: false }
-          ]
-        }
-      ]
+      categories: COMMON_NAVIGATION_CATEGORIES
     },
     externalResources: {
       title: '相关链接',
-      resources: [
-        {
-          label: '韬奋纪念馆',
-          url: 'https://zoutaofen.com',
-          icon: '🏛️',
-          description: '官方网站'
-        },
-        {
-          label: '上海图书馆',
-          url: 'https://data.library.sh.cn',
-          icon: '📚',
-          description: '开放数据平台'
-        },
-        {
-          label: '维基百科',
-          url: 'https://zh.wikipedia.org/wiki/邹韬奋',
-          icon: '📖',
-          description: '百科资料'
-        }
-      ]
+      resources: COMMON_EXTERNAL_RESOURCES
     },
-    legal: {
-      copyright: '© 2025 不知道起什么名字团队',
-      competitionInfo: '本作品为第十届上海图书馆开放数据竞赛作品',
-      teamName: '不知道起什么名字团队'
-    },
-    style: {
-      backgroundColor: 'dark',
-      textColor: 'light',
-      themeColor: 'gold'
-    }
+    legal: DEFAULT_LEGAL_CONFIG,
+    style: DEFAULT_STYLE
   };
 
   return <Footer config={config} className={className} version={version} />;
@@ -278,62 +337,17 @@ const ZoutaofenFooterMinimal: React.FC<AppFooterProps> = ({
 }) => {
   const config: FooterConfig = {
     primaryNavigation: {
-      categories: [
-        {
-          id: 'life-journey',
-          title: '岁月行履',
-          links: [
-            { label: '岁月行履', to: '/life-journey', external: false }
-          ]
-        },
-        {
-          id: 'books-times',
-          title: '时光书影',
-          links: [
-            { label: '时光书影', to: '/books-times', external: false }
-          ]
-        },
-        {
-          id: 'writing-style',
-          title: '笔下风骨',
-          links: [
-            { label: '笔下风骨', to: '/writing-style', external: false }
-          ]
-        },
-        {
-          id: 'contemporary-figures',
-          title: '同行群像',
-          links: [
-            { label: '同行群像', to: '/contemporary-figures', external: false }
-          ]
-        }
-      ]
+      categories: DESKTOP_NAVIGATION_CATEGORIES
     },
     externalResources: {
       title: '资源链接',
-      resources: [
-        {
-          label: '韬奋纪念馆',
-          url: 'https://zoutaofen.com',
-          icon: '🏛️'
-        },
-        {
-          label: '上海图书馆',
-          url: 'https://data.library.sh.cn',
-          icon: '📚'
-        }
-      ]
+      resources: MINIMAL_EXTERNAL_RESOURCES
     },
     legal: {
-      copyright: '© 2025 不知道起什么名字团队',
-      competitionInfo: '第十届上海图书馆开放数据竞赛作品',
-      teamName: '不知道起什么名字团队'
+      ...DEFAULT_LEGAL_CONFIG,
+      competitionInfo: '第十届上海图书馆开放数据竞赛作品'
     },
-    style: {
-      backgroundColor: 'dark',
-      textColor: 'light',
-      themeColor: 'gold'
-    }
+    style: DEFAULT_STYLE
   };
 
   return <Footer config={config} className={className} version={version} />;
@@ -346,82 +360,18 @@ const ZoutaofenFooter: React.FC<AppFooterProps> = ({
 }) => {
   const config: FooterConfig = {
     primaryNavigation: {
-      categories: [
-        {
-          id: 'life-journey',
-          title: '岁月行履',
-          links: [
-            { label: '岁月行履', to: '/life-journey', external: false }
-          ]
-        },
-        {
-          id: 'books-times',
-          title: '时光书影',
-          links: [
-            { label: '时光书影', to: '/books-times', external: false }
-          ]
-        },
-        {
-          id: 'writing-style',
-          title: '笔下风骨',
-          links: [
-            { label: '笔下风骨', to: '/writing-style', external: false }
-          ]
-        },
-        {
-          id: 'contemporary-figures',
-          title: '同行群像',
-          links: [
-            { label: '同行群像', to: '/contemporary-figures', external: false }
-          ]
-        }
-      ]
+      categories: DESKTOP_NAVIGATION_CATEGORIES
     },
     externalResources: {
       title: '相关链接',
-      resources: [
-        {
-          label: '韬奋纪念馆',
-          url: 'https://zoutaofen.com',
-          icon: '🏛️',
-          description: '官方网站与数字档案'
-        },
-        {
-          label: '上海图书馆',
-          url: 'https://data.library.sh.cn',
-          icon: '📚',
-          description: '开放数据平台与研究资源'
-        },
-        {
-          label: '维基百科',
-          url: 'https://zh.wikipedia.org/wiki/邹韬奋',
-          icon: '📖',
-          description: '百科资料与参考文献'
-        },
-        {
-          label: '国家图书馆',
-          url: 'https://www.nlc.cn',
-          icon: '🏛️',
-          description: '数字资源与古籍档案'
-        },
-        {
-          label: '学术研究',
-          url: 'https://scholar.google.com',
-          icon: '🎓',
-          description: '学术论文与研究资料'
-        }
-      ]
+      resources: FULL_EXTERNAL_RESOURCES
     },
     legal: {
+      ...DEFAULT_LEGAL_CONFIG,
       copyright: '© 2025 不知道起什么名字团队. 保留所有权利.',
-      competitionInfo: '本作品为第十届上海图书馆开放数据竞赛参赛作品，基于开放数据平台构建',
-      teamName: '不知道起什么名字团队'
+      competitionInfo: '本作品为第十届上海图书馆开放数据竞赛参赛作品，基于开放数据平台构建'
     },
-    style: {
-      backgroundColor: 'dark',
-      textColor: 'light',
-      themeColor: 'gold'
-    }
+    style: DEFAULT_STYLE
   };
 
   return <Footer config={config} className={className} version={version} />;
