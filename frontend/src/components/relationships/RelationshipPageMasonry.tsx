@@ -512,7 +512,7 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
     const touch = e.changedTouches[0];
     const deltaX = touch.clientX - touchState.current.startX;
     const deltaY = touch.clientY - touchState.current.startY;
-    // const deltaTime = Date.now() - touchState.current.startTime; // 保留用于未来的性能优化
+    const deltaTime = Date.now() - touchState.current.startTime;
     const card = touchState.current.currentCard;
     
     // 重置卡片样式
