@@ -741,6 +741,7 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
           );
         })}
       </div>
+      )}
 
       {isLoading && (
         <div className="masonry-loading-container">
@@ -751,8 +752,6 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
       {visibleItems >= items.length && items.length > 0 && (
         <div className="masonry-complete-container">
           已显示全部 {items.length} 位人物
-        </div>
-      )}
         </div>
       )}
     </div>
