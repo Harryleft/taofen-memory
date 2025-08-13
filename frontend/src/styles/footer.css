@@ -8,6 +8,15 @@
   background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
 }
 
+/* 通用footer类样式 */
+.footer {
+  position: relative;
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  color: #ffffff;
+}
+
 .footer-container {
   max-width: 1200px;
   margin: 0 auto;
