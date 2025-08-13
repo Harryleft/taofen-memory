@@ -72,39 +72,6 @@ export interface FooterProps {
 
 // ================ 子组件定义 ================
 
-// 主导航栏目组件
-const PrimaryNavigationSection: React.FC<{ 
-  categories: NavigationCategory[];
-}> = ({ categories }) => {
-  return (
-    <nav className="primary-navigation" aria-label="主导航栏目">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {categories.map((category) => (
-          <div key={category.id} className="nav-category">
-            <h3 className="nav-category-title text-lg font-semibold mb-4 text-amber-500">
-              {category.title}
-            </h3>
-            <ul className="nav-links space-y-2">
-              {category.links.map((link, index) => (
-                <li key={index}>
-                  <a
-                    href={link.to}
-                    target={link.external ? '_blank' : '_self'}
-                    rel={link.external ? 'noopener noreferrer' : ''}
-                    className="nav-link text-gray-300 hover:text-white hover:translate-x-1 transition-all duration-200 text-sm"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-    </nav>
-  );
-};
-
 // 外部资源链接组件
 const ExternalResourcesSection: React.FC<{ 
   title: string;
@@ -221,30 +188,54 @@ const Footer: React.FC<FooterProps> = ({
       aria-label="网站页脚"
     >
       <div className="footer-container max-w-7xl mx-auto">
-        {/* 主要内容区域 */}
-        <div className="footer-content space-y-12">
-          {/* 主导航栏目 */}
-          <section className="primary-navigation-section">
-            <PrimaryNavigationSection categories={primaryNavigation.categories} />
+        {/* 主要内容区域 - 两列布局 */}
+        <div className="footer-content grid grid-cols-1 lg:grid-cols-2 gap-12">
+          {/* 左侧：栏目导航 */}
+          <section className="categories-section">
+            <h2 className="section-title text-xl font-bold mb-6 text-amber-500">栏目导航</h2>
+            <div className="categories-grid grid grid-cols-1 md:grid-cols-2 gap-6">
+              {primaryNavigation.categories.map((category) => (
+                <div key={category.id} className="nav-category">
+                  <h3 className="nav-category-title text-lg font-semibold mb-4 text-amber-500">
+                    {category.title}
+                  </h3>
+                  <ul className="nav-links space-y-2">
+                    {category.links.map((link, index) => (
+                      <li key={index}>
+                        <a
+                          href={link.to}
+                          target={link.external ? '_blank' : '_self'}
+                          rel={link.external ? 'noopener noreferrer' : ''}
+                          className="nav-link text-gray-300 hover:text-white hover:translate-x-1 transition-all duration-200 text-sm"
+                        >
+                          {link.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
           </section>
           
-          {/* 外部资源链接 */}
+          {/* 右侧：外部资源链接 */}
           <section className="external-resources-section">
+            <h2 className="section-title text-xl font-bold mb-6 text-amber-500">相关链接</h2>
             <ExternalResourcesSection 
               title={externalResources.title}
               resources={externalResources.resources}
             />
           </section>
-          
-          {/* 版权与法律信息 */}
-          <section className="legal-section-section border-t border-gray-700 pt-8">
-            <LegalSection 
-              copyright={legal.copyright}
-              competitionInfo={legal.competitionInfo}
-              teamName={legal.teamName}
-            />
-          </section>
         </div>
+        
+        {/* 版权与法律信息 */}
+        <section className="legal-section-section border-t border-gray-700 pt-8 mt-12">
+          <LegalSection 
+            copyright={legal.copyright}
+            competitionInfo={legal.competitionInfo}
+            teamName={legal.teamName}
+          />
+        </section>
       </div>
     </footer>
   );
