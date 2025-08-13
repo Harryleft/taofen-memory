@@ -72,45 +72,6 @@ export interface FooterProps {
 
 // ================ 子组件定义 ================
 
-// 外部资源链接组件
-const ExternalResourcesSection: React.FC<{ 
-  title: string;
-  resources: ExternalResource[];
-}> = ({ title, resources }) => {
-  return (
-    <section className="external-resources">
-      <h3 className="resources-title text-lg font-semibold mb-4 text-amber-500">
-        {title}
-      </h3>
-      <div className="resources-grid grid grid-cols-1 md:grid-cols-3 gap-4">
-        {resources.map((resource, index) => (
-          <a
-            key={index}
-            href={resource.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="resource-link bg-gray-800 bg-opacity-50 hover:bg-gray-700 hover:bg-opacity-70 p-4 rounded-lg transition-all duration-200 group"
-          >
-            {resource.icon && (
-              <span className="resource-icon text-amber-500 mr-2">
-                {resource.icon}
-              </span>
-            )}
-            <span className="resource-label text-gray-300 group-hover:text-white text-sm">
-              {resource.label}
-            </span>
-            {resource.description && (
-              <p className="resource-description text-gray-400 text-xs mt-1">
-                {resource.description}
-              </p>
-            )}
-          </a>
-        ))}
-      </div>
-    </section>
-  );
-};
-
 // 版权与法律信息组件
 const LegalSection: React.FC<{ 
   copyright: string;
@@ -161,17 +122,9 @@ const Footer: React.FC<FooterProps> = ({
     dark: 'text-gray-900'
   };
 
-  const themeColorClasses = {
-    gold: 'text-amber-500',
-    blue: 'text-blue-500',
-    green: 'text-green-500',
-    red: 'text-red-500'
-  };
-
   const backgroundColorClass = backgroundColorClasses[style?.backgroundColor || 'dark'];
   const textColorClass = textColorClasses[style?.textColor || 'light'];
-  const themeColorClass = themeColorClasses[style?.themeColor || 'gold'];
-
+  
   // 版本特定的类名
   const versionClasses = {
     responsive: 'py-12 px-4',
