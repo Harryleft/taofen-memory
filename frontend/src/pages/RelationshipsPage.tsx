@@ -92,6 +92,21 @@ export default function RelationshipsPage() {
   return (
     <div className="relationships-page-container flex flex-col min-h-screen">
       <AppHeader moduleId="relationships" />
+      
+      {/* 移动端导航优化 */}
+      <div className="md:hidden">
+        <div className="sticky top-0 z-30 bg-white border-b border-gray-200 px-4 py-3">
+          <div className="flex items-center justify-between">
+            <h1 className="text-lg font-semibold text-gray-800">人物关系</h1>
+            <div className="flex items-center gap-2">
+              <div className="text-sm text-gray-500">
+                {filteredPersons.length} / {persons.length}
+              </div>
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Category Filter */}
       <div className="relationships-main-content-container">
@@ -136,6 +151,11 @@ export default function RelationshipsPage() {
           <div 
             ref={filterContainerRef}
             className="relationships-filter-container-mobile overflow-x-auto scrollbar-hide -mx-6 px-6"
+            style={{
+              // 移动端滚动优化
+              '-webkit-overflow-scrolling': 'touch',
+              'scroll-behavior': 'smooth'
+            }}
           >
             <div className="flex gap-2 pb-2">
               {RELATIONSHIPS_CATEGORIES.map((category) => {

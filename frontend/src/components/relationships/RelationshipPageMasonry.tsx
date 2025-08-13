@@ -36,7 +36,10 @@ const MASONRY_CONFIG = {
         GAP: 12,
         VERTICAL_GAP: 16,
         BASE_HEIGHT: 160,
-        DESC_MAX_LENGTH: 100
+        DESC_MAX_LENGTH: 100,
+        MIN_CARD_WIDTH: 140, // 移动端最小卡片宽度
+        MAX_COLUMNS: 2, // 移动端最大2列
+        PADDING: 8 // 移动端内边距
       },
       tablet: {
         BREAKPOINT: 768,
@@ -44,7 +47,21 @@ const MASONRY_CONFIG = {
         GAP: 14,
         VERTICAL_GAP: 18,
         BASE_HEIGHT: 180,
-        DESC_MAX_LENGTH: 120
+        DESC_MAX_LENGTH: 120,
+        MIN_CARD_WIDTH: 200,
+        MAX_COLUMNS: 3,
+        PADDING: 12
+      },
+      desktop: {
+        BREAKPOINT: 1024,
+        CARD_WIDTH: 280,
+        GAP: 16,
+        VERTICAL_GAP: 20,
+        BASE_HEIGHT: 200,
+        DESC_MAX_LENGTH: 150,
+        MIN_CARD_WIDTH: 240,
+        MAX_COLUMNS: 4,
+        PADDING: 16
       }
     }
   },
@@ -123,6 +140,8 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
       return MASONRY_CONFIG.layout.RESPONSIVE.mobile;
     } else if (width <= MASONRY_CONFIG.layout.RESPONSIVE.tablet.BREAKPOINT) {
       return MASONRY_CONFIG.layout.RESPONSIVE.tablet;
+    } else if (width <= MASONRY_CONFIG.layout.RESPONSIVE.desktop.BREAKPOINT) {
+      return MASONRY_CONFIG.layout.RESPONSIVE.desktop;
     }
     return null; // 使用默认配置
   }, []);
@@ -132,16 +151,21 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
     const responsiveConfig = getResponsiveConfig();
     const gap = responsiveConfig?.GAP || MASONRY_CONFIG.layout.GAP;
     const cardWidth = responsiveConfig?.CARD_WIDTH || MASONRY_CONFIG.layout.CARD_WIDTH;
-    const availableWidth = width - gap;
+    const minCardWidth = responsiveConfig?.MIN_CARD_WIDTH || cardWidth;
+    const maxColumns = responsiveConfig?.MAX_COLUMNS || MASONRY_CONFIG.layout.MAX_COLUMNS;
+    const padding = responsiveConfig?.PADDING || 0;
+    
+    // 计算可用宽度（考虑内边距）
+    const availableWidth = width - (padding * 2) - gap;
     
     // 动态计算最小卡片宽度，根据屏幕大小调整
-    const minCardWidth = Math.min(cardWidth, Math.max(240, width / 6));
-    const possibleColumns = Math.floor(availableWidth / (minCardWidth + gap));
+    const effectiveMinWidth = Math.min(minCardWidth, Math.max(140, width / 4));
+    const possibleColumns = Math.floor(availableWidth / (effectiveMinWidth + gap));
     
-    // 移动端优先单列
+    // 移动端优先单列，但允许最多2列
     const minColumns = responsiveConfig ? 1 : MASONRY_CONFIG.layout.MIN_COLUMNS;
     
-    return Math.max(minColumns, Math.min(MASONRY_CONFIG.layout.MAX_COLUMNS, possibleColumns));
+    return Math.max(minColumns, Math.min(maxColumns, possibleColumns));
   }, [getResponsiveConfig]);
 
   // 估算用于初始快速占位（防闪烁）
@@ -233,16 +257,28 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
         // 使用最大的有效宽度
         width = Math.max(offsetWidth, clientWidth, scrollWidth, rectWidth);
         
+        // 移动端特殊处理：考虑视口宽度和滚动条
+        const responsiveConfig = getResponsiveConfig();
+        if (responsiveConfig) {
+          const padding = responsiveConfig.PADDING || 0;
+          const viewportWidth = window.innerWidth - (padding * 2);
+          width = Math.min(width, viewportWidth);
+        }
+        
         console.log('Masonry Debug: Container width updated:', {
           width,
           offsetWidth,
           clientWidth,
           scrollWidth,
-          rectWidth
+          rectWidth,
+          viewportWidth: window.innerWidth,
+          responsiveConfig: responsiveConfig ? 'mobile' : 'desktop'
         });
       } else {
         // 如果容器ref不存在，使用窗口宽度作为后备
-        width = window.innerWidth - 48; // 减去页面padding
+        const responsiveConfig = getResponsiveConfig();
+        const padding = responsiveConfig?.PADDING || 24;
+        width = window.innerWidth - padding; // 减去页面padding
         console.log('Masonry Debug: Using window width as fallback:', width);
       }
       
@@ -393,19 +429,43 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
     startY: 0,
     startTime: 0,
     currentCard: null as HTMLDivElement | null,
-    isSwiping: false
+    isSwiping: false,
+    isDragging: false,
+    lastTapTime: 0,
+    tapCount: 0
   });
 
   // 处理触摸开始事件
   const handleTouchStart = useCallback((e: React.TouchEvent, card: HTMLDivElement, person: Person) => {
     const touch = e.touches[0];
+    const currentTime = Date.now();
+    
+    // 检测双击（防止误触）
+    const timeSinceLastTap = currentTime - touchState.current.lastTapTime;
+    if (timeSinceLastTap < 300) {
+      touchState.current.tapCount++;
+    } else {
+      touchState.current.tapCount = 1;
+    }
+    touchState.current.lastTapTime = currentTime;
+    
     touchState.current = {
       startX: touch.clientX,
       startY: touch.clientY,
-      startTime: Date.now(),
+      startTime: currentTime,
       currentCard: card,
-      isSwiping: false
+      isSwiping: false,
+      isDragging: false,
+      lastTapTime: currentTime,
+      tapCount: touchState.current.tapCount
     };
+    
+    // 添加触摸反馈
+    card.style.transform = 'scale(0.98)';
+    card.style.transition = 'transform 0.1s ease';
+    
+    // 防止默认行为
+    e.preventDefault();
   }, []);
 
   // 处理触摸移动事件
@@ -417,16 +477,31 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
     const deltaY = touch.clientY - touchState.current.startY;
     const deltaTime = Date.now() - touchState.current.startTime;
     
-    // 判断是否为横向滑动
-    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
-      touchState.current.isSwiping = true;
+    // 判断是否为滑动
+    const totalDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    
+    if (totalDistance > 8) {
+      touchState.current.isDragging = true;
       
-      // 添加滑动视觉反馈
-      const card = touchState.current.currentCard;
-      const maxSwipe = 100;
-      const opacity = 1 - Math.min(Math.abs(deltaX) / maxSwipe, 0.5);
-      card.style.transform = `translateX(${deltaX}px)`;
-      card.style.opacity = opacity.toString();
+      // 判断是否为横向滑动
+      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 15) {
+        touchState.current.isSwiping = true;
+        
+        // 添加滑动视觉反馈
+        const card = touchState.current.currentCard;
+        const maxSwipe = 120;
+        const opacity = 1 - Math.min(Math.abs(deltaX) / maxSwipe, 0.6);
+        const scale = 1 - Math.min(Math.abs(deltaX) / maxSwipe, 0.1);
+        
+        card.style.transform = `translateX(${deltaX * 0.8}px) scale(${scale})`;
+        card.style.opacity = opacity.toString();
+        card.style.transition = 'none';
+      }
+    }
+    
+    // 防止页面滚动
+    if (touchState.current.isSwiping) {
+      e.preventDefault();
     }
   }, []);
 
@@ -436,16 +511,31 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
     
     const touch = e.changedTouches[0];
     const deltaX = touch.clientX - touchState.current.startX;
+    const deltaY = touch.clientY - touchState.current.startY;
     const deltaTime = Date.now() - touchState.current.startTime;
     const card = touchState.current.currentCard;
     
     // 重置卡片样式
     card.style.transform = '';
     card.style.opacity = '';
+    card.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+    
+    // 计算滑动速度和距离
+    const velocity = Math.abs(deltaX) / deltaTime;
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
     
     // 如果是快速滑动且距离足够，则打开详情
-    if (touchState.current.isSwiping && Math.abs(deltaX) > 50 && deltaTime < 300) {
+    if (touchState.current.isSwiping && Math.abs(deltaX) > 40 && deltaTime < 400 && velocity > 0.2) {
       onItemClick(person);
+    } 
+    // 如果是轻触且没有拖动，则打开详情（但防止双击误触）
+    else if (!touchState.current.isDragging && distance < 8 && touchState.current.tapCount === 1) {
+      // 延迟执行以确保不是双击
+      setTimeout(() => {
+        if (touchState.current.tapCount === 1) {
+          onItemClick(person);
+        }
+      }, 200);
     }
     
     touchState.current = {
@@ -453,7 +543,10 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
       startY: 0,
       startTime: 0,
       currentCard: null,
-      isSwiping: false
+      isSwiping: false,
+      isDragging: false,
+      lastTapTime: 0,
+      tapCount: 0
     };
   }, [onItemClick]);
 
@@ -467,16 +560,33 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
     const responsiveConfig = getResponsiveConfig();
     const isMobile = !!responsiveConfig;
     
-    // 移动端提前加载，提升用户体验
-    const loadThreshold = isMobile ? MASONRY_CONFIG.lazyLoad.LOAD_THRESHOLD * 1.5 : MASONRY_CONFIG.lazyLoad.LOAD_THRESHOLD;
+    // 移动端优化：根据网络状况调整加载策略
+    const loadThreshold = isMobile ? MASONRY_CONFIG.lazyLoad.LOAD_THRESHOLD * 2 : MASONRY_CONFIG.lazyLoad.LOAD_THRESHOLD;
     const itemsPerLoad = isMobile ? MASONRY_CONFIG.lazyLoad.MOBILE_ITEMS_PER_LOAD : MASONRY_CONFIG.lazyLoad.ITEMS_PER_LOAD;
+    
+    // 网络状况检测（简化版）
+    const isSlowNetwork = navigator.connection ? 
+      navigator.connection.effectiveType.includes('2g') || 
+      navigator.connection.saveData : false;
+    
+    // 根据网络状况调整延迟
+    const loadDelay = isSlowNetwork ? MASONRY_CONFIG.lazyLoad.LOAD_DELAY * 2 : MASONRY_CONFIG.lazyLoad.LOAD_DELAY;
+    
+    // 更智能的加载阈值计算
+    const effectiveThreshold = isMobile ? 
+      Math.max(loadThreshold, windowHeight * 0.3) : 
+      loadThreshold;
 
-    if (scrollTop + windowHeight >= documentHeight - loadThreshold) {
+    if (scrollTop + windowHeight >= documentHeight - effectiveThreshold) {
       setIsLoading(true);
-      setTimeout(() => {
-        setVisibleItems(prev => Math.min(prev + itemsPerLoad, items.length));
-        setIsLoading(false);
-      }, MASONRY_CONFIG.lazyLoad.LOAD_DELAY);
+      
+      // 使用 requestAnimationFrame 优化性能
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          setVisibleItems(prev => Math.min(prev + itemsPerLoad, items.length));
+          setIsLoading(false);
+        }, loadDelay);
+      });
     }
   }, [isLoading, visibleItems, items.length, getResponsiveConfig]);
 
@@ -552,6 +662,8 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
                 left: `${left}px`,
                 top: `${top}px`,
                 width: `${columnWidth}px`,
+                // 移动端优化：增大触摸区域
+                minHeight: responsiveConfig?.BASE_HEIGHT || MASONRY_CONFIG.layout.BASE_HEIGHT
               }}
               onClick={() => onItemClick(person)}
               onTouchStart={(e) => {
@@ -560,6 +672,22 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
               }}
               onTouchMove={handleTouchMove}
               onTouchEnd={(e) => handleTouchEnd(e, person)}
+              // 移动端优化：添加触摸反馈属性
+              onTouchCancel={(e) => {
+                const card = e.currentTarget;
+                card.style.transform = '';
+                card.style.opacity = '';
+                touchState.current = {
+                  startX: 0,
+                  startY: 0,
+                  startTime: 0,
+                  currentCard: null,
+                  isSwiping: false,
+                  isDragging: false,
+                  lastTapTime: 0,
+                  tapCount: 0
+                };
+              }}
             >
               <div className="masonry-card-content">
                 <div className={`masonry-card-avatar-container ${avatarPosition}`}>

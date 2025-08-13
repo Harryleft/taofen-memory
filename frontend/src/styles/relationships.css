@@ -25,10 +25,55 @@
     @apply px-4 py-2 text-sm;
     min-width: 80px;
     max-width: 120px;
+    /* 移动端优化 */
+    min-height: 44px; /* iOS推荐的最小触摸目标 */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
   
   .relationships-category-button span {
     @apply text-xs;
+  }
+  
+  /* 移动端横向滚动优化 */
+  .relationships-filter-container-mobile {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    /* 优化滚动性能 */
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  
+  .relationships-filter-container-mobile::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .relationships-category-button-mobile {
+    @apply relative flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 font-medium text-sm backdrop-blur-sm;
+    min-width: fit-content;
+    min-height: 44px; /* iOS推荐的最小触摸目标 */
+    /* 移动端优化 */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  
+  .relationships-category-button-mobile:active {
+    transform: scale(0.95);
+  }
+  
+  /* 移动端滚动提示优化 */
+  .relationships-filter-container-mobile::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 40px;
+    background: linear-gradient(to right, transparent, white);
+    pointer-events: none;
+    z-index: 10;
   }
 }
 
@@ -452,6 +497,80 @@
   animation: cardEnter 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
+/* 移动端优化的动画 */
+@keyframes cardEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.9);
+  }
+  50% {
+    opacity: 0.7;
+    transform: translateY(10px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 移动端快速动画 */
+@media (max-width: 768px) {
+  @keyframes cardEnterMobile {
+    0% {
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  
+  .masonry-card-base.animate-in {
+    animation: cardEnterMobile 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+}
+
+/* 移动端触摸反馈动画 */
+@keyframes touchPulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.masonry-card-base:active {
+  animation: touchPulse 0.2s ease;
+}
+
+/* 移动端优化：内容可见性 */
+@media (max-width: 768px) {
+  .masonry-card-base {
+    contain: layout style paint;
+    content-visibility: auto;
+    contain-intrinsic-size: 140px 200px;
+  }
+  
+  /* 减少不必要的重绘 */
+  .masonry-card-content {
+    will-change: auto;
+  }
+  
+  /* 优化图片加载 */
+  .masonry-avatar-image {
+    loading: lazy;
+    decoding: async;
+  }
+}
+
 /* 确保动画完成后卡片保持可见状态 */
 .masonry-card-base.animate-in,
 .masonry-card-base.visible {
@@ -460,16 +579,35 @@
 }
 
 /* 交错动画延迟 */
-.masonry-card-base:nth-child(1) { animation-delay: 0.1s; }
-.masonry-card-base:nth-child(2) { animation-delay: 0.2s; }
-.masonry-card-base:nth-child(3) { animation-delay: 0.3s; }
-.masonry-card-base:nth-child(4) { animation-delay: 0.4s; }
-.masonry-card-base:nth-child(5) { animation-delay: 0.5s; }
-.masonry-card-base:nth-child(6) { animation-delay: 0.6s; }
-.masonry-card-base:nth-child(7) { animation-delay: 0.7s; }
-.masonry-card-base:nth-child(8) { animation-delay: 0.8s; }
-.masonry-card-base:nth-child(9) { animation-delay: 0.9s; }
-.masonry-card-base:nth-child(10) { animation-delay: 1.0s; }
+.masonry-card-base:nth-child(1) { animation-delay: 0.05s; }
+.masonry-card-base:nth-child(2) { animation-delay: 0.1s; }
+.masonry-card-base:nth-child(3) { animation-delay: 0.15s; }
+.masonry-card-base:nth-child(4) { animation-delay: 0.2s; }
+.masonry-card-base:nth-child(5) { animation-delay: 0.25s; }
+.masonry-card-base:nth-child(6) { animation-delay: 0.3s; }
+.masonry-card-base:nth-child(7) { animation-delay: 0.35s; }
+.masonry-card-base:nth-child(8) { animation-delay: 0.4s; }
+.masonry-card-base:nth-child(9) { animation-delay: 0.45s; }
+.masonry-card-base:nth-child(10) { animation-delay: 0.5s; }
+
+/* 移动端减少动画延迟 */
+@media (max-width: 768px) {
+  .masonry-card-base:nth-child(1) { animation-delay: 0.02s; }
+  .masonry-card-base:nth-child(2) { animation-delay: 0.04s; }
+  .masonry-card-base:nth-child(3) { animation-delay: 0.06s; }
+  .masonry-card-base:nth-child(4) { animation-delay: 0.08s; }
+  .masonry-card-base:nth-child(5) { animation-delay: 0.1s; }
+  .masonry-card-base:nth-child(6) { animation-delay: 0.12s; }
+  .masonry-card-base:nth-child(7) { animation-delay: 0.14s; }
+  .masonry-card-base:nth-child(8) { animation-delay: 0.16s; }
+  .masonry-card-base:nth-child(9) { animation-delay: 0.18s; }
+  .masonry-card-base:nth-child(10) { animation-delay: 0.2s; }
+  
+  /* 第10个以后的卡片没有延迟 */
+  .masonry-card-base:nth-child(n+11) {
+    animation-delay: 0s;
+  }
+}
 
 .masonry-loading-container {
   @apply flex justify-center items-center py-8;
@@ -638,6 +776,9 @@
   .masonry-card-base {
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
     touch-action: manipulation;
+    /* 防止双击缩放 */
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
   }
   
   /* 触摸时的波纹效果 */
@@ -652,11 +793,36 @@
     background: rgba(0, 0, 0, 0.05);
     transform: translate(-50%, -50%);
     transition: width 0.3s, height 0.3s;
+    pointer-events: none;
   }
   
   .masonry-card-base:active::after {
     width: 200px;
     height: 200px;
+  }
+  
+  /* 移动端优化的滚动容器 */
+  .masonry-container {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  
+  /* 防止iOS橡皮筋效果 */
+  .relationships-page-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .relationships-main-content-container {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
@@ -665,25 +831,66 @@
   .masonry-card-base {
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    /* 增大触摸区域 */
+    min-height: 140px;
+    /* 防止误触 */
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
   
   .masonry-card-base:hover {
     transform: translateY(-2px);
   }
   
+  .masonry-card-base:active {
+    transform: scale(0.98);
+  }
+  
   /* 增大点击区域 */
   .masonry-card-content {
     position: relative;
+    /* 移动端增加内边距 */
+    padding: 16px;
   }
   
   .masonry-card-content::before {
     content: '';
     position: absolute;
-    top: -10px;
-    left: -10px;
-    right: -10px;
-    bottom: -10px;
+    top: -8px;
+    left: -8px;
+    right: -8px;
+    bottom: -8px;
     z-index: -1;
+  }
+  
+  /* 移动端优化的头像尺寸 */
+  .masonry-avatar-container {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .masonry-category-icon {
+    width: 20px;
+    height: 20px;
+  }
+  
+  /* 移动端字体优化 */
+  .masonry-card-name {
+    font-size: 16px;
+    line-height: 1.3;
+  }
+  
+  .masonry-card-description {
+    font-size: 13px;
+    line-height: 1.4;
+    -webkit-line-clamp: 2; /* 移动端减少行数 */
+  }
+  
+  /* 移动端优化动画 */
+  .masonry-card-base.animate-in {
+    animation-duration: 0.4s;
   }
 }
 
@@ -706,6 +913,9 @@
       0 1px 2px rgba(0, 0, 0, 0.04),
       0 2px 4px rgba(0, 0, 0, 0.06);
     will-change: transform;
+    /* 优化渲染性能 */
+    transform: translateZ(0);
+    backface-visibility: hidden;
   }
   
   .masonry-card-base:hover {
@@ -717,39 +927,47 @@
   /* 优化图片加载 */
   .masonry-avatar-image {
     transition: none;
+    /* 添加渐进式加载 */
+    opacity: 0;
+    animation: fadeIn 0.3s ease forwards;
+  }
+  
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+    }
   }
   
   /* 减少渐变和复杂效果 */
   .masonry-card-content {
     background: rgba(255, 255, 255, 0.95);
+    /* 减少重绘 */
+    will-change: auto;
   }
   
   /* 简化动画 */
   .masonry-card-base.animate-in {
     animation-duration: 0.3s;
+    animation-timing-function: ease-out;
   }
   
   /* 优化滚动性能 */
   .masonry-container {
     -webkit-overflow-scrolling: touch;
-    overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    /* 减少滚动重绘 */
+    transform: translateZ(0);
   }
   
-  /* 防止iOS橡皮筋效果 */
-  .relationships-page-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
+  /* 移动端优化：减少动画数量 */
+  .masonry-card-base:nth-child(n+10) {
+    animation-delay: 0s !important;
   }
   
-  .relationships-main-content-container {
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+  /* 移动端懒加载优化 */
+  .masonry-card-base {
+    contain: layout style paint;
+    content-visibility: auto;
+    contain-intrinsic-size: 140px 200px;
   }
 }

@@ -30,6 +30,7 @@ const VirtualScrollMasonry: React.FC<VirtualScrollMasonryProps> = ({
 }) => {
   const [scrollTop, setScrollTop] = useState(0);
   const [containerHeight, setContainerHeight] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -67,29 +68,50 @@ const VirtualScrollMasonry: React.FC<VirtualScrollMasonryProps> = ({
     };
   }, [items, columnCount, itemHeight, gap]);
 
-  // 更新容器高度
+  // 更新容器高度和检测移动端
   useEffect(() => {
-    if (containerRef.current) {
-      setContainerHeight(containerRef.current.clientHeight);
-    }
+    const updateContainer = () => {
+      if (containerRef.current) {
+        setContainerHeight(containerRef.current.clientHeight);
+        setIsMobile(window.innerWidth <= 768);
+      }
+    };
+    
+    updateContainer();
+    window.addEventListener('resize', updateContainer);
+    
+    return () => {
+      window.removeEventListener('resize', updateContainer);
+    };
   }, []);
 
   // 处理滚动事件
   const handleScroll = useCallback(() => {
     if (containerRef.current) {
-      setScrollTop(containerRef.current.scrollTop);
+      const newScrollTop = containerRef.current.scrollTop;
+      setScrollTop(newScrollTop);
+      
+      // 移动端滚动性能优化
+      if (isMobile) {
+        // 使用 requestAnimationFrame 优化滚动性能
+        requestAnimationFrame(() => {
+          // 可以在这里添加滚动优化逻辑
+        });
+      }
     }
-  }, []);
+  }, [isMobile]);
 
   // 计算可见区域
   const visibleRange = useMemo(() => {
-    const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - 5);
+    // 移动端增加缓冲区以减少白屏
+    const bufferSize = isMobile ? 8 : 5;
+    const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - bufferSize);
     const endIndex = Math.min(
       layoutItems.items.length - 1,
-      Math.ceil((scrollTop + containerHeight) / itemHeight) + 5
+      Math.ceil((scrollTop + containerHeight) / itemHeight) + bufferSize
     );
     return { startIndex, endIndex };
-  }, [scrollTop, containerHeight, itemHeight, layoutItems.items.length]);
+  }, [scrollTop, containerHeight, itemHeight, layoutItems.items.length, isMobile]);
 
   // 过滤出可见的项目
   const visibleItems = layoutItems.items.slice(visibleRange.startIndex, visibleRange.endIndex + 1);
@@ -130,14 +152,31 @@ const VirtualScrollMasonry: React.FC<VirtualScrollMasonryProps> = ({
           return (
             <div
               key={item.person.id}
-              className="absolute cursor-pointer overflow-hidden masonry-card-base animate-in"
+              className={`absolute cursor-pointer overflow-hidden masonry-card-base animate-in ${isMobile ? 'mobile-optimized' : ''}`}
               style={{
                 left: `${left}px`,
                 top: `${item.top}px`,
                 width: `${columnWidth}px`,
                 height: `${item.height}px`,
+                // 移动端优化
+                minHeight: isMobile ? '140px' : undefined
               }}
               onClick={() => onItemClick(item.person)}
+              // 移动端触摸优化
+              onTouchStart={(e) => {
+                if (isMobile) {
+                  const card = e.currentTarget;
+                  card.style.transform = 'scale(0.98)';
+                  card.style.transition = 'transform 0.1s ease';
+                }
+              }}
+              onTouchEnd={(e) => {
+                if (isMobile) {
+                  const card = e.currentTarget;
+                  card.style.transform = '';
+                  card.style.transition = 'transform 0.3s ease';
+                }
+              }}
             >
               <div className="masonry-card-content p-4">
                 <div className="masonry-card-avatar-container position-center mb-3">
