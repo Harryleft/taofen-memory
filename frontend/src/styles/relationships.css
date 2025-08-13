@@ -772,6 +772,12 @@
     background: rgba(250, 247, 240, 0.8);
   }
   
+  /* 虚拟滚动容器最小高度修复 */
+  .relative.overflow-y-auto {
+    min-height: 600px;
+    height: calc(100vh - 327px);
+  }
+  
   /* 增强触摸反馈 */
   .masonry-card-base {
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
