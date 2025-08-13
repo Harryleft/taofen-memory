@@ -31,9 +31,23 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({ onRefresh, children }) =>
 
       if (diff > 0 && container.scrollTop === 0) {
         e.preventDefault();
-        const distance = Math.min(diff * 0.5, 80); // 限制最大拉动距离
+        
+        // 移动端优化：使用非线性阻尼
+        const maxDistance = 100;
+        const threshold = 60;
+        
+        // 非线性阻尼：开始时容易拉动，后期变难
+        let distance;
+        if (diff < threshold) {
+          distance = diff * 0.6;
+        } else {
+          distance = threshold * 0.6 + (diff - threshold) * 0.3;
+        }
+        
+        distance = Math.min(distance, maxDistance);
+        
         setPullDistance(distance);
-        setCanRefresh(distance > 50);
+        setCanRefresh(distance > threshold);
       }
     };
 
@@ -66,23 +80,28 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({ onRefresh, children }) =>
     <div 
       ref={containerRef}
       className="relative overflow-y-auto h-full"
+      style={{
+        // 移动端优化
+        '-webkit-overflow-scrolling': 'touch',
+        'scroll-behavior': 'smooth'
+      }}
     >
       {/* 下拉刷新指示器 */}
       <div 
         className="absolute left-0 right-0 top-0 flex flex-col items-center justify-end transition-transform duration-300 pointer-events-none z-10"
         style={{
-          height: '100px',
-          transform: `translateY(${-100 + pullDistance}px)`,
+          height: '120px',
+          transform: `translateY(${-120 + pullDistance}px)`,
         }}
       >
         <div className={`
-          w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center mb-4
+          w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center mb-4
           transition-all duration-300
-          ${canRefresh ? 'scale-110 bg-blue-50' : ''}
+          ${canRefresh ? 'scale-110 bg-blue-50 shadow-blue-200' : ''}
           ${isRefreshing ? 'animate-spin' : ''}
         `}>
           <RefreshCw 
-            size={20} 
+            size={22} 
             className={`
               transition-colors duration-300
               ${canRefresh ? 'text-blue-500' : 'text-gray-400'}
@@ -95,6 +114,9 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({ onRefresh, children }) =>
         `}>
           {isRefreshing ? '刷新中...' : canRefresh ? '释放立即刷新' : '下拉刷新'}
         </p>
+        <div className="text-xs text-gray-400 mt-1">
+          {isRefreshing ? '正在加载数据...' : ''}
+        </div>
       </div>
 
       {/* 内容区域 */}
