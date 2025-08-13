@@ -23,7 +23,12 @@ export function useRelationshipsData() {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch('/data/json/relationships.json?' + Date.now()); // 添加时间戳防止缓存
+      const response = await fetch('/data/json/relationships.json?' + Date.now(), {
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
