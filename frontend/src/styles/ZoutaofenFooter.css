@@ -162,21 +162,35 @@
 .zoutaofen-footer .categories-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
-.zoutaofen-footer .nav-category {
+.zoutaofen-footer .category-card {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
-  padding: 1.25rem;
+  padding: 1rem;
   transition: all 0.3s ease;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 80px;
 }
 
-.zoutaofen-footer .nav-category:hover {
-  background: rgba(255, 255, 255, 0.08);
+.zoutaofen-footer .category-card:hover {
+  background: rgba(255, 255, 255, 0.1);
   border-color: rgba(251, 191, 36, 0.3);
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.1);
+}
+
+.zoutaofen-footer .category-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 0;
+  transition: color 0.3s ease;
 }
 
 /* 响应式布局优化 */
@@ -190,23 +204,16 @@
     gap: 2rem !important;
   }
   
-  .zoutaofen-footer .nav-category {
-    text-align: center;
+  .zoutaofen-footer .categories-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
   }
   
-  .zoutaofen-footer .nav-category-title::after {
-    left: 50%;
-    transform: translateX(-50%);
+  .zoutaofen-footer .category-card {
+    min-height: 60px;
   }
   
-  .zoutaofen-footer .nav-link {
-    text-align: center;
-  }
-  
-  .zoutaofen-footer .nav-link:hover {
-    transform: none;
-  }
-  
+    
   .zoutaofen-footer .resources-title::after {
     left: 50%;
     transform: translateX(-50%);

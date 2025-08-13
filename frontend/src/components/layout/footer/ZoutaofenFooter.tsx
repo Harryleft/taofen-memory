@@ -193,27 +193,17 @@ const Footer: React.FC<FooterProps> = ({
           {/* 左侧：栏目导航 */}
           <section className="categories-section">
             <h2 className="section-title text-xl font-bold mb-6 text-amber-500">栏目导航</h2>
-            <div className="categories-grid grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="categories-grid grid grid-cols-2 md:grid-cols-4 gap-4">
               {primaryNavigation.categories.map((category) => (
-                <div key={category.id} className="nav-category">
-                  <h3 className="nav-category-title text-lg font-semibold mb-4 text-amber-500">
+                <a
+                  key={category.id}
+                  href={category.links[0]?.to || '#'}
+                  className="category-card text-center p-4 bg-gray-800 bg-opacity-50 hover:bg-gray-700 hover:bg-opacity-70 rounded-lg transition-all duration-200 group"
+                >
+                  <h3 className="category-title text-amber-500 font-semibold text-sm group-hover:text-white">
                     {category.title}
                   </h3>
-                  <ul className="nav-links space-y-2">
-                    {category.links.map((link, index) => (
-                      <li key={index}>
-                        <a
-                          href={link.to}
-                          target={link.external ? '_blank' : '_self'}
-                          rel={link.external ? 'noopener noreferrer' : ''}
-                          className="nav-link text-gray-300 hover:text-white hover:translate-x-1 transition-all duration-200 text-sm"
-                        >
-                          {link.label}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                </a>
               ))}
             </div>
           </section>
@@ -260,40 +250,28 @@ const ZoutaofenFooterResponsive: React.FC<AppFooterProps> = ({
           id: 'life-journey',
           title: '岁月行履',
           links: [
-            { label: '生平简介', to: '/life-journey/biography', external: false },
-            { label: '重要时刻', to: '/life-journey/moments', external: false },
-            { label: '成长历程', to: '/life-journey/growth', external: false },
-            { label: '历史足迹', to: '/life-journey/footprints', external: false }
+            { label: '岁月行履', to: '/life-journey', external: false }
           ]
         },
         {
           id: 'books-times',
           title: '时光书影',
           links: [
-            { label: '代表作品', to: '/books-times/works', external: false },
-            { label: '出版历程', to: '/books-times/publications', external: false },
-            { label: '读书笔记', to: '/books-times/notes', external: false },
-            { label: '文化影响', to: '/books-times/influence', external: false }
+            { label: '时光书影', to: '/books-times', external: false }
           ]
         },
         {
           id: 'writing-style',
           title: '笔下风骨',
           links: [
-            { label: '写作风格', to: '/writing-style/style', external: false },
-            { label: '思想精髓', to: '/writing-style/philosophy', external: false },
-            { label: '语言特色', to: '/writing-style/language', external: false },
-            { label: '创作方法', to: '/writing-style/methods', external: false }
+            { label: '笔下风骨', to: '/writing-style', external: false }
           ]
         },
         {
           id: 'contemporary-figures',
           title: '同行群像',
           links: [
-            { label: '同时代人', to: '/contemporary-figures/peers', external: false },
-            { label: '师友往来', to: '/contemporary-figures/friends', external: false },
-            { label: '文化圈', to: '/contemporary-figures/circle', external: false },
-            { label: '社会影响', to: '/contemporary-figures/impact', external: false }
+            { label: '同行群像', to: '/contemporary-figures', external: false }
           ]
         }
       ]
@@ -345,12 +323,30 @@ const ZoutaofenFooterMinimal: React.FC<AppFooterProps> = ({
     primaryNavigation: {
       categories: [
         {
-          id: 'core-categories',
-          title: '核心内容',
+          id: 'life-journey',
+          title: '岁月行履',
           links: [
-            { label: '岁月行履', to: '/life-journey', external: false },
-            { label: '时光书影', to: '/books-times', external: false },
-            { label: '笔下风骨', to: '/writing-style', external: false },
+            { label: '岁月行履', to: '/life-journey', external: false }
+          ]
+        },
+        {
+          id: 'books-times',
+          title: '时光书影',
+          links: [
+            { label: '时光书影', to: '/books-times', external: false }
+          ]
+        },
+        {
+          id: 'writing-style',
+          title: '笔下风骨',
+          links: [
+            { label: '笔下风骨', to: '/writing-style', external: false }
+          ]
+        },
+        {
+          id: 'contemporary-figures',
+          title: '同行群像',
+          links: [
             { label: '同行群像', to: '/contemporary-figures', external: false }
           ]
         }
@@ -398,48 +394,28 @@ const ZoutaofenFooter: React.FC<AppFooterProps> = ({
           id: 'life-journey',
           title: '岁月行履',
           links: [
-            { label: '生平简介', to: '/life-journey/biography', external: false },
-            { label: '重要时刻', to: '/life-journey/moments', external: false },
-            { label: '成长历程', to: '/life-journey/growth', external: false },
-            { label: '历史足迹', to: '/life-journey/footprints', external: false },
-            { label: '家族背景', to: '/life-journey/family', external: false },
-            { label: '教育经历', to: '/life-journey/education', external: false }
+            { label: '岁月行履', to: '/life-journey', external: false }
           ]
         },
         {
           id: 'books-times',
           title: '时光书影',
           links: [
-            { label: '代表作品', to: '/books-times/works', external: false },
-            { label: '出版历程', to: '/books-times/publications', external: false },
-            { label: '读书笔记', to: '/books-times/notes', external: false },
-            { label: '文化影响', to: '/books-times/influence', external: false },
-            { label: '文学成就', to: '/books-times/achievements', external: false },
-            { label: '思想传播', to: '/books-times/dissemination', external: false }
+            { label: '时光书影', to: '/books-times', external: false }
           ]
         },
         {
           id: 'writing-style',
           title: '笔下风骨',
           links: [
-            { label: '写作风格', to: '/writing-style/style', external: false },
-            { label: '思想精髓', to: '/writing-style/philosophy', external: false },
-            { label: '语言特色', to: '/writing-style/language', external: false },
-            { label: '创作方法', to: '/writing-style/methods', external: false },
-            { label: '文学技巧', to: '/writing-style/techniques', external: false },
-            { label: '艺术特色', to: '/writing-style/artistry', external: false }
+            { label: '笔下风骨', to: '/writing-style', external: false }
           ]
         },
         {
           id: 'contemporary-figures',
           title: '同行群像',
           links: [
-            { label: '同时代人', to: '/contemporary-figures/peers', external: false },
-            { label: '师友往来', to: '/contemporary-figures/friends', external: false },
-            { label: '文化圈', to: '/contemporary-figures/circle', external: false },
-            { label: '社会影响', to: '/contemporary-figures/impact', external: false },
-            { label: '合作者', to: '/contemporary-figures/collaborators', external: false },
-            { label: '追随者', to: '/contemporary-figures/followers', external: false }
+            { label: '同行群像', to: '/contemporary-figures', external: false }
           ]
         }
       ]
