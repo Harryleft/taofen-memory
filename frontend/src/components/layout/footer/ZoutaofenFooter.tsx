@@ -84,9 +84,6 @@ const LegalSection: React.FC<{
         <p className="copyright text-gray-400 text-sm">
           {copyright}
         </p>
-        <p className="team-name text-amber-500 text-sm font-medium">
-          {teamName}
-        </p>
         <p className="competition-info text-gray-500 text-xs">
           {competitionInfo}
         </p>
