@@ -610,8 +610,9 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
     : responsiveConfig?.CARD_WIDTH || MASONRY_CONFIG.layout.CARD_WIDTH;
 
   // 判断是否使用虚拟滚动
-  const shouldUseVirtualScroll = MASONRY_CONFIG.virtualScroll.ENABLED && 
-    items.length > MASONRY_CONFIG.virtualScroll.ENABLE_THRESHOLD;
+  const shouldUseVirtualScroll = false; // 暂时禁用虚拟滚动，修复容器高度为0的问题
+  // MASONRY_CONFIG.virtualScroll.ENABLED && 
+  // items.length > MASONRY_CONFIG.virtualScroll.ENABLE_THRESHOLD;
 
   // 虚拟滚动容器高度
   // const virtualScrollContainerHeight = window.innerHeight - 200; // 减去头部和筛选器的高度

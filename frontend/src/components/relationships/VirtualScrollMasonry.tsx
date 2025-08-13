@@ -72,16 +72,35 @@ const VirtualScrollMasonry: React.FC<VirtualScrollMasonryProps> = ({
   useEffect(() => {
     const updateContainer = () => {
       if (containerRef.current) {
-        setContainerHeight(containerRef.current.clientHeight);
+        // 使用多种方式获取容器高度
+        const height = Math.max(
+          containerRef.current.clientHeight,
+          containerRef.current.offsetHeight,
+          window.innerHeight - 327, // 减去头部高度
+          400 // 最小高度
+        );
+        setContainerHeight(height);
         setIsMobile(window.innerWidth <= 768);
+        
+        console.log('VirtualScroll Debug: Container height updated:', {
+          clientHeight: containerRef.current.clientHeight,
+          offsetHeight: containerRef.current.offsetHeight,
+          calculatedHeight: height,
+          windowInnerHeight: window.innerHeight,
+          isMobile: window.innerWidth <= 768
+        });
       }
     };
     
     updateContainer();
+    // 添加延迟确保DOM完全渲染
+    const timeoutId = setTimeout(updateContainer, 100);
+    
     window.addEventListener('resize', updateContainer);
     
     return () => {
       window.removeEventListener('resize', updateContainer);
+      clearTimeout(timeoutId);
     };
   }, []);
 
