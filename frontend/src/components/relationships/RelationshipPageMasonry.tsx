@@ -311,7 +311,7 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
   }, []);
 
   // 防抖函数
-  const debounce = <T extends (...args: any[]) => void>(func: T, wait: number) => {
+  const debounce = <T extends (...args: unknown[]) => void>(func: T, wait: number) => {
     let timeout: number;
     return (...args: Parameters<T>) => {
       clearTimeout(timeout);
@@ -436,7 +436,7 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
   });
 
   // 处理触摸开始事件
-  const handleTouchStart = useCallback((e: React.TouchEvent, card: HTMLDivElement, person: Person) => {
+  const handleTouchStart = useCallback((e: React.TouchEvent, card: HTMLDivElement) => {
     const touch = e.touches[0];
     const currentTime = Date.now();
     
@@ -475,7 +475,7 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
     const touch = e.touches[0];
     const deltaX = touch.clientX - touchState.current.startX;
     const deltaY = touch.clientY - touchState.current.startY;
-    const deltaTime = Date.now() - touchState.current.startTime;
+    // const deltaTime = Date.now() - touchState.current.startTime; // 保留用于未来的性能优化
     
     // 判断是否为滑动
     const totalDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
@@ -512,7 +512,7 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
     const touch = e.changedTouches[0];
     const deltaX = touch.clientX - touchState.current.startX;
     const deltaY = touch.clientY - touchState.current.startY;
-    const deltaTime = Date.now() - touchState.current.startTime;
+    // const deltaTime = Date.now() - touchState.current.startTime; // 保留用于未来的性能优化
     const card = touchState.current.currentCard;
     
     // 重置卡片样式
@@ -614,7 +614,7 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
     items.length > MASONRY_CONFIG.virtualScroll.ENABLE_THRESHOLD;
 
   // 虚拟滚动容器高度
-  const virtualScrollContainerHeight = window.innerHeight - 200; // 减去头部和筛选器的高度
+  // const virtualScrollContainerHeight = window.innerHeight - 200; // 减去头部和筛选器的高度
 
   return (
     <div className="masonry-container">
