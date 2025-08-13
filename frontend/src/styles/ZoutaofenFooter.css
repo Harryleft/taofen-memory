@@ -1,0 +1,362 @@
+/* Zoutaofen Footer 专用样式 */
+
+/* 基础样式 */
+.zoutaofen-footer {
+  position: relative;
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  color: #ffffff;
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+}
+
+/* 容器样式 */
+.zoutaofen-footer .footer-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* 主导航栏目样式 */
+.zoutaofen-footer .nav-category-title {
+  color: #fbbf24;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  position: relative;
+  font-size: 1.125rem;
+}
+
+.zoutaofen-footer .nav-category-title::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(to right, #fbbf24, #f59e0b);
+}
+
+.zoutaofen-footer .nav-link {
+  display: block;
+  padding: 0.5rem 0;
+  color: #d1d5db;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  position: relative;
+  font-size: 0.875rem;
+}
+
+.zoutaofen-footer .nav-link:hover {
+  color: #ffffff;
+  transform: translateX(4px);
+}
+
+.zoutaofen-footer .nav-link::before {
+  content: '•';
+  position: absolute;
+  left: -12px;
+  color: #fbbf24;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.zoutaofen-footer .nav-link:hover::before {
+  opacity: 1;
+}
+
+/* 外部资源链接样式 */
+.zoutaofen-footer .resources-title {
+  color: #fbbf24;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  position: relative;
+  font-size: 1.125rem;
+}
+
+.zoutaofen-footer .resources-title::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(to right, #fbbf24, #f59e0b);
+}
+
+.zoutaofen-footer .resource-link {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 1rem;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+}
+
+.zoutaofen-footer .resource-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #fbbf24;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.2);
+}
+
+.zoutaofen-footer .resource-icon {
+  font-size: 1.5rem;
+  color: #fbbf24;
+}
+
+.zoutaofen-footer .resource-label {
+  color: #ffffff;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.zoutaofen-footer .resource-description {
+  color: #9ca3af;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+/* 版权信息样式 */
+.zoutaofen-footer .copyright {
+  color: #9ca3af;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.zoutaofen-footer .team-name {
+  color: #fbbf24;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.zoutaofen-footer .competition-info {
+  color: #6b7280;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+/* 响应式布局优化 */
+@media (max-width: 640px) {
+  .zoutaofen-footer .footer-container {
+    padding: 0 0.5rem;
+  }
+  
+  .zoutaofen-footer .nav-category {
+    text-align: center;
+  }
+  
+  .zoutaofen-footer .nav-category-title::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .zoutaofen-footer .nav-link {
+    text-align: center;
+  }
+  
+  .zoutaofen-footer .nav-link:hover {
+    transform: none;
+  }
+  
+  .zoutaofen-footer .resources-title::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .zoutaofen-footer .resource-link {
+    padding: 0.75rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .zoutaofen-footer .footer-container {
+    padding: 0 2rem;
+  }
+  
+  .zoutaofen-footer .nav-category-title {
+    font-size: 1.25rem;
+  }
+  
+  .zoutaofen-footer .resources-title {
+    font-size: 1.25rem;
+  }
+  
+  .zoutaofen-footer .resource-link {
+    padding: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .zoutaofen-footer .footer-container {
+    padding: 0 3rem;
+  }
+  
+  .zoutaofen-footer .nav-category-title {
+    font-size: 1.375rem;
+  }
+  
+  .zoutaofen-footer .resources-title {
+    font-size: 1.375rem;
+  }
+  
+  .zoutaofen-footer .resource-link {
+    padding: 1.5rem;
+  }
+  
+  .zoutaofen-footer .nav-link {
+    font-size: 1rem;
+  }
+  
+  .zoutaofen-footer .resource-label {
+    font-size: 1rem;
+  }
+  
+  .zoutaofen-footer .resource-description {
+    font-size: 0.875rem;
+  }
+}
+
+/* 版本特定样式 */
+.zoutaofen-footer.version-responsive {
+  padding: 3rem 0;
+}
+
+.zoutaofen-footer.version-minimal {
+  padding: 2rem 0;
+}
+
+.zoutaofen-footer.version-full {
+  padding: 4rem 0;
+}
+
+/* 动画效果 */
+.zoutaofen-footer .nav-link,
+.zoutaofen-footer .resource-link {
+  transition: all 0.3s ease;
+}
+
+/* 无障碍支持 */
+.zoutaofen-footer .nav-link:focus,
+.zoutaofen-footer .resource-link:focus {
+  outline: 2px solid #fbbf24;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* 打印样式 */
+@media print {
+  .zoutaofen-footer {
+    background: white !important;
+    color: black !important;
+    border-top: 1px solid #ccc;
+  }
+  
+  .zoutaofen-footer .nav-link,
+  .zoutaofen-footer .resource-link {
+    color: black !important;
+    text-decoration: underline;
+  }
+  
+  .zoutaofen-footer .nav-category-title,
+  .zoutaofen-footer .resources-title,
+  .zoutaofen-footer .team-name {
+    color: black !important;
+  }
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+  .zoutaofen-footer {
+    border-top: 2px solid currentColor;
+  }
+  
+  .zoutaofen-footer .nav-link:hover,
+  .zoutaofen-footer .resource-link:hover {
+    border: 1px solid currentColor;
+  }
+}
+
+/* 减少动画模式支持 */
+@media (prefers-reduced-motion: reduce) {
+  .zoutaofen-footer .nav-link,
+  .zoutaofen-footer .resource-link {
+    transition: none;
+    transform: none;
+  }
+}
+
+/* 深色模式优化 */
+@media (prefers-color-scheme: dark) {
+  .zoutaofen-footer {
+    background: linear-gradient(135deg, #0f172a 0%, #020617 100%);
+  }
+}
+
+/* 性能优化 */
+.zoutaofen-footer .nav-link,
+.zoutaofen-footer .resource-link {
+  will-change: transform, color;
+}
+
+.zoutaofen-footer .resource-link {
+  contain: layout style paint;
+}
+
+/* 悬浮效果优化 */
+.zoutaofen-footer .resource-link:hover {
+  transform: translateY(-4px) scale(1.02);
+}
+
+/* 主题色变量 */
+.zoutaofen-footer {
+  --theme-primary: #fbbf24;
+  --theme-secondary: #f59e0b;
+  --theme-accent: #d97706;
+  --text-primary: #ffffff;
+  --text-secondary: #d1d5db;
+  --text-tertiary: #9ca3af;
+  --bg-primary: #1f2937;
+  --bg-secondary: #111827;
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 使用CSS变量 */
+.zoutaofen-footer .nav-category-title,
+.zoutaofen-footer .resources-title,
+.zoutaofen-footer .team-name {
+  color: var(--theme-primary);
+}
+
+.zoutaofen-footer .nav-link {
+  color: var(--text-secondary);
+}
+
+.zoutaofen-footer .nav-link:hover {
+  color: var(--text-primary);
+}
+
+.zoutaofen-footer .resource-link {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-color);
+}
+
+.zoutaofen-footer .resource-link:hover {
+  border-color: var(--theme-primary);
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.2);
+}
+
+.zoutaofen-footer .resource-icon {
+  color: var(--theme-primary);
+}
+
+.zoutaofen-footer .copyright {
+  color: var(--text-tertiary);
+}
+
+.zoutaofen-footer .competition-info {
+  color: var(--text-tertiary);
+}
