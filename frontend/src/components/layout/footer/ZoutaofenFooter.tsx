@@ -212,7 +212,7 @@ const Footer: React.FC<FooterProps> = ({
     full: 'py-16 px-6'
   };
 
-  const footerClassName = `footer ${backgroundColorClass} ${textColorClass} ${versionClasses[version]} ${className}`.trim();
+  const footerClassName = `footer zoutaofen-footer version-${version} ${backgroundColorClass} ${textColorClass} ${versionClasses[version]} ${className}`.trim();
 
   return (
     <footer 
