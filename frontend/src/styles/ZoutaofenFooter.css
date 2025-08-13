@@ -64,7 +64,7 @@
   opacity: 1;
 }
 
-/* 外部资源链接样式 */
+/* 外部资源链接样式 - 纯文字链接 */
 .zoutaofen-footer .resources-title {
   color: #fbbf24;
   font-weight: 600;
@@ -84,40 +84,20 @@
 }
 
 .zoutaofen-footer .resource-link {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  padding: 1rem;
+  color: #d1d5db;
+  text-decoration: none;
+  font-size: 0.875rem;
+  padding: 0.5rem 0;
+  border-left: 2px solid transparent;
+  padding-left: 1rem;
   transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 0.5rem;
+  display: block;
 }
 
 .zoutaofen-footer .resource-link:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: #fbbf24;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.2);
-}
-
-.zoutaofen-footer .resource-icon {
-  font-size: 1.5rem;
-  color: #fbbf24;
-}
-
-.zoutaofen-footer .resource-label {
   color: #ffffff;
-  font-weight: 500;
-  font-size: 0.875rem;
-}
-
-.zoutaofen-footer .resource-description {
-  color: #9ca3af;
-  font-size: 0.75rem;
-  line-height: 1.4;
+  border-left-color: #fbbf24;
+  transform: translateX(4px);
 }
 
 /* 版权信息样式 */
@@ -185,46 +165,7 @@
 .zoutaofen-footer .resources-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-}
-
-.zoutaofen-footer .resource-item {
-  border-left: 2px solid rgba(251, 191, 36, 0.3);
-  padding-left: 1rem;
-}
-
-.zoutaofen-footer .resource-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.25rem;
-}
-
-.zoutaofen-footer .resource-link {
-  text-decoration: none;
-  color: #d1d5db;
-  transition: color 0.3s ease;
-}
-
-.zoutaofen-footer .resource-link:hover {
-  color: #ffffff;
-}
-
-.zoutaofen-footer .resource-icon {
-  color: #fbbf24;
-  font-size: 1.125rem;
-}
-
-.zoutaofen-footer .resource-label {
-  color: #ffffff;
-  font-weight: 500;
-  font-size: 0.875rem;
-}
-
-.zoutaofen-footer .resource-description {
-  color: #9ca3af;
-  font-size: 0.75rem;
-  line-height: 1.4;
+  gap: 0.75rem;
 }
 
 /* 响应式布局优化 */
@@ -297,10 +238,7 @@
     font-size: 1.25rem;
   }
   
-  .zoutaofen-footer .resource-link {
-    padding: 1.25rem;
   }
-}
 
 @media (min-width: 1024px) {
   .zoutaofen-footer .footer-container {
@@ -315,10 +253,7 @@
     font-size: 1.375rem;
   }
   
-  .zoutaofen-footer .resource-link {
-    padding: 1.5rem;
-  }
-  
+    
   .zoutaofen-footer .nav-link {
     font-size: 1rem;
   }
@@ -418,10 +353,6 @@
   contain: layout style paint;
 }
 
-/* 悬浮效果优化 */
-.zoutaofen-footer .resource-link:hover {
-  transform: translateY(-4px) scale(1.02);
-}
 
 /* 主题色变量 */
 .zoutaofen-footer {
@@ -449,20 +380,6 @@
 
 .zoutaofen-footer .nav-link:hover {
   color: var(--text-primary);
-}
-
-.zoutaofen-footer .resource-link {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: var(--border-color);
-}
-
-.zoutaofen-footer .resource-link:hover {
-  border-color: var(--theme-primary);
-  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.2);
-}
-
-.zoutaofen-footer .resource-icon {
-  color: var(--theme-primary);
 }
 
 .zoutaofen-footer .copyright {
