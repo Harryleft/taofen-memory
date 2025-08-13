@@ -23,46 +23,351 @@
   }
 }
 
-/* Footer区域通用样式 */
-.footer-section {
-  opacity: 1;
+/* 网格布局 */
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
 }
 
-/* Footer内容区域样式 */
-.footer-content-wrapper {
+@media (min-width: 768px) {
+  .footer-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3rem;
+  }
+}
+
+/* 品牌区域样式 */
+.brand-section {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+}
+
+.brand-logo {
+  width: 120px;
+  height: 120px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 120px;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #fbbf24;
 }
 
-/* 品牌内容样式 */
-.brand-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
+.brand-name {
+  color: #fbbf24;
+  font-weight: 700;
+  line-height: 1.2;
 }
 
 .brand-description {
-  text-align: center;
+  line-height: 1.6;
+  max-width: 300px;
+  text-align: left;
 }
 
-.brand-copyright {
-  text-align: center;
+/* 导航区域样式 */
+.nav-category {
+  margin-bottom: 1.5rem;
 }
 
-/* 法律内容样式 */
-.legal-content {
+.nav-title {
+  color: #fbbf24;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  position: relative;
+}
+
+.nav-title::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 30px;
+  height: 2px;
+  background: linear-gradient(to right, #fbbf24, #f59e0b);
+}
+
+.nav-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-link {
+  display: block;
+  padding: 0.25rem 0;
+  color: #d1d5db;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.nav-link:hover {
+  color: #ffffff;
+  transform: translateX(4px);
+}
+
+.nav-link::before {
+  content: '•';
+  position: absolute;
+  left: -12px;
+  color: #fbbf24;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.nav-link:hover::before {
+  opacity: 1;
+}
+
+/* 联系信息区域样式 */
+.contact-title {
+  color: #fbbf24;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  position: relative;
+}
+
+.contact-title::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 30px;
+  height: 2px;
+  background: linear-gradient(to right, #fbbf24, #f59e0b);
+}
+
+.contact-items {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.contact-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.contact-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fbbf24;
+  flex-shrink: 0;
+}
+
+.contact-label {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.contact-value {
+  line-height: 1.4;
+}
+
+/* 社交媒体区域样式 */
+.social-title {
+  color: #fbbf24;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  position: relative;
+}
+
+.social-title::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 30px;
+  height: 2px;
+  background: linear-gradient(to right, #fbbf24, #f59e0b);
+}
+
+.social-links {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  color: #d1d5db;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.social-link:hover {
+  background: #fbbf24;
+  color: #111827;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+}
+
+.social-icon {
+  font-size: 1.2rem;
+}
+
+/* 底部区域样式 */
+.footer-bottom {
+  margin-top: 2rem;
+}
+
+.footer-bottom-content {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .footer-bottom-content {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+  }
+}
+
+.footer-copyright {
+  text-align: center;
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+@media (min-width: 768px) {
+  .footer-copyright {
+    text-align: left;
+  }
+}
+
+/* 法律区域样式 */
+.legal-section {
+  text-align: center;
 }
 
 .legal-additional-text {
-  text-align: center;
-  max-width: 600px;
+  color: #9ca3af;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  max-width: 400px;
   margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .legal-additional-text {
+    margin: 0;
+  }
+}
+
+/* 响应式优化 */
+@media (max-width: 640px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 2rem 0;
+  }
+  
+  .brand-section {
+    align-items: center;
+    text-align: center;
+  }
+  
+  .brand-description {
+    text-align: center;
+    margin: 0 auto;
+  }
+  
+  .nav-category,
+  .contact-section,
+  .social-section {
+    text-align: center;
+  }
+  
+  .nav-title::after,
+  .contact-title::after,
+  .social-title::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .contact-items {
+    align-items: center;
+  }
+  
+  .social-links {
+    justify-content: center;
+  }
+}
+
+/* 动画效果 */
+.nav-link,
+.social-link,
+.contact-item {
+  transition: all 0.3s ease;
+}
+
+/* 无障碍支持 */
+.nav-link:focus,
+.social-link:focus,
+.contact-item:focus {
+  outline: 2px solid #fbbf24;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* 打印样式 */
+@media print {
+  .footer {
+    background: white !important;
+    color: black !important;
+    border-top: 1px solid #ccc;
+  }
+  
+  .social-link,
+  .nav-link {
+    color: black !important;
+    text-decoration: underline;
+  }
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+  .footer {
+    border-top: 2px solid currentColor;
+  }
+  
+  .nav-link:hover,
+  .social-link:hover {
+    border: 1px solid currentColor;
+  }
+}
+
+/* 减少动画模式支持 */
+@media (prefers-reduced-motion: reduce) {
+  .nav-link,
+  .social-link,
+  .contact-item {
+    transition: none;
+    transform: none;
+  }
 }
