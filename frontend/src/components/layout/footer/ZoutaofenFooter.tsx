@@ -113,9 +113,31 @@ const DEFAULT_STYLE = {
 // 默认法律信息配置
 const DEFAULT_LEGAL_CONFIG = {
   copyright: '© 2025 不知道起什么名字团队',
-  competitionInfo: '本作品为第十届上海图书馆开放数据竞赛作品',
+  competitionInfo: '第十届上海图书馆开放数据竞赛作品',
   teamName: '不知道起什么名字团队'
 };
+
+// 默认显示配置
+const DEFAULT_SECTIONS: FooterSection[] = [
+  {
+    id: 'categories',
+    title: '栏目导航',
+    visible: true,
+    order: 1
+  },
+  {
+    id: 'external-resources',
+    title: '外部资源',
+    visible: true,
+    order: 2
+  },
+  {
+    id: 'legal',
+    title: '法律信息',
+    visible: true,
+    order: 3
+  }
+];
 
 // ================ 类型定义 ================
 
@@ -324,6 +346,7 @@ const ZoutaofenFooterResponsive: React.FC<AppFooterProps> = ({
       resources: COMMON_EXTERNAL_RESOURCES
     },
     legal: DEFAULT_LEGAL_CONFIG,
+    sections: DEFAULT_SECTIONS,
     style: DEFAULT_STYLE
   };
 
@@ -347,6 +370,7 @@ const ZoutaofenFooterMinimal: React.FC<AppFooterProps> = ({
       ...DEFAULT_LEGAL_CONFIG,
       competitionInfo: '第十届上海图书馆开放数据竞赛作品'
     },
+    sections: DEFAULT_SECTIONS,
     style: DEFAULT_STYLE
   };
 
@@ -371,6 +395,7 @@ const ZoutaofenFooter: React.FC<AppFooterProps> = ({
       copyright: '© 2025 不知道起什么名字团队. 保留所有权利.',
       competitionInfo: '本作品为第十届上海图书馆开放数据竞赛参赛作品，基于开放数据平台构建'
     },
+    sections: DEFAULT_SECTIONS,
     style: DEFAULT_STYLE
   };
 
