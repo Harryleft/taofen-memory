@@ -188,33 +188,53 @@ const Footer: React.FC<FooterProps> = ({
       aria-label="网站页脚"
     >
       <div className="footer-container max-w-7xl mx-auto">
-        {/* 主要内容区域 - 两列布局 */}
-        <div className="footer-content grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* 左侧：栏目导航 */}
+        {/* 主要内容区域 - 单列布局 */}
+        <div className="footer-content space-y-8">
+          {/* 栏目导航 - 竖向文字布局 */}
           <section className="categories-section">
             <h2 className="section-title text-xl font-bold mb-6 text-amber-500">栏目导航</h2>
-            <div className="categories-grid grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="categories-list space-y-3">
               {primaryNavigation.categories.map((category) => (
                 <a
                   key={category.id}
                   href={category.links[0]?.to || '#'}
-                  className="category-card text-center p-4 bg-gray-800 bg-opacity-50 hover:bg-gray-700 hover:bg-opacity-70 rounded-lg transition-all duration-200 group"
+                  className="category-link text-gray-300 hover:text-white transition-colors duration-200 text-sm"
                 >
-                  <h3 className="category-title text-amber-500 font-semibold text-sm group-hover:text-white">
-                    {category.title}
-                  </h3>
+                  {category.title}
                 </a>
               ))}
             </div>
           </section>
           
-          {/* 右侧：外部资源链接 */}
+          {/* 外部资源链接 - 简化显示 */}
           <section className="external-resources-section">
-            <h2 className="section-title text-xl font-bold mb-6 text-amber-500">相关链接</h2>
-            <ExternalResourcesSection 
-              title={externalResources.title}
-              resources={externalResources.resources}
-            />
+            <h2 className="section-title text-xl font-bold mb-6 text-amber-500">外部资源</h2>
+            <div className="resources-list space-y-4">
+              {externalResources.resources.map((resource, index) => (
+                <div key={index} className="resource-item">
+                  <a
+                    href={resource.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="resource-link text-gray-300 hover:text-white transition-colors duration-200"
+                  >
+                    <div className="resource-header flex items-center gap-2 mb-1">
+                      {resource.icon && (
+                        <span className="resource-icon text-amber-500">
+                          {resource.icon}
+                        </span>
+                      )}
+                      <span className="resource-label font-medium">{resource.label}</span>
+                    </div>
+                    {resource.description && (
+                      <p className="resource-description text-gray-400 text-sm ml-6">
+                        {resource.description}
+                      </p>
+                    )}
+                  </a>
+                </div>
+              ))}
+            </div>
           </section>
         </div>
         
