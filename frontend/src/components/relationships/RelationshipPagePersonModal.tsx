@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { BookOpen, ExternalLink, FileText, X } from 'lucide-react';
 import { Person } from '../../types/Person.ts';
 import { getCategoryClass } from '../../constants/relationshipsConstants';

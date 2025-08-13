@@ -19,16 +19,9 @@ export default function RelationshipsPage() {
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
   const { persons, loading, error, refetch } = useRelationshipsData();
   const filterContainerRef = useRef<HTMLDivElement>(null);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
   // 处理下拉刷新
   const handleRefresh = async () => {
-    setIsRefreshing(true);
-    try {
-      await refetch();
-    } finally {
-      setIsRefreshing(false);
-    }
+    await refetch();
   };
 
   // ESC键关闭详情卡片
