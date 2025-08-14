@@ -32,15 +32,15 @@
   }
 
   .bookstore-search-input {
-    @apply pl-10 pr-4 py-2 bg-white border border-brand-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-gold/50 w-80;
+    @apply pl-10 pr-4 py-2 bg-white border border-accent-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-gold/50 w-80;
   }
 
   .bookstore-select {
-    @apply px-4 py-2 bg-white border border-brand-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-gold/50;
+    @apply px-4 py-2 bg-white border border-accent-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-gold/50;
   }
 
   .bookstore-download-button {
-    @apply flex items-center gap-2 px-4 py-2 bg-white border-2 border-brand-gold/30 text-primary rounded-lg hover:bg-brand-gold/5 hover:border-brand-gold/60 focus:outline-none focus:ring-2 focus:ring-brand-gold/30 transition-all duration-300 shadow-sm hover:shadow-md;
+    @apply flex items-center gap-2 px-4 py-2 bg-white border-2 border-accent-gold/30 text-primary rounded-lg hover:bg-accent-gold/5 hover:border-accent-gold/60 focus:outline-none focus:ring-2 focus:ring-accent-gold/30 transition-all duration-300 shadow-warm-sm hover:shadow-warm-lg;
   }
 
   .bookstore-grid-container {
@@ -67,7 +67,7 @@
   }
 
   .bookstore-card-wrapper {
-    @apply bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300;
+    @apply bg-white rounded-lg shadow-warm-md overflow-hidden hover:shadow-warm-xl transition-shadow duration-300;
   }
 
   .bookstore-card-image-container {
@@ -166,7 +166,7 @@
   }
 
   .bookstore-loading-spinner {
-    @apply animate-spin rounded-full h-8 w-8 border-b-2 border-brand-gold;
+    @apply animate-spin rounded-full h-8 w-8 border-b-2 border-accent-gold;
   }
 
   .bookstore-loading-text {
@@ -182,7 +182,7 @@
   }
 
   .bookstore-load-more-spinner {
-    @apply animate-spin rounded-full h-6 w-6 border-b-2 border-brand-gold mr-3;
+    @apply animate-spin rounded-full h-6 w-6 border-b-2 border-accent-gold mr-3;
   }
 
   .bookstore-load-more-text {
