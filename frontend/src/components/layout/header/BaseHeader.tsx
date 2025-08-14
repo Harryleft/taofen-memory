@@ -47,7 +47,7 @@ function SiteLogo({ config, onClick }: { config: HeaderConfig['logo']; onClick?:
   return (
     <button
       onClick={onClick}
-      className={`group flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg p-1 transition-all duration-300 hover:bg-gray-100 ${config.className || ''}`}
+      className={`group flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg p-2 transition-all duration-200 hover:scale-105 hover:shadow-md hover:shadow-amber-200/30 ${config.className || ''}`}
       aria-label="韬奋纪念馆首页"
     >
       {config.showIcon && (
