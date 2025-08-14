@@ -22,9 +22,9 @@ const MASONRY_CONFIG = {
     GAP: 16,
     CARD_WIDTH: 280,
     MIN_COLUMNS: 1, // 移动端允许单列
-    MAX_COLUMNS: 8,
-    BASE_HEIGHT: 200,
-    MIN_HEIGHT: 150,
+    MAX_COLUMNS: 4,
+    BASE_HEIGHT: 280,
+    MIN_HEIGHT: 240,
     MAX_HEIGHT: 400,
     HEIGHT_PER_CHAR: 0.8,
     VERTICAL_GAP: 20,
@@ -35,10 +35,11 @@ const MASONRY_CONFIG = {
         CARD_WIDTH: 160,
         GAP: 12,
         VERTICAL_GAP: 16,
-        BASE_HEIGHT: 160,
+        BASE_HEIGHT: 200,
         DESC_MAX_LENGTH: 100,
         MIN_CARD_WIDTH: 140, // 移动端最小卡片宽度
         MAX_COLUMNS: 2, // 移动端最大2列
+        MIN_HEIGHT: 180, // 移动端最小卡片高度
         PADDING: 8 // 移动端内边距
       },
       tablet: {
@@ -46,10 +47,11 @@ const MASONRY_CONFIG = {
         CARD_WIDTH: 220,
         GAP: 14,
         VERTICAL_GAP: 18,
-        BASE_HEIGHT: 180,
+        BASE_HEIGHT: 240,
         DESC_MAX_LENGTH: 120,
         MIN_CARD_WIDTH: 200,
         MAX_COLUMNS: 3,
+        MIN_HEIGHT: 200, // 平板端最小卡片高度
         PADDING: 12
       },
       desktop: {
@@ -57,10 +59,11 @@ const MASONRY_CONFIG = {
         CARD_WIDTH: 280,
         GAP: 16,
         VERTICAL_GAP: 20,
-        BASE_HEIGHT: 200,
+        BASE_HEIGHT: 280,
         DESC_MAX_LENGTH: 150,
         MIN_CARD_WIDTH: 240,
         MAX_COLUMNS: 4,
+        MIN_HEIGHT: 240, // 桌面端最小卡片高度
         PADDING: 16
       }
     }
