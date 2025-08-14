@@ -47,7 +47,7 @@ function SiteLogo({ config, onClick }: { config: HeaderConfig['logo']; onClick?:
   return (
     <button
       onClick={onClick}
-      className={`group flex items-center gap-2 focus:outline-none rounded-lg p-2 transition-all duration-200 hover:scale-105 ${config.className || ''}`}
+      className={`group flex items-center gap-2 focus:outline-none rounded-lg p-2 transition-transform duration-200 hover:scale-105 active:scale-100 border-0 ${config.className || ''}`}
       aria-label="韬奋纪念"
     >
       {config.showIcon && (
