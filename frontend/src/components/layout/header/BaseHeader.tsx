@@ -52,11 +52,11 @@ function SiteLogo({ config, onClick }: { config: HeaderConfig['logo']; onClick?:
     >
       {config.showIcon && (
           <div
-              className="w-9 h-9 rounded-lg bg-gray-900 text-white ring-1 ring-amber-400/20 flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300 transform">
+              className="w-9 h-9 rounded-lg text-white ring-1 ring-amber-400/20 flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300 transform">
             <svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"
-                 fill="none" style="color:#000">
-              <g stroke="currentColor" stroke-width="12" stroke-linecap="round"
-                 stroke-linejoin="round">
+                                  fill="none" style={{color: '#000'}}>
+              <g stroke="currentColor" strokeWidth="12" strokeLinecap="round"
+                                  strokeLinejoin="round">
                 <path d="M40 92H216"/>
                 <polygon points="80,74 176,74 152,92 104,92" fill="currentColor"
                          stroke="none"/>
