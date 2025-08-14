@@ -1,6 +1,6 @@
 @layer components {
   .bookstore-page-container {
-    @apply relative py-20 bg-white;
+    @apply relative py-20 bg-cream;
   }
 
   .bookstore-content-container {
