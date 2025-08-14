@@ -47,12 +47,12 @@ function SiteLogo({ config, onClick }: { config: HeaderConfig['logo']; onClick?:
   return (
     <button
       onClick={onClick}
-      className={`group flex items-center gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg p-1 transition-all duration-300 ${config.className || ''}`}
+      className={`group flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg p-1 transition-all duration-300 hover:bg-gray-100 ${config.className || ''}`}
       aria-label="韬奋纪念馆首页"
     >
       {config.showIcon && (
           <div
-              className="w-9 h-9 rounded-lg text-white ring-1 ring-amber-400/20 flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300 transform">
+              className="w-9 h-9 rounded-lg text-white flex items-center justify-center transition-all duration-300">
             <svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"
                                   fill="none" style={{color: '#000'}}>
               <g stroke="currentColor" strokeWidth="12" strokeLinecap="round"
@@ -74,11 +74,11 @@ function SiteLogo({ config, onClick }: { config: HeaderConfig['logo']; onClick?:
       {config.showText && (
           <div className="flex flex-col items-start">
           <span
-              className="font-bold text-xl text-gray-900 transition-all duration-300">
+              className="font-bold text-xl text-gray-900 transition-all duration-300 group-hover:text-amber-700">
             韬奋 · 纪念
           </span>
             <span
-                className="text-xs text-gray-500 leading-none mt-0.5 transition-all duration-300 font-medium tracking-wide">
+                className="text-xs text-gray-600 leading-none mt-0.5 transition-all duration-300 font-medium tracking-wide group-hover:text-amber-600">
             TAOFEN MEMORIAL
           </span>
           </div>
