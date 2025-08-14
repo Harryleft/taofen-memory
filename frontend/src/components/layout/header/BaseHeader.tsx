@@ -47,28 +47,17 @@ function SiteLogo({ config, onClick }: { config: HeaderConfig['logo']; onClick?:
   return (
     <button
       onClick={onClick}
-      className={`group flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2 rounded-lg p-2 transition-all duration-200 hover:scale-105 ${config.className || ''}`}
+      className={`group flex items-center gap-2 focus:outline-none rounded-lg p-2 transition-all duration-200 hover:scale-105 ${config.className || ''}`}
       aria-label="韬奋纪念"
     >
       {config.showIcon && (
           <div
-              className="w-9 h-9 rounded-lg text-white flex items-center justify-center transition-all duration-300">
-            <svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"
-                                  fill="none" style={{color: '#000'}}>
-              <g stroke="currentColor" strokeWidth="12" strokeLinecap="round"
-                                  strokeLinejoin="round">
-                <path d="M40 92H216"/>
-                <polygon points="80,74 176,74 152,92 104,92" fill="currentColor"
-                         stroke="none"/>
-                <path d="M205 92V124"/>
-                <circle cx="205" cy="136" r="7" fill="currentColor"
-                        stroke="none"/>
-                <circle cx="80" cy="145" r="34"/>
-                <circle cx="157" cy="145" r="34"/>
-              </g>
-              <path d="M110 148 L128 140 L130 130 Z" fill="currentColor"/>
-            </svg>
-
+              className="w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-300">
+            <img 
+              src="/images/logo/logo.png" 
+              alt="韬奋纪念" 
+              className="w-full h-full object-contain"
+            />
           </div>
       )}
       {config.showText && (
