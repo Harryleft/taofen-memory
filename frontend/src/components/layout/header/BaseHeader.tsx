@@ -87,10 +87,9 @@ function DesktopNavigation({items, onNavigate}: {
         <button
           key={item.to}
           onClick={() => onNavigate(item.to)}
-          className="relative px-4 py-2 font-medium text-gray-700 hover:text-gray-900 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 group"
+          className="px-4 py-2 font-medium text-gray-700 focus:outline-none rounded-lg transition-transform duration-200 hover:scale-105 active:scale-100 border-0"
         >
-          <span className="relative z-10">{item.label}</span>
-          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-amber-500 to-amber-600 group-hover:w-full transition-all duration-300" />
+          {item.label}
         </button>
       ))}
     </nav>
@@ -104,7 +103,7 @@ function MobileMenuButton({ isOpen, onToggle }: { isOpen: boolean; onToggle: () 
   return (
     <button
       onClick={onToggle}
-      className="md:hidden relative w-10 h-10 flex flex-col items-center justify-center space-y-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg transition-all duration-300 hover:bg-gray-50 hover:shadow-sm"
+      className="md:hidden relative w-10 h-10 flex flex-col items-center justify-center space-y-1.5 focus:outline-none rounded-lg transition-transform duration-200 hover:scale-105 active:scale-100 border-0"
       aria-label="菜单"
       aria-expanded={isOpen}
       aria-controls="mobile-menu"
@@ -150,16 +149,15 @@ function MobileMenu({ isOpen, items, onClose, onNavigate }: {
                 onNavigate(item.to);
                 onClose();
               }}
-              className="group block w-full text-left py-3 px-4 rounded-lg hover:bg-amber-500/10 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+              className="block w-full text-left py-3 px-4 rounded-lg focus:outline-none transition-transform duration-200 hover:scale-105 active:scale-100 border-0"
               style={{
                 animationDelay: `${index * 50}ms`,
                 animation: isOpen ? 'slideInFromRight 0.3s ease-out forwards' : 'none'
               }}
             >
-              <span className="text-lg font-medium text-gray-700 group-hover:text-gray-900 transition-colors duration-150">
+              <span className="text-lg font-medium text-gray-700">
                 {item.label}
               </span>
-              <div className="w-0 h-0.5 bg-gradient-to-r from-amber-500 to-amber-600 group-hover:w-full transition-all duration-300 mt-1" />
             </button>
           ))}
         </div>
