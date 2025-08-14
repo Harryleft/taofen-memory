@@ -66,10 +66,10 @@ function SiteLogo({ config, onClick }: { config: HeaderConfig['logo']; onClick?:
       )}
       {config.showText && (
         <div className="flex flex-col items-start">
-          <span className="font-bold text-xl text-gray-900 transition-all duration-300 group-hover:shadow-sm">
+          <span className="font-bold text-xl text-gray-900 transition-all duration-300">
             韬奋 · 纪念
           </span>
-          <span className="text-xs text-gray-500 leading-none mt-0.5 transition-all duration-300 font-medium tracking-wide group-hover:shadow-sm">
+          <span className="text-xs text-gray-500 leading-none mt-0.5 transition-all duration-300 font-medium tracking-wide">
             TAOFEN MEMORIAL
           </span>
         </div>
@@ -88,8 +88,7 @@ function DesktopNavigation({ items, onNavigate }: { items: NavigationItem[]; onN
           onClick={() => onNavigate(item.to)}
           className="relative px-4 py-2 font-medium text-gray-700 hover:text-gray-900 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 group"
         >
-          <span className="relative z-10 group-hover:shadow-sm">{item.label}</span>
-          <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 to-amber-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <span className="relative z-10">{item.label}</span>
           <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-amber-500 to-amber-600 group-hover:w-full transition-all duration-300" />
         </button>
       ))}
@@ -156,7 +155,7 @@ function MobileMenu({ isOpen, items, onClose, onNavigate }: {
                 animation: isOpen ? 'slideInFromRight 0.3s ease-out forwards' : 'none'
               }}
             >
-              <span className="text-lg font-medium text-gray-700 group-hover:text-gray-900 group-hover:shadow-sm transition-colors duration-150">
+              <span className="text-lg font-medium text-gray-700 group-hover:text-gray-900 transition-colors duration-150">
                 {item.label}
               </span>
               <div className="w-0 h-0.5 bg-gradient-to-r from-amber-500 to-amber-600 group-hover:w-full transition-all duration-300 mt-1" />
