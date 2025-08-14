@@ -1,7 +1,7 @@
 /* CSS 变量已迁移到 tailwind.config.js 中的 category-* 颜色定义 */
 
 .relationships-page-container {
-  @apply min-h-screen bg-white;
+  @apply min-h-screen bg-cream;
 }
 
 /* 头部样式已移除 - 使用 BaseHeader 组件 */
@@ -172,7 +172,7 @@
 }
 
 .relationships-loading-container {
-  @apply min-h-screen bg-white flex items-center justify-center;
+  @apply min-h-screen bg-cream flex items-center justify-center;
 }
 
 .relationships-loading-content {
@@ -188,7 +188,7 @@
 }
 
 .relationships-error-container {
-  @apply min-h-screen bg-white flex items-center justify-center;
+  @apply min-h-screen bg-cream flex items-center justify-center;
 }
 
 .relationships-error-content {

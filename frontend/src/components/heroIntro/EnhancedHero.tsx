@@ -1,8 +1,6 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import HeroPageBackdrop from './HeroPageBackdrop.tsx';
-import BaseHeader from '../layout/header/BaseHeader';
-import { headerConfigs } from '../../constants/header.configs';
 import { CONFIG } from '../../constants/config';
 
 // ====== 类型定义 ======
