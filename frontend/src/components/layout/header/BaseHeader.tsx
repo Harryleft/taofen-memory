@@ -47,8 +47,8 @@ function SiteLogo({ config, onClick }: { config: HeaderConfig['logo']; onClick?:
   return (
     <button
       onClick={onClick}
-      className={`group flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg p-2 transition-all duration-200 hover:scale-105 hover:shadow-md hover:shadow-amber-200/30 ${config.className || ''}`}
-      aria-label="韬奋纪念馆首页"
+      className={`group flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2 rounded-lg p-2 transition-all duration-200 hover:scale-105 ${config.className || ''}`}
+      aria-label="韬奋纪念"
     >
       {config.showIcon && (
           <div
@@ -74,11 +74,11 @@ function SiteLogo({ config, onClick }: { config: HeaderConfig['logo']; onClick?:
       {config.showText && (
           <div className="flex flex-col items-start">
           <span
-              className="font-bold text-xl text-gray-900 transition-all duration-300 group-hover:text-amber-700">
+              className="font-bold text-xl text-black transition-all duration-300 group-hover:text-black">
             韬奋 · 纪念
           </span>
             <span
-                className="text-xs text-gray-600 leading-none mt-0.5 transition-all duration-300 font-medium tracking-wide group-hover:text-amber-600">
+                className="text-xs text-black leading-none mt-0.5 transition-all duration-300 font-medium tracking-wide group-hover:text-black">
             TAOFEN MEMORIAL
           </span>
           </div>
