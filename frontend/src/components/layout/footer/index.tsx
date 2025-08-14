@@ -1,4 +1,3 @@
-import React from 'react';
 import '../../../styles/ZoutaofenFooter.css';
 
 // 导入新的ZoutaofenFooter组件和类型

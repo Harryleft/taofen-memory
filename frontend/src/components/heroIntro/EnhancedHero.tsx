@@ -354,9 +354,6 @@ export default function EnhancedHero() {
   // ====== 主渲染 ======
   return (
     <>
-      {/* 使用统一的Header组件 */}
-      <BaseHeader config={headerConfigs.home} />
-
       {/* Skip Link */}
       <a
         href="#modules"

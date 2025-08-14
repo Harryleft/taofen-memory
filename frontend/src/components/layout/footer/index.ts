@@ -2,11 +2,8 @@
 export type {
   FooterConfig,
   FooterProps,
-  FooterSection,
   NavigationLink,
   NavigationCategory,
-  ContactInfo,
-  SocialLink
 } from './index.tsx';
 
 // 组件导出
