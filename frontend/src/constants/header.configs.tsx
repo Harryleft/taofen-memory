@@ -28,7 +28,7 @@ export const headerConfigs: Record<string, HeaderConfig> = {
     backgroundColor: 'transparent',
   },
 
-  // 生平时光轴 - 统一使用首页样式
+  // 生平时光轴 - 其他页面使用白色背景
   timeline: {
     moduleId: 'timeline',
     title: '生平时光轴',
@@ -43,10 +43,10 @@ export const headerConfigs: Record<string, HeaderConfig> = {
     },
     showNavigation: true,
     showMobileMenu: true,
-    backgroundColor: 'transparent',
+    backgroundColor: 'white',
   },
 
-  // 人物关系 - 统一使用首页样式
+  // 人物关系 - 其他页面使用白色背景
   relationships: {
     moduleId: 'relationships',
     title: '人物关系',
@@ -61,10 +61,10 @@ export const headerConfigs: Record<string, HeaderConfig> = {
     },
     showNavigation: true,
     showMobileMenu: true,
-    backgroundColor: 'transparent',
+    backgroundColor: 'white',
   },
 
-  // 手稿文献 - 统一使用首页样式
+  // 手稿文献 - 其他页面使用白色背景
   handwriting: {
     moduleId: 'handwriting',
     title: '手稿文献',
@@ -79,10 +79,10 @@ export const headerConfigs: Record<string, HeaderConfig> = {
     },
     showNavigation: true,
     showMobileMenu: true,
-    backgroundColor: 'transparent',
+    backgroundColor: 'white',
   },
 
-  // 书店经营 - 统一使用首页样式
+  // 书店经营 - 其他页面使用白色背景
   bookstore: {
     moduleId: 'bookstore',
     title: '书店经营',
@@ -97,10 +97,10 @@ export const headerConfigs: Record<string, HeaderConfig> = {
     },
     showNavigation: true,
     showMobileMenu: true,
-    backgroundColor: 'transparent',
+    backgroundColor: 'white',
   },
 
-  // 默认或未知模块 - 统一使用首页样式
+  // 默认或未知模块 - 其他页面使用白色背景
   default: {
     moduleId: 'default',
     title: '韬奋纪念馆',
@@ -115,6 +115,6 @@ export const headerConfigs: Record<string, HeaderConfig> = {
     },
     showNavigation: true,
     showMobileMenu: true,
-    backgroundColor: 'transparent',
+    backgroundColor: 'white',
   },
 };

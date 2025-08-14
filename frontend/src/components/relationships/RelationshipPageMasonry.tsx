@@ -308,7 +308,7 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
       clearTimeout(timeoutId);
       clearTimeout(timeoutId2);
     };
-  }, []);
+  }, [getResponsiveConfig]);
 
   // 防抖函数
   const debounce = <T extends (...args: unknown[]) => void>(func: T, wait: number) => {
