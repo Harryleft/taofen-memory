@@ -174,6 +174,12 @@ export default {
         'inner': 'inset 0 2px 4px rgba(0, 0, 0, 0.06)',
         'card': '0 2px 4px rgba(0, 0, 0, 0.04), 0 4px 8px rgba(0, 0, 0, 0.06), 0 8px 16px rgba(0, 0, 0, 0.08)',
         'hover': '0 8px 16px rgba(0, 0, 0, 0.08), 0 16px 32px rgba(0, 0, 0, 0.12), 0 24px 48px rgba(0, 0, 0, 0.16)',
+        // === 暖色背景适配阴影 ===
+        'warm-sm': '0 1px 3px rgba(139, 69, 19, 0.12)',
+        'warm-md': '0 4px 6px rgba(139, 69, 19, 0.15)',
+        'warm-lg': '0 10px 15px rgba(139, 69, 19, 0.18)',
+        'warm-xl': '0 20px 25px rgba(139, 69, 19, 0.20)',
+        'warm-hover': '0 8px 16px rgba(139, 69, 19, 0.20), 0 16px 32px rgba(139, 69, 19, 0.25), 0 24px 48px rgba(139, 69, 19, 0.30)',
       },
       
       // === 字体大小系统 ===

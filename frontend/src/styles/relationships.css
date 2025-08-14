@@ -258,11 +258,11 @@
 .masonry-card-base {
   @apply absolute cursor-pointer overflow-hidden;
   
-  /* 多层阴影营造层次感 */
+  /* 多层阴影营造层次感 - 适配暖色背景 */
   box-shadow: 
-    0 2px 4px rgba(0, 0, 0, 0.04),
-    0 4px 8px rgba(0, 0, 0, 0.06),
-    0 8px 16px rgba(0, 0, 0, 0.08);
+    0 2px 4px rgba(139, 69, 19, 0.08),
+    0 4px 8px rgba(139, 69, 19, 0.12),
+    0 8px 16px rgba(139, 69, 19, 0.16);
   
   /* 微妙的背景纹理和渐变 */
   background: 
@@ -291,11 +291,11 @@
 }
 
 .masonry-card-base:hover {
-  /* 悬停时的增强阴影 */
+  /* 悬停时的增强阴影 - 适配暖色背景 */
   box-shadow: 
-    0 8px 16px rgba(0, 0, 0, 0.08),
-    0 16px 32px rgba(0, 0, 0, 0.12),
-    0 24px 48px rgba(0, 0, 0, 0.16);
+    0 8px 16px rgba(139, 69, 19, 0.15),
+    0 16px 32px rgba(139, 69, 19, 0.20),
+    0 24px 48px rgba(139, 69, 19, 0.25);
   
   /* 边框颜色变化 */
   border-color: rgba(212, 175, 55, 0.3);
@@ -350,8 +350,8 @@
   background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 100%);
   border: 3px solid rgba(212, 175, 55, 0.2);
   box-shadow: 
-    0 2px 8px rgba(0, 0, 0, 0.1),
-    0 1px 3px rgba(0, 0, 0, 0.06);
+    0 2px 8px rgba(139, 69, 19, 0.15),
+    0 1px 3px rgba(139, 69, 19, 0.08);
   position: relative;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -367,8 +367,8 @@
 .masonry-avatar-container:hover {
   border-color: var(--category-color);
   box-shadow: 
-    0 4px 12px rgba(0, 0, 0, 0.15),
-    0 2px 6px rgba(0, 0, 0, 0.1);
+    0 4px 12px rgba(139, 69, 19, 0.20),
+    0 2px 6px rgba(139, 69, 19, 0.12);
   transform: scale(1.05);
 }
 
@@ -414,13 +414,13 @@
   align-items: center;
   justify-content: center;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(139, 69, 19, 0.20);
   z-index: 10;
 }
 
 .masonry-category-icon:hover {
   transform: scale(1.1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px rgba(139, 69, 19, 0.30);
   background: var(--category-color-dark);
 }
 
@@ -913,11 +913,11 @@
 
 /* 移动端性能优化 */
 @media (max-width: 768px) {
-  /* 减少动画和阴影效果 */
+  /* 减少动画和阴影效果 - 适配暖色背景 */
   .masonry-card-base {
     box-shadow: 
-      0 1px 2px rgba(0, 0, 0, 0.04),
-      0 2px 4px rgba(0, 0, 0, 0.06);
+      0 1px 2px rgba(139, 69, 19, 0.06),
+      0 2px 4px rgba(139, 69, 19, 0.10);
     will-change: transform;
     /* 优化渲染性能 */
     transform: translateZ(0);
@@ -926,8 +926,8 @@
   
   .masonry-card-base:hover {
     box-shadow: 
-      0 2px 4px rgba(0, 0, 0, 0.08),
-      0 4px 8px rgba(0, 0, 0, 0.12);
+      0 2px 4px rgba(139, 69, 19, 0.12),
+      0 4px 8px rgba(139, 69, 19, 0.18);
   }
   
   /* 优化图片加载 */
