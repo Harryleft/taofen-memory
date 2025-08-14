@@ -309,7 +309,7 @@
   background: linear-gradient(180deg, 
     rgba(255, 255, 255, 0.98) 0%, 
     rgba(255, 255, 255, 0.99) 100%);
-  min-height: 200px;
+  min-height: 220px;
 }
 
 .masonry-card-avatar-container {
@@ -665,12 +665,12 @@
 /* 响应式卡片尺寸调整 */
 @media (max-width: 640px) {
   .masonry-card-base {
-    min-height: 180px;
+    min-height: 200px;
   }
   
   .masonry-card-content {
     padding: 16px;
-    min-height: 180px;
+    min-height: 200px;
   }
   
   .masonry-avatar-container {
@@ -695,12 +695,12 @@
 
 @media (max-width: 480px) {
   .masonry-card-base {
-    min-height: 160px;
+    min-height: 180px;
   }
   
   .masonry-card-content {
     padding: 12px;
-    min-height: 160px;
+    min-height: 180px;
   }
   
   .masonry-avatar-container {
@@ -727,7 +727,7 @@
 @media (min-width: 1024px) {
   .masonry-card-content {
     padding: 28px;
-    min-height: 280px;
+    min-height: 320px;
   }
   
   .masonry-avatar-container {
@@ -748,7 +748,7 @@
 @media (min-width: 768px) and (max-width: 1023px) {
   .masonry-card-content {
     padding: 20px;
-    min-height: 240px;
+    min-height: 260px;
   }
   
   .masonry-avatar-container {

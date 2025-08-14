@@ -20,11 +20,11 @@ const getCategoryClass = (category: string): string => {
 const MASONRY_CONFIG = {
   layout: {
     GAP: 16,
-    CARD_WIDTH: 280,
+    CARD_WIDTH: 300,
     MIN_COLUMNS: 1, // 移动端允许单列
     MAX_COLUMNS: 4,
-    BASE_HEIGHT: 280,
-    MIN_HEIGHT: 240,
+    BASE_HEIGHT: 360,
+    MIN_HEIGHT: 340,
     MAX_HEIGHT: 400,
     HEIGHT_PER_CHAR: 0.8,
     VERTICAL_GAP: 20,
@@ -32,38 +32,38 @@ const MASONRY_CONFIG = {
     RESPONSIVE: {
       mobile: {
         BREAKPOINT: 480,
-        CARD_WIDTH: 160,
+        CARD_WIDTH: 180,
         GAP: 12,
         VERTICAL_GAP: 16,
-        BASE_HEIGHT: 220,
+        BASE_HEIGHT: 216,
         DESC_MAX_LENGTH: 100,
-        MIN_CARD_WIDTH: 140, // 移动端最小卡片宽度
+        MIN_CARD_WIDTH: 160, // 移动端最小卡片宽度
         MAX_COLUMNS: 2, // 移动端最大2列
         MIN_HEIGHT: 200, // 移动端最小卡片高度
         PADDING: 8 // 移动端内边距
       },
       tablet: {
         BREAKPOINT: 768,
-        CARD_WIDTH: 220,
+        CARD_WIDTH: 240,
         GAP: 14,
         VERTICAL_GAP: 18,
-        BASE_HEIGHT: 300,
+        BASE_HEIGHT: 288,
         DESC_MAX_LENGTH: 120,
-        MIN_CARD_WIDTH: 200,
+        MIN_CARD_WIDTH: 220,
         MAX_COLUMNS: 3,
         MIN_HEIGHT: 280, // 平板端最小卡片高度
         PADDING: 12
       },
       desktop: {
         BREAKPOINT: 1024,
-        CARD_WIDTH: 280,
+        CARD_WIDTH: 300,
         GAP: 16,
         VERTICAL_GAP: 20,
-        BASE_HEIGHT: 380,
+        BASE_HEIGHT: 360,
         DESC_MAX_LENGTH: 150,
-        MIN_CARD_WIDTH: 240,
+        MIN_CARD_WIDTH: 280,
         MAX_COLUMNS: 4,
-        MIN_HEIGHT: 360, // 桌面端最小卡片高度
+        MIN_HEIGHT: 340, // 桌面端最小卡片高度
         PADDING: 16
       }
     }

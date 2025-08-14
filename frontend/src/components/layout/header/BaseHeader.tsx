@@ -51,37 +51,49 @@ function SiteLogo({ config, onClick }: { config: HeaderConfig['logo']; onClick?:
       aria-label="韬奋纪念馆首页"
     >
       {config.showIcon && (
-        <div className="w-9 h-9 rounded-lg bg-gray-900 text-white ring-1 ring-amber-400/20 flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300 transform">
-          <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <rect x="3" y="6" width="18" height="12" rx="2" strokeWidth="1.5"/>
-            <rect x="6" y="3" width="12" height="8" rx="1" strokeWidth="1.5"
-                  fill="currentColor" fillOpacity="0.2"/>
-            <circle cx="8" cy="12" r="1" fill="currentColor"/>
-            <circle cx="12" cy="12" r="1" fill="currentColor"/>
-            <circle cx="16" cy="12" r="1" fill="currentColor"/>
-            <circle cx="10" cy="15" r="1" fill="currentColor"/>
-            <circle cx="14" cy="15" r="1" fill="currentColor"/>
-          </svg>
-        </div>
+          <div
+              className="w-9 h-9 rounded-lg bg-gray-900 text-white ring-1 ring-amber-400/20 flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300 transform">
+            <svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"
+                 fill="none" style="color:#000">
+              <g stroke="currentColor" stroke-width="12" stroke-linecap="round"
+                 stroke-linejoin="round">
+                <path d="M40 92H216"/>
+                <polygon points="80,74 176,74 152,92 104,92" fill="currentColor"
+                         stroke="none"/>
+                <path d="M205 92V124"/>
+                <circle cx="205" cy="136" r="7" fill="currentColor"
+                        stroke="none"/>
+                <circle cx="80" cy="145" r="34"/>
+                <circle cx="157" cy="145" r="34"/>
+              </g>
+              <path d="M110 148 L128 140 L130 130 Z" fill="currentColor"/>
+            </svg>
+
+          </div>
       )}
       {config.showText && (
-        <div className="flex flex-col items-start">
-          <span className="font-bold text-xl text-gray-900 transition-all duration-300">
+          <div className="flex flex-col items-start">
+          <span
+              className="font-bold text-xl text-gray-900 transition-all duration-300">
             韬奋 · 纪念
           </span>
-          <span className="text-xs text-gray-500 leading-none mt-0.5 transition-all duration-300 font-medium tracking-wide">
+            <span
+                className="text-xs text-gray-500 leading-none mt-0.5 transition-all duration-300 font-medium tracking-wide">
             TAOFEN MEMORIAL
           </span>
-        </div>
+          </div>
       )}
     </button>
   );
 }
 
 // 桌面端导航组件
-function DesktopNavigation({ items, onNavigate }: { items: NavigationItem[]; onNavigate: (path: string) => void }) {
+function DesktopNavigation({items, onNavigate}: {
+  items: NavigationItem[];
+  onNavigate: (path: string) => void
+}) {
   return (
-    <nav className="hidden md:flex items-center gap-8" aria-label="主导航">
+      <nav className="hidden md:flex items-center gap-8" aria-label="主导航">
       {items.map((item) => (
         <button
           key={item.to}
