@@ -30,6 +30,11 @@ const PERIODS: PeriodRange[] = [
  * 支持 "1895年", "1916年3月24日", "1931年9月18日" 等格式
  */
 function extractYear(timeString: string): number {
+  // 特殊处理"弥留之际"等情况
+  if (timeString.includes('弥留之际') || timeString.includes('逝世') || timeString.includes('去世')) {
+    return 1944; // 邹韬奋逝世年份
+  }
+  
   // 匹配4位数字年份
   const yearMatch = timeString.match(/(\d{4})/);
   if (!yearMatch) {
