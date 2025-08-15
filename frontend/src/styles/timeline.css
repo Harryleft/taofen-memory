@@ -461,20 +461,131 @@
   }
 }
 
+/* 滚动发现体验动画 */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(40px) scale(0.98);
+  transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity;
+  filter: blur(2px);
+  contain: layout style paint;
+}
+
+.scroll-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
+/* 性能优化：减少动画复杂度 */
+@media (prefers-reduced-motion: no-preference) {
+  .scroll-reveal {
+    transition-property: transform, opacity, filter;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 1.2s;
+  }
+}
+
+/* 硬件加速优化 */
+.scroll-reveal {
+  backface-visibility: hidden;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+/* 核心事件标题动画 - 优雅入场 */
+.core-event-title.scroll-reveal {
+  transition-delay: 0.1s;
+  transform: translateY(20px);
+  filter: blur(1px);
+}
+
+.core-event-title.scroll-reveal.revealed {
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* 首个事件卡片动画 - 主要内容突出 */
+.first-event-clickable.scroll-reveal {
+  transition-delay: 0.3s;
+  transform: translateY(35px) scale(0.96);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.first-event-clickable.scroll-reveal.revealed {
+  transform: translateY(0) scale(1);
+  box-shadow: 0 4px 12px rgba(184, 134, 11, 0.08);
+}
+
+/* 展开事件动画 - 层次感递进 */
+.staggered-animation.scroll-reveal {
+  transition-delay: 0.5s;
+  transform: translateY(25px) scale(0.97);
+  opacity: 0.7;
+}
+
+.staggered-animation.scroll-reveal.revealed {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+/* 关键历史事件突出动画 - 更强烈的视觉冲击 */
+.key-milestone.scroll-reveal {
+  transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(50px) scale(0.92);
+  filter: blur(3px) brightness(0.9);
+  opacity: 0.6;
+}
+
+.key-milestone.scroll-reveal.revealed {
+  transform: translateY(0) scale(1);
+  filter: blur(0) brightness(1);
+  opacity: 1;
+}
+
+/* 次要事件温和动画 - 轻柔出现 */
+.minor-event.scroll-reveal {
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(15px) scale(0.99);
+  filter: blur(1px);
+  opacity: 0.8;
+}
+
+.minor-event.scroll-reveal.revealed {
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+  opacity: 1;
+}
+
+/* 背景事件更温和的动画 */
+.background-event.scroll-reveal {
+  transition: all 0.6s ease-out;
+  transform: translateY(10px);
+  opacity: 0.5;
+}
+
+.background-event.scroll-reveal.revealed {
+  transform: translateY(0);
+  opacity: 0.8;
+}
+
 /* 高对比度模式支持 */
 @media (prefers-contrast: high) {
-  .timeline-dot:not(.hidden)::before {
-    border-width: 3px;
-    box-shadow: 
-      0 0 16px var(--dot-shadow-gold),
-      0 0 8px var(--dot-shadow-dark) !important;
+  .scroll-reveal {
+    transform: translateY(20px);
   }
   
-  .timeline-dot-gray:not(.hidden)::before {
-    border-width: 3px;
-    box-shadow: 
-      0 0 16px var(--dot-shadow-gray),
-      0 0 8px var(--dot-shadow-dark) !important;
+  .key-milestone.scroll-reveal {
+    transform: translateY(30px) scale(0.98);
+  }
+}
+
+/* 减少动画模式支持 */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal {
+    transition: none;
+    transform: none;
+    opacity: 1;
   }
 }
 
