@@ -20,12 +20,12 @@ export const periods = [
   { id: 'late', name: '救亡图存期', color: '#5B8CB8', years: '1937-1944' }
 ] as const;
 
-// 从年份判断所属阶段
-function getPeriodFromYear(year: number): 'early' | 'middle' | 'late' {
-  if (year <= 1921) return 'early';
-  if (year <= 1936) return 'middle';
-  return 'late';
-}
+// 从年份判断所属阶段（预留功能）
+// function getPeriodFromYear(year: number): 'early' | 'middle' | 'late' {
+//   if (year <= 1921) return 'early';
+//   if (year <= 1936) return 'middle';
+//   return 'late';
+// }
 
 // 提取年份的辅助函数
 function extractYear(timeString: string): number | null {
