@@ -1,10 +1,10 @@
 .timeline-page-root {
-  --bg-cream: var(--brand-cream);
-  --text-charcoal: var(--text-primary);
-  --text-muted: var(--text-muted);
-  --accent-gold: var(--brand-gold);
-  --surface: var(--background-card);
-  --border: var(--border-light);
+  --bg-cream: #FAF7F0;
+  --text-charcoal: #2C2C2C;
+  --text-muted: #999999;
+  --accent-gold: #D4AF37;
+  --surface: #FFFFFF;
+  --border: rgba(0, 0, 0, 0.08);
   --radius: 12px;
   --radius-sm: 8px;
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
@@ -42,7 +42,7 @@
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
 }
 
-.timeline-dot::before {
+.timeline-dot:not(.hidden)::before {
   content: '';
   position: absolute;
   top: 8px;
@@ -50,16 +50,16 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: var(--accent-gold);
-  border: 2px solid var(--bg-cream);
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
+  background: var(--accent-gold) !important;
+  border: 2px solid var(--bg-cream) !important;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.15) !important;
   transform: translateX(-50%);
   z-index: 2;
 }
 
-.timeline-dot-gray::before {
-  background: #9CA3AF;
-  box-shadow: 0 0 15px rgba(156, 163, 175, 0.3);
+.timeline-dot-gray:not(.hidden)::before {
+  background: #9CA3AF !important;
+  box-shadow: 0 0 15px rgba(156, 163, 175, 0.3) !important;
 }
 
 .animate-fadeIn {
@@ -91,7 +91,7 @@
 
 .core-event-title {
   position: relative;
-  background: var(--brand-cream);
+  background: #FAF7F0;
   padding: 20px 0;
   margin-bottom: 24px;
   z-index: 1;
@@ -339,7 +339,7 @@
 
 @media (max-width: 768px) {
   .timeline-container::before,
-  .timeline-dot::before {
+  .timeline-dot:not(.hidden)::before {
     left: 20px;
   }
 
@@ -371,6 +371,25 @@
 .timeline-meta {
   color: var(--text-secondary);
   font-weight: 500;
+}
+
+/* 确保timeline-dot元素有正确的定位上下文 */
+.timeline-item {
+  position: relative;
+}
+
+.timeline-dot {
+  position: relative;
+  display: block;
+  width: 1px;
+  height: 1px;
+}
+
+/* 强制显示timeline-dot伪元素 */
+.timeline-dot:not(.hidden)::before {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 /* 首事件标题在桌面端隐藏（TOC 已提供导航）；移动端保留 */
