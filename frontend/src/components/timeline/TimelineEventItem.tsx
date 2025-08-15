@@ -85,7 +85,7 @@ const TimelineEventItem: React.FC<TimelineItemProps> = ({ event, isFeatured, lay
 
 
     // 根据 isFeatured 属性决定时间文本的样式
-  const timeTextClasses = isFeatured ? 'text-base font-semibold' : 'text-sm font-medium';
+  const timeTextClasses = isFeatured ? 'text-[1.563rem] font-semibold' : 'text-[1rem] font-medium';
 
   // 根据是否为特色事件设置图片尺寸样式
   // 特色事件: 最大宽度80%, 高度自适应保持比例
@@ -218,9 +218,9 @@ const TimelineEventItem: React.FC<TimelineItemProps> = ({ event, isFeatured, lay
               </div>
               
               <div className="pt-1">
-                <p className={`leading-relaxed ${
-                  isKeyMilestone ? 'text-charcoal text-lg font-medium' : 
-                  isBackgroundEvent ? 'text-charcoal/60 text-sm' : 
+                <p className={`leading-relaxed text-[1rem] ${
+                  isKeyMilestone ? 'text-charcoal font-medium' : 
+                  isBackgroundEvent ? 'text-charcoal/60 text-[0.8rem]' : 
                   'text-charcoal/80'
                 }`}>
                   {renderTextWithPersonLinks(event.experience)}

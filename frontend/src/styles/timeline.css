@@ -1,14 +1,56 @@
 .timeline-page-root {
+  /* 基础颜色系统 */
   --bg-cream: #FAF7F0;
   --text-charcoal: #2C2C2C;
   --text-muted: #999999;
   --accent-gold: #D4AF37;
   --surface: #FFFFFF;
   --border: rgba(0, 0, 0, 0.08);
+  
+  /* 圆角系统 */
   --radius: 12px;
   --radius-sm: 8px;
+  
+  /* 阴影系统 */
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
   --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.15);
+  
+  /* 排版系统 - 按设计规范 */
+  --text-h1: 2.441rem;     /* 39.06px - 人物姓名 */
+  --text-h2: 1.953rem;     /* 31.25px - 阶段标题 */
+  --text-h3: 1.563rem;     /* 25px - 年份标题 */
+  --text-body: 1rem;       /* 16px - 正文内容 */
+  --text-caption: 0.8rem;  /* 12.8px - 图片说明 */
+  
+  /* 行高系统 */
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.75;
+  
+  /* 字重系统 */
+  --font-light: 300;
+  --font-regular: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  
+  /* 间距系统 */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  
+  /* Z-index层级系统 */
+  --z-below: -1;
+  --z-base: 1;
+  --z-elevated: 10;
+  --z-modal: 100;
+  --z-popover: 200;
+  --z-tooltip: 300;
   
   /* 时间轴点专用优化变量 */
   --dot-gold: #B8860B;
@@ -22,6 +64,17 @@
   --dot-size: 14px;
   --dot-size-mobile: 12px;
   --dot-border-width: 2px;
+  
+  /* 动画参数 */
+  --animation-fast: 0.2s;
+  --animation-normal: 0.4s;
+  --animation-slow: 0.8s;
+  --animation-slower: 1.2s;
+  
+  /* 缓动函数 */
+  --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 .timeline-container {
@@ -44,13 +97,13 @@
     rgba(0, 0, 0, 0.0) 100%
   );
   transform: translateX(-50%);
-  z-index: 0;
+  z-index: var(--z-below);
   border-radius: 2px;
 }
 
 .timeline-item {
   position: relative;
-  z-index: 1;
+  z-index: var(--z-base);
   color: var(--text-primary);
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
 }
@@ -70,10 +123,10 @@
     0 0 4px var(--dot-shadow-dark),
     inset 0 0 4px rgba(255, 255, 255, 0.6) !important;
   transform: translateX(-50%) translateZ(0);
-  z-index: 2;
+  z-index: var(--z-elevated);
   will-change: transform, box-shadow;
   backface-visibility: hidden;
-  transition: transform 0.3s ease, background 0.3s ease;
+  transition: transform var(--animation-normal) var(--ease-out), background var(--animation-normal) var(--ease-out);
 }
 
 .timeline-dot-gray:not(.hidden)::before {
@@ -133,19 +186,20 @@
 
 .first-event-clickable {
   position: relative;
-  border-radius: 12px;
-  padding: 20px;
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
   margin: 0;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all var(--animation-normal) var(--ease-out);
   background: rgba(245, 235, 220, 0.8);
   border: 1px solid rgba(184, 134, 11, 0.15);
-  box-shadow: 0 4px 12px rgba(184, 134, 11, 0.08);
+  box-shadow: var(--shadow-md);
   overflow: visible;
   width: 100%;
   text-align: left;
   transform: translateZ(0);
   will-change: transform, box-shadow;
   backface-visibility: hidden;
+  z-index: var(--z-base);
 }
 
 .first-event-clickable::after {
@@ -172,18 +226,20 @@
 .first-event-clickable.expanded {
   background: rgba(240, 230, 210, 0.9);
   border-color: rgba(184, 134, 11, 0.3);
-  box-shadow: 0 6px 20px rgba(184, 134, 11, 0.15);
+  box-shadow: var(--shadow-lg);
+  z-index: var(--z-elevated);
 }
 
 .first-event-clickable:hover {
   background: rgba(242, 232, 215, 0.9);
   border-color: rgba(184, 134, 11, 0.25);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(184, 134, 11, 0.18);
+  box-shadow: var(--shadow-xl);
+  z-index: var(--z-elevated);
 }
 
 .staggered-animation {
-  animation: staggerIn 0.6s ease-out forwards;
+  animation: staggerIn var(--animation-normal) var(--ease-out) forwards;
   opacity: 0;
   transform: translateY(20px);
   transform: translateZ(0);
@@ -191,10 +247,11 @@
   backface-visibility: hidden;
   background: rgba(248, 240, 225, 0.7);
   border: 1px solid rgba(184, 134, 11, 0.1);
-  border-radius: 12px;
-  padding: 18px;
-  margin: 8px 0;
-  box-shadow: 0 2px 8px rgba(184, 134, 11, 0.06);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  margin: var(--spacing-sm) 0;
+  box-shadow: var(--shadow-sm);
+  z-index: var(--z-base);
 }
 
 /* 事件卡片骨架（占位样式，先定义，后续可按需启用） */
@@ -465,7 +522,7 @@
 .scroll-reveal {
   opacity: 0;
   transform: translateY(40px) scale(0.98);
-  transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all var(--animation-slower) var(--ease-out);
   will-change: transform, opacity;
   filter: blur(2px);
   contain: layout style paint;
@@ -481,8 +538,8 @@
 @media (prefers-reduced-motion: no-preference) {
   .scroll-reveal {
     transition-property: transform, opacity, filter;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 1.2s;
+    transition-timing-function: var(--ease-out);
+    transition-duration: var(--animation-slower);
   }
 }
 
@@ -495,7 +552,7 @@
 
 /* 核心事件标题动画 - 优雅入场 */
 .core-event-title.scroll-reveal {
-  transition-delay: 0.1s;
+  transition-delay: var(--animation-fast);
   transform: translateY(20px);
   filter: blur(1px);
 }
@@ -507,19 +564,19 @@
 
 /* 首个事件卡片动画 - 主要内容突出 */
 .first-event-clickable.scroll-reveal {
-  transition-delay: 0.3s;
+  transition-delay: var(--animation-normal);
   transform: translateY(35px) scale(0.96);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
 }
 
 .first-event-clickable.scroll-reveal.revealed {
   transform: translateY(0) scale(1);
-  box-shadow: 0 4px 12px rgba(184, 134, 11, 0.08);
+  box-shadow: var(--shadow-md);
 }
 
 /* 展开事件动画 - 层次感递进 */
 .staggered-animation.scroll-reveal {
-  transition-delay: 0.5s;
+  transition-delay: var(--animation-slow);
   transform: translateY(25px) scale(0.97);
   opacity: 0.7;
 }
@@ -531,7 +588,7 @@
 
 /* 关键历史事件突出动画 - 更强烈的视觉冲击 */
 .key-milestone.scroll-reveal {
-  transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 1.5s var(--ease-out);
   transform: translateY(50px) scale(0.92);
   filter: blur(3px) brightness(0.9);
   opacity: 0.6;
@@ -545,7 +602,7 @@
 
 /* 次要事件温和动画 - 轻柔出现 */
 .minor-event.scroll-reveal {
-  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all var(--animation-slow) var(--ease-out);
   transform: translateY(15px) scale(0.99);
   filter: blur(1px);
   opacity: 0.8;
@@ -559,7 +616,7 @@
 
 /* 背景事件更温和的动画 */
 .background-event.scroll-reveal {
-  transition: all 0.6s ease-out;
+  transition: all var(--animation-normal) var(--ease-out);
   transform: translateY(10px);
   opacity: 0.5;
 }
@@ -584,6 +641,18 @@
 @media (prefers-reduced-motion: reduce) {
   .scroll-reveal {
     transition: none;
+    transform: none;
+    opacity: 1;
+    filter: none;
+  }
+  
+  .timeline-dot:not(.hidden)::before {
+    transition: none;
+  }
+  
+  .first-event-clickable,
+  .staggered-animation {
+    animation: none;
     transform: none;
     opacity: 1;
   }
