@@ -3,8 +3,9 @@
  * @description 渲染单个核心事件区域，包含该核心事件的标题和其下的多个时间轴事件。
  * @module TimelineCoreEventSection
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TimelineEventItem from './TimelineEventItem.tsx';
+import { useScrollReveal } from '@/hooks/useScrollReveal.ts';
 
 /**
  * @interface TimelineEvent
@@ -54,6 +55,20 @@ const TimelineCoreEventSection: React.FC<CoreEventSectionProps> = ({ coreEvent, 
   // 计算可展开的事件数量
   const expandableEventCount = coreEvent.timeline && coreEvent.timeline.length > 1 ? coreEvent.timeline.length - 1 : 0;
 
+  // 滚动发现体验
+  const titleReveal = useScrollReveal({ threshold: 0.1, delay: 100 });
+  const firstEventReveal = useScrollReveal({ threshold: 0.2, delay: 300 });
+  const [staggeredRevealed, setStaggeredRevealed] = useState(false);
+
+  // 展开事件时的滚动发现效果
+  useEffect(() => {
+    if (isExpanded) {
+      setStaggeredRevealed(true);
+    } else {
+      setStaggeredRevealed(false);
+    }
+  }, [isExpanded]);
+
     // 切换展开/折叠状态的函数
   const toggleExpansion = () => {
     setIsExpanded(!isExpanded);
@@ -85,7 +100,10 @@ const TimelineCoreEventSection: React.FC<CoreEventSectionProps> = ({ coreEvent, 
 
   return (
     <div className="core-event-section" data-core-event={coreIndex}>
-      <div className="core-event-title text-center mb-6">
+      <div 
+        ref={titleReveal.elementRef}
+        className={`core-event-title text-center mb-6 scroll-reveal ${titleReveal.isRevealed ? 'revealed' : ''}`}
+      >
         <h3 
           className={`text-3xl font-bold text-charcoal font-serif mb-2 inline-flex items-center gap-2 cursor-pointer transition-all duration-200 ${
             expandableEventCount > 0 ? 'hover:text-gold' : ''
@@ -110,7 +128,8 @@ const TimelineCoreEventSection: React.FC<CoreEventSectionProps> = ({ coreEvent, 
       </div>
 
       <div
-        className={`first-event-clickable ${isExpanded ? 'expanded' : ''} cursor-pointer relative group`}
+        ref={firstEventReveal.elementRef}
+        className={`first-event-clickable ${isExpanded ? 'expanded' : ''} cursor-pointer relative group scroll-reveal ${firstEventReveal.isRevealed ? 'revealed' : ''}`}
         onClick={toggleExpansion}
         role="button"
         tabIndex={0}
@@ -138,12 +157,15 @@ const TimelineCoreEventSection: React.FC<CoreEventSectionProps> = ({ coreEvent, 
 
       {isExpanded && (
         <>
-          <div className="space-y-6 animate-fadeIn mt-8">
+          <div className="space-y-6 mt-8">
             {coreEvent.timeline.slice(1).map((event, eventIndex) => (
               <div
                 key={`${coreIndex}-${eventIndex + 1}`}
-                className="staggered-animation"
-                style={{ animationDelay: `${eventIndex * 0.1}s` }}
+                className={`staggered-animation scroll-reveal ${staggeredRevealed ? 'revealed' : ''}`}
+                style={{ 
+                  transitionDelay: `${0.5 + eventIndex * 0.15}s`,
+                  transition: 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
+                }}
               >
                 <TimelineEventItem event={event} layout={(coreIndex + eventIndex + 1) % 2 === 0 ? 'image-left' : 'image-right'} />
               </div>
@@ -151,7 +173,7 @@ const TimelineCoreEventSection: React.FC<CoreEventSectionProps> = ({ coreEvent, 
           </div>
           
           {/* 折叠按钮 */}
-          <div className="text-center mt-6">
+          <div className="text-center mt-6 scroll-reveal" style={{ transitionDelay: `${0.5 + (coreEvent.timeline.length - 1) * 0.15}s` }}>
             <button
               onClick={toggleExpansion}
               className="inline-flex items-center gap-1 text-sm text-gold font-medium hover:text-gold/80 transition-colors duration-200"

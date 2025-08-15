@@ -47,6 +47,11 @@ const TimelineEventItem: React.FC<TimelineItemProps> = ({ event, isFeatured, lay
   const [isPersonDataLoaded, setIsPersonDataLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
+  // 判断事件类型用于视觉层次
+  const isKeyMilestone = isFeatured; // 特色事件作为关键里程碑
+  const isBackgroundEvent = event.timespot === 1; // 背景事件
+  const isMinorEvent = !isFeatured && !isBackgroundEvent; // 次要事件
+
   // Effect Hook: 组件挂载时异步加载人物数据
   useEffect(() => {
     const loadPersonData = async () => {
@@ -155,9 +160,14 @@ const TimelineEventItem: React.FC<TimelineItemProps> = ({ event, isFeatured, lay
     return <>{elements}</>;
   };
 
+  // 根据事件类型确定视觉层次类
+  const visualClass = isKeyMilestone ? 'key-milestone' : 
+                     isBackgroundEvent ? 'background-event' : 
+                     isMinorEvent ? 'minor-event' : '';
+
   // 骨架屏（统一样式）：当图片存在但尚未加载时由浏览器自己处理；这里提供统一结构供未来扩展
   return (
-    <div className={`timeline-item ${containerClasses}`}>
+    <div className={`timeline-item ${containerClasses} ${visualClass}`}>
       <div className={`timeline-dot ${event.timespot ? 'timeline-dot-gray' : 'timeline-dot-gold'} ${isFeatured ? 'hidden' : ''}`}></div>
       <div className={`${isFeatured ? 'pl-0' : 'pl-[45px]'} md:pl-0`}>
         <div className={`md:flex justify-between items-start w-full ${isImageRight ? 'md:flex-row-reverse' : ''}`}>
@@ -167,7 +177,11 @@ const TimelineEventItem: React.FC<TimelineItemProps> = ({ event, isFeatured, lay
                 <img
                   src={event.image}
                   alt=""
-                  className={`inline-block ${imageSizeClasses} object-cover ml-auto rounded-lg transition-transform duration-300 group-hover:scale-105`}
+                  className={`inline-block ${imageSizeClasses} object-cover ml-auto rounded-lg transition-all duration-500 group-hover:scale-105 ${
+                    isKeyMilestone ? 'shadow-lg' : 
+                    isBackgroundEvent ? 'opacity-80' : 
+                    'shadow-md'
+                  }`}
                   onError={handleImageError}
                 />
               </div>
@@ -186,18 +200,30 @@ const TimelineEventItem: React.FC<TimelineItemProps> = ({ event, isFeatured, lay
           <div className="md:w-6/12 mt-4 md:mt-0 px-2">
             <div className="space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                <p className={`text-gold ${timeTextClasses}`}>
+                <p className={`text-gold ${timeTextClasses} ${
+                  isKeyMilestone ? 'font-bold text-lg' : 
+                  isBackgroundEvent ? 'opacity-70' : 
+                  ''
+                }`}>
                   {event.time}
                 </p>
                 {event.location && (
-                  <div className="text-sm text-charcoal font-bold">
+                  <div className={`text-sm font-bold ${
+                    isKeyMilestone ? 'text-charcoal' : 
+                    isBackgroundEvent ? 'text-charcoal/60' : 
+                    'text-charcoal'
+                  }`}>
                     {event.location}
                   </div>
                 )}
               </div>
               
               <div className="pt-1">
-                <p className={`text-charcoal/80 ${experienceTextClasses} leading-relaxed`}>
+                <p className={`leading-relaxed ${
+                  isKeyMilestone ? 'text-charcoal text-lg font-medium' : 
+                  isBackgroundEvent ? 'text-charcoal/60 text-sm' : 
+                  'text-charcoal/80'
+                }`}>
                   {renderTextWithPersonLinks(event.experience)}
                 </p>
               </div>
