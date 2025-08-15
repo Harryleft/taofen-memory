@@ -31,12 +31,12 @@ const AppHeader: React.FC<AppHeaderProps> = ({ moduleId }) => {
     if (location.pathname === '/') {
       return {
         ...baseConfig,
-        backgroundColor: isScrolled ? 'white' : 'transparent'
+        backgroundColor: (isScrolled ? 'white' : 'transparent') as 'white' | 'transparent'
       };
     }
     return {
       ...baseConfig,
-      backgroundColor: 'white'
+      backgroundColor: 'white' as const
     };
   }, [baseConfig, location.pathname, isScrolled]);
 
