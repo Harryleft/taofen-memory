@@ -16,8 +16,6 @@ export default function TimelinePage() {
   // 状态管理
   const [selectedYear, setSelectedYear] = useState<string>('');
   const [currentYear, setCurrentYear] = useState<string>('');
-  const [yearStart, setYearStart] = useState<number | null>(null);
-  const [yearEnd, setYearEnd] = useState<number | null>(null);
 
   // 使用新的数据适配层
   const flatEvents = useMemo(() => {
@@ -33,13 +31,6 @@ export default function TimelinePage() {
   const allYears = useMemo(() => {
     return getYearRange(flatEvents);
   }, [flatEvents]);
-
-  useEffect(() => {
-    if (allYears.min !== null && allYears.max !== null) {
-      setYearStart(prev => (prev === null ? (allYears.min as number) : prev));
-      setYearEnd(prev => (prev === null ? (allYears.max as number) : prev));
-    }
-  }, [allYears.min, allYears.max]);
 
   // 监听滚动，自动更新当前年份
   useEffect(() => {
@@ -61,21 +52,10 @@ export default function TimelinePage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [yearsData]);
 
-  // 过滤数据
-  const filteredYears = useMemo(() => {
-    const hasYearRange = typeof yearStart === 'number' && typeof yearEnd === 'number';
-
-    return yearsData
-      .map(yearData => {
-        const filteredEvents = yearData.events.filter(event => {
-          const y = extractYear(event.time);
-          const passYear = !hasYearRange || (typeof y === 'number' && y >= (yearStart as number) && y <= (yearEnd as number));
-          return passYear;
-        });
-        return { ...yearData, events: filteredEvents };
-      })
-      .filter(yearData => yearData.events.length > 0);
-  }, [yearsData, yearStart, yearEnd]);
+  // 显示所有时间线数据（无需过滤）
+  const displayYears = useMemo(() => {
+    return yearsData;
+  }, [yearsData]);
 
   // 处理年份选择
   const handleYearChange = (year: string) => {
@@ -127,45 +107,16 @@ export default function TimelinePage() {
               </div>
             </div>
           </div>
-          {/* 过滤栏 */}
-          <div className="timeline-filter-card mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-end">
-            <div className="flex gap-3">
-              <div>
-                <label className="block text-sm text-charcoal/70 mb-2">起始年份</label>
-                <input
-                  type="number"
-                  value={yearStart ?? ''}
-                  onChange={e => setYearStart(e.target.value ? parseInt(e.target.value, 10) : null)}
-                  placeholder={allYears.min?.toString() ?? ''}
-                  className="w-28 rounded-md border border-charcoal/20 bg-white/60 px-3 py-2"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-charcoal/70 mb-2">结束年份</label>
-                <input
-                  type="number"
-                  value={yearEnd ?? ''}
-                  onChange={e => setYearEnd(e.target.value ? parseInt(e.target.value, 10) : null)}
-                  placeholder={allYears.max?.toString() ?? ''}
-                  className="w-28 rounded-md border border-charcoal/20 bg-white/60 px-3 py-2"
-                />
-              </div>
-            </div>
-          </div>
 
           {/* 主时间线 */}
           <main className="timeline-container">
-            {filteredYears.length === 0 ? (
-              <div className="text-center text-charcoal/60 py-12">未找到匹配的事件，请调整年份范围。</div>
-            ) : (
-              <TimelineEventList years={filteredYears} selectedYear={selectedYear} />
-            )}
+            <TimelineEventList years={displayYears} selectedYear={selectedYear} />
           </main>
 
           {/* 右侧时间轴导航 */}
           <TimelineNavigation
-            years={filteredYears}
-            currentYear={currentYear || filteredYears[0]?.year || ''}
+            years={displayYears}
+            currentYear={currentYear || displayYears[0]?.year || ''}
             onYearChange={handleYearChange}
           />
 
