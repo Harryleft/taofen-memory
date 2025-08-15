@@ -1,6 +1,7 @@
-import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
+import { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { useTimelineData } from '@/hooks/useTimelineData';
-import TimelineCoreEventSection from '@/components/timeline/TimelineCoreEventSection.tsx';
+import TimelineEventList from '@/components/timeline/TimelineEventList.tsx';
+import TimelineCircularNavigation from '@/components/timeline/TimelineCircularNavigation.tsx';
 import TimelineProgressBar from '@/components/timeline/TimelineProgressBar.tsx';
 import AppHeader from '@/components/layout/header/AppHeader.tsx';
 import { AppFooter } from '@/components/layout/footer';
@@ -12,11 +13,6 @@ type TimelineEvent = {
   image: string;
   location: string;
   timespot?: number;
-};
-
-type CoreEvent = {
-  core_event: string;
-  timeline: TimelineEvent[];
 };
 
 function extractYear(input: string): number | null {
@@ -45,25 +41,47 @@ function extractYear(input: string): number | null {
 export default function TimelinePage() {
   const { timelineData, loading, error } = useTimelineData();
 
-  // 第一阶段新增：搜索 + 年份过滤 + 侧边索引 + 回到顶部
+  // 状态管理
   const [search, setSearch] = useState('');
+  const [selectedYear, setSelectedYear] = useState<string>('');
   const [yearStart, setYearStart] = useState<number | null>(null);
   const [yearEnd, setYearEnd] = useState<number | null>(null);
-  const [activeIndex, setActiveIndex] = useState<number>(0);
 
   const deferredSearch = useDeferredValue(search);
 
+  // 将数据按年份重新组织
+  const yearsData = useMemo(() => {
+    const yearMap = new Map<string, TimelineEvent[]>();
+    
+    timelineData.forEach(group => {
+      group.timeline.forEach(event => {
+        const year = extractYear(event.time);
+        if (year) {
+          const yearKey = year.toString();
+          if (!yearMap.has(yearKey)) {
+            yearMap.set(yearKey, []);
+          }
+          yearMap.get(yearKey)?.push(event);
+        }
+      });
+    });
+
+    // 转换为TimelineYear数组并按年份排序
+    return Array.from(yearMap.entries())
+      .map(([year, events]) => ({
+        year,
+        label: `${year}年的重要事件`,
+        events: events.sort((a, b) => a.time.localeCompare(b.time))
+      }))
+      .sort((a, b) => parseInt(a.year) - parseInt(b.year));
+  }, [timelineData]);
+
+  // 获取年份范围
   const allYears = useMemo(() => {
-    const years: number[] = [];
-    timelineData.forEach(group =>
-      group.timeline.forEach(ev => {
-        const y = extractYear(ev.time);
-        if (typeof y === 'number') years.push(y);
-      })
-    );
+    const years = yearsData.map(y => parseInt(y.year));
     if (years.length === 0) return { min: null as number | null, max: null as number | null };
     return { min: Math.min(...years), max: Math.max(...years) };
-  }, [timelineData]);
+  }, [yearsData]);
 
   useEffect(() => {
     if (allYears.min !== null && allYears.max !== null) {
@@ -72,51 +90,29 @@ export default function TimelinePage() {
     }
   }, [allYears.min, allYears.max]);
 
-  const filteredData: CoreEvent[] = useMemo(() => {
+  // 过滤数据
+  const filteredYears = useMemo(() => {
     const s = deferredSearch.trim();
     const hasYearRange = typeof yearStart === 'number' && typeof yearEnd === 'number';
 
-    return timelineData
-      .map(group => {
-        const filteredTimeline = group.timeline.filter(ev => {
-          const y = extractYear(ev.time);
+    return yearsData
+      .map(yearData => {
+        const filteredEvents = yearData.events.filter(event => {
+          const y = extractYear(event.time);
           const passYear = !hasYearRange || (typeof y === 'number' && y >= (yearStart as number) && y <= (yearEnd as number));
           if (!passYear) return false;
           if (!s) return true;
-          const hay = `${group.core_event} ${ev.time} ${ev.experience} ${ev.location}`.toLowerCase();
+          const hay = `${event.time} ${event.experience} ${event.location}`.toLowerCase();
           return hay.includes(s.toLowerCase());
         });
-        return { ...group, timeline: filteredTimeline };
+        return { ...yearData, events: filteredEvents };
       })
-      .filter(group => group.timeline.length > 0);
-  }, [timelineData, deferredSearch, yearStart, yearEnd]);
+      .filter(yearData => yearData.events.length > 0);
+  }, [yearsData, deferredSearch, yearStart, yearEnd]);
 
-  // Scrollspy：监听各核心段曝光并高亮侧边索引
-  const sectionRefs = useRef<Array<HTMLElement | null>>([]);
-  sectionRefs.current = [];
-
-  useEffect(() => {
-    const nodes = sectionRefs.current.filter(Boolean) as HTMLElement[];
-    if (nodes.length === 0) return;
-    const obs = new IntersectionObserver(
-      entries => {
-        const visible = entries
-          .filter(e => e.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-        if (visible[0]) {
-          const idx = Number(visible[0].target.getAttribute('data-core-idx') || 0);
-          setActiveIndex(idx);
-        }
-      },
-      { rootMargin: '-20% 0px -70% 0px', threshold: [0, 0.2, 0.6] }
-    );
-    nodes.forEach(n => obs.observe(n));
-    return () => obs.disconnect();
-  }, [filteredData]);
-
-  const handleJump = (idx: number) => {
-    const node = sectionRefs.current[idx];
-    if (node) node.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // 处理年份选择
+  const handleYearChange = (year: string) => {
+    setSelectedYear(year === selectedYear ? '' : year);
   };
 
   if (loading) {
@@ -198,47 +194,21 @@ export default function TimelinePage() {
             </div>
           </div>
 
-          <div className="timeline-two-col">
-            {/* 侧边索引（桌面端可见） */}
-            <aside className="timeline-sidenav hidden lg:block">
-              <div className="timeline-sidenav-card">
-                <div className="timeline-sidenav-title">核心事件</div>
-                <ul className="timeline-sidenav-list">
-                  {filteredData.map((g, idx) => (
-                    <li key={idx}>
-                      <button
-                        onClick={() => handleJump(idx)}
-                        className={`timeline-sidenav-item ${idx === activeIndex ? 'active' : ''}`}
-                        title={g.core_event}
-                        aria-current={idx === activeIndex ? 'true' : undefined}
-                      >
-                        {g.core_event}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </aside>
+          {/* 主时间线 */}
+          <main className="timeline-container pl-24"> {/* 为圆形导航栏留出空间 */}
+            {filteredYears.length === 0 ? (
+              <div className="text-center text-charcoal/60 py-12">未找到匹配的事件，请调整搜索或年份范围。</div>
+            ) : (
+              <TimelineEventList years={filteredYears} selectedYear={selectedYear} />
+            )}
+          </main>
 
-            {/* 主时间线 */}
-            <main className="timeline-container">
-              {filteredData.length === 0 ? (
-                <div className="text-center text-charcoal/60 py-12">未找到匹配的事件，请调整搜索或年份范围。</div>
-              ) : (
-                filteredData.map((coreEvent, coreIndex) => (
-                  <section
-                    key={coreIndex}
-                    id={`core-${coreIndex}`}
-                    data-core-idx={coreIndex}
-                    ref={(el) => (sectionRefs.current[coreIndex] = el)}
-                    className="mb-12 clear-right"
-                  >
-                    <TimelineCoreEventSection coreEvent={coreEvent} coreIndex={coreIndex} />
-                  </section>
-                ))
-              )}
-            </main>
-          </div>
+          {/* 圆形时间导航栏 */}
+          <TimelineCircularNavigation
+            years={filteredYears}
+            currentYear={selectedYear || filteredYears[0]?.year || ''}
+            onYearChange={handleYearChange}
+          />
 
           {/* 回到顶部 */}
           <button
