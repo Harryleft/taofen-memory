@@ -161,7 +161,7 @@ const TimelineEventItem: React.FC<TimelineItemProps> = ({ event, isFeatured, lay
       <div className={`timeline-dot ${event.timespot ? 'timeline-dot-gray' : 'timeline-dot-gold'} ${isFeatured ? 'hidden' : ''}`}></div>
       <div className={`${isFeatured ? 'pl-0' : 'pl-[45px]'} md:pl-0`}>
         <div className={`md:flex justify-between items-start w-full ${isImageRight ? 'md:flex-row-reverse' : ''}`}>
-          <div className={`md:w-6/12 ${isImageRight ? 'md:text-left md:pl-2' : 'md:text-right md:pr-2'}`}>
+          <div className={`md:w-6/12 ${isImageRight ? 'md:text-left md:pl-4' : 'md:text-right md:pr-4'}`}>
             {event.image && !imageError && (
               <div className="relative group">
                 <img
@@ -181,11 +181,11 @@ const TimelineEventItem: React.FC<TimelineItemProps> = ({ event, isFeatured, lay
             )}
           </div>
           
-          <div className="hidden md:block w-12"></div>
+          <div className="hidden md:block w-16"></div>
           
-          <div className="md:w-6/12 mt-4 md:mt-0">
-            <div className="space-y-2">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+          <div className="md:w-6/12 mt-4 md:mt-0 px-2">
+            <div className="space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                 <p className={`text-gold ${timeTextClasses}`}>
                   {event.time}
                 </p>
@@ -196,8 +196,8 @@ const TimelineEventItem: React.FC<TimelineItemProps> = ({ event, isFeatured, lay
                 )}
               </div>
               
-              <div className="space-y-1">
-                <p className={`text-charcoal/80 ${experienceTextClasses}`}>
+              <div className="pt-1">
+                <p className={`text-charcoal/80 ${experienceTextClasses} leading-relaxed`}>
                   {renderTextWithPersonLinks(event.experience)}
                 </p>
               </div>
