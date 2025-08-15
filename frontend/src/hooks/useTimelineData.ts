@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+import { adaptTimelineData, debugDataTransformation } from './timelineDataAdapter';
+import { TimelineEvent } from '../components/timeline-data.ts';
 
-interface TimelineEvent {
+interface RawTimelineEvent {
   time: string;
   experience: string;
   image: string;
@@ -10,13 +12,13 @@ interface TimelineEvent {
 
 interface CoreEvent {
   core_event: string;
-  timeline: TimelineEvent[];
+  timeline: RawTimelineEvent[];
 }
 
 export type TimelineData = CoreEvent[];
 
 export function useTimelineData() {
-  const [timelineData, setTimelineData] = useState<TimelineData>([]);
+  const [timelineData, setTimelineData] = useState<TimelineEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -129,11 +131,16 @@ export function useTimelineData() {
               throw new Error('Invalid timeline data structure');
             }
             
-            setTimelineData(data);
-            console.info('[Timeline] Loaded events', data.length);
-            console.log('🐛 useTimelineData Debug - 数据设置成功:', {
-              timelineData: data,
-              length: data.length
+            // 使用适配器转换数据
+            const adaptedData = adaptTimelineData(data);
+            setTimelineData(adaptedData);
+            
+            // 调试信息
+            debugDataTransformation(data);
+            console.info('[Timeline] Loaded events', adaptedData.length);
+            console.log('🐛 useTimelineData Debug - 适配后数据设置成功:', {
+              timelineData: adaptedData,
+              length: adaptedData.length
             });
             lastError = null;
             break;

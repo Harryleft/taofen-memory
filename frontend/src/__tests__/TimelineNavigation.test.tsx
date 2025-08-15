@@ -2,6 +2,7 @@
  * @file TimelineNavigation.test.tsx
  * @description TimelineNavigation组件的测试文件
  */
+import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { TimelineNavigation } from '@/components/timeline/TimelineNavigation';
 
@@ -21,38 +22,36 @@ Object.defineProperty(document, 'querySelector', {
 
 const mockYears = [
   {
-    year: '1915',
-    label: '1915年的重要事件',
-    events: [
+    core_event: "1. 幼年生活",
+    timeline: [
       {
-        time: '1915年',
-        experience: '考入上海圣约翰大学',
-        image: 'test-image-1.jpg',
-        location: '上海'
+        time: "1895年",
+        experience: "11月5日，邹韬奋出生于福建省永安市。",
+        image: "/images/timeline_images/taofen_children.jpg",
+        location: "福建, 永安"
+      },
+      {
+        time: "1900年",
+        experience: "父亲去福州任候补，全家迁往。",
+        image: "/images/timeline_images/taofen_father.jpg",
+        location: "福建, 福州"
       }
     ]
   },
   {
-    year: '1922',
-    label: '1922年的重要事件',
-    events: [
+    core_event: "2. 求学时期",
+    timeline: [
       {
-        time: '1922年',
-        experience: '创办《生活》周刊',
-        image: 'test-image-2.jpg',
-        location: '上海'
-      }
-    ]
-  },
-  {
-    year: '1926',
-    label: '1926年的重要事件',
-    events: [
+        time: "1909年",
+        experience: "与胞叔邹国珂一同考入福州工业学校。",
+        image: "/images/timeline_images/taofen_fuzhougongye.jpg",
+        location: "福建, 福州"
+      },
       {
-        time: '1926年',
-        experience: '《生活》周刊影响力扩大',
-        image: 'test-image-3.jpg',
-        location: '上海'
+        time: "1922年",
+        experience: "韬奋担任编辑股主任，主持《教育与职业》月刊。",
+        image: "",
+        location: "上海"
       }
     ]
   }
@@ -80,13 +79,14 @@ describe('TimelineNavigation', () => {
     // 检查向下箭头按钮
     expect(screen.getByLabelText('滚动到底部')).toBeInTheDocument();
     
-    // 检查年份节点
-    expect(screen.getByLabelText('跳转到1915年')).toBeInTheDocument();
+    // 检查年份节点（应该从timeline中提取的年份：1895, 1900, 1909, 1922）
+    expect(screen.getByLabelText('跳转到1895年')).toBeInTheDocument();
+    expect(screen.getByLabelText('跳转到1900年')).toBeInTheDocument();
+    expect(screen.getByLabelText('跳转到1909年')).toBeInTheDocument();
     expect(screen.getByLabelText('跳转到1922年')).toBeInTheDocument();
-    expect(screen.getByLabelText('跳转到1926年')).toBeInTheDocument();
     
-    // 检查进度指示器
-    expect(screen.getByText('2 / 3')).toBeInTheDocument();
+    // 检查进度指示器（1922是第4个年份，总共4个年份）
+    expect(screen.getByText('4 / 4')).toBeInTheDocument();
   });
 
   it('应该显示激活状态的年份节点', () => {
@@ -122,10 +122,10 @@ describe('TimelineNavigation', () => {
     );
 
     // 点击年份节点
-    const yearButton = screen.getByLabelText('跳转到1915年');
+    const yearButton = screen.getByLabelText('跳转到1895年');
     fireEvent.click(yearButton);
 
-    expect(mockOnYearChange).toHaveBeenCalledWith('1915');
+    expect(mockOnYearChange).toHaveBeenCalledWith('1895');
     expect(mockScrollTo).toHaveBeenCalled();
   });
 
@@ -183,8 +183,62 @@ describe('TimelineNavigation', () => {
     );
 
     // 检查进度条
-    const progressBar = screen.getByText('2 / 3').nextElementSibling;
+    const progressBar = screen.getByText('4 / 4').nextElementSibling;
     expect(progressBar).toBeInTheDocument();
   });
-});
 
+  it('应该正确处理没有当前年份的情况', () => {
+    const mockOnYearChange = jest.fn();
+    
+    render(
+      <TimelineNavigation
+        years={mockYears}
+        currentYear=""
+        onYearChange={mockOnYearChange}
+      />
+    );
+
+    // 应该仍然渲染所有年份节点
+    expect(screen.getByLabelText('跳转到1895年')).toBeInTheDocument();
+    expect(screen.getByLabelText('跳转到1900年')).toBeInTheDocument();
+    
+    // 进度显示应该是 0 / 4
+    expect(screen.getByText('0 / 4')).toBeInTheDocument();
+  });
+
+  it('应该从timeline中正确提取年份', () => {
+    const mockOnYearChange = jest.fn();
+    
+    // 测试数据包含重复年份的情况
+    const mockYearsWithDuplicates = [
+      {
+        core_event: "测试事件1",
+        timeline: [
+          { time: "1900年", experience: "事件1", image: "", location: "地点1" },
+          { time: "1900年", experience: "事件2", image: "", location: "地点2" }
+        ]
+      },
+      {
+        core_event: "测试事件2", 
+        timeline: [
+          { time: "1910年", experience: "事件3", image: "", location: "地点3" }
+        ]
+      }
+    ];
+    
+    render(
+      <TimelineNavigation
+        years={mockYearsWithDuplicates}
+        currentYear="1900"
+        onYearChange={mockOnYearChange}
+      />
+    );
+
+    // 应该只显示唯一年份：1900, 1910
+    expect(screen.getByLabelText('跳转到1900年')).toBeInTheDocument();
+    expect(screen.getByLabelText('跳转到1910年')).toBeInTheDocument();
+    
+    // 进度显示应该是 1 / 2
+    expect(screen.getByText('1 / 2')).toBeInTheDocument();
+  });
+});

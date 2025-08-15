@@ -1,3 +1,14 @@
+/* Timeline Background Style */
+.timeline-background {
+  background: linear-gradient(
+    to bottom,
+    #FAF7F2 0%,
+    #F7F3EE 50%,
+    #FAF7F2 100%
+  );
+  min-height: 100vh;
+}
+
 .timeline-page-root {
   /* 基础颜色系统 - 60-30-10配色法则 */
   --bg-primary: #FAF7F2;      /* 60% 背景色 */

@@ -106,7 +106,7 @@ frontend/
 │   │   └── index.ts           # 状态管理
 │   ├── types/
 │   │   └── index.ts           # TypeScript类型定义
-│   ├── App.tsx                # 主应用组件
+│   ├── TimelinePage.tsx                # 主应用组件
 │   ├── main.tsx               # 应用入口
 │   └── index.css              # 全局样式
 ├── package.json               # 项目依赖配置
