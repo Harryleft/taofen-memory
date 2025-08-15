@@ -328,6 +328,128 @@
   transition: width 0.3s ease;
 }
 
+/* 右侧时间轴导航样式 */
+.timeline-navigation {
+  position: fixed;
+  right: 3rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: var(--z-navigation);
+  transition: all var(--animation-normal) var(--ease-out);
+}
+
+.timeline-navigation-visible {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+.timeline-navigation-hidden {
+  opacity: 0;
+  transform: translateY(-50%) translateX(2rem);
+}
+
+/* 导航按钮样式 */
+.timeline-nav-button {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: 2px solid var(--text-tertiary);
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  transition: all var(--animation-fast) var(--ease-out);
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+}
+
+.timeline-nav-button:hover {
+  border-color: var(--accent-secondary);
+  background: var(--accent-secondary);
+  color: white;
+  transform: scale(1.1);
+}
+
+/* 年份节点样式 */
+.timeline-year-node {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.timeline-year-button {
+  position: relative;
+  transition: all var(--animation-normal) var(--ease-out);
+  cursor: pointer;
+  border: 2px solid white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.timeline-year-button.active {
+  width: 4rem;
+  height: 4rem;
+  box-shadow: var(--shadow-elevated);
+}
+
+.timeline-year-button.inactive {
+  width: 1rem;
+  height: 1rem;
+}
+
+.timeline-year-button.inactive:hover {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+/* 脉冲动画 */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0;
+    transform: scale(1.3);
+  }
+}
+
+.timeline-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* 进度指示器样式 */
+.timeline-progress-indicator {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.timeline-progress-text {
+  font-size: calc(var(--text-caption) * 0.75);
+  color: var(--text-tertiary);
+  margin-bottom: 0.25rem;
+}
+
+.timeline-progress-bar {
+  width: 4rem;
+  height: 0.25rem;
+  background: #e5e7eb;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.timeline-progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background: var(--accent-secondary);
+  transition: width var(--animation-normal) var(--ease-out);
+}
+
 /* 侧边滚动索引（第一阶段新增） */
 .timeline-sidenav {
   position: sticky;

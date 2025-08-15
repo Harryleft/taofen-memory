@@ -1,87 +1,38 @@
-import { useDeferredValue, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTimelineData } from '@/hooks/useTimelineData';
 import TimelineEventList from '@/components/timeline/TimelineEventList.tsx';
-import TimelineCircularNavigation from '@/components/timeline/TimelineCircularNavigation.tsx';
+import TimelineNavigation from '@/components/timeline/TimelineNavigation.tsx';
 import TimelineProgressBar from '@/components/timeline/TimelineProgressBar.tsx';
 import AppHeader from '@/components/layout/header/AppHeader.tsx';
 import { AppFooter } from '@/components/layout/footer';
-import '@/styles/timeline.css';
+import '@/styles/timeline-simple.css';
+import { transformTimelineData, groupEventsByYear, getYearRange, extractYear } from '@/utils/timelineDataTransformer';
 
-type TimelineEvent = {
-  time: string;
-  experience: string;
-  image: string;
-  location: string;
-  timespot?: number;
-};
 
-function extractYear(input: string): number | null {
-  if (!input || typeof input !== 'string') return null;
-  
-  // 支持多种日期格式：YYYY年、YYYY、YYYY-MM-DD等
-  const patterns = [
-    /(\d{4})年/,        // 2023年
-    /(\d{4})/,          // 2023
-    /(\d{4})-(\d{1,2})-(\d{1,2})/, // 2023-12-31
-  ];
-  
-  for (const pattern of patterns) {
-    const match = input.match(pattern);
-    if (match) {
-      const year = parseInt(match[1], 10);
-      if (year >= 1800 && year <= 2100) { // 合理的年份范围
-        return year;
-      }
-    }
-  }
-  
-  return null;
-}
 
 export default function TimelinePage() {
   const { timelineData, loading, error } = useTimelineData();
 
   // 状态管理
-  const [search, setSearch] = useState('');
   const [selectedYear, setSelectedYear] = useState<string>('');
+  const [currentYear, setCurrentYear] = useState<string>('');
   const [yearStart, setYearStart] = useState<number | null>(null);
   const [yearEnd, setYearEnd] = useState<number | null>(null);
 
-  const deferredSearch = useDeferredValue(search);
-
-  // 将数据按年份重新组织
-  const yearsData = useMemo(() => {
-    const yearMap = new Map<string, TimelineEvent[]>();
-    
-    timelineData.forEach(group => {
-      group.timeline.forEach(event => {
-        const year = extractYear(event.time);
-        if (year) {
-          const yearKey = year.toString();
-          if (!yearMap.has(yearKey)) {
-            yearMap.set(yearKey, []);
-          }
-          yearMap.get(yearKey)?.push(event);
-        }
-      });
-    });
-
-    // 转换为TimelineYear数组并按年份排序
-    return Array.from(yearMap.entries())
-      .map(([year, events]) => ({
-        year,
-        label: `${year}年的重要事件`,
-        events: events.sort((a, b) => a.time.localeCompare(b.time))
-      }))
-      .sort((a, b) => parseInt(a.year) - parseInt(b.year));
+  // 使用新的数据适配层
+  const flatEvents = useMemo(() => {
+    return transformTimelineData(timelineData);
   }, [timelineData]);
+
+  // 将数据按年份重新组织（兼容现有组件）
+  const yearsData = useMemo(() => {
+    return groupEventsByYear(flatEvents);
+  }, [flatEvents]);
 
   // 获取年份范围
   const allYears = useMemo(() => {
-    const years = yearsData.map(y => parseInt(y.year));
-    if (years.length === 0) return { min: null as number | null, max: null as number | null };
-    return { min: Math.min(...years), max: Math.max(...years) };
-  }, [yearsData]);
+    return getYearRange(flatEvents);
+  }, [flatEvents]);
 
   useEffect(() => {
     if (allYears.min !== null && allYears.max !== null) {
@@ -90,9 +41,28 @@ export default function TimelinePage() {
     }
   }, [allYears.min, allYears.max]);
 
+  // 监听滚动，自动更新当前年份
+  useEffect(() => {
+    const handleScroll = () => {
+      const yearElements = document.querySelectorAll('[data-year]');
+      const scrollTop = window.scrollY + 200; // 偏移量
+
+      for (let i = yearElements.length - 1; i >= 0; i--) {
+        const element = yearElements[i] as HTMLElement;
+        const year = element.getAttribute('data-year');
+        if (year && element.offsetTop <= scrollTop) {
+          setCurrentYear(year);
+          break;
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [yearsData]);
+
   // 过滤数据
   const filteredYears = useMemo(() => {
-    const s = deferredSearch.trim();
     const hasYearRange = typeof yearStart === 'number' && typeof yearEnd === 'number';
 
     return yearsData
@@ -100,19 +70,17 @@ export default function TimelinePage() {
         const filteredEvents = yearData.events.filter(event => {
           const y = extractYear(event.time);
           const passYear = !hasYearRange || (typeof y === 'number' && y >= (yearStart as number) && y <= (yearEnd as number));
-          if (!passYear) return false;
-          if (!s) return true;
-          const hay = `${event.time} ${event.experience} ${event.location}`.toLowerCase();
-          return hay.includes(s.toLowerCase());
+          return passYear;
         });
         return { ...yearData, events: filteredEvents };
       })
       .filter(yearData => yearData.events.length > 0);
-  }, [yearsData, deferredSearch, yearStart, yearEnd]);
+  }, [yearsData, yearStart, yearEnd]);
 
   // 处理年份选择
   const handleYearChange = (year: string) => {
     setSelectedYear(year === selectedYear ? '' : year);
+    setCurrentYear(year);
   };
 
   if (loading) {
@@ -160,16 +128,7 @@ export default function TimelinePage() {
             </div>
           </div>
           {/* 过滤栏 */}
-          <div className="timeline-filter-card mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div className="flex-1">
-              <label className="block text-sm text-charcoal/70 mb-2">搜索事件</label>
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="输入关键词（事件、地点、年份）"
-                className="w-full rounded-md border border-charcoal/20 bg-white/60 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gold/60"
-              />
-            </div>
+          <div className="timeline-filter-card mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-end">
             <div className="flex gap-3">
               <div>
                 <label className="block text-sm text-charcoal/70 mb-2">起始年份</label>
@@ -195,18 +154,18 @@ export default function TimelinePage() {
           </div>
 
           {/* 主时间线 */}
-          <main className="timeline-container pl-24"> {/* 为圆形导航栏留出空间 */}
+          <main className="timeline-container">
             {filteredYears.length === 0 ? (
-              <div className="text-center text-charcoal/60 py-12">未找到匹配的事件，请调整搜索或年份范围。</div>
+              <div className="text-center text-charcoal/60 py-12">未找到匹配的事件，请调整年份范围。</div>
             ) : (
               <TimelineEventList years={filteredYears} selectedYear={selectedYear} />
             )}
           </main>
 
-          {/* 圆形时间导航栏 */}
-          <TimelineCircularNavigation
+          {/* 右侧时间轴导航 */}
+          <TimelineNavigation
             years={filteredYears}
-            currentYear={selectedYear || filteredYears[0]?.year || ''}
+            currentYear={currentYear || filteredYears[0]?.year || ''}
             onYearChange={handleYearChange}
           />
 
