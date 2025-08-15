@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import RelationshipPageMasonry from '../components/relationships/RelationshipPageMasonry.tsx';
 import RelationshipPagePersonModal from '../components/relationships/RelationshipPagePersonModal.tsx';
 import AppHeader from '../components/layout/header/AppHeader.tsx';
-import { AppFooter } from '../components/layout/footer';
+import { AppFooter } from '@/components/layout/footer';
 import BackToTop from '../components/relationships/BackToTop.tsx';
 import PullToRefresh from '../components/relationships/PullToRefresh.tsx';
 import { Person } from '../types/Person';
@@ -146,9 +146,9 @@ export default function RelationshipsPage() {
             className="relationships-filter-container-mobile overflow-x-auto scrollbar-hide -mx-6 px-6"
             style={{
               // 移动端滚动优化
-              '-webkit-overflow-scrolling': 'touch',
-              'scroll-behavior': 'smooth'
-            }}
+              WebkitOverflowScrolling: 'touch',
+              scrollBehavior: 'smooth'
+            } as React.CSSProperties}
           >
             <div className="flex gap-2 pb-2">
               {RELATIONSHIPS_CATEGORIES.map((category) => {
