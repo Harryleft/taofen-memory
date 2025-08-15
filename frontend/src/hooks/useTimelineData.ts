@@ -22,21 +22,58 @@ export function useTimelineData() {
 
   // 数据验证函数
   const validateTimelineData = (data: unknown): data is TimelineData => {
-    if (!Array.isArray(data)) return false;
+    if (!Array.isArray(data)) {
+      console.error('[Timeline] Validation failed: Not an array', data);
+      return false;
+    }
     
-    for (const item of data) {
-      if (!item || typeof item !== 'object') return false;
-      if (!item.core_event || typeof item.core_event !== 'string') return false;
-      if (!Array.isArray(item.timeline)) return false;
+    for (let i = 0; i < data.length; i++) {
+      const item = data[i];
+      if (!item || typeof item !== 'object') {
+        console.error(`[Timeline] Validation failed: Item ${i} is not an object`, item);
+        return false;
+      }
       
-      for (const event of item.timeline) {
-        if (!event || typeof event !== 'object') return false;
-        if (!event.time || typeof event.time !== 'string') return false;
-        if (!event.experience || typeof event.experience !== 'string') return false;
-        if (!event.image || typeof event.image !== 'string') return false;
-        if (!event.location || typeof event.location !== 'string') return false;
+      if (!item.core_event || typeof item.core_event !== 'string') {
+        console.error(`[Timeline] Validation failed: Item ${i} missing or invalid core_event`, item);
+        return false;
+      }
+      
+      if (!Array.isArray(item.timeline)) {
+        console.error(`[Timeline] Validation failed: Item ${i} timeline is not an array`, item);
+        return false;
+      }
+      
+      for (let j = 0; j < item.timeline.length; j++) {
+        const event = item.timeline[j];
+        if (!event || typeof event !== 'object') {
+          console.error(`[Timeline] Validation failed: Event ${j} in item ${i} is not an object`, event);
+          return false;
+        }
+        
+        if (!event.time || typeof event.time !== 'string') {
+          console.error(`[Timeline] Validation failed: Event ${j} in item ${i} missing or invalid time`, event);
+          return false;
+        }
+        
+        if (!event.experience || typeof event.experience !== 'string') {
+          console.error(`[Timeline] Validation failed: Event ${j} in item ${i} missing or invalid experience`, event);
+          return false;
+        }
+        
+        if (typeof event.image !== 'string') {
+          console.error(`[Timeline] Validation failed: Event ${j} in item ${i} invalid image type`, event);
+          return false;
+        }
+        
+        if (typeof event.location !== 'string') {
+          console.error(`[Timeline] Validation failed: Event ${j} in item ${i} invalid location type`, event);
+          return false;
+        }
       }
     }
+    
+    console.log('[Timeline] Validation passed for', data.length, 'items');
     return true;
   };
 
