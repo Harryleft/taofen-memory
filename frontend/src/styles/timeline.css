@@ -1,9 +1,17 @@
 .timeline-page-root {
-  /* 基础颜色系统 */
-  --bg-cream: #FAF7F0;
-  --text-charcoal: #2C2C2C;
-  --text-muted: #999999;
-  --accent-gold: #D4AF37;
+  /* 基础颜色系统 - 60-30-10配色法则 */
+  --bg-primary: #FAF7F2;      /* 60% 背景色 */
+  --text-primary: #2D3748;    /* 30% 主文本色 */
+  --text-secondary: #4A5568;   /* 次要文本色 */
+  --text-tertiary: #A0AEC0;    /* 辅助文本色 */
+  --accent-primary: #1B365D;  /* 主色：深蓝灰 */
+  --accent-secondary: #C49B61;/* 强调色：暖金色 */
+  
+  /* 兼容现有变量名 */
+  --bg-cream: var(--bg-primary);
+  --text-charcoal: var(--text-primary);
+  --text-muted: var(--text-tertiary);
+  --accent-gold: var(--accent-secondary);
   --surface: #FFFFFF;
   --border: rgba(0, 0, 0, 0.08);
   
@@ -17,17 +25,21 @@
   --shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.12);
   --shadow-modal: 0 8px 32px rgba(0, 0, 0, 0.16);
   
-  /* 排版系统 - 按设计规范 */
+  /* 排版系统 - Modular Scale 1.25比例 */
   --text-h1: 2.441rem;     /* 39.06px - 人物姓名 */
   --text-h2: 1.953rem;     /* 31.25px - 阶段标题 */
   --text-h3: 1.563rem;     /* 25px - 年份标题 */
   --text-body: 1rem;       /* 16px - 正文内容 */
   --text-caption: 0.8rem;  /* 12.8px - 图片说明 */
+  --text-small: 0.64rem;   /* 10.24px - 最小字号 */
   
-  /* 行高系统 - 1.6倍行距提升可读性 */
-  --leading-tight: 1.4;
+  /* 行高系统 - 统一1.6倍行距提升可读性 */
+  --leading-tight: 1.5;
   --leading-normal: 1.6;
-  --leading-relaxed: 1.8;
+  --leading-relaxed: 1.7;
+  
+  /* 段落间距 - 1.5em确保信息分层清晰 */
+  --paragraph-spacing: 1.5em;
   
   /* 字重系统 */
   --font-light: 300;
@@ -36,14 +48,14 @@
   --font-semibold: 600;
   --font-bold: 700;
   
-  /* 间距系统 */
-  --spacing-xs: 0.25rem;
-  --spacing-sm: 0.5rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-  --spacing-xl: 2rem;
-  --spacing-2xl: 3rem;
-  --spacing-3xl: 4rem;
+  /* 间距系统 - 基于1.6比例的间距体系 */
+  --spacing-xs: 0.25rem;    /* 4px */
+  --spacing-sm: 0.5rem;     /* 8px */
+  --spacing-md: 1rem;       /* 16px */
+  --spacing-lg: 1.6rem;     /* 25.6px */
+  --spacing-xl: 2.5rem;     /* 40px */
+  --spacing-2xl: 4rem;      /* 64px */
+  --spacing-3xl: 6.4rem;    /* 102.4px */
   
   /* Z-index层级系统 */
   --z-background: 0;      /* Background Layer: 页面背景 */
@@ -52,20 +64,20 @@
   --z-modal: 30;          /* Modal Layer: 弹层内容 */
   --z-tooltip: 40;        /* Tooltip Layer: 工具提示 */
   
-  /* 卡片设计规范 */
-  --card-padding-y: 2rem;      /* 32px 上下 */
-  --card-padding-x: 1.5rem;    /* 24px 左右 */
-  --card-gap-y: 3.5rem;        /* 56px 垂直间距 */
-  --card-gap-x: 1.5rem;        /* 24px 水平间距 */
+  /* 卡片设计规范 - 统一间距 */
+  --card-padding-y: var(--spacing-xl);      /* 40px 上下 */
+  --card-padding-x: var(--spacing-lg);      /* 25.6px 左右 */
+  --card-gap-y: var(--spacing-2xl);         /* 64px 垂直间距 */
+  --card-gap-x: var(--spacing-lg);          /* 25.6px 水平间距 */
   
-  /* 时间轴点专用优化变量 */
-  --dot-gold: #B8860B;
-  --dot-gold-light: #DAA520;
-  --dot-gray: #6B7280;
-  --dot-gray-light: #9CA3AF;
+  /* 时间轴点专用优化变量 - 使用设计规范色彩 */
+  --dot-gold: var(--accent-secondary);
+  --dot-gold-light: #D4A574;  /* 暖金色变体 */
+  --dot-gray: var(--text-secondary);
+  --dot-gray-light: var(--text-tertiary);
   --dot-border: #FFFFFF;
-  --dot-shadow-gold: rgba(184, 134, 11, 0.4);
-  --dot-shadow-gray: rgba(107, 114, 128, 0.4);
+  --dot-shadow-gold: rgba(196, 155, 97, 0.4);
+  --dot-shadow-gray: rgba(74, 85, 104, 0.4);
   --dot-shadow-dark: rgba(0, 0, 0, 0.2);
   --dot-size: 14px;
   --dot-size-mobile: 12px;
@@ -319,7 +331,7 @@
 /* 侧边滚动索引（第一阶段新增） */
 .timeline-sidenav {
   position: sticky;
-  top: 7rem; /* 约等于 top-28 */
+  top: var(--spacing-2xl); /* 64px */
   width: 12rem; /* 约等于 w-48 */
   z-index: var(--z-navigation);
 }
@@ -330,16 +342,16 @@
   -webkit-backdrop-filter: saturate(1.1) blur(6px);
   backdrop-filter: saturate(1.1) blur(6px);
   border-radius: var(--radius);
-  padding: var(--spacing-md);
+  padding: var(--spacing-lg);
   max-height: 70vh;
   overflow: auto;
   box-shadow: var(--shadow-card);
 }
 
 .timeline-sidenav-title {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-bottom: 6px;
+  font-size: var(--text-caption);
+  color: var(--text-tertiary);
+  margin-bottom: var(--spacing-xs);
   letter-spacing: .02em;
 }
 
@@ -353,14 +365,14 @@
   display: block;
   width: 100%;
   text-align: left;
-  padding: 6px 10px;
+  padding: var(--spacing-sm) var(--spacing-md);
   border-left: 3px solid transparent;
-  border-radius: 8px;
+  border-radius: var(--radius);
   background: transparent;
   border: none;
-  color: rgba(31, 41, 55, 0.86);
+  color: var(--text-secondary);
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color var(--animation-fast) var(--ease-out), color var(--animation-fast) var(--ease-out);
 }
 
 .timeline-sidenav-item:hover {
