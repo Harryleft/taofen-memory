@@ -467,7 +467,11 @@
   -moz-osx-font-smoothing: grayscale;
   opacity: 0.9;
   transition: all 0.3s ease;
-  display: -webkit-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
+  text-align: center;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
@@ -478,14 +482,17 @@
 
 .masonry-card-description.text-align-left {
   text-align: left;
+  justify-content: flex-start;
 }
 
 .masonry-card-description.text-align-center {
   text-align: center;
+  justify-content: center;
 }
 
 .masonry-card-description.text-align-right {
   text-align: right;
+  justify-content: flex-end;
 }
 
 .masonry-card-description:hover {
@@ -892,6 +899,7 @@
     font-size: 13px;
     line-height: 1.4;
     -webkit-line-clamp: 2; /* 移动端减少行数 */
+    min-height: 40px; /* 移动端减少最小高度 */
   }
   
   /* 移动端优化动画 */
