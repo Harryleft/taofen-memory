@@ -25,13 +25,36 @@ interface EventListProps {
 }
 
 const TimelineEventList: React.FC<EventListProps> = ({ years, selectedYear }) => {
+  // 🐛 调试信息：TimelineEventList组件接收到的数据
+  console.log('🐛 TimelineEventList Debug:', {
+    years,
+    yearsLength: years?.length,
+    selectedYear,
+    yearsSample: years?.[0],
+    allYears: years?.map(y => ({ year: y.year, eventsCount: y.events.length }))
+  });
+
   // 根据选中的年份过滤事件
   const filteredYears = selectedYear 
     ? years.filter(year => year.year === selectedYear)
     : years;
 
+  console.log('🐛 TimelineEventList Debug - 过滤后的数据:', {
+    filteredYears,
+    filteredYearsLength: filteredYears?.length,
+    selectedYear
+  });
+
   // 滚动发现体验
   const containerReveal = useScrollReveal({ threshold: 0.1 });
+
+  // 🐛 调试信息：即将渲染
+  console.log('🐛 TimelineEventList Debug - 即将渲染:', {
+    filteredYearsLength: filteredYears?.length,
+    hasData: filteredYears && filteredYears.length > 0,
+    firstYear: filteredYears?.[0]?.year,
+    firstYearEvents: filteredYears?.[0]?.events
+  });
 
   return (
     <div className="timeline-event-list">

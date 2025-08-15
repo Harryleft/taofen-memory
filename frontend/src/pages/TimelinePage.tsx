@@ -13,19 +13,30 @@ import { transformTimelineData } from '@/utils/timelineDataTransformer';
 export default function TimelinePage() {
   const { timelineData, loading, error } = useTimelineData();
 
+  // 🐛 调试信息：数据加载状态
+  console.log('🐛 TimelinePage Debug:', {
+    timelineData,
+    loading,
+    error,
+    timelineDataLength: timelineData?.length,
+    timelineDataSample: timelineData?.[0]
+  });
+
   // 状态管理
   const [selectedYear, setSelectedYear] = useState<string>('');
   const [currentYear, setCurrentYear] = useState<string>('');
 
   // 使用新的数据适配层（直接返回TimelineYear格式）
   const yearsData = useMemo(() => {
-    return transformTimelineData(timelineData);
+    const transformed = transformTimelineData(timelineData);
+    console.log('🐛 TimelinePage Debug - 转换后的数据:', {
+      yearsData: transformed,
+      yearsDataLength: transformed?.length,
+      yearsDataSample: transformed?.[0]
+    });
+    return transformed;
   }, [timelineData]);
 
-  // 获取年份范围（预留功能）
-  // const allYears = useMemo(() => {
-  //   return getYearRange(yearsData);
-  // }, [yearsData]);
 
   // 监听滚动，自动更新当前年份
   useEffect(() => {
@@ -49,8 +60,14 @@ export default function TimelinePage() {
 
   // 显示所有时间线数据（无需过滤）
   const displayYears = useMemo(() => {
+    console.log('🐛 TimelinePage Debug - displayYears:', {
+      displayYears: yearsData,
+      displayYearsLength: yearsData?.length,
+      selectedYear,
+      currentYear
+    });
     return yearsData;
-  }, [yearsData]);
+  }, [yearsData, selectedYear, currentYear]);
 
   // 处理年份选择
   const handleYearChange = (year: string) => {
@@ -59,25 +76,38 @@ export default function TimelinePage() {
   };
 
   if (loading) {
+    console.log('🐛 TimelinePage Debug - 显示加载状态');
     return (
       <div className="min-h-screen bg-cream flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold mx-auto"></div>
           <p className="mt-4 text-charcoal/70">正在加载邹韬奋先生的人生轨迹...</p>
+          <p className="mt-2 text-sm text-charcoal/50">调试：数据加载中...</p>
         </div>
       </div>
     );
   }
 
   if (error) {
+    console.log('🐛 TimelinePage Debug - 显示错误状态:', error);
     return (
       <div className="min-h-screen bg-cream flex items-center justify-center">
         <div className="text-center text-red-500">
           <p>加载数据失败: {error.message}</p>
+          <p className="mt-2 text-sm text-charcoal/50">调试：请检查控制台查看详细错误信息</p>
         </div>
       </div>
     );
   }
+
+  // 🐛 调试信息：即将渲染主界面
+  console.log('🐛 TimelinePage Debug - 即将渲染主界面:', {
+    displayYears,
+    displayYearsLength: displayYears?.length,
+    hasData: displayYears && displayYears.length > 0,
+    firstYear: displayYears?.[0]?.year,
+    lastYear: displayYears?.[displayYears.length - 1]?.year
+  });
 
   return (
     <>
