@@ -6,7 +6,7 @@ import TimelineProgressBar from '@/components/timeline/TimelineProgressBar.tsx';
 import AppHeader from '@/components/layout/header/AppHeader.tsx';
 import { AppFooter } from '@/components/layout/footer';
 import '@/styles/timeline-simple.css';
-import { transformTimelineData, groupEventsByYear, getYearRange, extractYear } from '@/utils/timelineDataTransformer';
+import { transformTimelineData } from '@/utils/timelineDataTransformer';
 
 
 
@@ -22,10 +22,10 @@ export default function TimelinePage() {
     return transformTimelineData(timelineData);
   }, [timelineData]);
 
-  // 获取年份范围
-  const allYears = useMemo(() => {
-    return getYearRange(yearsData);
-  }, [yearsData]);
+  // 获取年份范围（预留功能）
+  // const allYears = useMemo(() => {
+  //   return getYearRange(yearsData);
+  // }, [yearsData]);
 
   // 监听滚动，自动更新当前年份
   useEffect(() => {
