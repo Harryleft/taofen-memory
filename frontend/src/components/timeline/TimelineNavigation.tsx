@@ -61,7 +61,7 @@ export function TimelineNavigation({
   };
 
   const activeIndex = events.findIndex(
-    (event) => event.year.toString() === activeEventId,
+    (event) => event.id === activeEventId,
   );
 
   return (

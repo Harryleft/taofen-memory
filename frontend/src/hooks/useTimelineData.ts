@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { adaptTimelineData, debugDataTransformation } from './timelineDataAdapter';
 import { TimelineEvent } from '../components/timeline/timeline-data.ts';
 
@@ -21,7 +21,7 @@ export function useTimelineData() {
   const [timelineData, setTimelineData] = useState<TimelineEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const [dataLoaded, setDataLoaded] = useState(false);
+  const hasLoaded = useRef(false);
 
   // 数据验证函数
   const validateTimelineData = (data: unknown): data is TimelineData => {
@@ -82,7 +82,7 @@ export function useTimelineData() {
 
   useEffect(() => {
     // 防止重复加载
-    if (dataLoaded) {
+    if (hasLoaded.current) {
       return;
     }
 
@@ -140,7 +140,7 @@ export function useTimelineData() {
             // 使用适配器转换数据
             const adaptedData = adaptTimelineData(data);
             setTimelineData(adaptedData);
-            setDataLoaded(true); // 标记数据已加载
+            hasLoaded.current = true; // 标记数据已加载
             
             // 调试信息
             debugDataTransformation(data);
