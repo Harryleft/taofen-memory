@@ -109,14 +109,19 @@ export function adaptTimelineData(newData: TimelineData): TimelineEvent[] {
   }
 
   // 展平嵌套结构并过滤背景事件
-  const allEvents = newData.flatMap(coreEvent => 
-    coreEvent.timeline
+  const allEvents = newData.flatMap(coreEvent => {
+    if (!coreEvent || !Array.isArray(coreEvent.timeline)) {
+      console.warn('跳过无效的coreEvent:', coreEvent);
+      return [];
+    }
+    
+    return coreEvent.timeline
       .filter(event => !event.timespot) // 过滤掉背景事件(timespot=1)
       .map(event => ({
         ...event,
         coreEvent: coreEvent.core_event // 保留原始分类信息
-      }))
-  );
+      }));
+  });
 
   // 按年份排序
   allEvents.sort((a, b) => extractYear(a.time) - extractYear(b.time));

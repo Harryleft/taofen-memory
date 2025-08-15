@@ -4,15 +4,15 @@
  * @module TimelineNavigation
  */
 import React, { useState, useEffect } from 'react';
-import { TimelineData } from '@/hooks/useTimelineData';
+import { TimelineEvent } from '@/components/timeline-data';
 
 interface TimelineNavigationProps {
-  years: TimelineYear[];
-  currentYear: string;
-  onYearChange: (year: string) => void;
+  events: TimelineEvent[];
+  activeEventId: string;
+  onEventClick: (eventId: string) => void;
 }
 
-export function TimelineNavigation({ years, currentYear, onYearChange }: TimelineNavigationProps) {
+export function TimelineNavigation({ events, activeEventId, onEventClick }: TimelineNavigationProps) {
   const [isVisible, setIsVisible] = useState(false);
 
   // 监听滚动显示/隐藏导航
@@ -25,14 +25,15 @@ export function TimelineNavigation({ years, currentYear, onYearChange }: Timelin
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // 从TimelineYear数据中提取所有年份
+  // 从TimelineEvent数据中提取所有年份
   const allYears = React.useMemo(() => {
-    return years.map(yearData => yearData.year).sort();
-  }, [years]);
+    const uniqueYears = [...new Set(events.map(event => event.year.toString()))];
+    return uniqueYears.sort();
+  }, [events]);
 
   // 滚动到指定年份
   const scrollToYear = (year: string) => {
-    const element = document.querySelector(`[data-year="${year}"]`);
+    const element = document.getElementById(`event-${year}`);
     if (element) {
       const offset = 120;
       const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
@@ -43,7 +44,7 @@ export function TimelineNavigation({ years, currentYear, onYearChange }: Timelin
         behavior: 'smooth'
       });
     }
-    onYearChange(year);
+    onEventClick(year);
   };
 
   // 滚动到顶部
@@ -108,7 +109,7 @@ export function TimelineNavigation({ years, currentYear, onYearChange }: Timelin
           {/* 时间节点 */}
           <div className="relative space-y-8">
             {allYears.map((year) => {
-              const isActive = currentYear === year;
+              const isActive = activeEventId === year;
 
               return (
                 <div key={year} className="relative flex items-center justify-center">
@@ -199,14 +200,14 @@ export function TimelineNavigation({ years, currentYear, onYearChange }: Timelin
             }}
             className="mb-1"
           >
-            {allYears.findIndex(y => y === currentYear) + 1} / {allYears.length}
+            {allYears.findIndex(y => y === activeEventId) + 1} / {allYears.length}
           </div>
           <div className="w-16 h-1 bg-gray-200 rounded-full overflow-hidden">
             <div
               className="h-full rounded-full transition-all duration-300"
               style={{ 
                 backgroundColor: '#D4A574',
-                width: `${((allYears.findIndex(y => y === currentYear) + 1) / allYears.length) * 100}%`
+                width: `${((allYears.findIndex(y => y === activeEventId) + 1) / allYears.length) * 100}%`
               }}
             />
           </div>

@@ -50,8 +50,8 @@ describe('TimelineDataAdapter', () => {
   test('应该正确展平嵌套结构', () => {
     const result = adaptTimelineData(mockTimelineData);
     
-    // 应该过滤掉背景事件，所以只有3个事件而不是4个
-    expect(result).toHaveLength(3);
+    // 应该过滤掉背景事件，所以只有4个事件而不是5个
+    expect(result).toHaveLength(4);
     
     // 应该包含所有非背景事件
     expect(result.map(e => e.year)).toEqual([1895, 1900, 1915, 1922]);
@@ -103,7 +103,7 @@ describe('TimelineDataAdapter', () => {
     const result = adaptTimelineData(mockTimelineData);
     
     const firstEvent = result[0];
-    expect(firstEvent.details).toContain('福建, 永安');
+    expect(firstEvent.details).toContain('地点：福建, 永安');
   });
 
   test('应该按年份排序', () => {
