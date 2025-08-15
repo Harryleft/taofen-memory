@@ -6,7 +6,6 @@ import TimelineProgressBar from '@/components/timeline/TimelineProgressBar.tsx';
 import AppHeader from '@/components/layout/header/AppHeader.tsx';
 import { AppFooter } from '@/components/layout/footer';
 import '@/styles/timeline-simple.css';
-import { transformTimelineData } from '@/utils/timelineDataTransformer';
 
 
 
@@ -26,15 +25,14 @@ export default function TimelinePage() {
   const [selectedYear, setSelectedYear] = useState<string>('');
   const [currentYear, setCurrentYear] = useState<string>('');
 
-  // 使用新的数据适配层（直接返回TimelineYear格式）
+  // 直接使用原始时间线数据
   const yearsData = useMemo(() => {
-    const transformed = transformTimelineData(timelineData);
-    console.log('🐛 TimelinePage Debug - 转换后的数据:', {
-      yearsData: transformed,
-      yearsDataLength: transformed?.length,
-      yearsDataSample: transformed?.[0]
+    console.log('🐛 TimelinePage Debug - 使用原始数据:', {
+      timelineData,
+      timelineDataLength: timelineData?.length,
+      timelineDataSample: timelineData?.[0]
     });
-    return transformed;
+    return timelineData;
   }, [timelineData]);
 
 
@@ -59,10 +57,10 @@ export default function TimelinePage() {
   }, [yearsData]);
 
   // 显示所有时间线数据（无需过滤）
-  const displayYears = useMemo(() => {
-    console.log('🐛 TimelinePage Debug - displayYears:', {
-      displayYears: yearsData,
-      displayYearsLength: yearsData?.length,
+  const displayData = useMemo(() => {
+    console.log('🐛 TimelinePage Debug - displayData:', {
+      displayData: yearsData,
+      displayDataLength: yearsData?.length,
       selectedYear,
       currentYear
     });
@@ -102,11 +100,11 @@ export default function TimelinePage() {
 
   // 🐛 调试信息：即将渲染主界面
   console.log('🐛 TimelinePage Debug - 即将渲染主界面:', {
-    displayYears,
-    displayYearsLength: displayYears?.length,
-    hasData: displayYears && displayYears.length > 0,
-    firstYear: displayYears?.[0]?.year,
-    lastYear: displayYears?.[displayYears.length - 1]?.year
+    displayData,
+    displayDataLength: displayData?.length,
+    hasData: displayData && displayData.length > 0,
+    firstCoreEvent: displayData?.[0]?.core_event,
+    lastCoreEvent: displayData?.[displayData.length - 1]?.core_event
   });
 
   return (
@@ -135,13 +133,13 @@ export default function TimelinePage() {
 
           {/* 主时间线 */}
           <main className="timeline-container">
-            <TimelineEventList years={displayYears} selectedYear={selectedYear} />
+            <TimelineEventList years={displayData} selectedYear={selectedYear} />
           </main>
 
           {/* 右侧时间轴导航 */}
           <TimelineNavigation
-            years={displayYears}
-            currentYear={currentYear || displayYears[0]?.year || ''}
+            years={displayData}
+            currentYear={currentYear || ''}
             onYearChange={handleYearChange}
           />
 
