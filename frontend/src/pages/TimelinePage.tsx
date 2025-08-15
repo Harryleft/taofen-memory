@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { TimelineHeader } from '../components/TimelineHeader.tsx';
-import { TimelineCard } from '../components/TimelineCard.tsx';
-import { TimelineNavigation } from '../components/TimelineNavigation.tsx';
+import AppHeader from '../components/layout/header/AppHeader';
+import { ZoutaofenFooter } from '../components/layout/footer/ZoutaofenFooter';
+import { TimelineCard } from '../components/timeline/TimelineCard.tsx';
+import { TimelineNavigation } from '../components/timeline/TimelineNavigation.tsx';
 import { useTimelineData } from '../hooks/useTimelineData.ts';
-import { TimelineEvent } from '../components/timeline-data.ts';
+import { TimelineEvent } from '../components/timeline/timeline-data.ts';
 
 export default function TimelinePage() {
   const { timelineData, loading, error } = useTimelineData();
@@ -14,7 +15,7 @@ export default function TimelinePage() {
 
   useEffect(() => {
     if (timelineData.length > 0) {
-      setActiveEventId(timelineData[0].year.toString());
+      setActiveEventId(timelineData[0].id);
     }
   }, [timelineData]);
 
@@ -23,13 +24,13 @@ export default function TimelinePage() {
       const scrollPosition = window.scrollY + window.innerHeight / 2;
 
       for (const event of timelineData) {
-        const element = document.getElementById(`event-${event.year}`);
+        const element = document.getElementById(`event-${event.id}`);
         if (element) {
           const elementTop = element.offsetTop;
           const elementBottom = elementTop + element.offsetHeight;
 
           if (scrollPosition >= elementTop && scrollPosition <= elementBottom) {
-            setActiveEventId(event.year.toString());
+            setActiveEventId(event.id);
             break;
           }
         }
@@ -44,13 +45,14 @@ export default function TimelinePage() {
     setActiveEventId(eventId);
   };
 
-  // 加载状态处理
+      {/* 加载状态处理 */}
   if (loading) {
     return (
       <div className="min-h-screen timeline-background flex items-center justify-center">
+        <AppHeader moduleId="timeline" />
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-[var(--timeline-secondary)] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p style={{ color: 'var(--timeline-text-secondary)' }}>
+          <p className="timeline-text-secondary">
             加载时间线数据中...
           </p>
         </div>
@@ -58,12 +60,13 @@ export default function TimelinePage() {
     );
   }
 
-  // 错误状态处理
+      {/* 错误状态处理 */}
   if (error) {
     return (
       <div className="min-h-screen timeline-background flex items-center justify-center">
+        <AppHeader moduleId="timeline" />
         <div className="text-center">
-          <p style={{ color: 'var(--timeline-text-secondary)' }} className="mb-4">
+          <p className="timeline-text-secondary mb-4">
             加载失败：{error.message}
           </p>
           <button 
@@ -77,12 +80,13 @@ export default function TimelinePage() {
     );
   }
 
-  // 空数据状态处理
+      {/* 空数据状态处理 */}
   if (timelineData.length === 0) {
     return (
       <div className="min-h-screen timeline-background flex items-center justify-center">
+        <AppHeader moduleId="timeline" />
         <div className="text-center">
-          <p style={{ color: 'var(--timeline-text-secondary)' }}>
+          <p className="timeline-text-secondary">
             暂无时间线数据
           </p>
         </div>
@@ -93,7 +97,7 @@ export default function TimelinePage() {
   return (
     <div className="min-h-screen timeline-background">
       {/* 页面头部 */}
-      <TimelineHeader />
+      <AppHeader moduleId="timeline" />
 
       {/* 时间轴主内容 */}
       <div className="relative max-w-screen-2xl mx-auto px-1 py-20">
@@ -106,24 +110,12 @@ export default function TimelinePage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-20"
+          className="text-center mb-20 pt-24"
         >
-          <h2 
-            style={{ 
-              fontSize: 'var(--text-section)',
-              color: 'var(--timeline-primary)'
-            }}
-            className="font-bold mb-4"
-          >
+          <h2 className="font-bold mb-4 timeline-primary timeline-text-section">
             人生轨迹
           </h2>
-          <p 
-            style={{ 
-              fontSize: 'var(--text-body)',
-              color: 'var(--timeline-text-secondary)'
-            }}
-            className="max-w-2xl mx-auto leading-relaxed"
-          >
+          <p className="max-w-2xl mx-auto leading-relaxed timeline-text-secondary timeline-text-body">
             从求学青年到新闻巨擘，从文化启蒙到救亡图存，
             邹韬奋用49年的生命书写了一段传奇的人生华章。
           </p>
@@ -136,8 +128,8 @@ export default function TimelinePage() {
               key={event.id}
               event={event}
               index={index}
-              isActive={activeEventId === event.year.toString()}
-              onClick={() => handleEventClick(event.year.toString())}
+              isActive={activeEventId === event.id}
+              onClick={() => handleEventClick(event.id)}
             />
           ))}
         </div>
@@ -154,13 +146,7 @@ export default function TimelinePage() {
             <div className="w-8 h-8 rounded-full bg-[var(--timeline-secondary)] flex items-center justify-center">
               <div className="w-3 h-3 rounded-full bg-white" />
             </div>
-            <p 
-              style={{ 
-                fontSize: 'var(--text-body)',
-                color: 'var(--timeline-text-muted)'
-              }}
-              className="text-center max-w-md leading-relaxed"
-            >
+            <p className="text-center max-w-md leading-relaxed timeline-text-muted timeline-text-body">
               虽然生命短暂，但邹韬奋先生的精神和理想
               <br />
               将永远激励着后人前行
@@ -177,24 +163,7 @@ export default function TimelinePage() {
       />
 
       {/* 底部信息 */}
-      <footer className="bg-[var(--timeline-primary)] text-white py-12">
-        <div className="max-w-6xl mx-auto px-6 text-center">
-          <p 
-            style={{ fontSize: 'var(--text-body)' }}
-            className="mb-4"
-          >
-            纪念邹韬奋先生诞辰 {new Date().getFullYear() - 1895} 周年
-          </p>
-          <p 
-            style={{ 
-              fontSize: 'var(--text-caption)',
-              color: 'rgba(255,255,255,0.7)'
-            }}
-          >
-            "生活的目的在增进人类全体之幸福"
-          </p>
-        </div>
-      </footer>
+      <ZoutaofenFooter version="responsive" />
     </div>
   );
 }

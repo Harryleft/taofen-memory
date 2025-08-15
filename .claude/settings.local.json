@@ -70,7 +70,10 @@
       "Bash(dir:*)"
     ],
     "deny": [],
-    "defaultMode": "acceptEdits"
+    "defaultMode": "acceptEdits",
+    "additionalDirectories": [
+      "S:\\S\\vibe_coding\\taofen_web"
+    ]
   },
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [

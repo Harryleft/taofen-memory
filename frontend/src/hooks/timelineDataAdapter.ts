@@ -1,4 +1,4 @@
-import { TimelineEvent } from '../components/timeline-data.ts';
+import { TimelineEvent } from '../components/timeline/timeline-data.ts';
 import { TimelineData } from './useTimelineData.ts';
 
 /**
@@ -69,10 +69,10 @@ function splitExperience(experience: string): { title: string; description: stri
 }
 
 /**
- * 生成唯一ID - 使用年份作为主要标识
+ * 生成唯一ID - 使用年份和索引组合确保唯一性
  */
 function generateId(year: number, index: number): string {
-  return year.toString();
+  return `${year}-${index}`;
 }
 
 /**
@@ -80,8 +80,8 @@ function generateId(year: number, index: number): string {
  */
 function normalizeImageUrl(image: string): string {
   if (!image || image.trim() === '') {
-    // 返回默认图片或空字符串
-    return '';
+    // 返回默认图片
+    return 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop';
   }
   
   // 如果已经是完整URL，直接返回

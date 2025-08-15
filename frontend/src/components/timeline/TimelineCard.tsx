@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { TimelineEvent } from './timeline-data.ts';
-import { ImageWithFallback } from '../../../example/邹韬奋竖轴时间轴页面/components/figma/ImageWithFallback.tsx';
+import { ImageWithFallback } from '../../../../example/邹韬奋竖轴时间轴页面/components/figma/ImageWithFallback.tsx';
 
 interface TimelineCardProps {
   event: TimelineEvent;
@@ -27,7 +27,7 @@ export function TimelineCard({ event, index, isActive, onClick }: TimelineCardPr
         ease: [0.4, 0.0, 0.2, 1]
       }}
       className="relative flex justify-center mb-20"
-      id={`event-${event.year}`}
+      id={`event-${event.id}`}
     >
       {/* 时间线连接线 */}
       <div className="absolute left-1/2 top-20 w-0.5 h-full -translate-x-0.5 bg-gradient-to-b from-[var(--timeline-secondary)] to-transparent opacity-30" />
@@ -87,38 +87,21 @@ export function TimelineCard({ event, index, isActive, onClick }: TimelineCardPr
         >
           {/* 年份 */}
           <div className={`flex items-center mb-4 ${isLeft ? 'justify-start' : 'justify-end pr-4'}`}>
-            <span 
-              style={{ 
-                fontSize: 'var(--text-body)',
-                color: 'var(--timeline-secondary)'
-              }}
-              className="font-bold"
-            >
+            <span className="font-bold timeline-secondary timeline-text-body">
               {event.year}
             </span>
           </div>
 
           {/* 标题 */}
-          <h3 
-            style={{ 
-              fontSize: 'var(--text-section)',
-              color: 'var(--timeline-primary)'
-            }}
-            className={`font-bold mb-4 leading-tight hover:text-[var(--timeline-secondary)] transition-colors duration-300 ${
+          <h3 className={`font-bold mb-4 leading-tight hover:text-[var(--timeline-secondary)] transition-colors duration-300 ${
               isLeft ? 'text-left' : 'text-right pr-4'
-            }`}
+            } timeline-primary timeline-text-section`}
           >
             {event.title}
           </h3>
 
           {/* 描述 */}
-          <p 
-            style={{ 
-              fontSize: 'var(--text-body)',
-              color: 'var(--timeline-text-secondary)',
-              lineHeight: '1.7'
-            }}
-            className={`mb-4 ${isLeft ? 'text-left' : 'text-right pr-4'}`}
+          <p className={`mb-4 ${isLeft ? 'text-left' : 'text-right pr-4'} timeline-text-secondary timeline-text-body timeline-line-height-relaxed`}
           >
             {event.description}
           </p>
