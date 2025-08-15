@@ -1,0 +1,357 @@
+/* 时间轴核心样式 - 简化版本 */
+
+/* 基础颜色系统 */
+:root {
+  --bg-primary: #FAF7F2;
+  --text-primary: #2D3748;
+  --text-secondary: #4A5568;
+  --accent-primary: #1B365D;
+  --accent-secondary: #D4A574;
+  --border-color: rgba(0, 0, 0, 0.08);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* 主容器 */
+.timeline-container {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* 时间线主线 */
+.timeline-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.0) 0%,
+    rgba(0, 0, 0, 0.08) 20%,
+    rgba(0, 0, 0, 0.12) 50%,
+    rgba(0, 0, 0, 0.08) 80%,
+    rgba(0, 0, 0, 0.0) 100%
+  );
+  transform: translateX(-50%);
+}
+
+/* 年份标题 */
+.year-header {
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.year-header h2 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--accent-primary);
+  margin-bottom: 0.5rem;
+}
+
+.year-header p {
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+}
+
+.year-header .divider {
+  width: 6rem;
+  height: 0.25rem;
+  background: linear-gradient(to right, var(--accent-secondary), var(--accent-primary));
+  margin: 1rem auto;
+  border-radius: 9999px;
+}
+
+/* 事件项 */
+.timeline-event-item {
+  position: relative;
+  margin-bottom: 3rem;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease;
+}
+
+.timeline-event-item.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 时间点 */
+.timeline-event-item::before {
+  content: '';
+  position: absolute;
+  top: 1.5rem;
+  left: 50%;
+  width: 1rem;
+  height: 1rem;
+  background: var(--accent-secondary);
+  border: 2px solid white;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.2);
+  z-index: 10;
+}
+
+/* 快速导航 */
+.quick-nav {
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.quick-nav h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.quick-nav .nav-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.quick-nav .nav-button {
+  padding: 0.75rem 1rem;
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--accent-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.quick-nav .nav-button:hover {
+  background: var(--accent-primary);
+  color: white;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+/* 右侧导航 */
+.timeline-navigation {
+  position: fixed;
+  right: 3rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 50;
+  transition: all 0.3s ease;
+}
+
+.timeline-navigation.hidden {
+  opacity: 0;
+  transform: translateY(-50%) translateX(2rem);
+}
+
+/* 导航按钮 */
+.nav-arrow {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: 2px solid #9CA3AF;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+}
+
+.nav-arrow:hover {
+  border-color: var(--accent-secondary);
+  background: var(--accent-secondary);
+  color: white;
+  transform: scale(1.1);
+}
+
+.nav-arrow svg {
+  width: 14px;
+  height: 14px;
+  color: #9CA3AF;
+  transition: color 0.2s ease;
+}
+
+.nav-arrow:hover svg {
+  color: white;
+}
+
+/* 时间节点 */
+.timeline-year-node {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.timeline-year-button {
+  position: relative;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 2px solid white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-secondary);
+  box-shadow: var(--shadow-sm);
+}
+
+.timeline-year-button.active {
+  width: 4rem;
+  height: 4rem;
+  box-shadow: var(--shadow-lg);
+}
+
+.timeline-year-button.inactive {
+  width: 1rem;
+  height: 1rem;
+}
+
+.timeline-year-button.inactive:hover {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+/* 脉冲动画 */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0;
+    transform: scale(1.3);
+  }
+}
+
+.timeline-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* 进度指示器 */
+.progress-indicator {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.progress-text {
+  font-size: 0.75rem;
+  color: #9CA3AF;
+  margin-bottom: 0.25rem;
+}
+
+.progress-bar {
+  width: 4rem;
+  height: 0.25rem;
+  background: #e5e7eb;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background: var(--accent-secondary);
+  transition: width 0.3s ease;
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+  .timeline-container::before {
+    left: 2rem;
+  }
+  
+  .timeline-event-item::before {
+    left: 2rem;
+  }
+  
+  .timeline-navigation {
+    right: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .timeline-container {
+    padding: 1rem;
+  }
+  
+  .timeline-container::before {
+    left: 1rem;
+  }
+  
+  .timeline-event-item::before {
+    left: 1rem;
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+  
+  .year-header h2 {
+    font-size: 2rem;
+  }
+  
+  .timeline-navigation {
+    display: none;
+  }
+  
+  .quick-nav .nav-buttons {
+    gap: 0.5rem;
+  }
+  
+  .quick-nav .nav-button {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* 动画优化 */
+@media (prefers-reduced-motion: reduce) {
+  .timeline-event-item {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+  
+  .timeline-year-button {
+    transition: none;
+  }
+  
+  .nav-arrow {
+    transition: none;
+  }
+  
+  .timeline-pulse {
+    animation: none;
+  }
+}
+
+/* 滚动优化 */
+.timeline-container {
+  scroll-behavior: smooth;
+}
+
+/* 确保正确的层级 */
+.timeline-event-item {
+  position: relative;
+  z-index: 1;
+}
+
+.timeline-container::before {
+  z-index: 0;
+}
+
+.timeline-year-button::before {
+  z-index: 2;
+}
