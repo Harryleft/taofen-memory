@@ -1,4 +1,8 @@
 {
+  "env": {
+    "ANTHROPIC_MODEL": "glm-4.5",
+    "ANTHROPIC_SMALL_FAST_MODEL": "glm-4.5"
+  },
   "permissions": {
     "allow": [
       "Bash(find:*)",
@@ -63,14 +67,11 @@
       "mcp__figma-dev-mode-mcp-server__get_image",
       "mcp__thinking__sequentialthinking"
     ],
-    "deny": []
+    "deny": [],
+    "defaultMode": "acceptEdits"
   },
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "zen"
-  ],
-  "env": {
-      "ANTHROPIC_MODEL": "glm-4.5",
-  	  "ANTHROPIC_SMALL_FAST_MODEL": "glm-4.5"
-}
+  ]
 }

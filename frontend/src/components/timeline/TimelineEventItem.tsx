@@ -45,20 +45,31 @@ interface TimelineItemProps {
 const TimelineEventItem: React.FC<TimelineItemProps> = ({ event, isFeatured, layout = 'image-left' }) => {
     // 状态：标记人物数据是否已加载完成，用于控制人名链接的渲染
   const [isPersonDataLoaded, setIsPersonDataLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   // Effect Hook: 组件挂载时异步加载人物数据
   useEffect(() => {
     const loadPersonData = async () => {
       try {
-        await personMatcher.loadPersons();
-        setIsPersonDataLoaded(true);
+        // 检查是否已经加载过，避免重复加载
+        if (!isPersonDataLoaded && personMatcher) {
+          await personMatcher.loadPersons();
+          setIsPersonDataLoaded(true);
+        }
       } catch (error) {
         console.error('Failed to load person data:', error);
+        setIsPersonDataLoaded(false);
       }
     };
     
     loadPersonData();
-  }, []);
+  }, [isPersonDataLoaded]);
+
+  // 处理图片加载错误
+  const handleImageError = () => {
+    console.warn('Failed to load image:', event.image);
+    setImageError(true);
+  };
 
 
 
@@ -151,13 +162,21 @@ const TimelineEventItem: React.FC<TimelineItemProps> = ({ event, isFeatured, lay
       <div className={`${isFeatured ? 'pl-0' : 'pl-[45px]'} md:pl-0`}>
         <div className={`md:flex justify-between items-start w-full ${isImageRight ? 'md:flex-row-reverse' : ''}`}>
           <div className={`md:w-6/12 ${isImageRight ? 'md:text-left md:pl-2' : 'md:text-right md:pr-2'}`}>
-            {event.image && (
+            {event.image && !imageError && (
               <div className="relative group">
                 <img
                   src={event.image}
                   alt=""
                   className={`inline-block ${imageSizeClasses} object-cover ml-auto rounded-lg transition-transform duration-300 group-hover:scale-105`}
+                  onError={handleImageError}
                 />
+              </div>
+            )}
+            {imageError && (
+              <div className="relative group">
+                <div className={`inline-block ${imageSizeClasses} bg-charcoal/10 ml-auto rounded-lg flex items-center justify-center`}>
+                  <span className="text-charcoal/50 text-sm">图片加载失败</span>
+                </div>
               </div>
             )}
           </div>

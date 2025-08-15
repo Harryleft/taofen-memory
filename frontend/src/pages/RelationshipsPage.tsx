@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import RelationshipPageMasonry from '../components/relationships/RelationshipPageMasonry.tsx';
 import RelationshipPagePersonModal from '../components/relationships/RelationshipPagePersonModal.tsx';
 import AppHeader from '../components/layout/header/AppHeader.tsx';

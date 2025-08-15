@@ -47,13 +47,31 @@ interface CoreEventSectionProps {
 const TimelineCoreEventSection: React.FC<CoreEventSectionProps> = ({ coreEvent, coreIndex }) => {
     // 内部状态，用于控制事件列表是否展开
   const [isExpanded, setIsExpanded] = useState(false);
-  const firstEvent = coreEvent.timeline[0];
+  
+  // 安全获取首事件，防止空数组导致错误
+  const firstEvent = coreEvent.timeline && coreEvent.timeline.length > 0 ? coreEvent.timeline[0] : null;
 
     // 切换展开/折叠状态的函数
   const toggleExpansion = () => {
     setIsExpanded(!isExpanded);
     // Optional: Scroll into view logic can be handled here or in the parent
   };
+
+  // 如果没有事件数据，显示错误状态
+  if (!firstEvent) {
+    return (
+      <div className="core-event-section" data-core-event={coreIndex}>
+        <div className="core-event-title text-center">
+          <h3 className="text-3xl font-bold text-charcoal font-serif mb-2">
+            {coreEvent.core_event}
+          </h3>
+        </div>
+        <div className="text-center text-charcoal/60 py-8">
+          该核心事件暂无时间线数据
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="core-event-section" data-core-event={coreIndex}>
