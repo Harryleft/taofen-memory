@@ -20,8 +20,26 @@ type CoreEvent = {
 };
 
 function extractYear(input: string): number | null {
-  const m = input?.match?.(/(\d{4})/);
-  return m ? parseInt(m[1], 10) : null;
+  if (!input || typeof input !== 'string') return null;
+  
+  // 支持多种日期格式：YYYY年、YYYY、YYYY-MM-DD等
+  const patterns = [
+    /(\d{4})年/,        // 2023年
+    /(\d{4})/,          // 2023
+    /(\d{4})-(\d{1,2})-(\d{1,2})/, // 2023-12-31
+  ];
+  
+  for (const pattern of patterns) {
+    const match = input.match(pattern);
+    if (match) {
+      const year = parseInt(match[1], 10);
+      if (year >= 1800 && year <= 2100) { // 合理的年份范围
+        return year;
+      }
+    }
+  }
+  
+  return null;
 }
 
 export default function TimelinePage() {
