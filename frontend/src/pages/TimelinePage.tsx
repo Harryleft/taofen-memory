@@ -24,8 +24,8 @@ export default function TimelinePage() {
 
   // 获取年份范围
   const allYears = useMemo(() => {
-    return getYearRange(flatEvents);
-  }, [flatEvents]);
+    return getYearRange(yearsData);
+  }, [yearsData]);
 
   // 监听滚动，自动更新当前年份
   useEffect(() => {
