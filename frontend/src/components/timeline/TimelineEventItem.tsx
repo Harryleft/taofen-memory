@@ -113,6 +113,12 @@ const TimelineEventItem: React.FC<TimelineItemProps> = ({ event, isFeatured, lay
       return <span>{text}</span>;
     }
 
+    // 确保文本参数有效
+    if (!text || typeof text !== 'string') {
+      console.warn('Invalid text provided to renderTextWithPersonLinks:', text);
+      return <span>{text || ''}</span>;
+    }
+
     const personMatches = personMatcher.extractPersonsFromText(text);
     
     if (personMatches.length === 0) {

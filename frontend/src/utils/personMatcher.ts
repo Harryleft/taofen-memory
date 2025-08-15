@@ -192,6 +192,11 @@ export class PersonMatcher {
       return [];
     }
 
+    if (!text || typeof text !== 'string') {
+      console.warn('Invalid text provided to extractPersonsFromText:', text);
+      return [];
+    }
+
     const results: Array<{
       name: string;
       startIndex: number;
