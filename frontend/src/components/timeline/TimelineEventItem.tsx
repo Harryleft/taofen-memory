@@ -84,9 +84,8 @@ const TimelineEventItem: React.FC<TimelineItemProps> = ({ event, isFeatured, lay
     : 'transform scale-[0.98]';
 
 
-    // 根据 isFeatured 属性决定时间和描述文本的样式
+    // 根据 isFeatured 属性决定时间文本的样式
   const timeTextClasses = isFeatured ? 'text-base font-semibold' : 'text-sm font-medium';
-  const experienceTextClasses = isFeatured ? 'text-lg leading-relaxed font-medium' : 'text-base';
 
   // 根据是否为特色事件设置图片尺寸样式
   // 特色事件: 最大宽度80%, 高度自适应保持比例
