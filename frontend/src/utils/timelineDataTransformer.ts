@@ -1,15 +1,16 @@
 import { TimelineData } from '@/hooks/useTimelineData';
 
-// 扁平化的时间轴事件接口 - 基于参考设计
-export interface FlatTimelineEvent {
-  id: string;
-  year: number;
-  title: string;
-  description: string;
-  details: string[];
-  imageUrl: string;
-  period: 'early' | 'middle' | 'late';
-  originalCoreEvent?: string; // 保留原始数据引用
+// 事件分组接口 - 符合TimelineEventList期望的格式
+export interface TimelineYear {
+  year: string;
+  label: string;
+  events: Array<{
+    time: string;
+    experience: string;
+    image: string;
+    location: string;
+    timespot?: number;
+  }>;
 }
 
 // 阶段定义 - 基于参考设计
@@ -49,63 +50,49 @@ function extractYear(timeString: string): number | null {
   return null;
 }
 
-// 将原始数据转换为扁平结构
-export function transformTimelineData(data: TimelineData): FlatTimelineEvent[] {
-  const flatEvents: FlatTimelineEvent[] = [];
+// 将原始数据按年份组织（保持原始事件格式）
+export function transformTimelineData(data: TimelineData): TimelineYear[] {
+  const yearMap = new Map<string, Array<{
+    time: string;
+    experience: string;
+    image: string;
+    location: string;
+    timespot?: number;
+  }>>();
   
+  // 遍历所有核心事件
   data.forEach((coreEvent) => {
-    coreEvent.timeline.forEach((event, eventIndex) => {
+    coreEvent.timeline.forEach((event) => {
       const year = extractYear(event.time);
       if (!year) return; // 跳过没有年份的事件
       
-      const id = `${year}-${eventIndex}`; // 简单的ID生成
+      const yearKey = year.toString();
       
-      flatEvents.push({
-        id,
-        year,
-        title: event.experience,
-        description: `${event.time} - ${event.location}`,
-        details: [
-          event.experience,
-          event.location,
-          event.time
-        ].filter(Boolean),
-        imageUrl: event.image,
-        period: getPeriodFromYear(year),
-        originalCoreEvent: coreEvent.core_event
-      });
+      if (!yearMap.has(yearKey)) {
+        yearMap.set(yearKey, []);
+      }
+      
+      yearMap.get(yearKey)?.push(event);
     });
   });
   
-  // 按年份排序
-  return flatEvents.sort((a, b) => a.year - b.year);
-}
-
-// 将扁平数据按年份分组（用于兼容现有组件）
-export function groupEventsByYear(events: FlatTimelineEvent[]) {
-  const yearMap = new Map<number, FlatTimelineEvent[]>();
-  
-  events.forEach(event => {
-    if (!yearMap.has(event.year)) {
-      yearMap.set(event.year, []);
-    }
-    yearMap.get(event.year)?.push(event);
-  });
-  
-  return Array.from(yearMap.entries())
+  // 转换为TimelineYear数组格式
+  const result = Array.from(yearMap.entries())
     .map(([year, events]) => ({
-      year: year.toString(),
+      year,
       label: `${year}年的重要事件`,
-      events: events.sort((a, b) => a.title.localeCompare(b.title))
+      events: events.sort((a, b) => a.time.localeCompare(b.time))
     }))
     .sort((a, b) => parseInt(a.year) - parseInt(b.year));
+  
+  return result;
 }
 
 // 获取所有年份的范围
-export function getYearRange(events: FlatTimelineEvent[]) {
-  if (events.length === 0) return { min: null, max: null };
+export function getYearRange(yearsData: TimelineYear[]) {
+  if (yearsData.length === 0) return { min: null, max: null };
   
-  const years = events.map(e => e.year);
+  const years = yearsData.map(y => parseInt(y.year));
   return {
     min: Math.min(...years),
     max: Math.max(...years)
@@ -114,32 +101,3 @@ export function getYearRange(events: FlatTimelineEvent[]) {
 
 // 导出年份提取函数供其他组件使用
 export { extractYear };
-
-// 过滤事件的工具函数
-export function filterEvents(
-  events: FlatTimelineEvent[],
-  searchQuery: string = '',
-  yearStart?: number | null,
-  yearEnd?: number | null
-): FlatTimelineEvent[] {
-  return events.filter(event => {
-    // 年份范围过滤
-    if (typeof yearStart === 'number' && event.year < yearStart) return false;
-    if (typeof yearEnd === 'number' && event.year > yearEnd) return false;
-    
-    // 搜索过滤
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      const searchableText = [
-        event.title,
-        event.description,
-        ...event.details,
-        event.year.toString()
-      ].join(' ').toLowerCase();
-      
-      return searchableText.includes(query);
-    }
-    
-    return true;
-  });
-}

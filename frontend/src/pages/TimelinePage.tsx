@@ -17,15 +17,10 @@ export default function TimelinePage() {
   const [selectedYear, setSelectedYear] = useState<string>('');
   const [currentYear, setCurrentYear] = useState<string>('');
 
-  // 使用新的数据适配层
-  const flatEvents = useMemo(() => {
+  // 使用新的数据适配层（直接返回TimelineYear格式）
+  const yearsData = useMemo(() => {
     return transformTimelineData(timelineData);
   }, [timelineData]);
-
-  // 将数据按年份重新组织（兼容现有组件）
-  const yearsData = useMemo(() => {
-    return groupEventsByYear(flatEvents);
-  }, [flatEvents]);
 
   // 获取年份范围
   const allYears = useMemo(() => {
