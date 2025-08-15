@@ -1,8 +1,8 @@
 "use client";
 
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { TimelineEvent, periods } from "./timeline-data";
+import { TimelineEvent, periods } from "./timeline-data.ts";
 
 interface TimelineNavigationProps {
   events: TimelineEvent[];

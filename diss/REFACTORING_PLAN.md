@@ -35,7 +35,7 @@
 
 ```
 frontend/src/
-├── App.tsx              ✅ 保持不变
+├── TimelinePage.tsx              ✅ 保持不变
 ├── main.tsx             ✅ 保持不变
 ├── components/
 │   ├── ui/              🆕 建立基础组件库（Button, Card, Modal, Input）

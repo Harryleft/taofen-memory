@@ -1,7 +1,7 @@
 'use client';
 
-import { motion } from 'motion/react';
-import { ImageWithFallback } from './figma/ImageWithFallback';
+import { motion } from 'framer-motion';
+// import { ImageWithFallback } from '../../../example/邹韬奋竖轴时间轴页面/components/figma/ImageWithFallback.tsx';
 
 export function TimelineHeader() {
   return (

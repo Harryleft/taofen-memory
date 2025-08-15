@@ -4,18 +4,7 @@
  * @module TimelineNavigation
  */
 import React, { useState, useEffect } from 'react';
-
-interface TimelineYear {
-  year: string;
-  label: string;
-  events: Array<{
-    time: string;
-    experience: string;
-    image: string;
-    location: string;
-    timespot?: number;
-  }>;
-}
+import { TimelineData } from '@/hooks/useTimelineData';
 
 interface TimelineNavigationProps {
   years: TimelineYear[];
@@ -35,6 +24,11 @@ export function TimelineNavigation({ years, currentYear, onYearChange }: Timelin
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // 从TimelineYear数据中提取所有年份
+  const allYears = React.useMemo(() => {
+    return years.map(yearData => yearData.year).sort();
+  }, [years]);
 
   // 滚动到指定年份
   const scrollToYear = (year: string) => {
@@ -113,13 +107,13 @@ export function TimelineNavigation({ years, currentYear, onYearChange }: Timelin
 
           {/* 时间节点 */}
           <div className="relative space-y-8">
-            {years.map((yearData) => {
-              const isActive = currentYear === yearData.year;
+            {allYears.map((year) => {
+              const isActive = currentYear === year;
 
               return (
-                <div key={yearData.year} className="relative flex items-center justify-center">
+                <div key={year} className="relative flex items-center justify-center">
                   <button
-                    onClick={() => scrollToYear(yearData.year)}
+                    onClick={() => scrollToYear(year)}
                     className={`relative transition-all duration-300 cursor-pointer border-2 border-white rounded-full flex items-center justify-center ${
                       isActive 
                         ? 'w-16 h-16 shadow-lg'
@@ -131,7 +125,7 @@ export function TimelineNavigation({ years, currentYear, onYearChange }: Timelin
                         ? '0 0 20px rgba(212, 165, 116, 0.25), 0 4px 12px rgba(0,0,0,0.15)' 
                         : '0 2px 4px rgba(0,0,0,0.1)'
                     }}
-                    aria-label={`跳转到${yearData.year}年`}
+                    aria-label={`跳转到${year}年`}
                   >
                     {/* 年份文字（仅在激活时显示） */}
                     {isActive && (
@@ -142,7 +136,7 @@ export function TimelineNavigation({ years, currentYear, onYearChange }: Timelin
                         }}
                         className="font-bold"
                       >
-                        {yearData.year}
+                        {year}
                       </span>
                     )}
 
@@ -205,14 +199,14 @@ export function TimelineNavigation({ years, currentYear, onYearChange }: Timelin
             }}
             className="mb-1"
           >
-            {years.findIndex(y => y.year === currentYear) + 1} / {years.length}
+            {allYears.findIndex(y => y === currentYear) + 1} / {allYears.length}
           </div>
           <div className="w-16 h-1 bg-gray-200 rounded-full overflow-hidden">
             <div
               className="h-full rounded-full transition-all duration-300"
               style={{ 
                 backgroundColor: '#D4A574',
-                width: `${((years.findIndex(y => y.year === currentYear) + 1) / years.length) * 100}%`
+                width: `${((allYears.findIndex(y => y === currentYear) + 1) / allYears.length) * 100}%`
               }}
             />
           </div>

@@ -20,7 +20,7 @@ const TimelineEventList: React.FC<EventListProps> = ({ years, selectedYear }) =>
     yearsLength: years?.length,
     selectedYear,
     yearsSample: years?.[0],
-    allCoreEvents: years?.map((coreEvent, index) => ({ 
+    allCoreEvents: years?.map((coreEvent) => ({ 
       coreEvent: coreEvent.core_event, 
       eventsCount: coreEvent.timeline.length 
     }))

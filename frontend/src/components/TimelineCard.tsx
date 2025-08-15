@@ -1,9 +1,9 @@
 'use client';
 
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { TimelineEvent } from './timeline-data';
-import { ImageWithFallback } from './figma/ImageWithFallback';
+import { TimelineEvent } from './timeline-data.ts';
+import { ImageWithFallback } from '../../../example/邹韬奋竖轴时间轴页面/components/figma/ImageWithFallback.tsx';
 
 interface TimelineCardProps {
   event: TimelineEvent;
