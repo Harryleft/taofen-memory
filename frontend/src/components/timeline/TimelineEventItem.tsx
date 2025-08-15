@@ -4,8 +4,8 @@
  * @module TimelineEventItem
  */
 import React, { useState, useEffect } from 'react';
-import { personMatcher } from '../../utils/personMatcher';
-import { Person } from '../../types/Person';
+import { personMatcher } from '@/utils/personMatcher.ts';
+import { Person } from '@/types/Person.ts';
 
 /**
  * @interface TimelineEvent

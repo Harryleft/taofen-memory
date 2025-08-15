@@ -9,6 +9,19 @@
   --radius-sm: 8px;
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
   --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.08);
+  
+  /* 时间轴点专用优化变量 */
+  --dot-gold: #B8860B;
+  --dot-gold-light: #DAA520;
+  --dot-gray: #6B7280;
+  --dot-gray-light: #9CA3AF;
+  --dot-border: #FFFFFF;
+  --dot-shadow-gold: rgba(184, 134, 11, 0.4);
+  --dot-shadow-gray: rgba(107, 114, 128, 0.4);
+  --dot-shadow-dark: rgba(0, 0, 0, 0.2);
+  --dot-size: 14px;
+  --dot-size-mobile: 12px;
+  --dot-border-width: 2px;
 }
 
 .timeline-container {
@@ -45,21 +58,42 @@
 .timeline-dot:not(.hidden)::before {
   content: '';
   position: absolute;
-  top: 8px;
+  top: 12px;
   left: 50%;
-  width: 12px;
-  height: 12px;
+  width: var(--dot-size);
+  height: var(--dot-size);
   border-radius: 50%;
-  background: var(--accent-gold) !important;
-  border: 2px solid var(--bg-cream) !important;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.15) !important;
-  transform: translateX(-50%);
+  background: var(--dot-gold) !important;
+  border: var(--dot-border-width) solid var(--dot-border) !important;
+  box-shadow: 
+    0 0 12px var(--dot-shadow-gold),
+    0 0 4px var(--dot-shadow-dark),
+    inset 0 0 4px rgba(255, 255, 255, 0.6) !important;
+  transform: translateX(-50%) translateZ(0);
   z-index: 2;
+  will-change: transform, box-shadow;
+  backface-visibility: hidden;
+  transition: transform 0.3s ease, background 0.3s ease;
 }
 
 .timeline-dot-gray:not(.hidden)::before {
-  background: #9CA3AF !important;
-  box-shadow: 0 0 15px rgba(156, 163, 175, 0.3) !important;
+  background: var(--dot-gray) !important;
+  border-color: var(--dot-border) !important;
+  box-shadow: 
+    0 0 12px var(--dot-shadow-gray),
+    0 0 4px var(--dot-shadow-dark),
+    inset 0 0 4px rgba(255, 255, 255, 0.6) !important;
+}
+
+/* 悬停效果增强 */
+.timeline-dot:not(.hidden):hover::before {
+  background: var(--dot-gold-light) !important;
+  transform: translateX(-50%) translateZ(0) scale(1.2);
+}
+
+.timeline-dot-gray:not(.hidden):hover::before {
+  background: var(--dot-gray-light) !important;
+  transform: translateX(-50%) translateZ(0) scale(1.2);
 }
 
 .animate-fadeIn {
@@ -342,6 +376,13 @@
   .timeline-dot:not(.hidden)::before {
     left: 20px;
   }
+  
+  /* 移动端点的大小和位置微调 */
+  .timeline-dot:not(.hidden)::before {
+    top: 10px;
+    width: var(--dot-size-mobile);
+    height: var(--dot-size-mobile);
+  }
 
   .core-event-section {
     margin-bottom: 36px;
@@ -417,6 +458,23 @@
     width: 100% !important;
     max-width: 100% !important;
     max-height: 60vh !important;
+  }
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+  .timeline-dot:not(.hidden)::before {
+    border-width: 3px;
+    box-shadow: 
+      0 0 16px var(--dot-shadow-gold),
+      0 0 8px var(--dot-shadow-dark) !important;
+  }
+  
+  .timeline-dot-gray:not(.hidden)::before {
+    border-width: 3px;
+    box-shadow: 
+      0 0 16px var(--dot-shadow-gray),
+      0 0 8px var(--dot-shadow-dark) !important;
   }
 }
 
