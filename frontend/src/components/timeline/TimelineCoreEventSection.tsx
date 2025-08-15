@@ -105,7 +105,7 @@ const TimelineCoreEventSection: React.FC<CoreEventSectionProps> = ({ coreEvent, 
         className={`core-event-title text-center mb-6 scroll-reveal ${titleReveal.isRevealed ? 'revealed' : ''}`}
       >
         <h3 
-          className={`text-3xl font-bold text-charcoal font-serif mb-2 inline-flex items-center gap-2 cursor-pointer transition-all duration-200 ${
+          className={`text-[2.441rem] font-bold text-charcoal font-serif mb-2 inline-flex items-center gap-2 cursor-pointer transition-all duration-200 leading-tight ${
             expandableEventCount > 0 ? 'hover:text-gold' : ''
           }`}
           onClick={handleTitleClick}
