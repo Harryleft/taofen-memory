@@ -5,7 +5,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { TimelineNavigation } from '@/components/timeline/TimelineNavigation';
-import { TimelineEvent } from '@/components/timeline-data';
+import { TimelineEvent } from '@/components/timeline/timeline-data.ts';
 
 // Mock window.scrollTo
 const mockScrollTo = jest.fn();
