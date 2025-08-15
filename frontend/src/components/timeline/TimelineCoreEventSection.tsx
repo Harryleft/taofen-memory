@@ -50,11 +50,21 @@ const TimelineCoreEventSection: React.FC<CoreEventSectionProps> = ({ coreEvent, 
   
   // 安全获取首事件，防止空数组导致错误
   const firstEvent = coreEvent.timeline && coreEvent.timeline.length > 0 ? coreEvent.timeline[0] : null;
+  
+  // 计算可展开的事件数量
+  const expandableEventCount = coreEvent.timeline && coreEvent.timeline.length > 1 ? coreEvent.timeline.length - 1 : 0;
 
     // 切换展开/折叠状态的函数
   const toggleExpansion = () => {
     setIsExpanded(!isExpanded);
     // Optional: Scroll into view logic can be handled here or in the parent
+  };
+  
+  // 核心事件标题点击处理
+  const handleTitleClick = () => {
+    if (expandableEventCount > 0) {
+      setIsExpanded(!isExpanded);
+    }
   };
 
   // 如果没有事件数据，显示错误状态
@@ -75,14 +85,32 @@ const TimelineCoreEventSection: React.FC<CoreEventSectionProps> = ({ coreEvent, 
 
   return (
     <div className="core-event-section" data-core-event={coreIndex}>
-      <div className="core-event-title text-center">
-        <h3 className="text-3xl font-bold text-charcoal font-serif mb-2">
+      <div className="core-event-title text-center mb-6">
+        <h3 
+          className={`text-3xl font-bold text-charcoal font-serif mb-2 inline-flex items-center gap-2 cursor-pointer transition-all duration-200 ${
+            expandableEventCount > 0 ? 'hover:text-gold' : ''
+          }`}
+          onClick={handleTitleClick}
+          title={expandableEventCount > 0 ? `点击${isExpanded ? '折叠' : '展开'}查看更多事件` : coreEvent.core_event}
+        >
           {coreEvent.core_event}
+          {expandableEventCount > 0 && (
+            <span className={`transform transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}>
+              <svg className="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </span>
+          )}
         </h3>
+        {expandableEventCount > 0 && (
+          <p className="text-sm text-charcoal/60 mt-1">
+            共 {coreEvent.timeline.length} 个事件，{isExpanded ? '已展开' : `点击展开查看另外 ${expandableEventCount} 个事件`}
+          </p>
+        )}
       </div>
 
       <div
-        className={`first-event-clickable ${isExpanded ? 'expanded' : ''} cursor-pointer`}
+        className={`first-event-clickable ${isExpanded ? 'expanded' : ''} cursor-pointer relative group`}
         onClick={toggleExpansion}
         role="button"
         tabIndex={0}
@@ -94,21 +122,60 @@ const TimelineCoreEventSection: React.FC<CoreEventSectionProps> = ({ coreEvent, 
           }
         }}
       >
+        {/* 展开提示标签 */}
+        {expandableEventCount > 0 && !isExpanded && (
+          <div className="absolute -top-2 -right-2 bg-gold text-white text-xs px-2 py-1 rounded-full shadow-lg z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            点击展开
+            <svg className="w-3 h-3 inline-block ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        )}
+        
+        {/* 底部展开提示 */}
+        {expandableEventCount > 0 && (
+          <div className="text-center mt-3">
+            <div className={`inline-flex items-center gap-1 text-sm text-gold font-medium transition-all duration-200 ${
+              isExpanded ? 'opacity-0' : 'opacity-100 group-hover:scale-105'
+            }`}>
+              <span>查看更多事件</span>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
+        )}
+        
         <TimelineEventItem event={firstEvent} isFeatured layout={coreIndex % 2 === 0 ? 'image-left' : 'image-right'} />
       </div>
 
       {isExpanded && (
-        <div className="space-y-6 animate-fadeIn mt-8">
-          {coreEvent.timeline.slice(1).map((event, eventIndex) => (
-            <div
-              key={`${coreIndex}-${eventIndex + 1}`}
-              className="staggered-animation"
-              style={{ animationDelay: `${eventIndex * 0.1}s` }}
+        <>
+          <div className="space-y-6 animate-fadeIn mt-8">
+            {coreEvent.timeline.slice(1).map((event, eventIndex) => (
+              <div
+                key={`${coreIndex}-${eventIndex + 1}`}
+                className="staggered-animation"
+                style={{ animationDelay: `${eventIndex * 0.1}s` }}
+              >
+                <TimelineEventItem event={event} layout={(coreIndex + eventIndex + 1) % 2 === 0 ? 'image-left' : 'image-right'} />
+              </div>
+            ))}
+          </div>
+          
+          {/* 折叠按钮 */}
+          <div className="text-center mt-6">
+            <button
+              onClick={toggleExpansion}
+              className="inline-flex items-center gap-1 text-sm text-gold font-medium hover:text-gold/80 transition-colors duration-200"
             >
-              <TimelineEventItem event={event} layout={(coreIndex + eventIndex + 1) % 2 === 0 ? 'image-left' : 'image-right'} />
-            </div>
-          ))}
-        </div>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+              </svg>
+              <span>收起事件</span>
+            </button>
+          </div>
+        </>
       )}
     </div>
   );
