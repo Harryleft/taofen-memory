@@ -79,6 +79,8 @@ export function useTimelineData() {
 
   useEffect(() => {
     const loadTimelineData = async () => {
+      console.log('🐛 useTimelineData Debug - 开始加载数据');
+      
       try {
         // 调试：候选路径（优先使用 Vite BASE_URL + public 真实路径）
         const base = (import.meta as { env?: { BASE_URL?: string } }).env?.BASE_URL || '/';
@@ -86,6 +88,8 @@ export function useTimelineData() {
           `${base.replace(/\/$/, '')}/data/json/timeline.json`, // 实际存在的路径
           `${base.replace(/\/$/, '')}/data/timeline.json`       // 兼容旧路径
         ];
+        
+        console.log('🐛 useTimelineData Debug - 候选路径:', candidates);
 
         let lastError: Error | null = null;
         for (const url of candidates) {
@@ -112,6 +116,13 @@ export function useTimelineData() {
 
             const data = JSON.parse(text);
             
+            console.log('🐛 useTimelineData Debug - 解析后的原始数据:', {
+              dataType: typeof data,
+              isArray: Array.isArray(data),
+              length: Array.isArray(data) ? data.length : 'N/A',
+              sample: Array.isArray(data) ? data[0] : data
+            });
+            
             // 数据验证
             if (!validateTimelineData(data)) {
               console.error('[Timeline] Invalid data structure:', data);
@@ -120,6 +131,10 @@ export function useTimelineData() {
             
             setTimelineData(data);
             console.info('[Timeline] Loaded events', data.length);
+            console.log('🐛 useTimelineData Debug - 数据设置成功:', {
+              timelineData: data,
+              length: data.length
+            });
             lastError = null;
             break;
           } catch (err) {
@@ -134,11 +149,14 @@ export function useTimelineData() {
       } catch (e) {
         if (e instanceof Error) {
           setError(e);
+          console.log('🐛 useTimelineData Debug - 设置错误状态:', e);
         }
         console.error('加载时间线数据失败:', e);
         setTimelineData([]);
+        console.log('🐛 useTimelineData Debug - 设置空数据数组');
       } finally {
         setLoading(false);
+        console.log('🐛 useTimelineData Debug - 设置loading为false');
       }
     };
 
