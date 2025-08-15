@@ -6,42 +6,36 @@
 import React from 'react';
 import TimelineEventItem from './TimelineEventItem';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
-
-interface TimelineYear {
-  year: string;
-  label: string;
-  events: Array<{
-    time: string;
-    experience: string;
-    image: string;
-    location: string;
-    timespot?: number;
-  }>;
-}
+import { TimelineData } from '@/hooks/useTimelineData';
 
 interface EventListProps {
-  years: TimelineYear[];
+  years: TimelineData;
   selectedYear?: string;
 }
 
 const TimelineEventList: React.FC<EventListProps> = ({ years, selectedYear }) => {
-  // 🐛 调试信息：TimelineEventList组件接收到的数据
+  // 🐛 调试信息：TimelineEventList组件接收到的原始数据
   console.log('🐛 TimelineEventList Debug:', {
     years,
     yearsLength: years?.length,
     selectedYear,
     yearsSample: years?.[0],
-    allYears: years?.map(y => ({ year: y.year, eventsCount: y.events.length }))
+    allCoreEvents: years?.map((coreEvent, index) => ({ 
+      coreEvent: coreEvent.core_event, 
+      eventsCount: coreEvent.timeline.length 
+    }))
   });
 
-  // 根据选中的年份过滤事件
-  const filteredYears = selectedYear 
-    ? years.filter(year => year.year === selectedYear)
+  // 根据选中的年份过滤事件（在原始数据中查找匹配的事件）
+  const filteredCoreEvents = selectedYear 
+    ? years.filter(coreEvent => {
+        return coreEvent.timeline.some(event => event.time.includes(selectedYear));
+      })
     : years;
 
   console.log('🐛 TimelineEventList Debug - 过滤后的数据:', {
-    filteredYears,
-    filteredYearsLength: filteredYears?.length,
+    filteredCoreEvents,
+    filteredEventsLength: filteredCoreEvents?.length,
     selectedYear
   });
 
@@ -50,10 +44,10 @@ const TimelineEventList: React.FC<EventListProps> = ({ years, selectedYear }) =>
 
   // 🐛 调试信息：即将渲染
   console.log('🐛 TimelineEventList Debug - 即将渲染:', {
-    filteredYearsLength: filteredYears?.length,
-    hasData: filteredYears && filteredYears.length > 0,
-    firstYear: filteredYears?.[0]?.year,
-    firstYearEvents: filteredYears?.[0]?.events
+    filteredEventsLength: filteredCoreEvents?.length,
+    hasData: filteredCoreEvents && filteredCoreEvents.length > 0,
+    firstCoreEvent: filteredCoreEvents?.[0]?.core_event,
+    firstCoreEventEvents: filteredCoreEvents?.[0]?.timeline
   });
 
   return (
@@ -62,38 +56,42 @@ const TimelineEventList: React.FC<EventListProps> = ({ years, selectedYear }) =>
         ref={containerReveal.elementRef}
         className={`space-y-16 scroll-reveal ${containerReveal.isRevealed ? 'revealed' : ''}`}
       >
-        {filteredYears.map((yearData, yearIndex) => (
+        {filteredCoreEvents.map((coreEvent, coreIndex) => (
           <section 
-            key={yearData.year}
-            className="timeline-year-section"
-            data-year={yearData.year}
+            key={coreEvent.core_event}
+            className="timeline-core-event-section"
+            data-core-event={coreEvent.core_event}
           >
-            {/* 年份标题 */}
-            <div className="year-header mb-12 text-center">
+            {/* 核心事件标题 */}
+            <div className="core-event-header mb-12 text-center">
               <h2 className="text-3xl font-bold text-blue-900 mb-2">
-                {yearData.year}年
+                {coreEvent.core_event}
               </h2>
-              <p className="text-lg text-gray-600">
-                {yearData.label}
-              </p>
               <div className="w-24 h-1 bg-gradient-to-r from-yellow-600 to-blue-900 mx-auto mt-4 rounded-full"></div>
             </div>
 
             {/* 事件列表 */}
-            <div className="year-events space-y-12">
-              {yearData.events.map((event, eventIndex) => (
-                <div
-                  key={`${yearData.year}-${eventIndex}`}
-                  className="timeline-event-item scroll-reveal"
-                  style={{ transitionDelay: `${eventIndex * 100}ms` }}
-                >
-                  <TimelineEventItem
-                    event={event}
-                    isFeatured={eventIndex === 0}
-                    layout={yearIndex % 2 === 0 ? 'image-left' : 'image-right'}
-                  />
-                </div>
-              ))}
+            <div className="core-event-timeline space-y-12">
+              {coreEvent.timeline.map((event, eventIndex) => {
+                // 提取年份用于data-year属性
+                const yearMatch = event.time.match(/(\d{4})年/);
+                const year = yearMatch ? yearMatch[1] : '';
+                
+                return (
+                  <div
+                    key={`${coreEvent.core_event}-${eventIndex}`}
+                    className="timeline-event-item scroll-reveal"
+                    data-year={year}
+                    style={{ transitionDelay: `${eventIndex * 100}ms` }}
+                  >
+                    <TimelineEventItem
+                      event={event}
+                      isFeatured={eventIndex === 0}
+                      layout={coreIndex % 2 === 0 ? 'image-left' : 'image-right'}
+                    />
+                  </div>
+                );
+              })}
             </div>
           </section>
         ))}
@@ -106,20 +104,33 @@ const TimelineEventList: React.FC<EventListProps> = ({ years, selectedYear }) =>
             快速导航
           </h3>
           <div className="flex flex-wrap justify-center gap-4">
-            {years.map((yearData) => (
-              <button
-                key={`nav-${yearData.year}`}
-                onClick={() => {
-                  const element = document.querySelector(`[data-year="${yearData.year}"]`);
-                  if (element) {
-                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }
-                }}
-                className="px-4 py-2 bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 text-sm font-medium text-blue-900 hover:bg-blue-900 hover:text-white"
-              >
-                {yearData.year}年
-              </button>
-            ))}
+            {years.map((coreEvent) => {
+              // 提取该核心事件中的所有年份用于导航
+              const yearsInCoreEvent = coreEvent.timeline
+                .map(event => {
+                  const yearMatch = event.time.match(/(\d{4})年/);
+                  return yearMatch ? yearMatch[1] : null;
+                })
+                .filter(year => year !== null);
+              
+              // 获取唯一年份并排序
+              const uniqueYears = [...new Set(yearsInCoreEvent)].sort();
+              
+              return uniqueYears.map(year => (
+                <button
+                  key={`nav-${coreEvent.core_event}-${year}`}
+                  onClick={() => {
+                    const element = document.querySelector(`[data-year="${year}"]`);
+                    if (element) {
+                      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  }}
+                  className="px-4 py-2 bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 text-sm font-medium text-blue-900 hover:bg-blue-900 hover:text-white"
+                >
+                  {year}年
+                </button>
+              ));
+            }).flat()}
           </div>
         </div>
       )}
