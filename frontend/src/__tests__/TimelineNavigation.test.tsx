@@ -5,6 +5,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { TimelineNavigation } from '@/components/timeline/TimelineNavigation';
+import { TimelineEvent } from '@/components/timeline-data';
 
 // Mock window.scrollTo
 const mockScrollTo = jest.fn();
@@ -20,40 +21,42 @@ Object.defineProperty(document, 'querySelector', {
   writable: true
 });
 
-const mockYears = [
+const mockEvents: TimelineEvent[] = [
   {
-    core_event: "1. 幼年生活",
-    timeline: [
-      {
-        time: "1895年",
-        experience: "11月5日，邹韬奋出生于福建省永安市。",
-        image: "/images/timeline_images/taofen_children.jpg",
-        location: "福建, 永安"
-      },
-      {
-        time: "1900年",
-        experience: "父亲去福州任候补，全家迁往。",
-        image: "/images/timeline_images/taofen_father.jpg",
-        location: "福建, 福州"
-      }
-    ]
+    id: "1895",
+    year: 1895,
+    title: "1895年：出生于福建永安",
+    description: "11月5日，邹韬奋出生于福建省永安市。",
+    details: ["地点：福建, 永安"],
+    imageUrl: "/images/timeline_images/taofen_children.jpg",
+    period: "early"
   },
   {
-    core_event: "2. 求学时期",
-    timeline: [
-      {
-        time: "1909年",
-        experience: "与胞叔邹国珂一同考入福州工业学校。",
-        image: "/images/timeline_images/taofen_fuzhougongye.jpg",
-        location: "福建, 福州"
-      },
-      {
-        time: "1922年",
-        experience: "韬奋担任编辑股主任，主持《教育与职业》月刊。",
-        image: "",
-        location: "上海"
-      }
-    ]
+    id: "1900",
+    year: 1900,
+    title: "1900年：迁居福州",
+    description: "父亲去福州任候补，全家迁往。",
+    details: ["地点：福建, 福州"],
+    imageUrl: "/images/timeline_images/taofen_father.jpg",
+    period: "early"
+  },
+  {
+    id: "1909",
+    year: 1909,
+    title: "1909年：考入福州工业学校",
+    description: "与胞叔邹国珂一同考入福州工业学校。",
+    details: ["地点：福建, 福州"],
+    imageUrl: "/images/timeline_images/taofen_fuzhougongye.jpg",
+    period: "early"
+  },
+  {
+    id: "1922",
+    year: 1922,
+    title: "1922年：担任编辑",
+    description: "韬奋担任编辑股主任，主持《教育与职业》月刊。",
+    details: ["地点：上海"],
+    imageUrl: "",
+    period: "middle"
   }
 ];
 
@@ -63,13 +66,13 @@ describe('TimelineNavigation', () => {
   });
 
   it('应该正确渲染导航组件', () => {
-    const mockOnYearChange = jest.fn();
+    const mockOnEventClick = jest.fn();
     
     render(
       <TimelineNavigation
-        years={mockYears}
-        currentYear="1922"
-        onYearChange={mockOnYearChange}
+        events={mockEvents}
+        activeEventId="1922"
+        onEventClick={mockOnEventClick}
       />
     );
 
@@ -90,13 +93,13 @@ describe('TimelineNavigation', () => {
   });
 
   it('应该显示激活状态的年份节点', () => {
-    const mockOnYearChange = jest.fn();
+    const mockOnEventClick = jest.fn();
     
     render(
       <TimelineNavigation
-        years={mockYears}
-        currentYear="1922"
-        onYearChange={mockOnYearChange}
+        events={mockEvents}
+        activeEventId="1922"
+        onEventClick={mockOnEventClick}
       />
     );
 
@@ -106,18 +109,18 @@ describe('TimelineNavigation', () => {
   });
 
   it('应该处理年份点击事件', () => {
-    const mockOnYearChange = jest.fn();
+    const mockOnEventClick = jest.fn();
     const mockElement = {
       getBoundingClientRect: () => ({ top: 100 }),
       offsetTop: 500
     };
-    mockQuerySelector.mockReturnValue(mockElement);
+    jest.spyOn(document, 'getElementById').mockReturnValue(mockElement);
     
     render(
       <TimelineNavigation
-        years={mockYears}
-        currentYear="1922"
-        onYearChange={mockOnYearChange}
+        events={mockEvents}
+        activeEventId="1922"
+        onEventClick={mockOnEventClick}
       />
     );
 
@@ -125,18 +128,18 @@ describe('TimelineNavigation', () => {
     const yearButton = screen.getByLabelText('跳转到1895年');
     fireEvent.click(yearButton);
 
-    expect(mockOnYearChange).toHaveBeenCalledWith('1895');
+    expect(mockOnEventClick).toHaveBeenCalledWith('1895');
     expect(mockScrollTo).toHaveBeenCalled();
   });
 
   it('应该处理向上箭头点击事件', () => {
-    const mockOnYearChange = jest.fn();
+    const mockOnEventClick = jest.fn();
     
     render(
       <TimelineNavigation
-        years={mockYears}
-        currentYear="1922"
-        onYearChange={mockOnYearChange}
+        events={mockEvents}
+        activeEventId="1922"
+        onEventClick={mockOnEventClick}
       />
     );
 
@@ -151,13 +154,13 @@ describe('TimelineNavigation', () => {
   });
 
   it('应该处理向下箭头点击事件', () => {
-    const mockOnYearChange = jest.fn();
+    const mockOnEventClick = jest.fn();
     
     render(
       <TimelineNavigation
-        years={mockYears}
-        currentYear="1922"
-        onYearChange={mockOnYearChange}
+        events={mockEvents}
+        activeEventId="1922"
+        onEventClick={mockOnEventClick}
       />
     );
 
@@ -172,13 +175,13 @@ describe('TimelineNavigation', () => {
   });
 
   it('应该正确计算进度条宽度', () => {
-    const mockOnYearChange = jest.fn();
+    const mockOnEventClick = jest.fn();
     
     render(
       <TimelineNavigation
-        years={mockYears}
-        currentYear="1922"
-        onYearChange={mockOnYearChange}
+        events={mockEvents}
+        activeEventId="1922"
+        onEventClick={mockOnEventClick}
       />
     );
 
@@ -188,13 +191,13 @@ describe('TimelineNavigation', () => {
   });
 
   it('应该正确处理没有当前年份的情况', () => {
-    const mockOnYearChange = jest.fn();
+    const mockOnEventClick = jest.fn();
     
     render(
       <TimelineNavigation
-        years={mockYears}
-        currentYear=""
-        onYearChange={mockOnYearChange}
+        events={mockEvents}
+        activeEventId=""
+        onEventClick={mockOnEventClick}
       />
     );
 
@@ -207,30 +210,44 @@ describe('TimelineNavigation', () => {
   });
 
   it('应该从timeline中正确提取年份', () => {
-    const mockOnYearChange = jest.fn();
+    const mockOnEventClick = jest.fn();
     
     // 测试数据包含重复年份的情况
-    const mockYearsWithDuplicates = [
+    const mockEventsWithDuplicates: TimelineEvent[] = [
       {
-        core_event: "测试事件1",
-        timeline: [
-          { time: "1900年", experience: "事件1", image: "", location: "地点1" },
-          { time: "1900年", experience: "事件2", image: "", location: "地点2" }
-        ]
+        id: "1900_1",
+        year: 1900,
+        title: "事件1",
+        description: "事件1描述",
+        details: ["地点1"],
+        imageUrl: "",
+        period: "early"
       },
       {
-        core_event: "测试事件2", 
-        timeline: [
-          { time: "1910年", experience: "事件3", image: "", location: "地点3" }
-        ]
+        id: "1900_2",
+        year: 1900,
+        title: "事件2",
+        description: "事件2描述",
+        details: ["地点2"],
+        imageUrl: "",
+        period: "early"
+      },
+      {
+        id: "1910",
+        year: 1910,
+        title: "事件3",
+        description: "事件3描述",
+        details: ["地点3"],
+        imageUrl: "",
+        period: "early"
       }
     ];
     
     render(
       <TimelineNavigation
-        years={mockYearsWithDuplicates}
-        currentYear="1900"
-        onYearChange={mockOnYearChange}
+        events={mockEventsWithDuplicates}
+        activeEventId="1900"
+        onEventClick={mockOnEventClick}
       />
     );
 
