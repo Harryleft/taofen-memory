@@ -7,7 +7,6 @@ import { ZoutaofenFooter } from '../components/layout/footer/ZoutaofenFooter';
 import { TimelineCard } from '../components/timeline/TimelineCard.tsx';
 import { TimelineNavigation } from '../components/timeline/TimelineNavigation.tsx';
 import { useTimelineData } from '../hooks/useTimelineData.ts';
-import { TimelineEvent } from '../components/timeline/timeline-data.ts';
 
 export default function TimelinePage() {
   const { timelineData, loading, error } = useTimelineData();
@@ -20,24 +19,32 @@ export default function TimelinePage() {
   }, [timelineData]);
 
   useEffect(() => {
+    let ticking = false;
+    
     const handleScroll = () => {
-      const scrollPosition = window.scrollY + window.innerHeight / 2;
-
-      for (const event of timelineData) {
-        const element = document.getElementById(`event-${event.id}`);
-        if (element) {
-          const elementTop = element.offsetTop;
-          const elementBottom = elementTop + element.offsetHeight;
-
-          if (scrollPosition >= elementTop && scrollPosition <= elementBottom) {
-            setActiveEventId(event.id);
-            break;
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const scrollPosition = window.scrollY + window.innerHeight / 2;
+          
+          for (const event of timelineData) {
+            const element = document.getElementById(`event-${event.id}`);
+            if (element) {
+              const elementTop = element.offsetTop;
+              const elementBottom = elementTop + element.offsetHeight;
+              
+              if (scrollPosition >= elementTop && scrollPosition <= elementBottom) {
+                setActiveEventId(event.id);
+                break;
+              }
+            }
           }
-        }
+          ticking = false;
+        });
+        ticking = true;
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [timelineData]);
 
