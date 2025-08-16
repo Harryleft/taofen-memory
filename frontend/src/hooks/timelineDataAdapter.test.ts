@@ -93,17 +93,19 @@ describe('TimelineDataAdapter', () => {
   test('应该正确生成ID', () => {
     const result = adaptTimelineData(mockTimelineData);
     
-    // ID应该是年份的字符串形式
-    expect(result[0].id).toBe('1895');
-    expect(result[1].id).toBe('1900');
-    expect(result[2].id).toBe('1915');
+    // ID应该是年份和索引的组合
+    expect(result[0].id).toBe('1895-0');
+    expect(result[1].id).toBe('1900-1');
+    expect(result[2].id).toBe('1915-2');
   });
 
-  test('应该包含地点信息在details中', () => {
+  test('应该包含地点信息', () => {
     const result = adaptTimelineData(mockTimelineData);
     
     const firstEvent = result[0];
-    expect(firstEvent.details).toContain('地点：福建, 永安');
+    expect(firstEvent.location).toBe('福建, 永安');
+    // details数组现在为空，因为地点信息有专门的字段
+    expect(firstEvent.details).toEqual([]);
   });
 
   test('应该按年份排序', () => {
@@ -129,7 +131,7 @@ describe('TimelineDataAdapter', () => {
   });
 
   test('应该处理无效数据', () => {
-    const result = adaptTimelineData([null as any]);
+    const result = adaptTimelineData([null as unknown as TimelineData]);
     
     expect(result).toHaveLength(0);
   });
@@ -137,7 +139,7 @@ describe('TimelineDataAdapter', () => {
 
 // 如果在浏览器环境中运行，导出测试函数
 if (typeof window !== 'undefined') {
-  (window as any).runTimelineAdapterTests = () => {
+  (window as Record<string, unknown>).runTimelineAdapterTests = () => {
     console.group('🧪 时间线适配器测试');
     
     try {

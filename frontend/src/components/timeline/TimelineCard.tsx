@@ -19,7 +19,6 @@ export function TimelineCard({ event, index, isActive, onClick }: TimelineCardPr
 
   // 检查是否有有效的图片URL
   const hasValidImage = event.imageUrl && event.imageUrl.trim() !== '';
-  const shouldShowImage = hasValidImage && !imageError;
 
   return (
     <motion.div
@@ -48,17 +47,17 @@ export function TimelineCard({ event, index, isActive, onClick }: TimelineCardPr
         onClick={onClick}
       />
 
-      {/* 内容容器 - 左右交替 */}
-      <div className={`flex ${isLeft ? 'flex-row' : 'flex-row-reverse'} items-start gap-16 w-full max-w-6xl timeline-content ${isLeft ? 'justify-start pl-16' : shouldShowImage ? 'justify-end pr-32' : 'justify-end pr-16'}`}>
-        {/* 图片区域 - 仅在有有效图片时显示 */}
-        {shouldShowImage && (
-          <motion.div
-            initial={{ opacity: 0, x: isLeft ? -40 : 40 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex-shrink-0 timeline-image-container"
-          >
+      {/* 内容容器 - 左右交替，统一布局系统 */}
+      <div className={`flex ${isLeft ? 'flex-row' : 'flex-row-reverse'} items-start gap-16 w-full max-w-6xl timeline-content justify-between px-16`}>
+        {/* 图片区域 - 固定空间，始终显示 */}
+        <motion.div
+          initial={{ opacity: 0, x: isLeft ? -40 : 40 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="flex-shrink-0 w-80 timeline-image-container"
+        >
+          {hasValidImage && !imageError ? (
             <div className="relative w-80 h-60 overflow-hidden rounded-lg border-4 border-[var(--timeline-secondary)] shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group timeline-image"
                  onClick={onClick}>
               <ImageWithFallback
@@ -81,16 +80,19 @@ export function TimelineCard({ event, index, isActive, onClick }: TimelineCardPr
               {/* 图片遮罩 */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
-          </motion.div>
-        )}
+          ) : (
+            /* 无图片时保留空间 */
+            <div className="w-80 h-60 invisible" />
+          )}
+        </motion.div>
 
         {/* 文字区域 */}
         <motion.div
           initial={{ opacity: 0, x: isLeft ? 40 : -40 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: shouldShowImage ? 0.3 : 0.2 }}
-          className={`flex-1 min-w-0 cursor-pointer timeline-text ${shouldShowImage ? (isLeft ? 'max-w-lg' : 'max-w-xl pr-16') : 'max-w-3xl'}`}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="flex-1 min-w-0 cursor-pointer timeline-text max-w-2xl"
           onClick={onClick}
         >
           {/* 年份和地点 */}
