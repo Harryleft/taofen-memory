@@ -62,9 +62,9 @@ export function TimelineCoverCard({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.8 }}
-              className="timeline-cover-guide-section mt-8"
+              className="timeline-cover-guide-section"
             >
-              <div className="timeline-cover-stats">
+              <div className="timeline-cover-stats mt-8">
                 <div className="timeline-cover-stat-item">
                   <span className="timeline-cover-stat-number">{totalEvents}个</span>
                   <span className="timeline-cover-stat-label">重要事件</span>
