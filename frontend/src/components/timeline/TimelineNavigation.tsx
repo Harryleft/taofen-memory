@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useState, useRef, useCallback } from "react";
 import { TimelineEvent } from "./timeline-data.ts";
 
 interface TimelineNavigationProps {
@@ -13,33 +12,8 @@ export function TimelineNavigation({
   events,
   activeEventId,
 }: TimelineNavigationProps) {
-  const [isVisible, setIsVisible] = useState(false);
-  const lastScrollYRef = useRef(0);
-  const tickingRef = useRef(false);
 
-  // 使用防抖的滚动处理函数
-  const handleScroll = useCallback(() => {
-    if (!tickingRef.current) {
-      requestAnimationFrame(() => {
-        const scrollY = window.scrollY;
-        setIsVisible(scrollY > 100);
-        lastScrollYRef.current = scrollY;
-        tickingRef.current = false;
-      });
-      tickingRef.current = true;
-    }
-  }, []);
-
-  // 设置滚动监听
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
-
-  const activeIndex = events.findIndex(
-    (event) => event.id === activeEventId,
-  );
-
+  
   // 获取当前活动事件的年份
   const getActiveYear = () => {
     const activeEvent = events.find(event => event.id === activeEventId);
@@ -50,8 +24,8 @@ export function TimelineNavigation({
     <motion.div
       initial={{ opacity: 0, x: 50 }}
       animate={{
-        opacity: isVisible ? 1 : 0,
-        x: isVisible ? 0 : 50,
+        opacity: 1,
+        x: 0,
       }}
       transition={{ duration: 0.3 }}
       className="fixed right-8 top-1/2 -translate-y-1/2 z-20"
@@ -149,27 +123,6 @@ export function TimelineNavigation({
           </svg>
         </motion.div>
 
-        {/* 进度指示器 */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="text-center"
-        >
-          <div className="mb-1 timeline-text-muted timeline-text-caption-sm">
-            {activeIndex + 1} / {events.length}
-          </div>
-          <div className="w-20 h-1 bg-gray-200 rounded-full overflow-hidden">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{
-                width: `${((activeIndex + 1) / events.length) * 100}%`,
-              }}
-              transition={{ duration: 0.3 }}
-              className="h-full rounded-full bg-[var(--timeline-secondary)]"
-            />
-          </div>
-        </motion.div>
       </div>
     </motion.div>
   );
