@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { motion } from 'framer-motion';
 import AppHeader from '../components/layout/header/AppHeader';
 import { ZoutaofenFooter } from '../components/layout/footer/ZoutaofenFooter';
@@ -12,6 +12,8 @@ import { useTimelineData } from '../hooks/useTimelineData.ts';
 export default function TimelinePage() {
   const { timelineData, loading, error } = useTimelineData();
   const [activeEventId, setActiveEventId] = useState<string>('1895');
+  const coverCardRef = useRef<HTMLDivElement>(null);
+  const [coverCardHeight, setCoverCardHeight] = useState(0);
 
   // 计算时间跨度
   const yearSpan = timelineData.length > 0 
@@ -24,18 +26,32 @@ export default function TimelinePage() {
     }
   }, [timelineData]);
 
+  // 获取封面卡高度
+  useLayoutEffect(() => {
+    const updateCoverCardHeight = () => {
+      if (coverCardRef.current) {
+        setCoverCardHeight(coverCardRef.current.offsetHeight);
+      }
+    };
+
+    updateCoverCardHeight();
+    window.addEventListener('resize', updateCoverCardHeight);
+    return () => window.removeEventListener('resize', updateCoverCardHeight);
+  }, []);
+
   useEffect(() => {
     let ticking = false;
     
     const handleScroll = () => {
       if (!ticking) {
         requestAnimationFrame(() => {
-          const scrollPosition = window.scrollY + window.innerHeight / 2;
+          // 减去封面卡高度，确保导航与实际显示的事件对应
+          const scrollPosition = window.scrollY + window.innerHeight / 2 - coverCardHeight;
           
           for (const event of timelineData) {
             const element = document.getElementById(`event-${event.id}`);
             if (element) {
-              const elementTop = element.offsetTop;
+              const elementTop = element.offsetTop - coverCardHeight;
               const elementBottom = elementTop + element.offsetHeight;
               
               if (scrollPosition >= elementTop && scrollPosition <= elementBottom) {
@@ -52,7 +68,7 @@ export default function TimelinePage() {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [timelineData]);
+  }, [timelineData, coverCardHeight]);
 
   const handleEventClick = (eventId: string) => {
     setActiveEventId(eventId);
@@ -119,10 +135,12 @@ export default function TimelinePage() {
 
         {/* 跨轴章首页封面卡 - 替代页面标题 */}
         {timelineData.length > 0 && (
-          <TimelineCoverCard
-            totalEvents={timelineData.length}
-            yearSpan={yearSpan}
-          />
+          <div ref={coverCardRef}>
+            <TimelineCoverCard
+              totalEvents={timelineData.length}
+              yearSpan={yearSpan}
+            />
+          </div>
         )}
 
         {/* 时间轴事件卡片 - 与封面卡保持节拍间距 */}

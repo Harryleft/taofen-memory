@@ -69,7 +69,8 @@
       "Bash(npm run type-check:*)",
       "Bash(dir:*)",
       "mcp__playwright__browser_close",
-      "mcp__puppeteer__puppeteer_navigate"
+      "mcp__puppeteer__puppeteer_navigate",
+      "mcp__filesystem__write_file"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",
