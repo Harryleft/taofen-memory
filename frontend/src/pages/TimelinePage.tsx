@@ -49,10 +49,12 @@ export default function TimelinePage() {
           const scrollPosition = window.scrollY + window.innerHeight / 2 - coverCardHeight;
           
           for (const event of timelineData) {
-            const element = document.getElementById(`event-${event.id}`);
-            if (element) {
-              const elementTop = element.offsetTop - coverCardHeight;
-              const elementBottom = elementTop + element.offsetHeight;
+            // 获取文字区域元素，而不是整个卡片
+            const textElement = document.querySelector(`[data-text-region="event-${event.id}"]`);
+            if (textElement) {
+              const textRect = textElement.getBoundingClientRect();
+              const elementTop = textRect.top + window.scrollY - coverCardHeight;
+              const elementBottom = elementTop + textRect.height;
               
               if (scrollPosition >= elementTop && scrollPosition <= elementBottom) {
                 setActiveEventId(event.id);
