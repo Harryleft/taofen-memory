@@ -5,12 +5,18 @@ import { motion } from 'framer-motion';
 import AppHeader from '../components/layout/header/AppHeader';
 import { ZoutaofenFooter } from '../components/layout/footer/ZoutaofenFooter';
 import { TimelineCard } from '../components/timeline/TimelineCard.tsx';
+import { TimelineCoverCard } from '../components/timeline/TimelineCoverCard.tsx';
 import { TimelineNavigation } from '../components/timeline/TimelineNavigation.tsx';
 import { useTimelineData } from '../hooks/useTimelineData.ts';
 
 export default function TimelinePage() {
   const { timelineData, loading, error } = useTimelineData();
   const [activeEventId, setActiveEventId] = useState<string>('1895');
+
+  // 计算时间跨度
+  const yearSpan = timelineData.length > 0 
+    ? `${timelineData[0].year}-${timelineData[timelineData.length - 1].year}` 
+    : '';
 
   useEffect(() => {
     if (timelineData.length > 0) {
@@ -117,7 +123,7 @@ export default function TimelinePage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-20 pt-24"
+          className="text-center mb-12 pt-24"
         >
           <h2 className="font-bold mb-4 timeline-primary timeline-text-section">
             人生轨迹
@@ -128,8 +134,16 @@ export default function TimelinePage() {
           </p>
         </motion.div>
 
-        {/* 时间轴事件卡片 */}
-        <div className="relative">
+        {/* 跨轴章首页封面卡 */}
+        {timelineData.length > 0 && (
+          <TimelineCoverCard
+            totalEvents={timelineData.length}
+            yearSpan={yearSpan}
+          />
+        )}
+
+        {/* 时间轴事件卡片 - 与封面卡保持节拍间距 */}
+        <div className="relative mt-16">
           {timelineData.map((event, index) => (
             <TimelineCard
               key={event.id}

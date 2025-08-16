@@ -1150,3 +1150,349 @@ img {
   z-index: 0;
 }
 
+/* ===============================================
+   时间轴章首页封面卡样式系统
+   =============================================== */
+
+/* 主封面卡容器 - 跨轴设计 */
+.timeline-cover-card {
+  position: relative;
+  background: #FCFAF7; /* 与卡片相同的温白色 */
+  border-radius: 16px;
+  
+  /* 多层背景叠加：纸纹 + 拉丝金属 + 微渐变 + 内收晕影 */
+  background-image: 
+    /* 边缘内收晕影效果 */
+    radial-gradient(ellipse 85% 85% at center, transparent 60%, rgba(140, 120, 100, 0.08) 85%, rgba(100, 80, 60, 0.12) 100%),
+    
+    /* 极低频纸张纹理 (3-4%) */
+    radial-gradient(circle at 15% 40%, transparent 30%, rgba(139, 123, 107, 0.035) 32%, rgba(139, 123, 107, 0.035) 36%, transparent 38%),
+    radial-gradient(circle at 85% 20%, transparent 25%, rgba(156, 134, 118, 0.03) 27%, rgba(156, 134, 118, 0.03) 31%, transparent 33%),
+    radial-gradient(circle at 60% 80%, transparent 20%, rgba(127, 109, 95, 0.04) 22%, rgba(127, 109, 95, 0.04) 26%, transparent 28%),
+    
+    /* 拉丝金属纹理 (4-5%) */
+    linear-gradient(20deg, transparent 45%, rgba(165, 147, 133, 0.045) 47%, rgba(165, 147, 133, 0.045) 50%, transparent 52%),
+    linear-gradient(-20deg, transparent 43%, rgba(158, 140, 126, 0.04) 45%, rgba(158, 140, 126, 0.04) 48%, transparent 50%),
+    linear-gradient(70deg, transparent 40%, rgba(180, 162, 148, 0.05) 42%, rgba(180, 162, 148, 0.05) 45%, transparent 47%),
+    
+    /* 微妙垂直渐变 */
+    linear-gradient(to bottom, #FCFAF7 0%, #FAFAF9 30%, #F9F7F5 70%, #F7F5F2 100%);
+    
+  background-size: 
+    100% 100%,          /* 晕影覆盖全部 */
+    220px 220px,        /* 纸纹间距 */
+    280px 280px,
+    180px 180px,
+    120px 120px,        /* 拉丝纹理间距 */
+    160px 160px,
+    100px 100px,
+    100% 100%;          /* 渐变覆盖全部 */
+  
+  /* 卡片阴影：比普通卡片更深层 */
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    
+  /* 动画优化 */
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* 轴线穿过效果 */
+.timeline-cover-axis-line {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(196, 155, 97, 0.2) 20%,
+    rgba(196, 155, 97, 0.4) 48%,
+    rgba(27, 54, 93, 0.6) 50%,
+    rgba(196, 155, 97, 0.4) 52%,
+    rgba(196, 155, 97, 0.2) 80%,
+    transparent 100%
+  );
+  border-radius: 2px;
+}
+
+/* 中央徽章化起点节点 */
+.timeline-cover-start-badge {
+  filter: drop-shadow(0 4px 12px rgba(27, 54, 93, 0.25));
+}
+
+.timeline-cover-badge-outer {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #C49B61 0%, #B68C3D 50%, #A37E2C 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  
+  /* 外环发光效果 */
+  box-shadow: 
+    0 0 20px rgba(196, 155, 97, 0.3),
+    0 0 40px rgba(27, 54, 93, 0.15),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.timeline-cover-badge-inner {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1B365D 0%, #2A4A72 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* 内环质感 */
+  box-shadow: 
+    inset 0 1px 2px rgba(255, 255, 255, 0.2),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.timeline-cover-badge-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* ===============================================
+   封面卡文字样式系统
+   =============================================== */
+
+/* 主标题 */
+.timeline-cover-main-title {
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 700;
+  color: var(--timeline-primary);
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+/* 副标题 */
+.timeline-cover-sub-title {
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  font-weight: 500;
+  color: var(--timeline-secondary);
+  margin-bottom: 1rem;
+  letter-spacing: 0.01em;
+}
+
+/* 描述文字 */
+.timeline-cover-description {
+  font-size: clamp(0.9rem, 1.8vw, 1rem);
+  line-height: 1.6;
+  color: var(--timeline-text-secondary);
+  opacity: 0.9;
+}
+
+/* ===============================================
+   引导区域和统计样式
+   =============================================== */
+
+.timeline-cover-guide-section {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.timeline-cover-stats {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 1.5rem 2rem;
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(196, 155, 97, 0.2);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.timeline-cover-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.timeline-cover-stat-number {
+  font-size: clamp(1.8rem, 3vw, 2.2rem);
+  font-weight: 700;
+  color: var(--timeline-secondary);
+  line-height: 1;
+}
+
+.timeline-cover-stat-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--timeline-text-secondary);
+  opacity: 0.8;
+  white-space: nowrap;
+}
+
+.timeline-cover-stat-divider {
+  width: 1px;
+  height: 2rem;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(196, 155, 97, 0.3) 20%,
+    rgba(196, 155, 97, 0.3) 80%,
+    transparent 100%
+  );
+}
+
+.timeline-cover-scroll-guide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.timeline-cover-scroll-text {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--timeline-secondary);
+  opacity: 0.9;
+}
+
+.timeline-cover-scroll-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(196, 155, 97, 0.1);
+  border: 1px solid rgba(196, 155, 97, 0.2);
+  color: var(--timeline-secondary);
+  transition: all 0.3s ease;
+}
+
+.timeline-cover-scroll-arrow:hover {
+  background: rgba(196, 155, 97, 0.15);
+  border-color: rgba(196, 155, 97, 0.3);
+  transform: scale(1.05);
+}
+
+/* ===============================================
+   响应式优化
+   =============================================== */
+
+@media (max-width: 1023px) {
+  .timeline-cover-card {
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .timeline-cover-stats {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+  }
+  
+  .timeline-cover-stat-divider {
+    width: 2rem;
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      transparent 0%,
+      rgba(196, 155, 97, 0.3) 20%,
+      rgba(196, 155, 97, 0.3) 80%,
+      transparent 100%
+    );
+  }
+  
+  .timeline-cover-stat-item {
+    gap: 0.25rem;
+  }
+  
+  .timeline-cover-guide-section {
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .timeline-cover-card {
+    border-radius: 12px;
+  }
+  
+  .timeline-cover-card > div {
+    padding: 1.5rem !important;
+  }
+  
+  .timeline-cover-badge-outer {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .timeline-cover-badge-inner {
+    width: 26px;
+    height: 26px;
+  }
+  
+  .timeline-cover-stats {
+    flex-direction: row;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+  }
+  
+  .timeline-cover-stat-divider {
+    width: 1px;
+    height: 1.5rem;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(196, 155, 97, 0.3) 20%,
+      rgba(196, 155, 97, 0.3) 80%,
+      transparent 100%
+    );
+  }
+  
+  .timeline-cover-stat-number {
+    font-size: 1.5rem;
+  }
+  
+  .timeline-cover-stat-label {
+    font-size: 0.8rem;
+  }
+}
+
+/* ===============================================
+   悬停和交互效果
+   =============================================== */
+
+.timeline-cover-card:hover {
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.12),
+    0 4px 12px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+.timeline-cover-badge-outer:hover {
+  transform: scale(1.05);
+  transition: transform 0.2s ease;
+}
+
+/* 减少动画支持 */
+@media (prefers-reduced-motion: reduce) {
+  .timeline-cover-card,
+  .timeline-cover-badge-outer {
+    transition: none;
+    transform: none;
+  }
+}
+
