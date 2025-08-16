@@ -2,6 +2,7 @@
 @import 'relationships.css';
 @import 'bookstore.css';
 @import 'ZoutaofenFooter.css';
+@import 'timeline.css';
 
 @tailwind base;
 @tailwind components;
