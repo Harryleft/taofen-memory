@@ -91,7 +91,7 @@ export function TimelineCard({ event, isActive, onClick }: TimelineCardProps) {
             <div
               className={[
                 'relative w-full h-[clamp(220px,26vw,360px)]',
-                'overflow-hidden bg-white',
+                'overflow-hidden timeline-card-paper-texture',
                 'shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group',
                 'border-[var(--timeline-secondary)]',
                 frameBorderClass,
@@ -101,7 +101,7 @@ export function TimelineCard({ event, isActive, onClick }: TimelineCardProps) {
               <ImageWithFallback
                 src={event.imageUrl!}
                 alt={event.title}
-                onLoad={(e) => {
+                onLoad={(e: React.SyntheticEvent<HTMLImageElement>) => {
                   const img = e.currentTarget as HTMLImageElement;
                   setRatio(img.naturalWidth / img.naturalHeight);
                   setImageLoaded(true);
@@ -135,7 +135,7 @@ export function TimelineCard({ event, isActive, onClick }: TimelineCardProps) {
         {/* 覆盖层里的圆点：与标题行中线对齐 */}
         <div className="hidden lg:block absolute inset-0 pointer-events-none">
           <motion.button
-            whileHover={{ scale: 1.12 }}
+            whileHover={{ boxShadow: '0 0 0 6px rgba(var(--timeline-secondary-rgb),0.25)' }}
             transition={{ type: 'tween', duration: 0.15 }}
             onClick={onClick}
             style={{ top: dotY ?? '50%' }}
