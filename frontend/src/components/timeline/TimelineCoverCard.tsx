@@ -84,7 +84,7 @@ export function TimelineCoverCard({
                 transition={{ duration: 0.6, delay: 1.2 }}
                 className="timeline-cover-scroll-guide"
               >
-                <span className="timeline-cover-scroll-text">向下滚动，开始时光之旅</span>
+                {/* <span className="timeline-cover-scroll-text">向下滚动，开始时光之旅</span> */}
                 <motion.div
                   animate={{ y: [0, 6, 0] }}
                   transition={{ 
