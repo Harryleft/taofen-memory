@@ -54,9 +54,26 @@ export function TimelineNavigation({
         x: isVisible ? 0 : 50,
       }}
       transition={{ duration: 0.3 }}
-      className="fixed right-1/2 top-1/2 translate-x-1/2 -translate-y-1/2 z-20"
+      className="fixed right-8 top-1/2 -translate-y-1/2 z-20"
     >
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center space-y-8">
+        {/* 上方装饰箭头 */}
+        <motion.div
+          className="text-[var(--timeline-secondary)]"
+          animate={{
+            y: [0, -5, 0],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 19V5M5 12l7-7 7 7"/>
+          </svg>
+        </motion.div>
+
         {/* 单个金色圆形年份标识 */}
         <motion.div
           className="relative"
@@ -114,12 +131,30 @@ export function TimelineNavigation({
           />
         </motion.div>
 
+        {/* 下方装饰箭头 */}
+        <motion.div
+          className="text-[var(--timeline-secondary)]"
+          animate={{
+            y: [0, 5, 0],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1, // 与上方箭头形成错位动画
+          }}
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 5v14M5 12l7 7 7-7"/>
+          </svg>
+        </motion.div>
+
         {/* 进度指示器 */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="mt-6 text-center"
+          className="text-center"
         >
           <div className="mb-1 timeline-text-muted timeline-text-caption-sm">
             {activeIndex + 1} / {events.length}
