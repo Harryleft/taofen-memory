@@ -93,34 +93,23 @@ export function TimelineCard({ event, index, isActive, onClick }: TimelineCardPr
           className={`flex-1 min-w-0 cursor-pointer timeline-text ${shouldShowImage ? (isLeft ? 'max-w-lg' : 'max-w-xl pr-16') : 'max-w-3xl'}`}
           onClick={onClick}
         >
-          {/* 年份 */}
-          <div className={`flex items-center mb-4 ${isLeft ? 'justify-start' : 'justify-end pr-4'}`}>
+          {/* 年份和地点 */}
+          <div className={`flex items-center gap-3 mb-4 ${isLeft ? 'justify-start' : 'justify-end pr-4'}`}>
             <span className="font-bold timeline-secondary timeline-text-body">
               {event.year}
             </span>
+            {event.location && event.location.trim() !== '' && (
+              <span className="font-bold timeline-secondary timeline-text-body">
+                {event.location}
+              </span>
+            )}
           </div>
-
-          {/* 标题 */}
-          <h3 className={`font-bold mb-4 leading-tight hover:text-[var(--timeline-secondary)] transition-colors duration-300 ${
-              isLeft ? 'text-left' : 'text-right pr-4'
-            } timeline-primary timeline-text-section`}
-          >
-            {event.title}
-          </h3>
 
           {/* 描述 */}
           <p className={`mb-4 ${isLeft ? 'text-left' : 'text-right pr-4'} timeline-text-secondary timeline-text-body timeline-line-height-relaxed`}
           >
             {event.description}
           </p>
-
-          {/* 地点 - 仅在有地点信息时显示 */}
-          {event.location && event.location.trim() !== '' && (
-            <p className={`mb-4 ${isLeft ? 'text-left' : 'text-right pr-4'} timeline-text-tertiary timeline-text-body timeline-line-height-relaxed`}
-            >
-              📍 {event.location}
-            </p>
-          )}
 
           {/* 激活状态指示器 */}
           {isActive && (
