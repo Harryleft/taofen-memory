@@ -167,7 +167,7 @@ export function TimelineCard({ event, isActive, isFirstEvent = false, onClick }:
               }}
               style={{ 
                 top: `${(dotY ?? 50) + firstEventVerticalOffset}px`, 
-                left: anchorX ?? '50%' 
+                left: isFirstEvent ? '521px' : (anchorX ?? '50%')
               }}
               className="pointer-events-auto absolute -translate-x-1/2 -translate-y-1/2 origin-center transform-gpu will-change-transform z-20 timeline-first-event-badge"
               onClick={onClick}
