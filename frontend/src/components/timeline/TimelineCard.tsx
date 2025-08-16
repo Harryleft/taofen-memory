@@ -4,7 +4,7 @@
 import { motion } from 'framer-motion';
 import { useState, useRef, useLayoutEffect, type CSSProperties } from 'react';
 import { TimelineEvent } from './timeline-data.ts';
-import { ImageWithFallback } from '../../../../example/邹韬奋竖轴时间轴页面/components/figma/ImageWithFallback.tsx';
+import { ImageWithFallback } from './ImageWithFallback.tsx';
 
 interface TimelineCardProps {
   event: TimelineEvent & { imageFocus?: string }; // 可选：例如 '50% 20%'
