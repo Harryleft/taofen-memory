@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { TimelineEvent } from './timeline-data.ts';
-import { ImageWithFallback } from '../../../../example/邹韬奋竖轴时间轴页面/components/figma/ImageWithFallback.tsx';
+import { ImageWithFallback } from './ImageWithFallback';
 
 interface TimelineCardProps {
   event: TimelineEvent;
@@ -47,18 +47,18 @@ export function TimelineCard({ event, index, isActive, onClick }: TimelineCardPr
         onClick={onClick}
       />
 
-      {/* 内容容器 - 左右交替，统一布局系统 */}
-      <div className={`flex ${isLeft ? 'flex-row' : 'flex-row-reverse'} items-start gap-16 w-full max-w-6xl timeline-content justify-between px-16`}>
-        {/* 图片区域 - 固定空间，始终显示 */}
+      {/* 内容容器 - Linus式CSS Grid布局系统 */}
+      <div className="grid grid-cols-1 lg:grid-cols-[30%_70%] gap-x-6 md:gap-x-8 lg:gap-x-12 xl:gap-x-16 gap-y-0 max-w-6xl md:max-w-7xl mx-auto px-4 md:px-6 lg:px-8 xl:px-12 w-full">
+        {/* 图片区域 - 基于比例分配空间 */}
         <motion.div
           initial={{ opacity: 0, x: isLeft ? -40 : 40 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="flex-shrink-0 w-80 timeline-image-container"
+          className={`${isLeft ? 'lg:order-1' : 'lg:order-2'} w-full max-w-md mx-auto lg:mx-0 timeline-image-container`}
         >
           {hasValidImage && !imageError ? (
-            <div className="relative w-80 h-60 overflow-hidden rounded-lg border-4 border-[var(--timeline-secondary)] shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group timeline-image"
+            <div className="relative w-full h-60 overflow-hidden rounded-lg border-4 border-[var(--timeline-secondary)] shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group timeline-image"
                  onClick={onClick}>
               <ImageWithFallback
                 src={event.imageUrl}
@@ -82,21 +82,21 @@ export function TimelineCard({ event, index, isActive, onClick }: TimelineCardPr
             </div>
           ) : (
             /* 无图片时保留空间 */
-            <div className="w-80 h-60 invisible" />
+            <div className="w-full h-60 invisible" />
           )}
         </motion.div>
 
-        {/* 文字区域 */}
+        {/* 文字区域 - 基于比例分配空间 */}
         <motion.div
           initial={{ opacity: 0, x: isLeft ? 40 : -40 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="flex-1 min-w-0 cursor-pointer timeline-text max-w-2xl"
+          className={`${isLeft ? 'lg:order-2' : 'lg:order-1'} w-full max-w-4xl mx-auto lg:mx-0 cursor-pointer timeline-text`}
           onClick={onClick}
         >
           {/* 年份和地点 */}
-          <div className={`flex items-center gap-3 mb-4 ${isLeft ? 'justify-start' : 'justify-end pr-4'}`}>
+          <div className={`flex items-center gap-3 mb-4 ${isLeft ? 'lg:justify-start justify-center' : 'lg:justify-end justify-center'} lg:pr-0 pr-4`}>
             <span className="font-bold timeline-secondary timeline-text-body">
               {event.year}
             </span>
@@ -108,7 +108,7 @@ export function TimelineCard({ event, index, isActive, onClick }: TimelineCardPr
           </div>
 
           {/* 描述 */}
-          <p className={`mb-4 ${isLeft ? 'text-left' : 'text-right pr-4'} timeline-text-secondary timeline-text-body timeline-line-height-relaxed`}
+          <p className={`mb-4 ${isLeft ? 'lg:text-left text-center' : 'lg:text-right text-center'} timeline-text-secondary timeline-text-body timeline-line-height-relaxed lg:pr-0 pr-4`}
           >
             {event.description}
           </p>
@@ -119,7 +119,7 @@ export function TimelineCard({ event, index, isActive, onClick }: TimelineCardPr
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
               className={`h-1 bg-[var(--timeline-secondary)] rounded-full mt-4 ${
-                isLeft ? 'origin-left' : 'origin-right'
+                isLeft ? 'lg:origin-left origin-center' : 'lg:origin-right origin-center'
               }`}
             />
           )}

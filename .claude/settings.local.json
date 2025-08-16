@@ -68,7 +68,8 @@
       "mcp__thinking__sequentialthinking",
       "Bash(npm run type-check:*)",
       "Bash(dir:*)",
-      "mcp__playwright__browser_close"
+      "mcp__playwright__browser_close",
+      "mcp__puppeteer__puppeteer_navigate"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",
