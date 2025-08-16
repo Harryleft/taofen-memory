@@ -44,24 +44,28 @@ export function TimelineNavigation({
 
   // 计算事件位置
   const calculateEventPositions = useCallback(() => {
-    const positions: EventPosition[] = [];
-    
-    events.forEach(event => {
-      const element = document.getElementById(`event-${event.id}`);
-      if (element) {
-        const rect = element.getBoundingClientRect();
-        const scrollY = window.scrollY;
-        
-        positions.push({
-          id: event.id,
-          top: rect.top + scrollY,
-          height: rect.height,
-          center: rect.top + scrollY + rect.height / 2
-        });
-      }
-    });
-    
-    setEventPositions(positions);
+    try {
+      const positions: EventPosition[] = [];
+      
+      events.forEach(event => {
+        const element = document.getElementById(`event-${event.id}`);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          const scrollY = window.scrollY;
+          
+          positions.push({
+            id: event.id,
+            top: rect.top + scrollY,
+            height: rect.height,
+            center: rect.top + scrollY + rect.height / 2
+          });
+        }
+      });
+      
+      setEventPositions(positions);
+    } catch (error) {
+      console.warn('[TimelineNavigation] Error calculating event positions:', error);
+    }
   }, [events]);
 
   // 初始化位置计算和监听
@@ -85,9 +89,13 @@ export function TimelineNavigation({
     
     window.addEventListener("resize", debouncedResize, { passive: true });
     
-    // 设置MutationObserver监听DOM变化
+    // 设置防抖的MutationObserver监听DOM变化
+    let mutationTimeout: NodeJS.Timeout;
     const observer = new MutationObserver(() => {
-      calculateEventPositions();
+      clearTimeout(mutationTimeout);
+      mutationTimeout = setTimeout(() => {
+        calculateEventPositions();
+      }, 100); // 100ms防抖
     });
     
     observer.observe(document.body, {
