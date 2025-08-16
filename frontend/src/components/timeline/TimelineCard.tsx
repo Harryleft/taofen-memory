@@ -10,10 +10,11 @@ interface TimelineCardProps {
   event: TimelineEvent & { imageFocus?: string }; // 可选：例如 '50% 20%'
   index: number; // 保持签名一致
   isActive: boolean;
+  isFirstEvent?: boolean; // 是否为第一个事件
   onClick: () => void;
 }
 
-export function TimelineCard({ event, isActive, onClick }: TimelineCardProps) {
+export function TimelineCard({ event, isActive, isFirstEvent = false, onClick }: TimelineCardProps) {
   // —— 图片状态与方向识别
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -126,26 +127,70 @@ export function TimelineCard({ event, isActive, onClick }: TimelineCardProps) {
           </motion.div>
         )}
 
-        {/* 中列：仅画轴线（点改为覆盖层，避免 2px 列抖动） */}
+        {/* 中列：画轴线 + 第一个事件的特殊徽章 */}
         <div className="hidden lg:block col-start-2 relative h-full">
           <div className="absolute left-1/2 top-0 bottom-0 -translate-x-1/2 w-0.5 bg-gradient-to-b from-[var(--timeline-secondary)]/50 to-[var(--timeline-secondary)]/10" />
+          
+          {/* 第一个事件的特殊徽章节点 */}
+          {isFirstEvent && (
+            <motion.div
+              initial={{ scale: 0, rotate: -180 }}
+              whileInView={{ scale: 1, rotate: 0 }}
+              viewport={{ once: true }}
+              transition={{ 
+                duration: 0.6, 
+                delay: 0.3,
+                type: "spring",
+                stiffness: 100 
+              }}
+              style={{ top: dotY ?? '50%' }}
+              className="pointer-events-auto absolute left-1/2 -translate-x-1/2 -translate-y-1/2 origin-center transform-gpu will-change-transform z-20 timeline-first-event-badge"
+              onClick={onClick}
+            >
+              {/* 外环 */}
+              <div className="timeline-first-event-badge-outer">
+                {/* 内环 */}
+                <div className="timeline-first-event-badge-inner">
+                  {/* 核心图标 */}
+                  <div className="timeline-first-event-badge-icon">
+                    <svg 
+                      width="14" 
+                      height="14" 
+                      viewBox="0 0 24 24" 
+                      fill="none" 
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="text-white"
+                    >
+                      <path 
+                        d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" 
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
         </div>
 
-        {/* 覆盖层里的圆点：与标题行中线对齐 */}
-        <div className="hidden lg:block absolute inset-0 pointer-events-none">
-          <motion.button
-            whileHover={{ scale: 1.12 }}
-            transition={{ type: 'tween', duration: 0.15 }}
-            onClick={onClick}
-            style={{ top: dotY ?? '50%' }}
-            className={`pointer-events-auto absolute left-1/2 -translate-x-1/2 -translate-y-1/2 origin-center transform-gpu will-change-transform z-20 w-4 h-4 rounded-full border-4 border-white ${
-              isActive
-                ? 'bg-[var(--timeline-secondary)] shadow-lg shadow-[var(--timeline-secondary)]/30'
-                : 'bg-[var(--timeline-primary)] hover:bg-[var(--timeline-secondary)]'
-            }`}
-            aria-label={`${event.year} 时间点`}
-          />
-        </div>
+        {/* 覆盖层里的圆点：与标题行中线对齐（仅普通事件） */}
+        {!isFirstEvent && (
+          <div className="hidden lg:block absolute inset-0 pointer-events-none">
+            <motion.button
+            whileHover={{ boxShadow: '0 0 0 6px rgba(var(--timeline-secondary-rgb),0.25)' }}
+
+              transition={{ type: 'tween', duration: 0.15 }}
+              onClick={onClick}
+              style={{ top: dotY ?? '50%' }}
+              className={`pointer-events-auto absolute left-1/2 -translate-x-1/2 -translate-y-1/2 origin-center transform-gpu will-change-transform z-20 w-4 h-4 rounded-full border-4 border-white ${
+                isActive
+                  ? 'bg-[var(--timeline-secondary)] shadow-lg shadow-[var(--timeline-secondary)]/30'
+                  : 'bg-[var(--timeline-primary)] hover:bg-[var(--timeline-secondary)]'
+              }`}
+              aria-label={`${event.year} 时间点`}
+            />
+          </div>
+        )}
 
         {/* 右列：文字 */}
         <motion.div

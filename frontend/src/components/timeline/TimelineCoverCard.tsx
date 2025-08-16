@@ -28,46 +28,6 @@ export function TimelineCoverCard({
       <div className="relative timeline-cover-card">
         {/* 轴线穿过效果 - 在卡片下方 */}
         <div className="absolute top-1/2 left-0 right-0 h-1 -translate-y-1/2 timeline-cover-axis-line z-[1]" />
-        
-        {/* 中央徽章化起点节点 */}
-        <motion.div 
-          initial={{ scale: 0, rotate: -180 }}
-          whileInView={{ scale: 1, rotate: 0 }}
-          viewport={{ once: true }}
-          transition={{ 
-            duration: 0.6, 
-            delay: 0.5,
-            type: "spring",
-            stiffness: 100 
-          }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[3] timeline-cover-start-badge"
-        >
-          {/* 外环 */}
-          <div className="timeline-cover-badge-outer">
-            {/* 内环 */}
-            <div className="timeline-cover-badge-inner">
-              {/* 核心图标 */}
-              <div className="timeline-cover-badge-icon">
-                <svg 
-                  width="14" 
-                  height="14" 
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="text-white"
-                >
-                  <path 
-                    d="M9 11l3 3 8-8" 
-                    stroke="currentColor" 
-                    strokeWidth="2" 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </div>
-            </div>
-          </div>
-        </motion.div>
 
         {/* 卡片内容 - 居中引导布局 */}
         <div className="relative z-[2] flex flex-col items-center justify-center p-8 lg:p-12 text-center">
@@ -106,19 +66,19 @@ export function TimelineCoverCard({
             >
               <div className="timeline-cover-stats">
                 <div className="timeline-cover-stat-item">
-                  <span className="timeline-cover-stat-number">{totalEvents}</span>
+                  <span className="timeline-cover-stat-number">{totalEvents}个</span>
                   <span className="timeline-cover-stat-label">重要事件</span>
                 </div>
                 <div className="timeline-cover-stat-divider"></div>
                 <div className="timeline-cover-stat-item">
-                  <span className="timeline-cover-stat-number">49</span>
+                  <span className="timeline-cover-stat-number">49年</span>
                   <span className="timeline-cover-stat-label">传奇年华</span>
                 </div>
-                <div className="timeline-cover-stat-divider"></div>
+                {/* <div className="timeline-cover-stat-divider"></div>
                 <div className="timeline-cover-stat-item">
                   <span className="timeline-cover-stat-number">3</span>
                   <span className="timeline-cover-stat-label">人生阶段</span>
-                </div>
+                </div> */}
               </div>
               
               {/* 滚动引导 */}

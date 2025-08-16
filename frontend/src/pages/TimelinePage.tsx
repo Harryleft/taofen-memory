@@ -113,28 +113,11 @@ export default function TimelinePage() {
       <AppHeader moduleId="timeline" />
 
       {/* 时间轴主内容 */}
-      <div className="relative max-w-screen-2xl mx-auto px-1 py-20">
+      <div className="relative max-w-screen-2xl mx-auto px-1 pt-32 pb-20">
         {/* 中央时间线 */}
         <div className="absolute left-1/2 top-0 w-0.5 h-full -translate-x-0.5 bg-gradient-to-b from-[var(--timeline-secondary)] via-[var(--timeline-primary)] to-[var(--timeline-secondary)] opacity-20" />
 
-        {/* 时间轴标题 */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12 pt-24"
-        >
-          <h2 className="font-bold mb-4 timeline-primary timeline-text-section">
-            人生轨迹
-          </h2>
-          <p className="max-w-2xl mx-auto leading-relaxed timeline-text-secondary timeline-text-body">
-            从求学青年到新闻巨擘，从文化启蒙到救亡图存，
-            邹韬奋用49年的生命书写了一段传奇的人生华章。
-          </p>
-        </motion.div>
-
-        {/* 跨轴章首页封面卡 */}
+        {/* 跨轴章首页封面卡 - 替代页面标题 */}
         {timelineData.length > 0 && (
           <TimelineCoverCard
             totalEvents={timelineData.length}
@@ -150,6 +133,7 @@ export default function TimelinePage() {
               event={event}
               index={index}
               isActive={activeEventId === event.id}
+              isFirstEvent={index === 0}
               onClick={() => handleEventClick(event.id)}
             />
           ))}
