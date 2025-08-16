@@ -112,7 +112,9 @@ export function TimelineCard({ event, index: _index, isActive, onClick }: Timeli
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.18 }}
           onClick={onClick}
-          className="w-full max-w-[640px] cursor-pointer place-self-start items-start flex flex-col lg:col-start-3 justify-self-start lg:pl-6 text-left"
+          className="w-full max-w-[640px] cursor-pointer items-start flex flex-col
+            lg:col-start-3 justify-self-start lg:pl-6 text-left
+            place-self-start lg:place-self-center lg:justify-center"
         >
           <div className="flex items-center gap-3 mb-3 mt-0 w-full lg:justify-start justify-center">
             <span className="font-bold timeline-secondary timeline-text-body">{event.year}</span>
