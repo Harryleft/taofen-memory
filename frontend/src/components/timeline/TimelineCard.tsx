@@ -14,7 +14,12 @@ interface TimelineCardProps {
 
 export function TimelineCard({ event, index, isActive, onClick }: TimelineCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const isLeft = index % 2 === 0;
+
+  // 检查是否有有效的图片URL
+  const hasValidImage = event.imageUrl && event.imageUrl.trim() !== '';
+  const shouldShowImage = hasValidImage && !imageError;
 
   return (
     <motion.div
@@ -44,45 +49,48 @@ export function TimelineCard({ event, index, isActive, onClick }: TimelineCardPr
       />
 
       {/* 内容容器 - 左右交替 */}
-      <div className={`flex ${isLeft ? 'flex-row' : 'flex-row-reverse'} items-start gap-16 w-full max-w-6xl timeline-content ${isLeft ? 'justify-start pl-16' : 'justify-end pr-32'}`}>
-        {/* 图片区域 */}
-        <motion.div
-          initial={{ opacity: 0, x: isLeft ? -40 : 40 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="flex-shrink-0 timeline-image-container"
-        >
-          <div className="relative w-80 h-60 overflow-hidden rounded-lg border-4 border-[var(--timeline-secondary)] shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group timeline-image"
-               onClick={onClick}>
-            <ImageWithFallback
-              src={event.imageUrl}
-              alt={event.title}
-              className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-105 ${
-                imageLoaded ? 'opacity-100' : 'opacity-0'
-              }`}
-              onLoad={() => setImageLoaded(true)}
-            />
-            
-            {/* 图片加载骨架屏 */}
-            {!imageLoaded && (
-              <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
-                <div className="w-8 h-8 border-2 border-[var(--timeline-secondary)] border-t-transparent rounded-full animate-spin" />
-              </div>
-            )}
-            
-            {/* 图片遮罩 */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          </div>
-        </motion.div>
+      <div className={`flex ${isLeft ? 'flex-row' : 'flex-row-reverse'} items-start gap-16 w-full max-w-6xl timeline-content ${isLeft ? 'justify-start pl-16' : shouldShowImage ? 'justify-end pr-32' : 'justify-end pr-16'}`}>
+        {/* 图片区域 - 仅在有有效图片时显示 */}
+        {shouldShowImage && (
+          <motion.div
+            initial={{ opacity: 0, x: isLeft ? -40 : 40 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="flex-shrink-0 timeline-image-container"
+          >
+            <div className="relative w-80 h-60 overflow-hidden rounded-lg border-4 border-[var(--timeline-secondary)] shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group timeline-image"
+                 onClick={onClick}>
+              <ImageWithFallback
+                src={event.imageUrl}
+                alt={event.title}
+                className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-105 ${
+                  imageLoaded ? 'opacity-100' : 'opacity-0'
+                }`}
+                onLoad={() => setImageLoaded(true)}
+                onError={() => setImageError(true)}
+              />
+              
+              {/* 图片加载骨架屏 */}
+              {!imageLoaded && !imageError && (
+                <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
+                  <div className="w-8 h-8 border-2 border-[var(--timeline-secondary)] border-t-transparent rounded-full animate-spin" />
+                </div>
+              )}
+              
+              {/* 图片遮罩 */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </div>
+          </motion.div>
+        )}
 
         {/* 文字区域 */}
         <motion.div
           initial={{ opacity: 0, x: isLeft ? 40 : -40 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className={`flex-1 min-w-0 cursor-pointer timeline-text ${isLeft ? 'max-w-lg' : 'max-w-xl pr-16'}`}
+          transition={{ duration: 0.6, delay: shouldShowImage ? 0.3 : 0.2 }}
+          className={`flex-1 min-w-0 cursor-pointer timeline-text ${shouldShowImage ? (isLeft ? 'max-w-lg' : 'max-w-xl pr-16') : 'max-w-3xl'}`}
           onClick={onClick}
         >
           {/* 年份 */}
@@ -106,9 +114,13 @@ export function TimelineCard({ event, index, isActive, onClick }: TimelineCardPr
             {event.description}
           </p>
 
-
-
-
+          {/* 地点 - 仅在有地点信息时显示 */}
+          {event.location && event.location.trim() !== '' && (
+            <p className={`mb-4 ${isLeft ? 'text-left' : 'text-right pr-4'} timeline-text-tertiary timeline-text-body timeline-line-height-relaxed`}
+            >
+              📍 {event.location}
+            </p>
+          )}
 
           {/* 激活状态指示器 */}
           {isActive && (

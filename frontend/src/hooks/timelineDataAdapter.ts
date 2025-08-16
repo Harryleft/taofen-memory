@@ -141,8 +141,9 @@ export function adaptTimelineData(newData: TimelineData): TimelineEvent[] {
       year,
       title,
       description,
-      details: [event.location ? `地点：${event.location}` : ''], // 将location作为details
+      details: [], // 清空details数组，地点信息现在有专门字段
       imageUrl: normalizeImageUrl(event.image),
+      location: event.location || '', // 直接设置location字段
       period: getPeriodByYear(year)
     };
   });
