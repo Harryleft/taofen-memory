@@ -166,7 +166,6 @@ export default function TimelinePage() {
       <TimelineNavigation
         events={timelineData}
         activeEventId={activeEventId}
-        onEventClick={handleEventClick}
       />
 
       {/* 底部信息 */}
