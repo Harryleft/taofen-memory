@@ -218,6 +218,7 @@ export function TimelineCard({ event, isActive, isFirstEvent = false, onClick }:
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.18 }}
           onClick={onClick}
+          data-text-region={`event-${event.id}`}
           className="w-full max-w-[640px] cursor-pointer place-self-start items-start flex flex-col lg:col-start-3 justify-self-start lg:pl-6 text-left"
         >
           {/* 年份与地点（标题块） */}
