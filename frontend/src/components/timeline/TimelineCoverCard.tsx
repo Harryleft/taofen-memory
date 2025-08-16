@@ -46,7 +46,7 @@ export function TimelineCoverCard({
             
             {/* 副标题 */}
             <h2 className="timeline-cover-sub-title">
-              {yearSpan} · {totalEvents}个重要节点
+              {yearSpan} 
             </h2>
             
             {/* 描述文字 */}
@@ -91,27 +91,50 @@ export function TimelineCoverCard({
               >
                 <span className="timeline-cover-scroll-text">向下滚动，开始时光之旅</span>
                 <motion.div
-                  animate={{ y: [0, 8, 0] }}
+                  animate={{ y: [0, 6, 0] }}
                   transition={{ 
-                    duration: 2, 
+                    duration: 2.5, 
                     repeat: Infinity, 
                     ease: "easeInOut" 
                   }}
                   className="timeline-cover-scroll-arrow"
                 >
                   <svg 
-                    width="20" 
-                    height="20" 
-                    viewBox="0 0 24 24" 
+                    width="24" 
+                    height="32" 
+                    viewBox="0 0 24 32" 
                     fill="none"
                     className="text-current"
                   >
-                    <path 
-                      d="M7 13l3 3 3-3m-3-8v11" 
+                    {/* 第一个向下箭头 - 带流动动画 */}
+                    <motion.path 
+                      d="M6 10l6 6 6-6" 
                       stroke="currentColor" 
-                      strokeWidth="2" 
+                      strokeWidth="2.5" 
                       strokeLinecap="round" 
                       strokeLinejoin="round"
+                      animate={{ opacity: [0.3, 0.8, 0.3] }}
+                      transition={{ 
+                        duration: 2.5, 
+                        repeat: Infinity, 
+                        ease: "easeInOut",
+                        delay: 0
+                      }}
+                    />
+                    {/* 第二个向下箭头 - 带流动动画 */}
+                    <motion.path 
+                      d="M6 18l6 6 6-6" 
+                      stroke="currentColor" 
+                      strokeWidth="2.5" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
+                      animate={{ opacity: [0.8, 1, 0.8] }}
+                      transition={{ 
+                        duration: 2.5, 
+                        repeat: Infinity, 
+                        ease: "easeInOut",
+                        delay: 0.3
+                      }}
                     />
                   </svg>
                 </motion.div>
