@@ -85,8 +85,8 @@ function generateId(year: number, index: number): string {
  */
 function normalizeImageUrl(image: string): string {
   if (!image || image.trim() === '') {
-    // 返回默认图片
-    return 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop';
+    // 如果没有图片，返回空字符串而不是占位图片
+    return '';
   }
   
   // 如果已经是完整URL，直接返回
