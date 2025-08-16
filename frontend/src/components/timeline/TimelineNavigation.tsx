@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { TimelineEvent, periods } from "./timeline-data.ts";
 
 interface TimelineNavigationProps {
@@ -10,22 +10,129 @@ interface TimelineNavigationProps {
   onEventClick: (eventId: string) => void;
 }
 
+interface EventPosition {
+  id: string;
+  top: number;
+  height: number;
+  center: number;
+}
+
 export function TimelineNavigation({
   events,
   activeEventId,
   onEventClick,
 }: TimelineNavigationProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const [eventPositions, setEventPositions] = useState<EventPosition[]>([]);
+  const navigationRef = useRef<HTMLDivElement>(null);
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
+  const lastScrollYRef = useRef(0);
+  const tickingRef = useRef(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsVisible(window.scrollY > 100);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () =>
-      window.removeEventListener("scroll", handleScroll);
+  // 使用防抖的滚动处理函数
+  const handleScroll = useCallback(() => {
+    if (!tickingRef.current) {
+      requestAnimationFrame(() => {
+        const scrollY = window.scrollY;
+        setIsVisible(scrollY > 100);
+        lastScrollYRef.current = scrollY;
+        tickingRef.current = false;
+      });
+      tickingRef.current = true;
+    }
   }, []);
+
+  // 计算事件位置
+  const calculateEventPositions = useCallback(() => {
+    const positions: EventPosition[] = [];
+    
+    events.forEach(event => {
+      const element = document.getElementById(`event-${event.id}`);
+      if (element) {
+        const rect = element.getBoundingClientRect();
+        const scrollY = window.scrollY;
+        
+        positions.push({
+          id: event.id,
+          top: rect.top + scrollY,
+          height: rect.height,
+          center: rect.top + scrollY + rect.height / 2
+        });
+      }
+    });
+    
+    setEventPositions(positions);
+  }, [events]);
+
+  // 初始化位置计算和监听
+  useEffect(() => {
+    // 初始计算
+    calculateEventPositions();
+    
+    // 设置滚动监听
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    
+    // 设置防抖的resize监听
+    const debouncedResize = () => {
+      if (!tickingRef.current) {
+        requestAnimationFrame(() => {
+          calculateEventPositions();
+          tickingRef.current = false;
+        });
+        tickingRef.current = true;
+      }
+    };
+    
+    window.addEventListener("resize", debouncedResize, { passive: true });
+    
+    // 设置MutationObserver监听DOM变化
+    const observer = new MutationObserver(() => {
+      calculateEventPositions();
+    });
+    
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: false,
+      characterData: false
+    });
+    
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", debouncedResize);
+      observer.disconnect();
+      if (resizeObserverRef.current) {
+        resizeObserverRef.current.disconnect();
+      }
+    };
+  }, [handleScroll, calculateEventPositions]);
+
+  // 数据变化时重新计算位置
+  useEffect(() => {
+    calculateEventPositions();
+  }, [events, calculateEventPositions]);
+
+  // 计算导航节点在侧边栏中的位置
+  const getNavNodePosition = (eventId: string) => {
+    if (eventPositions.length === 0) return 0;
+    
+    const eventPos = eventPositions.find(pos => pos.id === eventId);
+    if (!eventPos) return 0;
+    
+    // 获取所有事件的最小和最大位置
+    const minTop = Math.min(...eventPositions.map(pos => pos.top));
+    const maxCenter = Math.max(...eventPositions.map(pos => pos.center));
+    const totalRange = maxCenter - minTop;
+    
+    // 计算相对位置（0-1之间）
+    const relativePosition = totalRange > 0 ? (eventPos.center - minTop) / totalRange : 0;
+    
+    // 转换为像素位置，考虑导航栏的高度限制
+    const navigationHeight = 600; // 导航栏的最大高度
+    const nodePosition = relativePosition * navigationHeight;
+    
+    return Math.max(0, Math.min(navigationHeight, nodePosition));
+  };
 
   const scrollToEvent = (eventId: string) => {
     const element = document.getElementById(`event-${eventId}`);
@@ -104,68 +211,60 @@ export function TimelineNavigation({
           }}
         />
 
-        {/* 时间节点容器 */}
-        <div className="relative">
+        {/* 简化的时间节点容器 - 仅显示金色圆形年份标识 */}
+        <div className="relative" ref={navigationRef}>
           {/* 主连接线 */}
           <div
             className="absolute left-1/2 top-0 w-0.5 h-full -translate-x-0.5"
             style={{
-              borderLeft:
-                "2px dashed var(--timeline-text-muted)",
+              borderLeft: "2px dashed var(--timeline-text-muted)",
               opacity: 0.3,
             }}
           />
 
-          {/* 时间节点 */}
-          <div className="relative space-y-8">
+          {/* 时间节点 - 精确定位 */}
+          <div className="relative" style={{ height: '600px' }}>
             {events.map((event, index) => {
-              const isActive =
-                activeEventId === event.id;
-              const periodColor = getPeriodColor(event.period);
-
+              const isActive = activeEventId === event.id;
+              const navPosition = getNavNodePosition(event.id);
+              
               return (
-                <div
+                <motion.div
                   key={event.id}
-                  className="relative flex items-center justify-center"
+                  className="absolute left-1/2 -translate-x-1/2"
+                  style={{ top: `${navPosition}px` }}
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.1 }}
                 >
                   <motion.button
-                    whileHover={{ scale: 1.15 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() =>
-                      scrollToEvent(event.id)
-                    }
-                    className={`relative transition-all duration-300 cursor-pointer border-2 border-white rounded-full flex items-center justify-center ${
+                    whileHover={{ scale: isActive ? 1.1 : 1.2 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => scrollToEvent(event.id)}
+                    className={`relative transition-all duration-300 cursor-pointer rounded-full flex items-center justify-center ${
                       isActive
-                        ? "w-16 h-16 shadow-lg"
-                        : "w-4 h-4 hover:w-6 hover:h-6"
+                        ? "w-12 h-12 shadow-lg"
+                        : "w-8 h-8"
                     }`}
                     style={{
-                      backgroundColor: isActive
-                        ? "var(--timeline-secondary)"
-                        : periodColor,
+                      backgroundColor: "var(--timeline-secondary)",
+                      border: "2px solid white",
                       boxShadow: isActive
-                        ? `0 0 20px ${periodColor}40, 0 4px 12px rgba(0,0,0,0.15)`
-                        : "var(--timeline-card-shadow)",
+                        ? "0 0 20px rgba(196, 155, 97, 0.4), 0 4px 12px rgba(0,0,0,0.15)"
+                        : "0 2px 8px rgba(0,0,0,0.1)",
                     }}
                   >
-                    {/* 年份文字（仅在激活时显示） */}
-                    {isActive && (
-                      <motion.span
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="font-bold text-white"
-                        style={{
-                          fontSize: "var(--text-caption)",
-                        }}
-                      >
-                        {event.year}
-                      </motion.span>
-                    )}
-
-                    {/* 内部高亮点（非激活状态） */}
-                    {!isActive && (
-                      <div className="w-1 h-1 rounded-full bg-white opacity-80" />
-                    )}
+                    {/* 年份文字 */}
+                    <motion.span
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="font-bold text-white"
+                      style={{
+                        fontSize: isActive ? "0.75rem" : "0.625rem",
+                      }}
+                    >
+                      {event.year}
+                    </motion.span>
                   </motion.button>
 
                   {/* 激活状态的脉冲效果 */}
@@ -183,12 +282,11 @@ export function TimelineNavigation({
                       }}
                       className="absolute inset-0 rounded-full border-2"
                       style={{
-                        borderColor:
-                          "var(--timeline-secondary)",
+                        borderColor: "var(--timeline-secondary)",
                       }}
                     />
                   )}
-                </div>
+                </motion.div>
               );
             })}
           </div>
