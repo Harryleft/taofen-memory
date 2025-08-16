@@ -50,10 +50,10 @@ export function TimelineCard({ event, isActive, onClick }: TimelineCardProps) {
 
   const frameBorderClass =
     variant === 'portrait'
-      ? 'border-[6px] rounded-2xl'
+      ? 'timeline-card-vintage-border-portrait rounded-2xl'
       : variant === 'landscape'
-      ? 'border-4 rounded-xl'
-      : 'border-[5px] rounded-2xl';
+      ? 'timeline-card-vintage-border-landscape rounded-xl'
+      : 'timeline-card-vintage-border-square rounded-2xl';
 
   const imgFitClass =
     variant === 'portrait' ? 'object-contain' : 'object-cover';
@@ -93,7 +93,6 @@ export function TimelineCard({ event, isActive, onClick }: TimelineCardProps) {
                 'relative w-full h-[clamp(220px,26vw,360px)]',
                 'overflow-hidden timeline-card-paper-texture',
                 'shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group',
-                'border-[var(--timeline-secondary)]',
                 frameBorderClass,
               ].join(' ')}
               onClick={onClick}
@@ -135,7 +134,7 @@ export function TimelineCard({ event, isActive, onClick }: TimelineCardProps) {
         {/* 覆盖层里的圆点：与标题行中线对齐 */}
         <div className="hidden lg:block absolute inset-0 pointer-events-none">
           <motion.button
-            whileHover={{ boxShadow: '0 0 0 6px rgba(var(--timeline-secondary-rgb),0.25)' }}
+            whileHover={{ scale: 1.12 }}
             transition={{ type: 'tween', duration: 0.15 }}
             onClick={onClick}
             style={{ top: dotY ?? '50%' }}

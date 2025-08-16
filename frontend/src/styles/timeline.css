@@ -1016,3 +1016,137 @@ img {
     var(--timeline-card-shadow);  /* 保持原有外阴影 */
 }
 
+/* 复古黄铜/旧金边框系统 - 多层叠加实现质感 */
+.timeline-card-vintage-border-portrait {
+  /* 主边框：旧金色 2px */
+  border: 2px solid #B68C3D;
+  
+  /* 多层阴影组合：外发光 + 内高光 + 暗侧阴影 + 压边 */
+  box-shadow: 
+    /* 外发光：极弱，使用时间轴副色调 */
+    0 0 10px rgba(196, 155, 97, 0.08),
+    
+    /* 暗侧阴影：底部和右侧 */
+    0 3px 6px rgba(122, 98, 48, 0.15),
+    2px 0 4px rgba(122, 98, 48, 0.1),
+    
+    /* 压边：外围1px暗描边，增强对比度 */
+    0 0 0 1px rgba(60, 40, 20, 0.25),
+    
+    /* 内高光：上、左更亮（内缩1px） */
+    inset 1px 1px 0 rgba(255, 243, 207, 0.25),
+    inset -1px -1px 0 rgba(122, 98, 48, 0.15),
+    
+    /* 保持原有卡片阴影 */
+    var(--timeline-card-shadow);
+}
+
+.timeline-card-vintage-border-landscape {
+  /* 主边框：旧金色 1.5px（横图边框更细） */
+  border: 1.5px solid #B68C3D;
+  
+  box-shadow: 
+    /* 外发光：极弱 */
+    0 0 8px rgba(196, 155, 97, 0.06),
+    
+    /* 暗侧阴影 */
+    0 2px 4px rgba(122, 98, 48, 0.12),
+    1px 0 3px rgba(122, 98, 48, 0.08),
+    
+    /* 压边 */
+    0 0 0 1px rgba(60, 40, 20, 0.2),
+    
+    /* 内高光 */
+    inset 1px 1px 0 rgba(255, 243, 207, 0.22),
+    inset -1px -1px 0 rgba(122, 98, 48, 0.12),
+    
+    var(--timeline-card-shadow);
+}
+
+.timeline-card-vintage-border-square {
+  /* 主边框：旧金色 1.8px（方图居中） */
+  border: 1.8px solid #B68C3D;
+  
+  box-shadow: 
+    /* 外发光 */
+    0 0 9px rgba(196, 155, 97, 0.07),
+    
+    /* 暗侧阴影 */
+    0 2px 5px rgba(122, 98, 48, 0.13),
+    1px 0 3px rgba(122, 98, 48, 0.09),
+    
+    /* 压边 */
+    0 0 0 1px rgba(60, 40, 20, 0.22),
+    
+    /* 内高光 */
+    inset 1px 1px 0 rgba(255, 243, 207, 0.24),
+    inset -1px -1px 0 rgba(122, 98, 48, 0.13),
+    
+    var(--timeline-card-shadow);
+}
+
+/* 悬停状态增强：边框发光效果 */
+.timeline-card-vintage-border-portrait:hover,
+.timeline-card-vintage-border-landscape:hover,
+.timeline-card-vintage-border-square:hover {
+  border-color: #A37E2C; /* 悬停时使用更深的旧金色 */
+  
+  box-shadow: 
+    /* 增强外发光 */
+    0 0 15px rgba(196, 155, 97, 0.15),
+    
+    /* 保持其他阴影层级 */
+    0 3px 8px rgba(122, 98, 48, 0.2),
+    2px 0 5px rgba(122, 98, 48, 0.15),
+    0 0 0 1px rgba(60, 40, 20, 0.3),
+    inset 1px 1px 0 rgba(255, 243, 207, 0.3),
+    inset -1px -1px 0 rgba(122, 98, 48, 0.18),
+    
+    /* 增强卡片阴影 */
+    var(--timeline-card-shadow-hover);
+}
+
+/* 高光细线叠加层 - 使用伪元素实现 0.5px 精细效果 */
+.timeline-card-vintage-border-portrait::before,
+.timeline-card-vintage-border-landscape::before,
+.timeline-card-vintage-border-square::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: inherit;
+  
+  /* 高光细线：仅上、左边更亮 */
+  border-top: 0.5px solid rgba(255, 243, 207, 0.3);
+  border-left: 0.5px solid rgba(255, 243, 207, 0.25);
+  border-right: 0.5px solid transparent;
+  border-bottom: 0.5px solid transparent;
+  
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 材质纹理叠加 - 极低透明度拉丝效果 */
+.timeline-card-vintage-border-portrait::after,
+.timeline-card-vintage-border-landscape::after,
+.timeline-card-vintage-border-square::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: inherit;
+  
+  /* 极低透明度的金属拉丝纹理 */
+  background-image: 
+    linear-gradient(45deg, transparent 40%, rgba(255, 243, 207, 0.04) 42%, rgba(255, 243, 207, 0.04) 45%, transparent 47%),
+    linear-gradient(-45deg, transparent 38%, rgba(180, 140, 61, 0.03) 40%, rgba(180, 140, 61, 0.03) 43%, transparent 45%);
+  background-size: 12px 12px, 8px 8px;
+  
+  pointer-events: none;
+  z-index: 0;
+}
+
