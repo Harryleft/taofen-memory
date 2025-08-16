@@ -62,7 +62,7 @@ export function TimelineCoverCard({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.8 }}
-              className="timeline-cover-guide-section"
+              className="timeline-cover-guide-section mt-8"
             >
               <div className="timeline-cover-stats">
                 <div className="timeline-cover-stat-item">
@@ -74,11 +74,6 @@ export function TimelineCoverCard({
                   <span className="timeline-cover-stat-number">49年</span>
                   <span className="timeline-cover-stat-label">传奇年华</span>
                 </div>
-                {/* <div className="timeline-cover-stat-divider"></div>
-                <div className="timeline-cover-stat-item">
-                  <span className="timeline-cover-stat-number">3</span>
-                  <span className="timeline-cover-stat-label">人生阶段</span>
-                </div> */}
               </div>
               
               {/* 滚动引导 */}

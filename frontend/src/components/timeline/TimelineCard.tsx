@@ -56,7 +56,7 @@ export function TimelineCard({ event, isActive, isFirstEvent = false, onClick }:
   }, []);
 
   // —— 图像焦点（横图 cover 时更有用）
-  const focus = (event as any).imageFocus ?? '50% 50%';
+  const focus = (event as TimelineEvent & { imageFocus?: string }).imageFocus ?? '50% 50%';
 
   // —— 方向与样式映射
   // portrait: ratio<0.9, landscape: ratio>1.1, square: 其它
