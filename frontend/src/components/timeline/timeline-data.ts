@@ -5,6 +5,7 @@ export interface TimelineEvent {
   description: string;
   details: string[];
   imageUrl: string;
+  location: string;
   period: 'early' | 'middle' | 'late';
 }
 
@@ -20,6 +21,7 @@ export const timelineEvents: TimelineEvent[] = [
       '自幼聪颖好学，展现出过人的文学天赋'
     ],
     imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop',
+    location: '福建永安',
     period: 'early'
   },
   {
@@ -33,6 +35,7 @@ export const timelineEvents: TimelineEvent[] = [
       '为日后的文学创作奠定了深厚的古文基础'
     ],
     imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop',
+    location: '福建永安',
     period: 'early'
   },
   {
@@ -46,6 +49,7 @@ export const timelineEvents: TimelineEvent[] = [
       '开始接触西方进步思想和民主理念'
     ],
     imageUrl: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=400&h=300&fit=crop',
+    location: '上海',
     period: 'early'
   },
   {
@@ -59,6 +63,7 @@ export const timelineEvents: TimelineEvent[] = [
       '很快成为当时最具影响力的刊物之一'
     ],
     imageUrl: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&h=300&fit=crop',
+    location: '上海',
     period: 'middle'
   },
   {
@@ -72,6 +77,7 @@ export const timelineEvents: TimelineEvent[] = [
       '成为青年知识分子的精神食粮'
     ],
     imageUrl: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=400&h=300&fit=crop',
+    location: '上海',
     period: 'middle'
   },
   {
@@ -85,6 +91,7 @@ export const timelineEvents: TimelineEvent[] = [
       '撰写了大量考察报告和游记'
     ],
     imageUrl: 'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=400&h=300&fit=crop',
+    location: '欧洲',
     period: 'middle'
   },
   {
@@ -98,6 +105,7 @@ export const timelineEvents: TimelineEvent[] = [
       '为抗日救亡运动提供了重要的舆论阵地'
     ],
     imageUrl: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=300&fit=crop',
+    location: '上海',
     period: 'middle'
   },
   {
@@ -111,6 +119,7 @@ export const timelineEvents: TimelineEvent[] = [
       '用笔杆子为抗战胜利贡献力量'
     ],
     imageUrl: 'https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=400&h=300&fit=crop',
+    location: '全国各地',
     period: 'late'
   },
   {
@@ -124,6 +133,7 @@ export const timelineEvents: TimelineEvent[] = [
       '成为黑暗中的一盏明灯'
     ],
     imageUrl: 'https://images.unsplash.com/photo-1526220362219-d2419bbe8089?w=400&h=300&fit=crop',
+    location: '上海',
     period: 'late'
   },
   {
@@ -137,6 +147,7 @@ export const timelineEvents: TimelineEvent[] = [
       '被誉为"人民的出版家"'
     ],
     imageUrl: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=400&h=300&fit=crop',
+    location: '上海',
     period: 'late'
   }
 ];
