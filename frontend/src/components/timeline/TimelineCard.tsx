@@ -53,11 +53,11 @@ export function TimelineCard({ event, index: _index, isActive, onClick }: Timeli
               <ImageWithFallback
                 src={event.imageUrl}
                 alt={event.title}
-                onLoad={(e) => {
-                  const img = e.currentTarget as HTMLImageElement;
-                  setIsPortrait(img.naturalHeight > img.naturalWidth);
-                  setImageLoaded(true);
-                }}
+                                 onLoad={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                   const img = e.currentTarget;
+                   setIsPortrait(img.naturalHeight > img.naturalWidth);
+                   setImageLoaded(true);
+                 }}
                 onError={() => setImageError(true)}
                 className={[
                   'absolute inset-0 w-full h-full transition-all duration-500',
@@ -80,20 +80,30 @@ export function TimelineCard({ event, index: _index, isActive, onClick }: Timeli
           )}
         </motion.div>
 
-        {/* 中列：时间轴（独立网格项） */}
-        <div className="hidden lg:block col-start-2 row-span-1 relative h-full">
-          <div className="absolute left-1/2 top-0 bottom-0 -translate-x-1/2 w-0.5 bg-gradient-to-b from-[var(--timeline-secondary)]/50 to-[var(--timeline-secondary)]/10" />
+        {/* ✅ 轴线：保留在第 2 列（只有线，没有点） */}
+        <div className="hidden lg:block col-start-2 relative h-full">
+          <div className="absolute left-1/2 top-0 bottom-0 -translate-x-1/2 w-0.5
+                          bg-gradient-to-b from-[var(--timeline-secondary)]/50 to-[var(--timeline-secondary)]/10" />
+        </div>
+
+        {/* ✅ 圆点：改为覆盖整行的绝对定位，锚在真正的 50% 上 */}
+        <div className="hidden lg:block absolute inset-0 pointer-events-none">
           <motion.button
-            whileHover={{ scale: 1.12 }}
+            whileHover={{ boxShadow: '0 0 0 6px rgba(var(--timeline-secondary-rgb),0.25)' }}
+
+            transition={{ type: 'tween', duration: 0.15 }}
             onClick={onClick}
-            className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-4 border-white z-10 transition-colors duration-300 ${
-              isActive
-                ? 'bg-[var(--timeline-secondary)] shadow-lg shadow-[var(--timeline-secondary)]/30'
-                : 'bg-[var(--timeline-primary)] hover:bg-[var(--timeline-secondary)]'
-            }`}
+            className={`pointer-events-auto
+                        absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
+                        origin-center transform-gpu will-change-transform z-20
+                        w-4 h-4 rounded-full border-4 border-white
+                        ${isActive
+                          ? 'bg-[var(--timeline-secondary)] shadow-lg shadow-[var(--timeline-secondary)]/30'
+                          : 'bg-[var(--timeline-primary)] hover:bg-[var(--timeline-secondary)]'}`}
             aria-label={`${event.year} 时间点`}
           />
         </div>
+
 
         {/* 右列：文字（顶对齐、靠轴贴边） */}
         <motion.div
