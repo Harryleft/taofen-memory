@@ -21,10 +21,15 @@ export function TimelineCard({ event, isActive, isFirstEvent = false, onClick }:
   const [ratio, setRatio] = useState<number | null>(null); // w/h
   const hasImage = !!(event.imageUrl && event.imageUrl.trim() !== '');
 
-  // —— 圆点与标题对齐
+  // —— 圆点与标题对齐，轴线精确定位
   const rowRef = useRef<HTMLDivElement>(null);
+  const axisRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const [dotY, setDotY] = useState<number | null>(null);
+  const [anchorX, setAnchorX] = useState<number | null>(null);
+  
+  // —— 第一个事件徽章垂直偏移（修复视觉对齐问题）
+  const firstEventVerticalOffset = isFirstEvent ? -4 : 0; // 向上偏移4px以对齐视觉中心
 
   useLayoutEffect(() => {
     const row = rowRef.current;
@@ -34,6 +39,21 @@ export function TimelineCard({ event, isActive, isFirstEvent = false, onClick }:
     const tRect = title.getBoundingClientRect();
     setDotY(tRect.top - rowRect.top + tRect.height / 2);
   }, [imageLoaded, hasImage, event.year, event.location, event.title]);
+
+  // 计算"轴中心"的 X（相对 rowRef）
+  useLayoutEffect(() => {
+    const calc = () => {
+      const row = rowRef.current;
+      const axis = axisRef.current;
+      if (!row || !axis) return;
+      const rowRect = row.getBoundingClientRect();
+      const axisRect = axis.getBoundingClientRect();
+      setAnchorX(axisRect.left - rowRect.left + axisRect.width / 2);
+    };
+    calc();
+    window.addEventListener('resize', calc);
+    return () => window.removeEventListener('resize', calc);
+  }, []);
 
   // —— 图像焦点（横图 cover 时更有用）
   const focus = (event as any).imageFocus ?? '50% 50%';
@@ -127,12 +147,14 @@ export function TimelineCard({ event, isActive, isFirstEvent = false, onClick }:
           </motion.div>
         )}
 
-        {/* 中列：画轴线 + 第一个事件的特殊徽章 */}
-        <div className="hidden lg:block col-start-2 relative h-full">
+        {/* 中列：画轴线（只画线，徽章和圆点移到覆盖层） */}
+        <div ref={axisRef} className="hidden lg:block col-start-2 relative h-full">
           <div className="absolute left-1/2 top-0 bottom-0 -translate-x-1/2 w-0.5 bg-gradient-to-b from-[var(--timeline-secondary)]/50 to-[var(--timeline-secondary)]/10" />
-          
-          {/* 第一个事件的特殊徽章节点 */}
-          {isFirstEvent && (
+        </div>
+
+        {/* 覆盖层：统一管理首事件徽章和普通圆点 */}
+        <div className="hidden lg:block absolute inset-0 pointer-events-none">
+          {isFirstEvent ? (
             <motion.div
               initial={{ scale: 0, rotate: -180 }}
               whileInView={{ scale: 1, rotate: 0 }}
@@ -143,8 +165,11 @@ export function TimelineCard({ event, isActive, isFirstEvent = false, onClick }:
                 type: "spring",
                 stiffness: 100 
               }}
-              style={{ top: dotY ?? '50%' }}
-              className="pointer-events-auto absolute left-1/2 -translate-x-1/2 -translate-y-1/2 origin-center transform-gpu will-change-transform z-20 timeline-first-event-badge"
+              style={{ 
+                top: `${(dotY ?? 50) + firstEventVerticalOffset}px`, 
+                left: anchorX ?? '50%' 
+              }}
+              className="pointer-events-auto absolute -translate-x-1/2 -translate-y-1/2 origin-center transform-gpu will-change-transform z-20 timeline-first-event-badge"
               onClick={onClick}
             >
               {/* 外环 */}
@@ -170,27 +195,21 @@ export function TimelineCard({ event, isActive, isFirstEvent = false, onClick }:
                 </div>
               </div>
             </motion.div>
-          )}
-        </div>
-
-        {/* 覆盖层里的圆点：与标题行中线对齐（仅普通事件） */}
-        {!isFirstEvent && (
-          <div className="hidden lg:block absolute inset-0 pointer-events-none">
+          ) : (
             <motion.button
-            whileHover={{ boxShadow: '0 0 0 6px rgba(var(--timeline-secondary-rgb),0.25)' }}
-
+              whileHover={{ boxShadow: '0 0 0 6px rgba(var(--timeline-secondary-rgb),0.25)' }}
               transition={{ type: 'tween', duration: 0.15 }}
               onClick={onClick}
-              style={{ top: dotY ?? '50%' }}
-              className={`pointer-events-auto absolute left-1/2 -translate-x-1/2 -translate-y-1/2 origin-center transform-gpu will-change-transform z-20 w-4 h-4 rounded-full border-4 border-white ${
+              style={{ top: dotY ?? '50%', left: anchorX ?? '50%' }}
+              className={`pointer-events-auto absolute -translate-x-1/2 -translate-y-1/2 origin-center transform-gpu will-change-transform z-20 w-4 h-4 rounded-full border-4 border-white ${
                 isActive
                   ? 'bg-[var(--timeline-secondary)] shadow-lg shadow-[var(--timeline-secondary)]/30'
                   : 'bg-[var(--timeline-primary)] hover:bg-[var(--timeline-secondary)]'
               }`}
               aria-label={`${event.year} 时间点`}
             />
-          </div>
-        )}
+          )}
+        </div>
 
         {/* 右列：文字 */}
         <motion.div
