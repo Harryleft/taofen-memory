@@ -626,15 +626,15 @@
 
 /* 双列布局容器（方案B：使用 Grid 替代 float） */
 .timeline-two-col {
-  display: grid;
-  grid-template-columns: 12rem minmax(0, 1fr);
-  column-gap: 2rem;
-  align-items: start;
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  align-items: flex-start;
 }
 
 @media (max-width: calc(var(--global-breakpoint-lg) - 1px)) {
   .timeline-two-col {
-    display: block; /* 移动端回退为单列 */
+    flex-direction: column; /* 移动端回退为单列 */
   }
 
 }
@@ -1506,9 +1506,9 @@ img {
   line-height: 0;                 /* 避免行高撑开影响定位 */
   outline: none;
 
-  /* 禁用过渡/变换/阴影，避免任何“看起来在动”的错觉 */
-  transition: none !important;
-  transform: none !important;
+  /* 移除 transform: none !important; 允许 Tailwind 的 -translate-x-1/2 生效 */
+  /* 保留 box-shadow 和 transition 的禁用 */
+  transition: box-shadow 0.2s; /* 允许一个平滑的过渡，但 transform 不变 */
   box-shadow: none !important;
 }
 
@@ -1521,6 +1521,7 @@ img {
 /* —— 彻底关闭鼠标 hover 的视觉效果 —— */
 .timeline-dot-button:hover{
   box-shadow: none !important;
+  /* 将 transform: none !important; 移动到此处，仅在悬停时禁用，防止意外的位移 */
   transform: none !important;
 }
 .timeline-dot-button:hover > div,
@@ -1562,6 +1563,7 @@ img {
     transform: none !important;
   }
 }
+
 
 
 
