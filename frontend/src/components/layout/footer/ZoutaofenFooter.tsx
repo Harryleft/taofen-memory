@@ -100,9 +100,9 @@ const DEFAULT_STYLE = {
 
 // 默认法律信息配置
 const DEFAULT_LEGAL_CONFIG = {
-  copyright: '© 2025 不知道起什么名字团队',
-  competitionInfo: '第十届上海图书馆开放数据竞赛作品',
-  teamName: '不知道起什么名字团队'
+  copyright: '© 2025 第十届上海图书馆开放数据竞赛作品',
+  competitionInfo: '',
+  teamName: ''
 };
 
 // 默认显示配置
@@ -380,8 +380,8 @@ const ZoutaofenFooter: React.FC<AppFooterProps> = ({
     },
     legal: {
       ...DEFAULT_LEGAL_CONFIG,
-      copyright: '© 2025 不知道起什么名字团队. 保留所有权利.',
-      competitionInfo: '本作品为第十届上海图书馆开放数据竞赛参赛作品，基于开放数据平台构建'
+      copyright: '© 2025 第十届上海图书馆开放数据竞赛作品',
+      competitionInfo: ''
     },
     sections: DEFAULT_SECTIONS,
     style: DEFAULT_STYLE
