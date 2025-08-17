@@ -59,62 +59,55 @@ export function TimelineCard({ event, isActive, isFirstEvent = false, onClick }:
     };
   }, []);
 
-  // X：基于网格布局计算轴线位置，避免DOM测量时序问题
+  // X：基于更稳定的2px轴线容器DOM元素测量，避免亚像素误差
   useLayoutEffect(() => {
     const recalcX = () => {
       const row = rowRef.current;
-      if (!row) return;
+      const axisContainer = axisRef.current; // ⭐ 改为测量2px宽的容器
+      if (!row || !axisContainer) return;
       
-      // 获取容器宽度
-      const containerWidth = row.offsetWidth;
+      const rowRect = row.getBoundingClientRect();
+      const axisContainerRect = axisContainer.getBoundingClientRect();
       
-      // 自适应定位算法：基于网格布局计算相对位置
-      // 网格布局：grid-cols-[1fr_2px_1fr]，左列占1fr，右列占1fr，中间2px分隔线
-      const gridGap = 12 * 4; // gap-x-12 = 3rem = 48px
-      const centerLineWidth = 2; // 轴线宽度2px
+      // 计算轴线容器中心相对于父容器的位置
+      const axisX = axisContainerRect.left - rowRect.left + axisContainerRect.width / 2;
       
-      // 计算左列宽度：在有图片时，左列实际占用的空间比例
-      // 基于观察：当容器760px时，左列约为536px（70.5%）
-      const leftColRatio = hasImage && !imageError ? 0.705 : 0.5;
-      
-      // 计算左列实际宽度
-      const availableWidth = containerWidth - gridGap - centerLineWidth;
-      const leftColWidth = Math.floor(availableWidth * leftColRatio);
-      
-      // 轴线位置：左列宽度 + 半个gap（居中在2px轴线上）
-      const axisX = leftColWidth + Math.floor(gridGap / 2) + 1;
-      
-      // 调试信息
-      console.log('Timeline positioning debug (adaptive):', {
-        containerWidth,
-        availableWidth,
-        leftColRatio: hasImage && !imageError ? '0.705 (with image)' : '0.5 (no image)',
-        leftColWidth,
+      console.log('Timeline positioning debug (DOM-based, stable):', {
+        containerWidth: row.offsetWidth,
+        axisContainerLeft: axisContainerRect.left,
+        axisContainerWidth: axisContainerRect.width,
+        containerLeft: rowRect.left,
         calculatedAxisX: axisX,
-        hasImage: hasImage && !imageError,
-        method: 'Grid-based calculation'
+        method: 'Stable DOM measurement (2px column)'
       });
       
       setAnchorX(snap(axisX));
     };
 
+    const debounce = (func: () => void, delay: number) => {
+      let timeout: number;
+      return () => {
+        clearTimeout(timeout);
+        timeout = window.setTimeout(func, delay);
+      };
+    };
+    
+    const debouncedRecalcX = debounce(recalcX, 16);
+
     // 初始计算
-    recalcX();
+    const timer = setTimeout(recalcX, 0);
     
     // 监听窗口大小变化
-    window.addEventListener('resize', recalcX);
+    window.addEventListener('resize', debouncedRecalcX);
     
-    // 使用ResizeObserver监听容器尺寸变化
-    const ro = new ResizeObserver(() => {
-      recalcX();
-    });
-    
+    const ro = new ResizeObserver(debouncedRecalcX);
     if (rowRef.current) {
       ro.observe(rowRef.current);
     }
     
     return () => {
-      window.removeEventListener('resize', recalcX);
+      clearTimeout(timer);
+      window.removeEventListener('resize', debouncedRecalcX);
       ro.disconnect();
     };
   }, [hasImage, imageError]);
@@ -234,7 +227,7 @@ export function TimelineCard({ event, isActive, isFirstEvent = false, onClick }:
               }}
               style={{
                 top: `${(dotY ?? 50) + firstEventVerticalOffset}px`,
-                left: anchorX ?? '521px', // 使用自适应计算的位置，回退到原有值
+                left: '521px', // 保留原有魔法数，不动它
               }}
               className="pointer-events-auto absolute -translate-x-1/2 -translate-y-1/2 origin-center transform-gpu will-change-transform z-20 timeline-first-event-badge"
               onClick={onClick}
@@ -260,26 +253,29 @@ export function TimelineCard({ event, isActive, isFirstEvent = false, onClick }:
               </div>
             </motion.div>
           ) : (
-            // ✅ 普通圆点：用 anchorX / dotY（来自轴线本体与标题块）
+            // ✅ 普通圆点：修复定位和样式
             <motion.button
               onClick={onClick}
-              style={{ top: dotY ?? '50%', left: anchorX ?? '50%' }}
-              className="pointer-events-auto absolute -translate-x-1/2 -translate-y-1/2 origin-center transform-gpu will-change-transform z-20 bg-transparent timeline-dot-button"
+              style={{ 
+                top: `${dotY ?? 50}px`, 
+                left: `${anchorX ?? 260}px` // 提供更合理的默认值
+              }}
+              className="pointer-events-auto absolute -translate-x-1/2 -translate-y-1/2 origin-center transform-gpu will-change-transform z-20 timeline-dot-button"
               aria-label={`${event.year} 时间点`}
             >
-              {/* 外环 */}
-              <div className="w-4 h-4 rounded-full border-2 border-white shadow-lg">
-                {/* 内环 - 深蓝色默认，滚动激活时变为金色 */}
+              {/* 外环 - 白色边框 */}
+              <div className="w-4 h-4 rounded-full border-2 border-white shadow-lg bg-white">
+                {/* 内环 - 主色彩填充 */}
                 <div
-                  className={`w-full h-full rounded-full flex items-center justify-center ${
+                  className={`w-full h-full rounded-full flex items-center justify-center transition-colors duration-200 ${
                     isActive
                       ? 'bg-[var(--timeline-secondary)] shadow-inner shadow-[var(--timeline-secondary)]/40'
                       : 'bg-[var(--timeline-primary)]'
                   }`}
                 >
-                  {/* 中心点 */}
+                  {/* 中心点 - 白色高光 */}
                   <div
-                    className={`w-1.5 h-1.5 rounded-full bg-white shadow-sm ${
+                    className={`w-1.5 h-1.5 rounded-full bg-white shadow-sm transition-opacity duration-200 ${
                       isActive ? 'opacity-100' : 'opacity-70'
                     }`}
                   />

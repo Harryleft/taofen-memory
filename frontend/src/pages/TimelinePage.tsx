@@ -22,7 +22,7 @@ export default function TimelinePage() {
 
   useEffect(() => {
     if (timelineData.length > 0) {
-      setActiveEventId(timelineData[0].id);
+      setActiveEventId(String(timelineData[0].id));
     }
   }, [timelineData]);
 
@@ -57,7 +57,7 @@ export default function TimelinePage() {
               const elementBottom = elementTop + textRect.height;
               
               if (scrollPosition >= elementTop && scrollPosition <= elementBottom) {
-                setActiveEventId(event.id);
+                setActiveEventId(String(event.id));
                 break;
               }
             }
@@ -152,9 +152,9 @@ export default function TimelinePage() {
               key={event.id}
               event={event}
               index={index}
-              isActive={activeEventId === event.id}
+              isActive={activeEventId === String(event.id)}
               isFirstEvent={index === 0}
-              onClick={() => handleEventClick(event.id)}
+              onClick={() => handleEventClick(String(event.id))}
             />
           ))}
         </div>
