@@ -162,7 +162,9 @@ export class ImagePreloader {
     // 在后台预加载下一页的图片
     if (nextImages.length > 0) {
       this.preloadImages(nextImages, { ...options, priority: false })
-        .catch(err => console.log('Background preloading failed:', err));
+        .catch(() => {
+          // 背景预加载失败静默处理
+        });
     }
   }
   

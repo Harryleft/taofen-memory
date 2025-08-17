@@ -220,8 +220,8 @@ export class TimelineDataService {
   // 预加载数据
   async preloadData(configs: DataLoadConfig[]): Promise<void> {
     const promises = configs.map(config => 
-      this.loadTimelineData(config).catch(error => {
-        console.warn('Preload failed for config:', config, error);
+      this.loadTimelineData(config).catch(() => {
+        // 预加载失败静默处理
       })
     );
     

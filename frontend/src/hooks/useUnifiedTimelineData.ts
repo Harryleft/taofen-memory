@@ -78,8 +78,7 @@ export function useUnifiedTimelineData(config: UseTimelineDataConfig = {}): UseT
     try {
       const data = await timelineDataService.loadTimelineData(dataLoadConfig);
       setTimelineData(data);
-    } catch (error) {
-      console.error('Failed to load timeline data:', error);
+    } catch {
       // 错误状态由service内部管理
     }
   }, [dataLoadConfig]);

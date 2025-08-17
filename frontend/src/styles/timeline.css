@@ -1161,23 +1161,23 @@ img {
   border-radius: 16px;
   
   /* 多层背景叠加：纸纹 + 拉丝金属 + 微渐变 + 内收晕影 */
-  background-image: 
+  background-image:
     /* 边缘内收晕影效果 */
     radial-gradient(ellipse 85% 85% at center, transparent 60%, rgba(140, 120, 100, 0.08) 85%, rgba(100, 80, 60, 0.12) 100%),
-    
+
     /* 极低频纸张纹理 (3-4%) */
     radial-gradient(circle at 15% 40%, transparent 30%, rgba(139, 123, 107, 0.035) 32%, rgba(139, 123, 107, 0.035) 36%, transparent 38%),
     radial-gradient(circle at 85% 20%, transparent 25%, rgba(156, 134, 118, 0.03) 27%, rgba(156, 134, 118, 0.03) 31%, transparent 33%),
     radial-gradient(circle at 60% 80%, transparent 20%, rgba(127, 109, 95, 0.04) 22%, rgba(127, 109, 95, 0.04) 26%, transparent 28%),
-    
+
     /* 拉丝金属纹理 (4-5%) */
     linear-gradient(20deg, transparent 45%, rgba(165, 147, 133, 0.045) 47%, rgba(165, 147, 133, 0.045) 50%, transparent 52%),
     linear-gradient(-20deg, transparent 43%, rgba(158, 140, 126, 0.04) 45%, rgba(158, 140, 126, 0.04) 48%, transparent 50%),
     linear-gradient(70deg, transparent 40%, rgba(180, 162, 148, 0.05) 42%, rgba(180, 162, 148, 0.05) 45%, transparent 47%),
-    
+
     /* 微妙垂直渐变 */
     linear-gradient(to bottom, #FCFAF7 0%, #FAFAF9 30%, #F9F7F5 70%, #F7F5F2 100%);
-    
+
   background-size: 
     100% 100%,          /* 晕影覆盖全部 */
     220px 220px,        /* 纸纹间距 */
@@ -1207,7 +1207,7 @@ img {
     transparent 0%,
     rgba(196, 155, 97, 0.2) 20%,
     rgba(196, 155, 97, 0.4) 48%,
-    rgba(27, 54, 93, 0.6) 50%,
+    rgba(196, 155, 97, 0.6) 50%,
     rgba(196, 155, 97, 0.4) 52%,
     rgba(196, 155, 97, 0.2) 80%,
     transparent 100%

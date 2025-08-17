@@ -38,7 +38,6 @@ function extractYear(timeString: string): number {
   // 匹配4位数字年份
   const yearMatch = timeString.match(/(\d{4})/);
   if (!yearMatch) {
-    console.warn(`无法从时间字符串提取年份: ${timeString}`);
     return 1900; // 默认年份
   }
   return parseInt(yearMatch[1], 10);
@@ -109,14 +108,12 @@ function normalizeImageUrl(image: string): string {
  */
 export function adaptTimelineData(newData: TimelineData): TimelineEvent[] {
   if (!Array.isArray(newData)) {
-    console.error('适配器收到无效数据:', newData);
     return [];
   }
 
   // 展平嵌套结构并过滤背景事件
   const allEvents = newData.flatMap(coreEvent => {
     if (!coreEvent || !Array.isArray(coreEvent.timeline)) {
-      console.warn('跳过无效的coreEvent:', coreEvent);
       return [];
     }
     
@@ -162,25 +159,3 @@ export function validateAdaptedData(events: TimelineEvent[]): boolean {
   );
 }
 
-/**
- * 调试工具函数 - 打印数据转换前后的对比
- */
-export function debugDataTransformation(newData: TimelineData): void {
-  console.group('🔧 时间线数据转换调试');
-  
-  console.log('原始数据结构:', {
-    总分类数: newData.length,
-    样本分类: newData[0]?.core_event,
-    样本事件: newData[0]?.timeline[0]
-  });
-  
-  const adapted = adaptTimelineData(newData);
-  
-  console.log('适配后数据结构:', {
-    总事件数: adapted.length,
-    样本事件: adapted[0],
-    验证结果: validateAdaptedData(adapted)
-  });
-  
-  console.groupEnd();
-}
