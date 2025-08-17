@@ -74,19 +74,7 @@ const COMMON_EXTERNAL_RESOURCES: ExternalResource[] = [
 
 // 完整版本的外部资源配置
 const FULL_EXTERNAL_RESOURCES: ExternalResource[] = [
-  ...COMMON_EXTERNAL_RESOURCES,
-  {
-    label: '国家图书馆',
-    url: 'https://www.nlc.cn',
-    icon: '🏛️',
-    description: '数字资源与古籍档案'
-  },
-  {
-    label: '学术研究',
-    url: 'https://scholar.google.com',
-    icon: '🎓',
-    description: '学术论文与研究资料'
-  }
+  ...COMMON_EXTERNAL_RESOURCES
 ];
 
 // 简化版本的外部资源配置
