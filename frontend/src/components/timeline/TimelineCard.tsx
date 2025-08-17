@@ -67,6 +67,10 @@ export function TimelineCard({ event, isActive, isFirstEvent = false, isLastEven
       const axisContainer = axisRef.current; // ⭐ 改为测量2px宽的容器
       if (!row || !axisContainer) return;
       
+      // 检查轴线容器是否可见（避免在移动端隐藏状态下计算）
+      const computedStyle = window.getComputedStyle(axisContainer);
+      if (computedStyle.display === 'none') return;
+      
       const rowRect = row.getBoundingClientRect();
       const axisContainerRect = axisContainer.getBoundingClientRect();
       
@@ -203,13 +207,13 @@ export function TimelineCard({ event, isActive, isFirstEvent = false, isLastEven
         )}
 
         {/* 中列：画轴线（只画线，徽章和圆点移到覆盖层） */}
-        <div ref={axisRef} className="hidden lg:block col-start-2 relative h-full">
+        <div ref={axisRef} className="hidden lg:block col-start-2 relative h-full w-2">
           <div
             ref={axisLineRef} // ⭐ 新增：轴线本体 ref
             className={`absolute left-1/2 -translate-x-1/2
                        w-px                                     /* 从 w-0.5 改为 w-px，像素对齐 */
                        bg-gradient-to-b from-[var(--timeline-secondary)]/50 to-[var(--timeline-secondary)]/10
-                       ${isLastEvent ? 'top-0 bottom-[-120px]' : 'top-0 bottom-0'}`} // 最后一个事件延伸轴线
+                       ${isLastEvent ? 'top-0 bottom-[-200px]' : 'top-0 bottom-0'}`} // 最后一个事件延伸轴线到结束装饰
           />
         </div>
 
