@@ -1,10 +1,20 @@
 /* stylelint-disable-next-line at-rule-no-unknown */
 @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600;700&family=Noto+Sans:wght@400;500;600;700&display=swap');
-@import 'relationships.css';
-@import 'bookstore.css';
-@import 'ZoutaofenFooter.css';
-@import 'timeline.css';
 
+/* ================================================
+   CSS导入顺序优化
+   ================================================ */
+/* 1. 统一变量系统 */
+@import 'variables.css';
+
+/* 2. 组件样式 - 按依赖关系和字母顺序 */
+@import 'bookstore.css';          /* 独立组件 */
+@import 'relationships.css';     /* 独立组件 */
+@import 'timeline.css';          /* 独立组件 */
+@import 'ZoutaofenFooter.css';   /* 特定Footer组件 */
+@import 'footer.css';           /* 通用Footer组件 */
+
+/* 3. Tailwind CSS */
 /* stylelint-disable-next-line at-rule-no-unknown */
 @tailwind base;
 /* stylelint-disable-next-line at-rule-no-unknown */
@@ -17,24 +27,77 @@
     scroll-behavior: smooth;
   } */
   
-  :root {
-    /* 全局背景色系统 - 统一使用timeline主背景色 */
-    --global-background: #FAF7F2;
-    --global-text-primary: #2D3748;
-    --global-text-secondary: #4A5568;
-  }
-  
+  /* 使用统一变量系统 */
   body {
-    font-family: 'Noto Sans', sans-serif;
-    line-height: 1.6;
-    background-color: var(--global-background);
+    font-family: var(--global-font-family-sans);
+    line-height: var(--global-line-height-normal);
+    background-color: var(--global-bg-primary);
     color: var(--global-text-primary);
   }
   
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'EB Garamond', serif;
-    font-weight: 700;
-    line-height: 1.2;
+    font-family: var(--global-font-family-serif);
+    font-weight: var(--global-font-weight-bold);
+    line-height: var(--global-line-height-tight);
+  }
+  
+  /* 统一链接样式 */
+  a {
+    color: var(--global-accent-primary);
+    text-decoration: none;
+    transition: color var(--global-animation-normal) var(--global-ease-out);
+  }
+  
+  a:hover {
+    color: var(--global-accent-secondary);
+  }
+  
+  /* 统一按钮样式 */
+  button {
+    font-family: var(--global-font-family-sans);
+    font-weight: var(--global-font-weight-medium);
+    border: none;
+    border-radius: var(--global-radius-md);
+    padding: var(--global-spacing-sm) var(--global-spacing-md);
+    background-color: var(--global-accent-primary);
+    color: white;
+    cursor: pointer;
+    transition: all var(--global-animation-normal) var(--global-ease-out);
+  }
+  
+  button:hover {
+    background-color: var(--global-accent-secondary);
+    transform: translateY(-1px);
+  }
+  
+  /* 统一输入框样式 */
+  input, textarea, select {
+    font-family: var(--global-font-family-sans);
+    border: 1px solid var(--global-border-light);
+    border-radius: var(--global-radius-md);
+    padding: var(--global-spacing-sm);
+    background-color: white;
+    color: var(--global-text-primary);
+    transition: border-color var(--global-animation-normal) var(--global-ease-out);
+  }
+  
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--global-accent-secondary);
+    box-shadow: 0 0 0 3px rgba(196, 155, 97, 0.1);
+  }
+  
+  /* 统一卡片样式 */
+  .card {
+    background-color: white;
+    border-radius: var(--global-radius-lg);
+    box-shadow: var(--global-shadow-card);
+    padding: var(--global-spacing-lg);
+    transition: box-shadow var(--global-animation-normal) var(--global-ease-out);
+  }
+  
+  .card:hover {
+    box-shadow: var(--global-shadow-hover);
   }
 }
 

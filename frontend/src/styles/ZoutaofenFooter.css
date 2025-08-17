@@ -169,7 +169,7 @@
 }
 
 /* 响应式布局优化 */
-@media (max-width: 640px) {
+@media (max-width: calc(var(--global-breakpoint-sm) - 1px)) {
   .zoutaofen-footer .footer-container {
     padding: 0 0.5rem;
   }
@@ -225,7 +225,7 @@
   }
 }
 
-@media (min-width: 768px) {
+@media (min-width: var(--global-breakpoint-md)) {
   .zoutaofen-footer .footer-container {
     padding: 0 2rem;
   }
@@ -240,7 +240,7 @@
   
   }
 
-@media (min-width: 1024px) {
+@media (min-width: var(--global-breakpoint-lg)) {
   .zoutaofen-footer .footer-container {
     padding: 0 3rem;
   }
