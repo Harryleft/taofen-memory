@@ -5,6 +5,12 @@
   transition: transform 0.2s ease;
 }
 
+/* 下滑查看更多按钮样式 */
+button[aria-label="下滑查看更多"] {
+  background-color: transparent !important;
+  border: none !important;
+}
+
 .header-button:hover {
   transform: scale(1.05);
 }
