@@ -265,11 +265,11 @@ const Footer: React.FC<FooterProps> = ({
     >
       <div className="footer-container max-w-7xl mx-auto">
         {/* 主要内容区域 - 两列竖栏布局 */}
-        <div className="footer-content grid grid-cols-1 md:grid-cols-2 gap-12">
+        <div className="footer-content grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* 左侧：栏目导航 - 竖向文字布局 */}
           <section className="categories-section">
-            <h2 className="section-title text-xl font-bold mb-6 text-amber-500">栏目导航</h2>
-            <div className="categories-list space-y-3">
+            <h2 className="section-title text-xl font-bold mb-4 text-amber-500">栏目导航</h2>
+            <div className="categories-list space-y-2">
               {primaryNavigation.categories.map((category) => (
                 <a
                   key={category.id}
@@ -284,8 +284,8 @@ const Footer: React.FC<FooterProps> = ({
           
           {/* 右侧：外部资源链接 - 纯文字链接 */}
           <section className="external-resources-section">
-            <h2 className="section-title text-xl font-bold mb-6 text-amber-500">外部资源</h2>
-            <div className="resources-list space-y-3">
+            <h2 className="section-title text-xl font-bold mb-4 text-amber-500">外部资源</h2>
+            <div className="resources-list space-y-2">
               {externalResources.resources.map((resource, index) => (
                 <a
                   key={index}
@@ -302,7 +302,7 @@ const Footer: React.FC<FooterProps> = ({
         </div>
         
         {/* 版权与法律信息 */}
-        <section className="legal-section-section border-t border-gray-700 pt-8 mt-12">
+        <section className="legal-section-section border-t border-gray-700 pt-6 mt-8">
           <LegalSection 
             copyright={legal.copyright}
             competitionInfo={legal.competitionInfo}
