@@ -68,62 +68,34 @@ export function TimelineCard({ event, isActive, isFirstEvent = false, onClick }:
       // 获取容器宽度
       const containerWidth = row.offsetWidth;
       
-      // 关键修复：根据是否有图片使用不同的计算逻辑
-      if (hasImage && !imageError) {
-        // 有图片事件：使用三列网格布局计算
-        let leftColWidth = 0;
-        
-        // 方法1：通过grid列选择器查找
-        const leftCol = row.querySelector('[class*="col-start-1"]');
-        if (leftCol) {
-          leftColWidth = leftCol.offsetWidth;
-        }
-        
-        // 方法2：如果方法1失败，查找第一个直接子元素（左列图片）
-        if (leftColWidth === 0) {
-          const firstChild = row.firstElementChild;
-          if (firstChild && firstChild.classList.contains('lg:col-start-1')) {
-            leftColWidth = firstChild.offsetWidth;
-          }
-        }
-        
-        // 方法3：如果都失败，使用网格布局理论计算
-        if (leftColWidth === 0) {
-          // 在三列网格 [1fr_2px_1fr] 中，左列大约占总宽度的 50%
-          // 根据用户提供的正确值 536px 反推，当容器760px时，左列应该是535px
-          leftColWidth = Math.floor(containerWidth * 0.705); // 536/760 ≈ 0.705
-        }
-        
-        // 轴线位置计算：基于用户提供的正确值536px进行调整
-        // 当容器宽度760px时，轴线应该在536px位置
-        // 如果左列宽度是420px，那么需要额外的115px偏移
-        const adjustment = containerWidth >= 760 ? 115 : Math.floor(containerWidth * 0.15);
-        const theoreticalAxisX = leftColWidth + 1 + adjustment;
-        
-        // 调试信息
-        console.log('Timeline positioning debug (with image):', {
-          containerWidth,
-          leftColWidth,
-          adjustment,
-          calculatedAxisX: theoreticalAxisX,
-          expectedAxisX: 536, // 用户提供的正确值
-          method: leftColWidth > 0 ? 'DOM' : 'Calculated'
-        });
-        
-        setAnchorX(snap(theoreticalAxisX));
-      } else {
-        // 无图片事件：使用固定位置537px与有图片事件保持一致
-        const fixedAxisX = 537;
-        
-        // 调试信息
-        console.log('Timeline positioning debug (no image):', {
-          containerWidth,
-          calculatedAxisX: fixedAxisX,
-          method: 'Fixed position (537px)'
-        });
-        
-        setAnchorX(snap(fixedAxisX));
-      }
+      // 自适应定位算法：基于网格布局计算相对位置
+      // 网格布局：grid-cols-[1fr_2px_1fr]，左列占1fr，右列占1fr，中间2px分隔线
+      const gridGap = 12 * 4; // gap-x-12 = 3rem = 48px
+      const centerLineWidth = 2; // 轴线宽度2px
+      
+      // 计算左列宽度：在有图片时，左列实际占用的空间比例
+      // 基于观察：当容器760px时，左列约为536px（70.5%）
+      const leftColRatio = hasImage && !imageError ? 0.705 : 0.5;
+      
+      // 计算左列实际宽度
+      const availableWidth = containerWidth - gridGap - centerLineWidth;
+      const leftColWidth = Math.floor(availableWidth * leftColRatio);
+      
+      // 轴线位置：左列宽度 + 半个gap（居中在2px轴线上）
+      const axisX = leftColWidth + Math.floor(gridGap / 2) + 1;
+      
+      // 调试信息
+      console.log('Timeline positioning debug (adaptive):', {
+        containerWidth,
+        availableWidth,
+        leftColRatio: hasImage && !imageError ? '0.705 (with image)' : '0.5 (no image)',
+        leftColWidth,
+        calculatedAxisX: axisX,
+        hasImage: hasImage && !imageError,
+        method: 'Grid-based calculation'
+      });
+      
+      setAnchorX(snap(axisX));
     };
 
     // 初始计算
@@ -262,7 +234,7 @@ export function TimelineCard({ event, isActive, isFirstEvent = false, onClick }:
               }}
               style={{
                 top: `${(dotY ?? 50) + firstEventVerticalOffset}px`,
-                left: '521px', // 保留原有魔法数，不动它
+                left: anchorX ?? '521px', // 使用自适应计算的位置，回退到原有值
               }}
               className="pointer-events-auto absolute -translate-x-1/2 -translate-y-1/2 origin-center transform-gpu will-change-transform z-20 timeline-first-event-badge"
               onClick={onClick}
