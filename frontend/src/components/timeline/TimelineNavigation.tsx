@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { TimelineEvent } from "./timeline-data.ts";
+import { TimelineEvent } from "../../types/personTypes.ts";
 
 interface TimelineNavigationProps {
   events: TimelineEvent[];

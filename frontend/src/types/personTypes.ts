@@ -48,4 +48,5 @@ export interface TimelineEvent {
   description: string;
   location: string;
   details: string[];
+  imageUrl?: string;  // 图片URL（可选）
 }
