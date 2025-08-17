@@ -41,19 +41,92 @@
   }
 
   .bookstore-year-button {
-    @apply flex items-center w-full pl-10 pr-4 py-2 bg-accent-gold/10 border border-accent-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-gold/50 font-serif text-left hover:bg-white hover:border-accent-gold/60 transition-all duration-300;
+    @apply relative flex items-center w-full pl-10 pr-10 py-3 bg-white border-2 border-accent-gold/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/40 focus:border-accent-gold/60 font-serif text-left text-primary/90 hover:bg-accent-gold/5 hover:border-accent-gold/40 hover:text-primary hover:shadow-warm-sm transition-all duration-300 ease-in-out transform hover:scale-[1.02] active:scale-[0.98] select-none;
+    min-height: 48px;
+    box-shadow: 0 1px 3px rgba(139, 69, 19, 0.08);
+  }
+
+  .bookstore-year-button:hover {
+    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.15);
+  }
+
+  .bookstore-year-button:focus-visible {
+    @apply ring-2 ring-accent-gold/40 ring-offset-2;
+    outline: none;
+  }
+
+  .bookstore-year-button:active {
+    @apply transform scale-[0.98];
+    transition: all 100ms ease-in-out;
   }
 
   .bookstore-year-dropdown {
-    @apply absolute z-10 mt-1 w-full bg-white border border-accent-gold/30 rounded-lg shadow-lg max-h-60 overflow-y-auto;
+    @apply absolute z-20 mt-2 w-full bg-white border-2 border-accent-gold/20 rounded-xl shadow-warm-lg overflow-hidden backdrop-blur-sm;
+    min-width: 200px;
+    max-height: 320px;
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+    transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+  }
+
+  .bookstore-year-dropdown.open {
+    @apply opacity-100;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+
+  .bookstore-year-dropdown::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .bookstore-year-dropdown::-webkit-scrollbar-track {
+    @apply bg-accent-gold/5;
+  }
+
+  .bookstore-year-dropdown::-webkit-scrollbar-thumb {
+    @apply bg-accent-gold/30 rounded-full;
+  }
+
+  .bookstore-year-dropdown::-webkit-scrollbar-thumb:hover {
+    @apply bg-accent-gold/50;
   }
 
   .bookstore-year-option {
-    @apply block w-full px-4 py-2 text-left hover:bg-accent-gold transition-colors duration-200 bg-transparent;
+    @apply relative block w-full px-4 py-3 text-left text-primary/80 hover:bg-accent-gold/10 hover:text-primary focus:bg-accent-gold/15 focus:text-primary focus:outline-none transition-all duration-200 ease-in-out border-l-4 border-transparent hover:border-accent-gold/40 focus:border-accent-gold/60;
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+
+  .bookstore-year-option:hover {
+    @apply bg-accent-gold/10;
+    transform: translateX(2px);
+  }
+
+  .bookstore-year-option:focus-visible {
+    @apply bg-accent-gold/15;
+    outline: none;
   }
 
   .bookstore-year-option.selected {
-    @apply bg-accent-gold font-medium;
+    @apply bg-accent-gold/15 text-primary border-l-4 border-accent-gold/60 font-semibold;
+    background: linear-gradient(90deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%);
+  }
+
+  .bookstore-year-option.selected:hover {
+    @apply bg-accent-gold/20;
+  }
+
+  .bookstore-year-option:first-child {
+    @apply rounded-t-xl;
+  }
+
+  .bookstore-year-option:last-child {
+    @apply rounded-b-xl;
+  }
+
+  .bookstore-year-option:not(:last-child) {
+    @apply border-b border-accent-gold/10;
   }
 
   .bookstore-download-button {
@@ -220,5 +293,131 @@
 
   .bookstore-empty-description {
     @apply text-primary/60;
+  }
+
+  /* 年份按钮响应式优化 */
+  @media (max-width: 640px) {
+    .bookstore-year-button {
+      @apply py-2.5 px-8;
+      min-height: 44px;
+      font-size: 0.875rem;
+    }
+
+    .bookstore-year-dropdown {
+      @apply mt-1;
+      max-height: 280px;
+    }
+
+    .bookstore-year-option {
+      @apply px-3 py-2.5;
+      font-size: 0.875rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .bookstore-year-button {
+      @apply px-6;
+      min-height: 42px;
+    }
+
+    .bookstore-year-dropdown {
+      max-height: 240px;
+    }
+  }
+
+  /* 高对比度模式支持 */
+  @media (prefers-contrast: high) {
+    .bookstore-year-button {
+      @apply border-2 border-primary/80;
+    }
+
+    .bookstore-year-button:hover {
+      @apply border-primary;
+    }
+
+    .bookstore-year-option.selected {
+      @apply border-l-4 border-primary;
+    }
+  }
+
+  /* 减少动画模式支持 */
+  @media (prefers-reduced-motion: reduce) {
+    .bookstore-year-button,
+    .bookstore-year-dropdown,
+    .bookstore-year-option {
+      transition: none !important;
+      animation: none !important;
+    }
+
+    .bookstore-year-dropdown {
+      transform: none !important;
+    }
+  }
+
+  /* 深色模式支持 */
+  @media (prefers-color-scheme: dark) {
+    .bookstore-year-button {
+      @apply bg-gray-800 border-gray-600 text-gray-100;
+    }
+
+    .bookstore-year-button:hover {
+      @apply bg-gray-700 border-gray-500;
+    }
+
+    .bookstore-year-dropdown {
+      @apply bg-gray-800 border-gray-600;
+    }
+
+    .bookstore-year-option {
+      @apply text-gray-300 hover:bg-gray-700;
+    }
+
+    .bookstore-year-option.selected {
+      @apply bg-gray-700 text-white;
+    }
+  }
+
+  /* 键盘导航优化 */
+  .bookstore-year-option:focus {
+    @apply outline-none ring-2 ring-accent-gold/40 ring-offset-2;
+  }
+
+  /* 加载状态动画 */
+  .bookstore-year-button.loading {
+    @apply pointer-events-none opacity-70;
+  }
+
+  .bookstore-year-button.loading::after {
+    content: '';
+    @apply absolute inset-0 bg-white/30 rounded-xl;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 0.3;
+    }
+    50% {
+      opacity: 0.1;
+    }
+  }
+
+  /* 触摸设备优化 */
+  @media (hover: none) {
+    .bookstore-year-button:active {
+      @apply transform scale-95;
+    }
+
+    .bookstore-year-option:active {
+      @apply bg-accent-gold/20;
+    }
+  }
+
+  /* 打印样式优化 */
+  @media print {
+    .bookstore-year-button,
+    .bookstore-year-dropdown {
+      @apply hidden;
+    }
   }
 }
