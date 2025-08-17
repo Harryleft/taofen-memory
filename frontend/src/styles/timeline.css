@@ -1141,26 +1141,26 @@ img {
 /* 主封面卡容器 - 跨轴设计 */
 .timeline-cover-card {
   position: relative;
-  background: #FCFAF7; /* 与卡片相同的温白色 */
+  background: #F8F5F0; /* 增强对比度：使用更深的温白色 */
   border-radius: 16px;
   
   /* 多层背景叠加：纸纹 + 拉丝金属 + 微渐变 + 内收晕影 */
   background-image:
     /* 边缘内收晕影效果 */
-    radial-gradient(ellipse 85% 85% at center, transparent 60%, rgba(140, 120, 100, 0.08) 85%, rgba(100, 80, 60, 0.12) 100%),
+    radial-gradient(ellipse 85% 85% at center, transparent 60%, rgba(140, 120, 100, 0.12) 85%, rgba(100, 80, 60, 0.18) 100%),
 
     /* 极低频纸张纹理 (3-4%) */
-    radial-gradient(circle at 15% 40%, transparent 30%, rgba(139, 123, 107, 0.035) 32%, rgba(139, 123, 107, 0.035) 36%, transparent 38%),
-    radial-gradient(circle at 85% 20%, transparent 25%, rgba(156, 134, 118, 0.03) 27%, rgba(156, 134, 118, 0.03) 31%, transparent 33%),
-    radial-gradient(circle at 60% 80%, transparent 20%, rgba(127, 109, 95, 0.04) 22%, rgba(127, 109, 95, 0.04) 26%, transparent 28%),
+    radial-gradient(circle at 15% 40%, transparent 30%, rgba(139, 123, 107, 0.045) 32%, rgba(139, 123, 107, 0.045) 36%, transparent 38%),
+    radial-gradient(circle at 85% 20%, transparent 25%, rgba(156, 134, 118, 0.04) 27%, rgba(156, 134, 118, 0.04) 31%, transparent 33%),
+    radial-gradient(circle at 60% 80%, transparent 20%, rgba(127, 109, 95, 0.05) 22%, rgba(127, 109, 95, 0.05) 26%, transparent 28%),
 
     /* 拉丝金属纹理 (4-5%) */
-    linear-gradient(20deg, transparent 45%, rgba(165, 147, 133, 0.045) 47%, rgba(165, 147, 133, 0.045) 50%, transparent 52%),
-    linear-gradient(-20deg, transparent 43%, rgba(158, 140, 126, 0.04) 45%, rgba(158, 140, 126, 0.04) 48%, transparent 50%),
-    linear-gradient(70deg, transparent 40%, rgba(180, 162, 148, 0.05) 42%, rgba(180, 162, 148, 0.05) 45%, transparent 47%),
+    linear-gradient(20deg, transparent 45%, rgba(165, 147, 133, 0.055) 47%, rgba(165, 147, 133, 0.055) 50%, transparent 52%),
+    linear-gradient(-20deg, transparent 43%, rgba(158, 140, 126, 0.05) 45%, rgba(158, 140, 126, 0.05) 48%, transparent 50%),
+    linear-gradient(70deg, transparent 40%, rgba(180, 162, 148, 0.06) 42%, rgba(180, 162, 148, 0.06) 45%, transparent 47%),
 
-    /* 微妙垂直渐变 */
-    linear-gradient(to bottom, #FCFAF7 0%, #FAFAF9 30%, #F9F7F5 70%, #F7F5F2 100%);
+    /* 增强对比度垂直渐变 */
+    linear-gradient(to bottom, #F8F5F0 0%, #F5F2EC 30%, #F2EFE8 70%, #EFEC E5 100%);
 
   background-size: 
     100% 100%,          /* 晕影覆盖全部 */
@@ -1172,11 +1172,15 @@ img {
     100px 100px,
     100% 100%;          /* 渐变覆盖全部 */
   
-  /* 卡片阴影：比普通卡片更深层 */
+  /* 增强对比度：更明显的边框 */
+  border: 1px solid rgba(196, 155, 97, 0.15);
+  
+  /* 卡片阴影：增强对比度 */
   box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.08),
-    0 2px 8px rgba(0, 0, 0, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    0 12px 40px rgba(0, 0, 0, 0.12),
+    0 4px 12px rgba(0, 0, 0, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
     
   /* 动画优化 */
   will-change: transform;
@@ -1489,6 +1493,69 @@ img {
 }
 
 /* ===============================================
+   呼吸动画效果系统
+   =============================================== */
+
+/* 呼吸动画基础类 */
+.timeline-cover-card-breathing {
+  animation: breathing 4s ease-in-out infinite;
+  transition: transform 4s ease-in-out;
+}
+
+@keyframes breathing {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-2px) scale(1.005);
+  }
+}
+
+/* 呼吸动画的光晕效果 - 增强对比度 */
+.timeline-cover-card-breathing::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  right: -20px;
+  bottom: -20px;
+  border-radius: 20px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(196, 155, 97, 0.15) 0%,
+    rgba(196, 155, 97, 0.08) 40%,
+    transparent 70%
+  );
+  opacity: 0.8;
+  animation: breathingGlow 4s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes breathingGlow {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+/* 减少动画模式下的呼吸效果 */
+@media (prefers-reduced-motion: reduce) {
+  .timeline-cover-card-breathing {
+    animation: none;
+  }
+  
+  .timeline-cover-card-breathing::before {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* ===============================================
    时间轴悬停效果优化
    =============================================== */
 
@@ -1496,9 +1563,10 @@ img {
 .timeline-cover-card {
   /* 基础状态阴影 */
   box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.08),
-    0 2px 8px rgba(0, 0, 0, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    0 12px 40px rgba(0, 0, 0, 0.12),
+    0 4px 12px rgba(0, 0, 0, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
   
   /* 平滑过渡所有属性 */
   transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
@@ -1507,28 +1575,33 @@ img {
   backface-visibility: hidden;
 }
 
-/* 悬停状态 - 增强阴影效果 */
+/* 悬停状态 - 增强对比度效果 */
 .timeline-cover-card:hover {
+  /* 增强边框对比度 */
+  border-color: rgba(196, 155, 97, 0.25);
+  
   box-shadow: 
     /* 主阴影层 - 更深更广 */
-    0 20px 60px rgba(0, 0, 0, 0.15),
-    0 8px 24px rgba(0, 0, 0, 0.12),
-    /* 内发光效果 */
-    0 0 0 1px rgba(196, 155, 97, 0.1),
+    0 24px 80px rgba(0, 0, 0, 0.18),
+    0 12px 32px rgba(0, 0, 0, 0.15),
+    /* 内发光效果增强 */
+    0 0 0 1px rgba(196, 155, 97, 0.2),
     /* 内高光保持 */
     inset 0 1px 0 rgba(255, 255, 255, 0.8),
-    /* 边缘发光 */
-    0 0 20px rgba(196, 155, 97, 0.08);
+    /* 边缘发光增强 */
+    0 0 30px rgba(196, 155, 97, 0.15);
   
-  transform: translateY(-4px) scale(1.01);
+  transform: translateY(-6px) scale(1.02);
 }
 
 /* 活跃状态 - 点击效果 */
 .timeline-cover-card:active {
-  transform: translateY(-2px) scale(1.005);
+  border-color: rgba(196, 155, 97, 0.3);
+  transform: translateY(-3px) scale(1.01);
   box-shadow: 
-    0 12px 40px rgba(0, 0, 0, 0.12),
-    0 4px 16px rgba(0, 0, 0, 0.08),
+    0 16px 48px rgba(0, 0, 0, 0.15),
+    0 6px 20px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(196, 155, 97, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
@@ -1594,6 +1667,41 @@ img {
   .timeline-dot-button:hover,
   .timeline-dot-button:focus-visible {
     transform: translateX(-50%) scale(1.1);
+  }
+}
+
+/* ===============================================
+   动画性能优化
+   =============================================== */
+
+/* 硬件加速优化 */
+.timeline-cover-card-breathing {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* 减少重绘优化 */
+.timeline-cover-card {
+  contain: layout style paint;
+}
+
+/* 动画帧率优化 */
+@supports (animation: smooth) {
+  .timeline-cover-card-breathing {
+    animation: breathing 4s ease-in-out infinite;
+  }
+}
+
+/* 低功耗模式优化 */
+@media (prefers-reduced-data: reduce) {
+  .timeline-cover-card-breathing {
+    animation-duration: 6s;
+  }
+  
+  .timeline-cover-card-breathing::before {
+    animation-duration: 6s;
   }
 }
 
