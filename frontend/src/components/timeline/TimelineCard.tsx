@@ -11,10 +11,11 @@ interface TimelineCardProps {
   index: number; // 保持签名一致
   isActive: boolean;
   isFirstEvent?: boolean; // 是否为第一个事件
+  isLastEvent?: boolean; // 是否为最后一个事件
   onClick: () => void;
 }
 
-export function TimelineCard({ event, isActive, isFirstEvent = false, onClick }: TimelineCardProps) {
+export function TimelineCard({ event, isActive, isFirstEvent = false, isLastEvent = false, onClick }: TimelineCardProps) {
   // —— 图片状态与方向识别
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -205,9 +206,10 @@ export function TimelineCard({ event, isActive, isFirstEvent = false, onClick }:
         <div ref={axisRef} className="hidden lg:block col-start-2 relative h-full">
           <div
             ref={axisLineRef} // ⭐ 新增：轴线本体 ref
-            className="absolute left-1/2 top-0 bottom-0 -translate-x-1/2
+            className={`absolute left-1/2 -translate-x-1/2
                        w-px                                     /* 从 w-0.5 改为 w-px，像素对齐 */
-                       bg-gradient-to-b from-[var(--timeline-secondary)]/50 to-[var(--timeline-secondary)]/10"
+                       bg-gradient-to-b from-[var(--timeline-secondary)]/50 to-[var(--timeline-secondary)]/10
+                       ${isLastEvent ? 'top-0 bottom-[-120px]' : 'top-0 bottom-0'}`} // 最后一个事件延伸轴线
           />
         </div>
 

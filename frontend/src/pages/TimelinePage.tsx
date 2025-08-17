@@ -154,6 +154,7 @@ export default function TimelinePage() {
               index={index}
               isActive={activeEventId === String(event.id)}
               isFirstEvent={index === 0}
+              isLastEvent={index === timelineData.length - 1}
               onClick={() => handleEventClick(String(event.id))}
             />
           ))}
@@ -167,15 +168,27 @@ export default function TimelinePage() {
           transition={{ duration: 0.6 }}
           className="flex justify-center mt-20"
         >
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-8 h-8 rounded-full bg-[var(--timeline-secondary)] flex items-center justify-center">
+          <div className="flex flex-col items-center gap-6">
+            {/* 装饰性圆点 */}
+            <div className="w-8 h-8 rounded-full bg-[var(--timeline-secondary)] flex items-center justify-center shadow-lg">
               <div className="w-3 h-3 rounded-full bg-white" />
             </div>
-            <p className="text-center max-w-md leading-relaxed timeline-text-muted timeline-text-body">
-              虽然生命短暂，但邹韬奋先生的精神和理想
-              <br />
-              将永远激励着后人前行
-            </p>
+            
+            {/* 主标题 */}
+            <h3 className="text-center text-lg font-semibold timeline-primary timeline-text-body">
+              精神永存，理想不灭
+            </h3>
+            
+            {/* 总结文字 */}
+            <div className="text-center max-w-lg leading-relaxed">
+              <p className="timeline-text-secondary timeline-text-body mb-2">
+                邹韬奋先生以笔为剑，以文为盾
+              </p>
+              <p className="timeline-text-secondary timeline-text-body">
+                他的精神与理想，将永远激励着后人前行
+              </p>
+            </div>
+                      
           </div>
         </motion.div>
       </div>
