@@ -21,6 +21,7 @@ import { downloadCSV } from '../../utils/bookUtils';
 import BookFiltersPanel from './BookFiltersPanel.tsx';
 import BookGrid from './BookGridContainer.tsx';
 import BookDetailModal from './BookDetailModal.tsx';
+import { BookstoreCoverCard } from './BookstoreCoverCard.tsx';
 
 
 import { useBookData } from '../../hooks/useBookData';
@@ -169,6 +170,11 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
   return (
     <section className={`relative py-20 ${className}`}>
       <div className="max-w-7xl mx-auto px-6">
+        {/* 书店封面卡 */}
+        <BookstoreCoverCard 
+          totalBooks={allData.length} 
+          featuredCategories={uniqueCategories.length} 
+        />
         
         {/* 筛选控件 */}
         <BookFiltersPanel
