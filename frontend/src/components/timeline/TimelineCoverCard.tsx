@@ -5,12 +5,10 @@ import { motion } from 'framer-motion';
 
 interface TimelineCoverCardProps {
   totalEvents: number;
-  yearSpan: string; // 例如 "1895-1944"
 }
 
 export function TimelineCoverCard({ 
-  totalEvents, 
-  yearSpan 
+  totalEvents 
 }: TimelineCoverCardProps) {
   return (
     <motion.div
@@ -31,7 +29,7 @@ export function TimelineCoverCard({
       {/* 跨轴封面卡主体 */}
       <div className="relative timeline-cover-card">
         {/* 轴线穿过效果 - 在卡片下方 */}
-        <div className="absolute top-1/2 left-0 right-0 h-1 -translate-y-1/2 timeline-cover-axis-line z-[1]" />
+        {/* <div className="absolute top-1/2 left-0 right-0 h-1 -translate-y-1/2 timeline-cover-axis-line z-[1]" /> */}
 
         {/* 卡片内容 - 居中引导布局 */}
         <div className="relative z-[2] flex flex-col items-center justify-center p-8 lg:p-12 text-center">

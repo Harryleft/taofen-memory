@@ -77,15 +77,7 @@ export function TimelineCard({ event, isActive, isFirstEvent = false, isLastEven
       // 计算轴线容器中心相对于父容器的位置
       const axisX = axisContainerRect.left - rowRect.left + axisContainerRect.width / 2;
       
-      console.log('Timeline positioning debug (DOM-based, stable):', {
-        containerWidth: row.offsetWidth,
-        axisContainerLeft: axisContainerRect.left,
-        axisContainerWidth: axisContainerRect.width,
-        containerLeft: rowRect.left,
-        calculatedAxisX: axisX,
-        method: 'Stable DOM measurement (2px column)'
-      });
-      
+        
       setAnchorX(snap(axisX));
     };
 
@@ -115,7 +107,7 @@ export function TimelineCard({ event, isActive, isFirstEvent = false, isLastEven
       window.removeEventListener('resize', debouncedRecalcX);
       ro.disconnect();
     };
-  }, [hasImage, imageError]);
+  }, []);
 
   // —— 图像焦点（横图 cover 时更有用）
   const focus = (event as TimelineEvent & { imageFocus?: string }).imageFocus ?? '50% 50%';
@@ -207,13 +199,14 @@ export function TimelineCard({ event, isActive, isFirstEvent = false, isLastEven
         )}
 
         {/* 中列：画轴线（只画线，徽章和圆点移到覆盖层） */}
-        <div ref={axisRef} className="hidden lg:block col-start-2 relative h-full w-2">
+        <div ref={axisRef} className="hidden lg:block col-start-2 relative self-stretch w-2">
           <div
             ref={axisLineRef} // ⭐ 新增：轴线本体 ref
-            className={`absolute left-1/2 -translate-x-1/2
-                       w-px                                     /* 从 w-0.5 改为 w-px，像素对齐 */
-                       bg-gradient-to-b from-[var(--timeline-secondary)]/50 to-[var(--timeline-secondary)]/10
-                       ${isLastEvent ? 'top-0 bottom-[-200px]' : 'top-0 bottom-0'}`} // 最后一个事件延伸轴线到结束装饰
+            className="absolute left-1/2 -translate-x-1/2 w-px bg-gradient-to-b from-[var(--timeline-secondary)]/50 to-[var(--timeline-secondary)]/10"
+            style={{
+              top: isFirstEvent ? `${dotY ?? 0}px` : '-96px',
+              bottom: isLastEvent ? '-200px' : '0px',
+            }}
           />
         </div>
 
