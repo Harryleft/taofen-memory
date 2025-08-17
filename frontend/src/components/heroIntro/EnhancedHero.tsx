@@ -44,8 +44,8 @@ const THEME = {
   gradients: {
     primary: 'from-amber-500 to-amber-600',
     primarySubtle: 'from-amber-500/10 to-amber-500/10',
-    bgHero: 'from-slate-50 via-amber-50/30 to-amber-50',
-    bgModules: 'from-white to-amber-50/20'
+    bgHero: 'from-[#FAF7F2] via-amber-50/30 to-[#FAF7F2]',
+    bgModules: 'from-[#FAF7F2] to-amber-50/20'
   }
 } as const;
 
