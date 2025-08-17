@@ -1489,49 +1489,79 @@ img {
 }
 
 /* ===============================================
-   时间轴圆点按钮样式 - 防止漂移问题
+   Timeline — 无鼠标交互版（可直接复制）
+   作用：
+   1) 普通事件圆点：无 hover 视觉，不改 top/left 定位
+   2) 封面卡片：无 hover 阴影/位移
+   3) 保留键盘可达性（:focus-visible）
    =============================================== */
 
-.timeline-dot-button {
-  transition: box-shadow 0.15s ease;
+/* —— 圆点按钮基础：干净化，去系统默认外观 —— */
+.timeline-dot-button{
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  line-height: 0;                 /* 避免行高撑开影响定位 */
+  outline: none;
+
+  /* 禁用过渡/变换/阴影，避免任何“看起来在动”的错觉 */
+  transition: none !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
-.timeline-dot-button:hover {
-  box-shadow: 0 0 0 6px rgba(var(--timeline-secondary-rgb), 0.25);
-}
-
-/* ===============================================
-   普通事件圆点悬停增强样式
-   =============================================== */
-
-/* 确保圆角矩形背景在圆点下方 */
-.timeline-dot-button > div:first-child {
+/* 外环（按钮的第一个直接子元素）不吃事件，避免遮挡 */
+.timeline-dot-button > div:first-child{
   pointer-events: none;
-  z-index: -1;
+  /* 不要设置 z-index:-1，防止被轴线或背景盖住造成“视觉偏移” */
 }
 
-/* 优化圆点悬停时的外发光效果 */
-.timeline-dot-button:hover > div:nth-child(2) {
-  box-shadow: 
-    0 0 12px rgba(196, 155, 97, 0.3),
-    0 0 24px rgba(196, 155, 97, 0.15),
-    0 4px 8px rgba(0, 0, 0, 0.2);
+/* —— 彻底关闭鼠标 hover 的视觉效果 —— */
+.timeline-dot-button:hover{
+  box-shadow: none !important;
+  transform: none !important;
+}
+.timeline-dot-button:hover > div,
+.timeline-dot-button:hover > div > div{
+  box-shadow: none !important;
+  transform: none !important;
 }
 
-/* 悬停时内环增强效果 */
-.timeline-dot-button:hover > div:nth-child(2) > div {
-  box-shadow: 
-    inset 0 0 8px rgba(196, 155, 97, 0.4),
-    0 0 4px rgba(196, 155, 97, 0.2);
+/* —— 保留键盘可达性（Tab 到按钮时可见）——
+   若也不想要焦点样式，注释/删除本段即可 */
+.timeline-dot-button:focus-visible{
+  outline: 2px solid rgba(var(--timeline-secondary-rgb), .55);
+  outline-offset: 2px;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
+/* —— 封面卡片：禁用 hover 阴影与位移 —— */
+.timeline-cover-card{
+  transition: none !important;   /* 去掉进入/离开过渡 */
+  transform: none !important;    /* 常态无位移 */
+  box-shadow: none !important;   /* 常态不强制阴影（可按需改） */
+}
 
+/* 悬停时保持静止、无发光 */
+.timeline-cover-card:hover{
+  transform: none !important;
+  box-shadow: none !important;
+}
 
-/* 减少动画支持 */
-@media (prefers-reduced-motion: reduce) {
-  .timeline-cover-card {
-    transition: none;
-    transform: none;
+/* —— 降噪：尊重“减少动画”偏好 —— */
+@media (prefers-reduced-motion: reduce){
+  .timeline-cover-card{
+    transition: none !important;
+    transform: none !important;
+  }
+  .timeline-dot-button{
+    transition: none !important;
+    transform: none !important;
   }
 }
+
+
 

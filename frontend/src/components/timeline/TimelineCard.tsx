@@ -112,17 +112,17 @@ export function TimelineCard({ event, isActive, isFirstEvent = false, onClick }:
         
         setAnchorX(snap(theoreticalAxisX));
       } else {
-        // 无图片事件：使用两列布局，轴线在容器中心
-        const centerAxisX = containerWidth / 2;
+        // 无图片事件：使用固定位置537px与有图片事件保持一致
+        const fixedAxisX = 537;
         
         // 调试信息
         console.log('Timeline positioning debug (no image):', {
           containerWidth,
-          calculatedAxisX: centerAxisX,
-          method: 'Center calculation'
+          calculatedAxisX: fixedAxisX,
+          method: 'Fixed position (537px)'
         });
         
-        setAnchorX(snap(centerAxisX));
+        setAnchorX(snap(fixedAxisX));
       }
     };
 
