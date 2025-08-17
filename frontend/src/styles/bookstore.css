@@ -41,7 +41,7 @@
   }
 
   .bookstore-year-button {
-    @apply flex items-center w-full pl-10 pr-4 py-2 bg-white border border-accent-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-gold/50 font-serif text-left hover:bg-accent-gold/5 hover:border-accent-gold/60 transition-all duration-300;
+    @apply flex items-center w-full pl-10 pr-4 py-2 bg-accent-gold/10 border border-accent-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-gold/50 font-serif text-left hover:bg-white hover:border-accent-gold/60 transition-all duration-300;
   }
 
   .bookstore-year-dropdown {
@@ -49,11 +49,11 @@
   }
 
   .bookstore-year-option {
-    @apply block w-full px-4 py-2 text-left hover:bg-accent-gold/5 transition-colors duration-200 bg-transparent;
+    @apply block w-full px-4 py-2 text-left hover:bg-accent-gold transition-colors duration-200 bg-transparent;
   }
 
   .bookstore-year-option.selected {
-    @apply bg-accent-gold/10 font-medium;
+    @apply bg-accent-gold font-medium;
   }
 
   .bookstore-download-button {
