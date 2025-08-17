@@ -185,32 +185,32 @@ export function TimelineCard({ event, isActive, isFirstEvent = false, isLastEven
 
               {!imageLoaded && !imageError && (
                 <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
-                  <div className="w-8 h-8 border-2 border-amber-600 border-t-transparent rounded-full animate-spin" />
+                  <div className="w-8 h-8 border-2 border-[var(--timeline-secondary)] border-t-transparent rounded-full animate-spin" />
                 </div>
               )}
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
           </motion.div>
         )}
 
         {/* 中列：轴线容器 - 修复尺寸和定位 */}
         <div ref={axisRef} className="hidden lg:flex col-start-2 relative self-stretch w-2 justify-center">
-          {/* 主轴线 - 修复显示问题 */}
+          {/* 主轴线 - 使用timeline.css专属样式 */}
           <div
-            className="absolute w-0.5 bg-gradient-to-b from-amber-600/60 via-slate-700/50 to-amber-600/60"
+            className="absolute w-0.5 bg-[var(--timeline-secondary)]"
             style={{
               top: isFirstEvent ? `${dotY ?? 50}px` : '-96px',
-              bottom: isLastEvent ? `calc(100% - ${dotY ?? 50}px + 200px)` : '-96px',
+              bottom: isLastEvent ? `calc(100% - ${dotY ?? 50}px + 200px)` : '-285px',
               left: '50%',
               transform: 'translateX(-50%)',
             }}
           />
         </div>
 
-        {/* 移动端轴线 - 修复定位 */}
+        {/* 移动端轴线 - 使用timeline.css专属样式 */}
         <div 
-          className="lg:hidden absolute w-0.5 bg-gradient-to-b from-amber-600/40 via-slate-700/30 to-amber-600/40 top-0 bottom-0"
+          className="lg:hidden absolute w-0.5 bg-[var(--timeline-secondary)]/40 top-0 bottom-0"
           style={{
             left: '2rem', // 固定在左边距离
           }}
@@ -232,7 +232,7 @@ export function TimelineCard({ event, isActive, isFirstEvent = false, isLastEven
               }}
               style={{
                 top: `${(dotY ?? 50) + firstEventVerticalOffset}px`,
-                left: `${anchorX ?? 260}px`, // 使用动态计算的位置
+                left: `${(anchorX ?? 260) - 23}px`, // 使用动态计算的位置
               }}
               className="pointer-events-auto absolute -translate-x-1/2 -translate-y-1/2 origin-center transform-gpu will-change-transform z-20 timeline-first-event-badge"
               onClick={onClick}
@@ -274,14 +274,14 @@ export function TimelineCard({ event, isActive, isFirstEvent = false, isLastEven
                 <div
                   className={`w-full h-full rounded-full flex items-center justify-center transition-colors duration-200 ${
                     isActive
-                      ? 'bg-amber-600 shadow-inner shadow-amber-600/40'
-                      : 'bg-slate-700'
+                      ? 'bg-[var(--timeline-secondary)] shadow-inner shadow-[var(--timeline-secondary)]/40'
+                      : 'bg-[var(--timeline-primary)]'
                   }`}
                 >
                   {/* 中心点 - 白色高光 */}
                   <div
-                    className={`w-1.5 h-1.5 rounded-full bg-white shadow-sm transition-opacity duration-200 ${
-                      isActive ? 'opacity-100' : 'opacity-70'
+                    className={`rounded-full bg-white shadow-sm transition-opacity duration-200 ${
+                      isActive ? 'opacity-100' : 'opacity-0'
                     }`}
                   />
                 </div>
@@ -299,7 +299,7 @@ export function TimelineCard({ event, isActive, isFirstEvent = false, isLastEven
               }}
               className="pointer-events-auto absolute -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full border-2 border-white shadow-md"
             >
-              <div className={`w-full h-full rounded-full ${isActive ? 'bg-amber-600' : 'bg-slate-600'}`} />
+              <div className={`w-full h-full rounded-full ${isActive ? 'bg-[var(--timeline-secondary)]' : 'bg-[var(--timeline-primary)]'}`} />
             </motion.button>
           </div>
         </div>
@@ -319,18 +319,18 @@ export function TimelineCard({ event, isActive, isFirstEvent = false, isLastEven
             ref={titleRef}
             className={`flex items-center gap-3 ${titleGap} mt-0 w-full lg:justify-start justify-start`}
           >
-            <span className="font-bold text-slate-700 text-lg">
+            <span className="font-bold timeline-secondary timeline-text-body">
               {event.year}
             </span>
             {event.location?.trim() && (
-              <span className="font-medium text-amber-600 text-lg">
+              <span className="font-bold timeline-secondary timeline-text-body">
                 {event.location}
               </span>
             )}
           </div>
 
           {/* 描述 */}
-          <p className="w-full mt-0 mb-4 text-slate-600 text-base leading-relaxed">
+          <p className="w-full mt-0 mb-4 timeline-text-secondary timeline-text-body timeline-line-height-relaxed">
             {event.description}
           </p>
 
@@ -339,7 +339,7 @@ export function TimelineCard({ event, isActive, isFirstEvent = false, isLastEven
             <motion.div
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
-              className="h-1 bg-amber-600 rounded-full mt-4 w-full lg:origin-left origin-center"
+              className="h-1 bg-[var(--timeline-secondary)] rounded-full mt-4 w-full lg:origin-left origin-center"
             />
           )}
         </motion.div>
