@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import '@/styles/header.css';
 
 // 导航菜单项配置
 export interface NavigationItem {
@@ -47,7 +48,7 @@ function SiteLogo({ config, onClick }: { config: HeaderConfig['logo']; onClick?:
   return (
     <button
       onClick={onClick}
-      className={`group flex items-center gap-2 focus:outline-none rounded-lg p-2 transition-transform duration-200 hover:scale-105 active:scale-100 border-0 ${config.className || ''}`}
+      className={`header-logo-button group flex items-center gap-2 focus:outline-none rounded-lg p-2 ${config.className || ''}`}
       aria-label="韬奋纪念"
     >
       {config.showIcon && (
@@ -87,7 +88,7 @@ function DesktopNavigation({items, onNavigate}: {
         <button
           key={item.to}
           onClick={() => onNavigate(item.to)}
-          className="px-4 py-2 font-medium text-gray-700 focus:outline-none rounded-lg transition-transform duration-200 hover:scale-105 active:scale-100 border-0"
+          className="header-nav-button px-4 py-2 font-medium text-gray-700 focus:outline-none rounded-lg"
         >
           {item.label}
         </button>
@@ -103,7 +104,7 @@ function MobileMenuButton({ isOpen, onToggle }: { isOpen: boolean; onToggle: () 
   return (
     <button
       onClick={onToggle}
-      className="md:hidden relative w-10 h-10 flex flex-col items-center justify-center space-y-1.5 focus:outline-none rounded-lg transition-transform duration-200 hover:scale-105 active:scale-100 border-0"
+      className="header-menu-button md:hidden relative w-10 h-10 flex flex-col items-center justify-center space-y-1.5 focus:outline-none rounded-lg"
       aria-label="菜单"
       aria-expanded={isOpen}
       aria-controls="mobile-menu"
@@ -149,7 +150,7 @@ function MobileMenu({ isOpen, items, onClose, onNavigate }: {
                 onNavigate(item.to);
                 onClose();
               }}
-              className="block w-full text-left py-3 px-4 rounded-lg focus:outline-none transition-transform duration-200 hover:scale-105 active:scale-100 border-0"
+              className="header-mobile-menu-item block w-full text-left py-3 px-4 rounded-lg focus:outline-none"
               style={{
                 animationDelay: `${index * 50}ms`,
                 animation: isOpen ? 'slideInFromRight 0.3s ease-out forwards' : 'none'
