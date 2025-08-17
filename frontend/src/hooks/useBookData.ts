@@ -37,9 +37,9 @@ export const useBookData = (filters: FilterOptions): UseBookDataReturn => {
       setDisplayedData(firstPage.items);
       setHasMore(firstPage.hasMore);
       setCurrentPage(0);
-    } catch (error) {
-      console.error('加载数据失败:', error);
-      throw error;
+    } catch {
+      // 加载数据失败
+      throw new Error('Failed to load initial data');
     } finally {
       setIsInitialLoading(false);
     }
@@ -56,9 +56,9 @@ export const useBookData = (filters: FilterOptions): UseBookDataReturn => {
       setDisplayedData(prev => [...prev, ...pageData.items]);
       setHasMore(pageData.hasMore);
       setCurrentPage(nextPage);
-    } catch (error) {
-      console.error('加载更多数据失败:', error);
-      throw error;
+    } catch {
+      // 加载更多数据失败
+      throw new Error('Failed to load more data');
     } finally {
       setIsLoading(false);
     }
@@ -72,9 +72,9 @@ export const useBookData = (filters: FilterOptions): UseBookDataReturn => {
       setDisplayedData(firstPage.items);
       setHasMore(firstPage.hasMore);
       setCurrentPage(0);
-    } catch (error) {
-      console.error('重新加载数据失败:', error);
-      throw error;
+    } catch {
+      // 重新加载数据失败
+      throw new Error('Failed to reload data');
     } finally {
       setIsLoading(false);
     }

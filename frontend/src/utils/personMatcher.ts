@@ -45,72 +45,52 @@ export class PersonMatcher {
   async loadPersons(): Promise<void> {
     if (this.isLoaded) return;
     
-    try {
-      const startAt = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
-      const base = (import.meta as { env?: { BASE_URL?: string } }).env?.BASE_URL || '/';
-      const normalizedBase = base.replace(/\/$/, '');
-      const candidates = [
-        `${normalizedBase}/data/json/relationships.json`, // 实际存在
-        `${normalizedBase}/data/relationships.json`        // 兼容旧路径
-      ];
+    const base = (import.meta as { env?: { BASE_URL?: string } }).env?.BASE_URL || '/';
+    const normalizedBase = base.replace(/\/$/, '');
+    const candidates = [
+      `${normalizedBase}/data/json/relationships.json`, // 实际存在
+      `${normalizedBase}/data/relationships.json`        // 兼容旧路径
+    ];
 
-      let lastError: Error | null = null;
-      let successUrl: string | null = null;
-      for (const url of candidates) {
-        try {
-          console.info('[PersonMatcher] fetching', { url, base: normalizedBase });
-          const response = await fetch(url, { cache: 'no-cache' });
-          console.info('[PersonMatcher] response', {
-            ok: response.ok,
-            status: response.status,
-            redirected: response.redirected,
-            finalURL: response.url
-          });
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status} when GET ${url}`);
-          }
-
-          const contentType = response.headers.get('content-type') || '';
-          const text = await response.text();
-          if (!contentType.includes('application/json')) {
-            const snippet = text.slice(0, 180);
-            throw new Error(`Invalid content-type: ${contentType}. Snippet: ${snippet}`);
-          }
-
-          const data: { persons: Person[] } = JSON.parse(text);
-          if (!data || !Array.isArray(data.persons)) {
-            throw new Error('Invalid persons payload structure');
-          }
-
-          // 过滤掉邹韬奋本人（ID: 499）
-          this.personsCache = data.persons.filter(person => person.id !== 499);
-          
-          // 创建姓名到人物的映射
-          this.personsMap.clear();
-          this.personsCache.forEach(person => {
-            this.personsMap.set(person.name, person);
-          });
-          
-          this.isLoaded = true;
-          successUrl = url;
-          console.info('[PersonMatcher] loaded persons count', this.personsCache.length);
-          lastError = null;
-          break;
-        } catch (err) {
-          console.warn('[PersonMatcher] failed candidate', url, err);
-          lastError = err instanceof Error ? err : new Error(String(err));
+    let lastError: Error | null = null;
+    for (const url of candidates) {
+      try {
+        const response = await fetch(url, { cache: 'no-cache' });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status} when GET ${url}`);
         }
-      }
 
-      if (lastError) {
-        throw lastError;
+        const contentType = response.headers.get('content-type') || '';
+        const text = await response.text();
+        if (!contentType.includes('application/json')) {
+          const snippet = text.slice(0, 180);
+          throw new Error(`Invalid content-type: ${contentType}. Snippet: ${snippet}`);
+        }
+
+        const data: { persons: Person[] } = JSON.parse(text);
+        if (!data || !Array.isArray(data.persons)) {
+          throw new Error('Invalid persons payload structure');
+        }
+
+        // 过滤掉邹韬奋本人（ID: 499）
+        this.personsCache = data.persons.filter(person => person.id !== 499);
+        
+        // 创建姓名到人物的映射
+        this.personsMap.clear();
+        this.personsCache.forEach(person => {
+          this.personsMap.set(person.name, person);
+        });
+        
+        this.isLoaded = true;
+        lastError = null;
+        break;
+      } catch (err) {
+        lastError = err instanceof Error ? err : new Error(String(err));
       }
-      const endAt = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
-      const elapsedMs = Math.round(endAt - startAt);
-      console.info('[PersonMatcher] loadPersons done', { elapsedMs, url: successUrl });
-    } catch (error) {
-      console.error('Failed to load persons data:', error);
-      throw error;
+    }
+
+    if (lastError) {
+      throw lastError;
     }
   }
   
@@ -132,7 +112,7 @@ export class PersonMatcher {
    */
   findPersonByName(name: string, maxDistance: number = 2): Person | null {
     if (!this.isLoaded) {
-      console.warn('Persons data not loaded. Call loadPersons() first.');
+      // Persons data not loaded
       return null;
     }
     
@@ -188,12 +168,12 @@ export class PersonMatcher {
     person: Person;
   }> {
     if (!this.isLoaded) {
-      console.warn('Persons data not loaded. Call loadPersons() first.');
+      // Persons data not loaded
       return [];
     }
 
     if (!text || typeof text !== 'string') {
-      console.warn('Invalid text provided to extractPersonsFromText:', text);
+      // Invalid text provided
       return [];
     }
 

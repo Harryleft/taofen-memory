@@ -49,7 +49,7 @@ export function useRelationshipsData() {
       } else {
         setError(new Error('An unknown error occurred'));
       }
-      console.error('Failed to load relationships data:', e);
+      // Failed to load relationships data
     } finally {
       setLoading(false);
     }
