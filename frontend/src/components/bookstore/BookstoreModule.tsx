@@ -154,7 +154,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
   // 初始加载状态渲染
   if (isInitialLoading && displayedData.length === 0) {
     return (
-      <section className={`relative py-20 bg-white ${className}`}>
+      <section className={`relative py-20 ${className}`}>
         <div className="max-w-7xl mx-auto px-6">
           
           <div className="flex flex-col items-center justify-center p-12 text-center">
@@ -167,7 +167,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
   }
 
   return (
-    <section className={`relative py-20 bg-white ${className}`}>
+    <section className={`relative py-20 ${className}`}>
       <div className="max-w-7xl mx-auto px-6">
         
         {/* 筛选控件 */}
