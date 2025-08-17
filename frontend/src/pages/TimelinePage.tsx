@@ -132,9 +132,11 @@ export default function TimelinePage() {
 
       {/* 时间轴主内容 */}
       <div className="relative max-w-screen-2xl mx-auto px-1 pt-32 pb-20">
-        {/* 中央时间线 */}
-        <div className="absolute left-1/2 top-0 w-0.5 h-full -translate-x-0.5 bg-gradient-to-b from-[var(--timeline-secondary)] via-[var(--timeline-primary)] to-[var(--timeline-secondary)] opacity-20" />
-
+        {/* 调试信息：时间轴数据 */}
+        {console.log('[DEBUG] TimelinePage渲染 - timelineData:', timelineData)}
+        {console.log('[DEBUG] TimelinePage渲染 - activeEventId:', activeEventId)}
+        {console.log('[DEBUG] TimelinePage渲染 - coverCardHeight:', coverCardHeight)}
+        
         {/* 跨轴章首页封面卡 - 替代页面标题 */}
         {timelineData.length > 0 && (
           <div ref={coverCardRef}>
@@ -147,30 +149,36 @@ export default function TimelinePage() {
 
         {/* 时间轴事件卡片 - 与封面卡保持节拍间距 */}
         <div className="relative mt-16">
+          {console.log('[DEBUG] 渲染TimelineCard事件卡片 - 事件数量:', timelineData.length)}
           {timelineData.map((event, index) => (
-            <TimelineCard
-              key={event.id}
-              event={event}
-              index={index}
-              isActive={activeEventId === String(event.id)}
-              isFirstEvent={index === 0}
-              isLastEvent={index === timelineData.length - 1}
-              onClick={() => handleEventClick(String(event.id))}
-            />
+            <div key={event.id}>
+              {console.log(`[DEBUG] 渲染事件卡片 ${index}:`, event.id, event.title)}
+              <TimelineCard
+                event={event}
+                index={index}
+                isActive={activeEventId === String(event.id)}
+                isFirstEvent={index === 0}
+                isLastEvent={index === timelineData.length - 1}
+                onClick={() => handleEventClick(String(event.id))}
+              />
+            </div>
           ))}
         </div>
 
-        {/* 结束装饰 */}
+        {/* 结束装饰 - 与轴线对齐 */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="flex justify-center mt-20"
+          className="flex justify-center mt-20 relative"
         >
+          {/* 轴线连接到装饰圆点 */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-6 bg-gradient-to-b from-[var(--timeline-secondary)]/10 to-[var(--timeline-secondary)]/50" />
+          
           <div className="flex flex-col items-center gap-6">
-            {/* 装饰性圆点 */}
-            <div className="w-8 h-8 rounded-full bg-[var(--timeline-secondary)] flex items-center justify-center shadow-lg">
+            {/* 装饰性圆点 - 轴线终点 */}
+            <div className="w-8 h-8 rounded-full bg-[var(--timeline-secondary)] flex items-center justify-center shadow-lg relative z-10">
               <div className="w-3 h-3 rounded-full bg-white" />
             </div>
             
@@ -194,6 +202,7 @@ export default function TimelinePage() {
       </div>
 
       {/* 右侧导航 */}
+      {console.log('[DEBUG] 渲染TimelineNavigation - 事件数量:', timelineData.length)}
       <TimelineNavigation
         events={timelineData}
         activeEventId={activeEventId}
