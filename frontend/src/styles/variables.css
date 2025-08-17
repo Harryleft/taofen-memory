@@ -1,0 +1,440 @@
+/* ================================================
+   统一CSS变量管理系统
+   ================================================ */
+
+/* 全局根变量定义 */
+:root {
+  /* === 基础色彩系统 === */
+  /* 主背景色 - 使用时间轴米色作为全局背景 */
+  --global-bg-primary: #FAF7F2;
+  --global-bg-secondary: #FCFAF7;
+  --global-bg-tertiary: #F9F7F5;
+  
+  /* 文字色彩系统 */
+  --global-text-primary: #2D3748;
+  --global-text-secondary: #4A5568;
+  --global-text-tertiary: #A0AEC0;
+  --global-text-muted: #CBD5E0;
+  
+  /* 强调色系统 */
+  --global-accent-primary: #1B365D;
+  --global-accent-secondary: #C49B61;
+  --global-accent-tertiary: #D4A574;
+  
+  /* 边框和分割线 */
+  --global-border-light: rgba(0, 0, 0, 0.08);
+  --global-border-medium: rgba(0, 0, 0, 0.12);
+  --global-border-strong: rgba(0, 0, 0, 0.16);
+  
+  /* === 圆角系统 === */
+  --global-radius-xs: 0.25rem;
+  --global-radius-sm: 0.375rem;
+  --global-radius-md: 0.5rem;
+  --global-radius-lg: 0.75rem;
+  --global-radius-xl: 1rem;
+  --global-radius-2xl: 1.5rem;
+  
+  /* === 阴影系统 === */
+  --global-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --global-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --global-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --global-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --global-shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+  --global-shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.15);
+  --global-shadow-card: 0 2px 4px rgba(0, 0, 0, 0.04), 0 4px 8px rgba(0, 0, 0, 0.06), 0 8px 16px rgba(0, 0, 0, 0.08);
+  --global-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.08), 0 16px 32px rgba(0, 0, 0, 0.12), 0 24px 48px rgba(0, 0, 0, 0.16);
+  
+  /* === 字体系统 === */
+  --global-font-family-sans: 'Noto Sans', sans-serif;
+  --global-font-family-serif: 'EB Garamond', serif;
+  --global-font-family-mono: 'Consolas', 'Monaco', monospace;
+  
+  /* 字体大小 */
+  --global-font-size-xs: 0.75rem;
+  --global-font-size-sm: 0.875rem;
+  --global-font-size-base: 1rem;
+  --global-font-size-lg: 1.125rem;
+  --global-font-size-xl: 1.25rem;
+  --global-font-size-2xl: 1.5rem;
+  --global-font-size-3xl: 1.875rem;
+  --global-font-size-4xl: 2.25rem;
+  --global-font-size-5xl: 3rem;
+  
+  /* 行高系统 */
+  --global-line-height-tight: 1.25;
+  --global-line-height-normal: 1.5;
+  --global-line-height-relaxed: 1.75;
+  
+  /* 字重系统 */
+  --global-font-weight-light: 300;
+  --global-font-weight-normal: 400;
+  --global-font-weight-medium: 500;
+  --global-font-weight-semibold: 600;
+  --global-font-weight-bold: 700;
+  
+  /* === 间距系统 === */
+  --global-spacing-xs: 0.25rem;
+  --global-spacing-sm: 0.5rem;
+  --global-spacing-md: 1rem;
+  --global-spacing-lg: 1.5rem;
+  --global-spacing-xl: 2rem;
+  --global-spacing-2xl: 3rem;
+  --global-spacing-3xl: 4rem;
+  --global-spacing-4xl: 6rem;
+  
+  /* === Z-index层级系统 === */
+  --global-z-below: -1;
+  --global-z-base: 1;
+  --global-z-dropdown: 10;
+  --global-z-sticky: 20;
+  --global-z-fixed: 30;
+  --global-z-modal-backdrop: 40;
+  --global-z-modal: 50;
+  --global-z-popover: 60;
+  --global-z-tooltip: 70;
+  
+  /* === 动画系统 === */
+  --global-animation-fast: 0.15s;
+  --global-animation-normal: 0.3s;
+  --global-animation-slow: 0.5s;
+  --global-animation-slower: 0.8s;
+  
+  /* 缓动函数 */
+  --global-ease-linear: linear;
+  --global-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --global-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --global-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* === 响应式断点系统 === */
+  --global-breakpoint-xs: 475px;
+  --global-breakpoint-sm: 640px;
+  --global-breakpoint-md: 768px;
+  --global-breakpoint-lg: 1024px;
+  --global-breakpoint-xl: 1280px;
+  --global-breakpoint-2xl: 1536px;
+  
+  /* === 过渡系统 === */
+  --global-transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  --global-transition-duration: 0.3s;
+  --global-transition-timing-function: var(--global-ease-in-out);
+}
+
+/* === 暗色模式变量 === */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --global-bg-primary: #0f172a;
+    --global-bg-secondary: #1e293b;
+    --global-bg-tertiary: #334155;
+    
+    --global-text-primary: #f8fafc;
+    --global-text-secondary: #e2e8f0;
+    --global-text-tertiary: #cbd5e1;
+    --global-text-muted: #94a3b8;
+    
+    --global-border-light: rgba(255, 255, 255, 0.1);
+    --global-border-medium: rgba(255, 255, 255, 0.2);
+    --global-border-strong: rgba(255, 255, 255, 0.3);
+  }
+}
+
+/* === 高对比度模式 === */
+@media (prefers-contrast: high) {
+  :root {
+    --global-border-light: currentColor;
+    --global-border-medium: currentColor;
+    --global-border-strong: currentColor;
+    
+    --global-text-primary: #000000;
+    --global-text-secondary: #333333;
+    --global-text-tertiary: #666666;
+  }
+}
+
+/* === 减少动画模式 === */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --global-animation-fast: 0.01ms;
+    --global-animation-normal: 0.01ms;
+    --global-animation-slow: 0.01ms;
+    --global-animation-slower: 0.01ms;
+    
+    --global-transition-duration: 0.01ms;
+  }
+}
+
+/* ================================================
+   组件专用变量
+   ================================================ */
+
+/* === 时间轴组件变量 === */
+:root {
+  /* 时间轴专用色彩 */
+  --timeline-bg-primary: var(--global-bg-primary);
+  --timeline-text-primary: var(--global-text-primary);
+  --timeline-text-secondary: var(--global-text-secondary);
+  --timeline-accent-primary: var(--global-accent-primary);
+  --timeline-accent-secondary: var(--global-accent-secondary);
+  
+  /* 时间轴点样式 */
+  --timeline-dot-size: 14px;
+  --timeline-dot-size-mobile: 12px;
+  --timeline-dot-border-width: 2px;
+  --timeline-dot-color: var(--timeline-accent-secondary);
+  --timeline-dot-border-color: #ffffff;
+  --timeline-dot-shadow: 0 0 12px rgba(196, 155, 97, 0.4);
+  
+  /* 时间轴线条 */
+  --timeline-line-width: 2px;
+  --timeline-line-color: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.0) 0%,
+    rgba(0, 0, 0, 0.08) 20%,
+    rgba(0, 0, 0, 0.12) 50%,
+    rgba(0, 0, 0, 0.08) 80%,
+    rgba(0, 0, 0, 0.0) 100%
+  );
+}
+
+/* === Footer组件变量 === */
+:root {
+  /* Footer基础变量 */
+  --footer-bg-primary: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  --footer-text-primary: #ffffff;
+  --footer-text-secondary: #d1d5db;
+  --footer-text-tertiary: #9ca3af;
+  --footer-accent: #fbbf24;
+  --footer-border: rgba(255, 255, 255, 0.1);
+  
+  /* Footer间距 */
+  --footer-padding-vertical: 3rem;
+  --footer-padding-horizontal: 1rem;
+  --footer-gap: 2rem;
+  
+  /* Footer响应式 */
+  --footer-container-max-width: 1200px;
+  --footer-grid-columns: 1;
+  --footer-grid-gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --footer-grid-columns: 3;
+    --footer-padding-horizontal: 2rem;
+    --footer-gap: 3rem;
+  }
+}
+
+/* === 书店组件变量 === */
+:root {
+  /* 书店基础变量 */
+  --bookstore-bg-primary: var(--global-bg-primary);
+  --bookstore-text-primary: var(--global-text-primary);
+  --bookstore-text-secondary: var(--global-text-secondary);
+  --bookstore-accent: #B8860B;
+  
+  /* 书店卡片 */
+  --bookstore-card-bg: #ffffff;
+  --bookstore-card-shadow: var(--global-shadow-card);
+  --bookstore-card-hover-shadow: var(--global-shadow-hover);
+  --bookstore-card-radius: var(--global-radius-lg);
+  
+  /* 书店网格 */
+  --bookstore-grid-gap: 1.25rem;
+  --bookstore-grid-columns: 1;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --bookstore-grid-columns: 2;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --bookstore-grid-columns: 3;
+  }
+}
+
+/* === 关系图谱组件变量 === */
+:root {
+  /* 关系图谱基础变量 */
+  --relationships-bg-primary: var(--global-bg-primary);
+  --relationships-text-primary: var(--global-text-primary);
+  --relationships-text-secondary: var(--global-text-secondary);
+  
+  /* 关系类型色彩 */
+  --relationships-family: #8D6E63;
+  --relationships-media: #1565C0;
+  --relationships-political: #689F38;
+  --relationships-academic: #7B1FA2;
+  --relationships-other: #F57C00;
+  
+  /* 图谱节点 */
+  --relationships-node-size: 40px;
+  --relationships-node-border: 2px;
+  --relationships-node-shadow: var(--global-shadow-md);
+}
+
+/* ================================================
+   统一响应式混入系统
+   ================================================ */
+
+/* 移动端优先的响应式混入 */
+/* Extra Small (xs) */
+@media (max-width: calc(var(--global-breakpoint-xs) - 1px)) {
+  .responsive-xs {
+    /* xs 断点专用样式 */
+  }
+}
+
+/* Small (sm) */
+@media (min-width: var(--global-breakpoint-xs)) and (max-width: calc(var(--global-breakpoint-sm) - 1px)) {
+  .responsive-sm {
+    /* sm 断点专用样式 */
+  }
+}
+
+/* Medium (md) */
+@media (min-width: var(--global-breakpoint-sm)) and (max-width: calc(var(--global-breakpoint-md) - 1px)) {
+  .responsive-md {
+    /* md 断点专用样式 */
+  }
+}
+
+/* Large (lg) */
+@media (min-width: var(--global-breakpoint-md)) and (max-width: calc(var(--global-breakpoint-lg) - 1px)) {
+  .responsive-lg {
+    /* lg 断点专用样式 */
+  }
+}
+
+/* Extra Large (xl) */
+@media (min-width: var(--global-breakpoint-lg)) and (max-width: calc(var(--global-breakpoint-xl) - 1px)) {
+  .responsive-xl {
+    /* xl 断点专用样式 */
+  }
+}
+
+/* 2X Large (2xl) */
+@media (min-width: var(--global-breakpoint-xl)) {
+  .responsive-2xl {
+    /* 2xl 断点专用样式 */
+  }
+}
+
+/* 移动端专用样式 */
+@media (max-width: calc(var(--global-breakpoint-md) - 1px)) {
+  .mobile-only {
+    /* 移动端专用样式 */
+  }
+}
+
+/* 桌面端专用样式 */
+@media (min-width: var(--global-breakpoint-md)) {
+  .desktop-only {
+    /* 桌面端专用样式 */
+  }
+}
+
+/* ================================================
+   工具类
+   ================================================ */
+
+/* 响应式容器 */
+.responsive-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--global-spacing-md);
+}
+
+@media (min-width: 768px) {
+  .responsive-container {
+    padding: 0 var(--global-spacing-lg);
+  }
+}
+
+@media (min-width: 1024px) {
+  .responsive-container {
+    padding: 0 var(--global-spacing-xl);
+  }
+}
+
+/* 统一过渡效果 */
+.smooth-transition {
+  transition: var(--global-transition-property) var(--global-transition-duration) var(--global-transition-timing-function);
+}
+
+/* 统一阴影效果 */
+.elevated {
+  box-shadow: var(--global-shadow-card);
+}
+
+.elevated-hover:hover {
+  box-shadow: var(--global-shadow-hover);
+}
+
+/* 统一圆角效果 */
+.rounded-default {
+  border-radius: var(--global-radius-md);
+}
+
+.rounded-card {
+  border-radius: var(--global-radius-lg);
+}
+
+/* 统一间距效果 */
+.spaced-vertical {
+  margin-bottom: var(--global-spacing-md);
+}
+
+.spaced-vertical-lg {
+  margin-bottom: var(--global-spacing-lg);
+}
+
+.spaced-horizontal {
+  margin-right: var(--global-spacing-md);
+}
+
+/* 统一文字效果 */
+.text-primary {
+  color: var(--global-text-primary);
+}
+
+.text-secondary {
+  color: var(--global-text-secondary);
+}
+
+.text-tertiary {
+  color: var(--global-text-tertiary);
+}
+
+.text-muted {
+  color: var(--global-text-muted);
+}
+
+/* 统一背景效果 */
+.bg-primary {
+  background-color: var(--global-bg-primary);
+}
+
+.bg-secondary {
+  background-color: var(--global-bg-secondary);
+}
+
+.bg-tertiary {
+  background-color: var(--global-bg-tertiary);
+}
+
+/* 统一边框效果 */
+.border-default {
+  border: 1px solid var(--global-border-light);
+}
+
+.border-medium {
+  border: 1px solid var(--global-border-medium);
+}
+
+.border-strong {
+  border: 1px solid var(--global-border-strong);
+}

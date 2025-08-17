@@ -184,7 +184,7 @@
 }
 
 .animate-fadeIn {
-  animation: fadeIn 0.6s ease-out;
+  animation: fadeIn var(--global-animation-normal) var(--global-ease-out);
   transform: translateZ(0);
   will-change: transform, opacity;
   backface-visibility: hidden;
@@ -273,7 +273,7 @@
 }
 
 .staggered-animation {
-  animation: staggerIn var(--animation-normal) var(--ease-out) forwards;
+  animation: staggerIn var(--global-animation-normal) var(--global-ease-out) forwards;
   opacity: 0;
   transform: translateY(20px);
   transform: translateZ(0);
@@ -281,11 +281,11 @@
   backface-visibility: hidden;
   background: rgba(248, 240, 225, 0.7);
   border: 1px solid rgba(184, 134, 11, 0.1);
-  border-radius: var(--radius);
+  border-radius: var(--global-radius-lg);
   padding: var(--card-padding-y) var(--card-padding-x);
-  margin: var(--spacing-sm) 0;
-  box-shadow: var(--shadow-card);
-  z-index: var(--z-content);
+  margin: var(--global-spacing-sm) 0;
+  box-shadow: var(--global-shadow-card);
+  z-index: var(--global-z-content);
 }
 
 /* 事件卡片骨架（占位样式，先定义，后续可按需启用） */
@@ -301,27 +301,9 @@
   100% { background-position: 0 50%; }
 }
 
-@keyframes staggerIn {
-  0% {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+/* 使用Tailwind统一定义的staggerIn动画 */
 
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+/* 使用Tailwind统一定义的fadeIn动画 */
 
 
 
@@ -648,7 +630,7 @@
   align-items: start;
 }
 
-@media (max-width: 1023px) {
+@media (max-width: calc(var(--global-breakpoint-lg) - 1px)) {
   .timeline-two-col {
     display: block; /* 移动端回退为单列 */
   }
@@ -660,7 +642,7 @@
   margin-top: 0;
 }
 
-@media (max-width: 768px) {
+@media (max-width: calc(var(--global-breakpoint-md) - 1px)) {
   .timeline-container::before,
   .timeline-dot:not(.hidden)::before {
     left: 20px;
@@ -741,7 +723,7 @@
 }
 
 /* 移动端：图片占满容器宽度，保持适当高度 */
-@media (max-width: 767px) {
+@media (max-width: calc(var(--global-breakpoint-md) - 1px)) {
   .featured-img,
   .regular-img {
     width: 100% !important;
@@ -1278,7 +1260,7 @@ img {
 }
 
 /* 移动端适配 */
-@media (max-width: 640px) {
+@media (max-width: calc(var(--global-breakpoint-sm) - 1px)) {
   .timeline-first-event-badge-outer {
     width: 40px;
     height: 40px;
@@ -1419,14 +1401,14 @@ img {
    响应式优化
    =============================================== */
 
-@media (max-width: 1023px) {
+@media (max-width: calc(var(--global-breakpoint-lg) - 1px)) {
   .timeline-cover-card {
     margin-left: 1rem;
     margin-right: 1rem;
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: calc(var(--global-breakpoint-md) - 1px)) {
   .timeline-cover-stats {
     flex-direction: column;
     gap: 1rem;
@@ -1454,7 +1436,7 @@ img {
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: calc(var(--global-breakpoint-sm) - 1px)) {
   .timeline-cover-card {
     border-radius: 12px;
   }
