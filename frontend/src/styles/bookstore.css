@@ -109,8 +109,8 @@
   }
 
   .bookstore-year-option.selected {
-    @apply bg-accent-gold/15 text-primary border-l-4 border-accent-gold/60 font-semibold;
-    background: linear-gradient(90deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%);
+    @apply text-primary border-l-4 border-accent-gold/60 font-semibold;
+    background-color: transparent !important;
   }
 
   .bookstore-year-option.selected:hover {
@@ -418,6 +418,365 @@
     .bookstore-year-button,
     .bookstore-year-dropdown {
       @apply hidden;
+    }
+  }
+
+  /* ===============================================
+     书店封面卡样式系统 - 基于TimelineCoverCard设计模式
+     =============================================== */
+
+  /* 主封面卡容器 - 书店专用配色 */
+  .bookstore-cover-card {
+    position: relative;
+    background: #FAF7F2; /* 书店页面主背景色 */
+    border-radius: 16px;
+    
+    /* 多层背景叠加：纸纹 + 拉丝金属 + 微渐变 + 内收晕影 */
+    background-image:
+      /* 边缘内收晕影效果 */
+      radial-gradient(ellipse 85% 85% at center, transparent 60%, rgba(196, 155, 97, 0.08) 85%, rgba(139, 69, 19, 0.12) 100%),
+
+      /* 极低频纸张纹理 (2-3%) */
+      radial-gradient(circle at 15% 40%, transparent 30%, rgba(196, 155, 97, 0.025) 32%, rgba(196, 155, 97, 0.025) 36%, transparent 38%),
+      radial-gradient(circle at 85% 20%, transparent 25%, rgba(196, 155, 97, 0.02) 27%, rgba(196, 155, 97, 0.02) 31%, transparent 33%),
+      radial-gradient(circle at 60% 80%, transparent 20%, rgba(196, 155, 97, 0.03) 22%, rgba(196, 155, 97, 0.03) 26%, transparent 28%),
+
+      /* 拉丝金属纹理 (3-4%) */
+      linear-gradient(20deg, transparent 45%, rgba(196, 155, 97, 0.035) 47%, rgba(196, 155, 97, 0.035) 50%, transparent 52%),
+      linear-gradient(-20deg, transparent 43%, rgba(196, 155, 97, 0.03) 45%, rgba(196, 155, 97, 0.03) 48%, transparent 50%),
+      linear-gradient(70deg, transparent 40%, rgba(196, 155, 97, 0.04) 42%, rgba(196, 155, 97, 0.04) 45%, transparent 47%),
+
+      /* 书店页面主题渐变 */
+      linear-gradient(to bottom, #FAF7F2 0%, #F8F5F0 30%, #F5F2ED 70%, #F2EFEB 100%);
+
+    background-size: 
+      100% 100%,          /* 晕影覆盖全部 */
+      220px 220px,        /* 纸纹间距 */
+      280px 280px,
+      180px 180px,
+      120px 120px,        /* 拉丝纹理间距 */
+      160px 160px,
+      100px 100px,
+      100% 100%;          /* 渐变覆盖全部 */
+    
+    /* 书店配色边框 */
+    border: 1px solid rgba(196, 155, 97, 0.15);
+    
+    /* 卡片阴影：适配书店配色 */
+    box-shadow: 
+      0 12px 40px rgba(139, 69, 19, 0.08),
+      0 4px 12px rgba(139, 69, 19, 0.06),
+      0 1px 3px rgba(139, 69, 19, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      
+    /* 动画优化 */
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  /* ===============================================
+     书店封面卡文字样式系统
+     =============================================== */
+
+  /* 主标题 */
+  .bookstore-cover-main-title {
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    font-weight: 700;
+    color: #1B365D; /* 使用timeline的主色调 */
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+    font-family: 'KaiTi', 'STKaiti', '华文楷体', serif;
+  }
+
+  /* 副标题 */
+  .bookstore-cover-sub-title {
+    font-size: clamp(0.95rem, 2vw, 1.1rem);
+    font-weight: 500;
+    color: #C49B61; /* 使用金色强调色 */
+    margin-bottom: 1rem;
+    letter-spacing: 0.01em;
+    font-family: 'SimSun', '宋体', 'NSimSun', serif;
+  }
+
+  /* 描述文字 */
+  .bookstore-cover-description {
+    font-size: clamp(0.9rem, 1.8vw, 1rem);
+    line-height: 1.6;
+    color: #2D3748; /* 深灰色文本 */
+    opacity: 0.9;
+    font-family: 'SimSun', '宋体', 'NSimSun', serif;
+  }
+
+  /* ===============================================
+     引导区域和统计样式
+     =============================================== */
+
+  .bookstore-cover-guide-section {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .bookstore-cover-stats {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding: 1.5rem 2rem;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(196, 155, 97, 0.2);
+    border-radius: 16px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .bookstore-cover-stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .bookstore-cover-stat-number {
+    font-size: clamp(1.8rem, 3vw, 2.2rem);
+    font-weight: 700;
+    color: #C49B61; /* 金色强调色 */
+    line-height: 1;
+    font-family: 'KaiTi', 'STKaiti', '华文楷体', serif;
+  }
+
+  .bookstore-cover-stat-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #4A5568; /* 次要文本色 */
+    opacity: 0.8;
+    white-space: nowrap;
+    font-family: 'SimSun', '宋体', 'NSimSun', serif;
+  }
+
+  .bookstore-cover-stat-divider {
+    width: 1px;
+    height: 2rem;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(196, 155, 97, 0.3) 20%,
+      rgba(196, 155, 97, 0.3) 80%,
+      transparent 100%
+    );
+  }
+
+  .bookstore-cover-scroll-guide {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .bookstore-cover-scroll-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    height: auto;
+    color: #C49B61; /* 金色强调色 */
+    transition: all 0.3s ease;
+    opacity: 0.8;
+  }
+
+  .bookstore-cover-scroll-arrow:hover {
+    opacity: 1;
+    transform: scale(1.1);
+    color: #1B365D; /* 悬停时变为主色调 */
+  }
+
+  /* ===============================================
+     响应式优化
+     =============================================== */
+
+  @media (max-width: calc(var(--global-breakpoint-lg) - 1px)) {
+    .bookstore-cover-card {
+      margin-left: 1rem;
+      margin-right: 1rem;
+    }
+  }
+
+  @media (max-width: calc(var(--global-breakpoint-md) - 1px)) {
+    .bookstore-cover-stats {
+      flex-direction: column;
+      gap: 1rem;
+      padding: 1.25rem 1.5rem;
+    }
+    
+    .bookstore-cover-stat-divider {
+      width: 2rem;
+      height: 1px;
+      background: linear-gradient(
+        to right,
+        transparent 0%,
+        rgba(196, 155, 97, 0.3) 20%,
+        rgba(196, 155, 97, 0.3) 80%,
+        transparent 100%
+      );
+    }
+    
+    .bookstore-cover-stat-item {
+      gap: 0.25rem;
+    }
+    
+    .bookstore-cover-guide-section {
+      gap: 1.5rem;
+    }
+  }
+
+  @media (max-width: calc(var(--global-breakpoint-sm) - 1px)) {
+    .bookstore-cover-card {
+      border-radius: 12px;
+    }
+    
+    .bookstore-cover-card > div {
+      padding: 1.5rem !important;
+    }
+    
+    .bookstore-cover-stats {
+      flex-direction: row;
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+    }
+    
+    .bookstore-cover-stat-divider {
+      width: 1px;
+      height: 1.5rem;
+      background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(196, 155, 97, 0.3) 20%,
+        rgba(196, 155, 97, 0.3) 80%,
+        transparent 100%
+      );
+    }
+    
+    .bookstore-cover-stat-number {
+      font-size: 1.5rem;
+    }
+    
+    .bookstore-cover-stat-label {
+      font-size: 0.8rem;
+    }
+  }
+
+  /* ===============================================
+     悬停和交互效果
+     =============================================== */
+
+  .bookstore-cover-card:hover {
+    box-shadow: 
+      0 12px 40px rgba(139, 69, 19, 0.08),
+      0 4px 12px rgba(139, 69, 19, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+  }
+
+  /* ===============================================
+     呼吸动画效果系统 - 复用TimelineCoverCard的breathing动画
+     =============================================== */
+
+  /* 呼吸动画基础类 */
+  .bookstore-cover-card-breathing {
+    animation: bookstoreBreathing 4s ease-in-out infinite;
+    transition: transform 4s ease-in-out;
+  }
+
+  @keyframes bookstoreBreathing {
+    0%, 100% {
+      transform: translateY(0) scale(1);
+    }
+    50% {
+      transform: translateY(-2px) scale(1.005);
+    }
+  }
+
+  /* 呼吸动画的光晕效果 - 书店配色 */
+  .bookstore-cover-card-breathing::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    right: -20px;
+    bottom: -20px;
+    border-radius: 20px;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(196, 155, 97, 0.12) 0%,
+      rgba(196, 155, 97, 0.06) 40%,
+      transparent 70%
+    );
+    opacity: 0.8;
+    animation: bookstoreBreathingGlow 4s ease-in-out infinite;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  @keyframes bookstoreBreathingGlow {
+    0%, 100% {
+      opacity: 0.5;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.02);
+    }
+  }
+
+  /* 减少动画模式下的呼吸效果 */
+  @media (prefers-reduced-motion: reduce) {
+    .bookstore-cover-card-breathing {
+      animation: none;
+    }
+    
+    .bookstore-cover-card-breathing::before {
+      animation: none;
+      opacity: 0;
+    }
+  }
+
+  /* ===============================================
+     动画性能优化
+     =============================================== */
+
+  /* 硬件加速优化 */
+  .bookstore-cover-card-breathing {
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+
+  /* 减少重绘优化 */
+  .bookstore-cover-card {
+    contain: layout style paint;
+  }
+
+  /* 动画帧率优化 */
+  @supports (animation: smooth) {
+    .bookstore-cover-card-breathing {
+      animation: bookstoreBreathing 4s ease-in-out infinite;
+    }
+  }
+
+  /* 低功耗模式优化 */
+  @media (prefers-reduced-data: reduce) {
+    .bookstore-cover-card-breathing {
+      animation-duration: 6s;
+    }
+    
+    .bookstore-cover-card-breathing::before {
+      animation-duration: 6s;
     }
   }
 }
