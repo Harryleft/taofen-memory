@@ -1489,78 +1489,111 @@ img {
 }
 
 /* ===============================================
-   Timeline — 无鼠标交互版（可直接复制）
-   作用：
-   1) 普通事件圆点：无 hover 视觉，不改 top/left 定位
-   2) 封面卡片：无 hover 阴影/位移
-   3) 保留键盘可达性（:focus-visible）
+   时间轴悬停效果优化
    =============================================== */
 
-/* —— 圆点按钮基础：干净化，去系统默认外观 —— */
-.timeline-dot-button{
+/* 封面卡片增强悬停效果 - 多层次阴影系统 */
+.timeline-cover-card {
+  /* 基础状态阴影 */
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  
+  /* 平滑过渡所有属性 */
+  transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+  will-change: transform, box-shadow;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* 悬停状态 - 增强阴影效果 */
+.timeline-cover-card:hover {
+  box-shadow: 
+    /* 主阴影层 - 更深更广 */
+    0 20px 60px rgba(0, 0, 0, 0.15),
+    0 8px 24px rgba(0, 0, 0, 0.12),
+    /* 内发光效果 */
+    0 0 0 1px rgba(196, 155, 97, 0.1),
+    /* 内高光保持 */
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    /* 边缘发光 */
+    0 0 20px rgba(196, 155, 97, 0.08);
+  
+  transform: translateY(-4px) scale(1.01);
+}
+
+/* 活跃状态 - 点击效果 */
+.timeline-cover-card:active {
+  transform: translateY(-2px) scale(1.005);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.12),
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+/* 圆点按钮悬停效果优化 */
+.timeline-dot-button {
   appearance: none;
   -webkit-appearance: none;
   border: 0;
   padding: 0;
   background: transparent;
-  line-height: 0;                 /* 避免行高撑开影响定位 */
+  line-height: 0;
   outline: none;
-
-  /* 移除 transform: none !important; 允许 Tailwind 的 -translate-x-1/2 生效 */
-  /* 保留 box-shadow 和 transition 的禁用 */
-  transition: box-shadow 0.2s; /* 允许一个平滑的过渡，但 transform 不变 */
-  box-shadow: none !important;
+  
+  /* 允许平滑过渡 */
+  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  cursor: pointer;
+  will-change: transform, box-shadow;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
-/* 外环（按钮的第一个直接子元素）不吃事件，避免遮挡 */
-.timeline-dot-button > div:first-child{
+/* 外环不吃事件 */
+.timeline-dot-button > div:first-child {
   pointer-events: none;
-  /* 不要设置 z-index:-1，防止被轴线或背景盖住造成“视觉偏移” */
 }
 
-/* —— 彻底关闭鼠标 hover 的视觉效果 —— */
-.timeline-dot-button:hover{
-  box-shadow: none !important;
-  /* 将 transform: none !important; 移动到此处，仅在悬停时禁用，防止意外的位移 */
-  transform: none !important;
-}
-.timeline-dot-button:hover > div,
-.timeline-dot-button:hover > div > div{
-  box-shadow: none !important;
-  transform: none !important;
+/* 圆点悬停效果 */
+.timeline-dot-button:hover {
+  transform: translateX(-50%) scale(1.2);
+  box-shadow: 
+    0 0 20px rgba(196, 155, 97, 0.6),
+    0 0 40px rgba(27, 54, 93, 0.2);
 }
 
-/* —— 保留键盘可达性（Tab 到按钮时可见）——
-   若也不想要焦点样式，注释/删除本段即可 */
-.timeline-dot-button:focus-visible{
-  outline: 2px solid rgba(var(--timeline-secondary-rgb), .55);
-  outline-offset: 2px;
-  box-shadow: none !important;
-  transform: none !important;
+/* 键盘焦点样式 */
+.timeline-dot-button:focus-visible {
+  outline: 2px solid rgba(196, 155, 97, 0.6);
+  outline-offset: 4px;
+  box-shadow: 
+    0 0 20px rgba(196, 155, 97, 0.6),
+    0 0 40px rgba(27, 54, 93, 0.2);
 }
 
-/* —— 封面卡片：禁用 hover 阴影与位移 —— */
-.timeline-cover-card{
-  transition: none !important;   /* 去掉进入/离开过渡 */
-  transform: none !important;    /* 常态无位移 */
-  box-shadow: none !important;   /* 常态不强制阴影（可按需改） */
-}
-
-/* 悬停时保持静止、无发光 */
-.timeline-cover-card:hover{
-  transform: none !important;
-  box-shadow: none !important;
-}
-
-/* —— 降噪：尊重“减少动画”偏好 —— */
-@media (prefers-reduced-motion: reduce){
-  .timeline-cover-card{
-    transition: none !important;
-    transform: none !important;
+/* 减少动画模式支持 */
+@media (prefers-reduced-motion: reduce) {
+  .timeline-cover-card {
+    transition: box-shadow 0.2s ease;
+    transform: none;
   }
-  .timeline-dot-button{
-    transition: none !important;
-    transform: none !important;
+  
+  .timeline-cover-card:hover {
+    transform: none;
+    box-shadow: 
+      0 12px 40px rgba(0, 0, 0, 0.12),
+      0 4px 16px rgba(0, 0, 0, 0.08);
+  }
+  
+  .timeline-dot-button {
+    transition: none;
+    transform: none;
+  }
+  
+  .timeline-dot-button:hover,
+  .timeline-dot-button:focus-visible {
+    transform: translateX(-50%) scale(1.1);
   }
 }
 
