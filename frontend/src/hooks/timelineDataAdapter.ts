@@ -1,4 +1,4 @@
-import { TimelineEvent } from '../components/timeline/timeline-data.ts';
+import { TimelineEvent } from '../types/personTypes.ts';
 import { TimelineData } from './useTimelineData.ts';
 
 /**
