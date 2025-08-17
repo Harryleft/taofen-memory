@@ -69,27 +69,27 @@ const BookFiltersPanel: React.FC<BookstoreFiltersProps> = ({
         <button 
           type="button"
           onClick={() => setYearDropdownOpen(!yearDropdownOpen)}
-          className="flex items-center w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-serif bg-white text-left"
+          className="bookstore-year-button"
         >
-          <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+          <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary/60" size={18} />
           <span>{selectedYear === 'all' ? '全部年份' : `${selectedYear}年`}</span>
           <div className="absolute inset-y-0 right-0 flex items-center pr-2">
             {yearDropdownOpen ? (
-              <ChevronUp className="h-4 w-4 text-gray-500" />
+              <ChevronUp className="h-4 w-4 text-primary/60" />
             ) : (
-              <ChevronDown className="h-4 w-4 text-gray-500" />
+              <ChevronDown className="h-4 w-4 text-primary/60" />
             )}
           </div>
         </button>
         
         {yearDropdownOpen && (
-          <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+          <div className="bookstore-year-dropdown">
             <div 
               className="py-1 divide-y divide-gray-100"
               onClick={() => setYearDropdownOpen(false)}
             >
               <button
-                className={`block w-full px-4 py-2 text-left hover:bg-blue-50 ${selectedYear === 'all' ? 'bg-blue-100 font-medium' : ''}`}
+                className={`bookstore-year-option ${selectedYear === 'all' ? 'selected' : ''}`}
                 onClick={() => setSelectedYear('all')}
               >
                 全部年份
@@ -98,7 +98,7 @@ const BookFiltersPanel: React.FC<BookstoreFiltersProps> = ({
               {uniqueYears.map(year => (
                 <button
                   key={year}
-                  className={`block w-full px-4 py-2 text-left hover:bg-blue-50 ${selectedYear === year.toString() ? 'bg-blue-100 font-medium' : ''}`}
+                  className={`bookstore-year-option ${selectedYear === year.toString() ? 'selected' : ''}`}
                   onClick={() => setSelectedYear(year.toString())}
                 >
                   {year}年
