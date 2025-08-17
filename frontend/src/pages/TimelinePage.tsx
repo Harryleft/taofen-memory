@@ -15,11 +15,7 @@ export default function TimelinePage() {
   const coverCardRef = useRef<HTMLDivElement>(null);
   const [coverCardHeight, setCoverCardHeight] = useState(0);
 
-  // 计算时间跨度
-  const yearSpan = timelineData.length > 0 
-    ? `${timelineData[0].year}-${timelineData[timelineData.length - 1].year}` 
-    : '';
-
+  
   useEffect(() => {
     if (timelineData.length > 0) {
       setActiveEventId(String(timelineData[0].id));
@@ -132,27 +128,24 @@ export default function TimelinePage() {
 
       {/* 时间轴主内容 */}
       <div className="relative max-w-screen-2xl mx-auto px-1 pt-32 pb-20">
-        {/* 调试信息：时间轴数据 */}
-        {console.log('[DEBUG] TimelinePage渲染 - timelineData:', timelineData)}
-        {console.log('[DEBUG] TimelinePage渲染 - activeEventId:', activeEventId)}
-        {console.log('[DEBUG] TimelinePage渲染 - coverCardHeight:', coverCardHeight)}
-        
+        {/* 中央时间线 */}
+        {/* <div className="absolute left-1/2 top-0 w-0.5 h-full -translate-x-0.5 bg-gradient-to-b from-[var(--timeline-secondary)] via-[var(--timeline-primary)] to-[var(--timeline-secondary)] opacity-20" /> */}
+
         {/* 跨轴章首页封面卡 - 替代页面标题 */}
         {timelineData.length > 0 && (
           <div ref={coverCardRef}>
             <TimelineCoverCard
               totalEvents={timelineData.length}
-              yearSpan={yearSpan}
             />
           </div>
         )}
 
         {/* 时间轴事件卡片 - 与封面卡保持节拍间距 */}
         <div className="relative mt-16">
-          {console.log('[DEBUG] 渲染TimelineCard事件卡片 - 事件数量:', timelineData.length)}
+          {/* {console.log('[DEBUG] 渲染TimelineCard事件卡片 - 事件数量:', timelineData.length)} */}
           {timelineData.map((event, index) => (
             <div key={event.id}>
-              {console.log(`[DEBUG] 渲染事件卡片 ${index}:`, event.id, event.title)}
+              {/* {console.log(`[DEBUG] 渲染事件卡片 ${index}:`, event.id, event.title)} */}
               <TimelineCard
                 event={event}
                 index={index}

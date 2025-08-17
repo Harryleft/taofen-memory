@@ -955,6 +955,11 @@ img {
 
 .timeline-text-body {
   font-size: var(--text-body);
+  line-height: var(--leading-normal);
+}
+
+.timeline-line-height-relaxed {
+  line-height: var(--leading-relaxed);
 }
 
 .timeline-card-shadow {
