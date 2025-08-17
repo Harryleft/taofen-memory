@@ -72,13 +72,16 @@
       "mcp__puppeteer__puppeteer_navigate",
       "mcp__filesystem__write_file",
       "mcp__ide__getDiagnostics",
-      "mcp__filesystem__read_multiple_files"
+      "mcp__filesystem__read_multiple_files",
+      "mcp__filesystem__edit_file",
+      "Bash(npm run test:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",
     "additionalDirectories": [
       "S:\\S\\vibe_coding\\taofen_web",
-      "S:\\mnt\\s\\vibe_coding\\taofen_web"
+      "S:\\mnt\\s\\vibe_coding\\taofen_web",
+      "S:\\S:\\vibe_coding\\taofen_web"
     ]
   },
   "enableAllProjectMcpServers": true,
