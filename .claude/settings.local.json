@@ -81,7 +81,8 @@
     "additionalDirectories": [
       "S:\\S\\vibe_coding\\taofen_web",
       "S:\\mnt\\s\\vibe_coding\\taofen_web",
-      "S:\\S:\\vibe_coding\\taofen_web"
+      "S:\\S:\\vibe_coding\\taofen_web",
+      "S:\\vibe_coding"
     ]
   },
   "enableAllProjectMcpServers": true,

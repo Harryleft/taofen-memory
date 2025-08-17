@@ -22,7 +22,11 @@ export function TimelineCoverCard({
         ease: [0.4, 0.0, 0.2, 1],
         delay: 0.2 
       }}
-      className="relative w-full max-w-5xl mx-auto px-4 md:px-6 lg:px-8 mb-16"
+      animate={{
+        y: [0, -2, 0],
+        scale: [1, 1.005, 1],
+      }}
+      className="relative w-full max-w-5xl mx-auto px-4 md:px-6 lg:px-8 mb-16 timeline-cover-card-breathing"
     >
       {/* 跨轴封面卡主体 */}
       <div className="relative timeline-cover-card">
@@ -41,12 +45,12 @@ export function TimelineCoverCard({
           >
             {/* 主标题 */}
             <h1 className="timeline-cover-main-title">
-              邹韬奋传奇人生
+              韬奋·岁月行履
             </h1>
             
             {/* 副标题 */}
             <h2 className="timeline-cover-sub-title">
-              {yearSpan} 
+              {/* {yearSpan}  */}
             </h2>
             
             {/* 描述文字 */}
