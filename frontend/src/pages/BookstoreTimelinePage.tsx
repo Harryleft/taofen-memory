@@ -4,7 +4,7 @@ import { AppFooter } from '../components/layout/footer';
 
 function BookstoreTimelinePage() {
   return (
-    <div className="min-h-screen bg-cream flex flex-col">
+    <div className="min-h-screen bookstore-page-container flex flex-col">
       <AppHeader moduleId="bookstore" />
 
       {/* Main Content */}
