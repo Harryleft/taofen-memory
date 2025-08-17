@@ -4,8 +4,8 @@
  * @module components/bookstore/BookFiltersPanel
  */
 
-import React, { useState } from 'react';
-import { Search, Download, Calendar, ChevronDown, ChevronUp } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Search, Download, Calendar, ChevronDown } from 'lucide-react';
 
 /**
  * @interface BookFiltersPanelProps
@@ -49,6 +49,30 @@ const BookFiltersPanel: React.FC<BookstoreFiltersProps> = ({
   onDownload,
 }) => {
   const [yearDropdownOpen, setYearDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // 处理点击外部关闭下拉菜单
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setYearDropdownOpen(false);
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setYearDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, []);
   
   return (
   <div className="mb-8 space-y-4 mx-auto max-w-4xl">
@@ -65,48 +89,68 @@ const BookFiltersPanel: React.FC<BookstoreFiltersProps> = ({
       </div>
 
 
-      <div className="relative inline-block min-w-40">
+      <div className="relative inline-block min-w-40" ref={dropdownRef}>
         <button 
           type="button"
           onClick={() => setYearDropdownOpen(!yearDropdownOpen)}
           className="bookstore-year-button"
+          aria-expanded={yearDropdownOpen}
+          aria-haspopup="listbox"
+          aria-label="选择年份"
         >
           <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary/60" size={18} />
-          <span>{selectedYear === 'all' ? '全部年份' : `${selectedYear}年`}</span>
-          <div className="absolute inset-y-0 right-0 flex items-center pr-2">
-            {yearDropdownOpen ? (
-              <ChevronUp className="h-4 w-4 text-primary/60" />
-            ) : (
-              <ChevronDown className="h-4 w-4 text-primary/60" />
-            )}
+          <span className="font-medium">{selectedYear === 'all' ? '全部年份' : `${selectedYear}年`}</span>
+          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+            <div className={`transform transition-transform duration-300 ${yearDropdownOpen ? 'rotate-180' : ''}`}>
+              <ChevronDown className="h-5 w-5 text-primary/60" />
+            </div>
           </div>
         </button>
         
-        {yearDropdownOpen && (
-          <div className="bookstore-year-dropdown">
-            <div 
-              className="py-1 divide-y divide-gray-100"
-              onClick={() => setYearDropdownOpen(false)}
+        <div className={`bookstore-year-dropdown ${yearDropdownOpen ? 'open' : ''}`}>
+          <div 
+            className="py-1"
+            role="listbox"
+            aria-label="年份选项"
+          >
+            <button
+              role="option"
+              aria-selected={selectedYear === 'all'}
+              className={`bookstore-year-option ${selectedYear === 'all' ? 'selected' : ''}`}
+              onClick={() => {
+                setSelectedYear('all');
+                setYearDropdownOpen(false);
+              }}
+              onFocus={(e) => e.target.classList.add('focus')}
+              onBlur={(e) => e.target.classList.remove('focus')}
             >
-              <button
-                className={`bookstore-year-option ${selectedYear === 'all' ? 'selected' : ''}`}
-                onClick={() => setSelectedYear('all')}
-              >
+              <span className="flex items-center">
+                <Calendar className="mr-2 h-4 w-4 text-primary/60" />
                 全部年份
-              </button>
-              
-              {uniqueYears.map(year => (
-                <button
-                  key={year}
-                  className={`bookstore-year-option ${selectedYear === year.toString() ? 'selected' : ''}`}
-                  onClick={() => setSelectedYear(year.toString())}
-                >
+              </span>
+            </button>
+            
+            {uniqueYears.map(year => (
+              <button
+                key={year}
+                role="option"
+                aria-selected={selectedYear === year.toString()}
+                className={`bookstore-year-option ${selectedYear === year.toString() ? 'selected' : ''}`}
+                onClick={() => {
+                  setSelectedYear(year.toString());
+                  setYearDropdownOpen(false);
+                }}
+                onFocus={(e) => e.target.classList.add('focus')}
+                onBlur={(e) => e.target.classList.remove('focus')}
+              >
+                <span className="flex items-center">
+                  <span className="mr-2 h-4 w-4 text-primary/60">{year}</span>
                   {year}年
-                </button>
-              ))}
-            </div>
+                </span>
+              </button>
+            ))}
           </div>
-        )}
+        </div>
       </div>
 
       <button
