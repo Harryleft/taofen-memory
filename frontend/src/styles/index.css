@@ -17,9 +17,18 @@
     scroll-behavior: smooth;
   } */
   
+  :root {
+    /* 全局背景色系统 - 统一使用timeline主背景色 */
+    --global-background: #FAF7F2;
+    --global-text-primary: #2D3748;
+    --global-text-secondary: #4A5568;
+  }
+  
   body {
     font-family: 'Noto Sans', sans-serif;
     line-height: 1.6;
+    background-color: var(--global-background);
+    color: var(--global-text-primary);
   }
   
   h1, h2, h3, h4, h5, h6 {

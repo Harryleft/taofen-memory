@@ -17,7 +17,7 @@ export default {
         'muted': '#999999',            // 静音文字色
         
         // === 主题色 ===
-        'cream': '#FAF7F0',            // 主背景色
+        'cream': '#FAF7F2',            // 主背景色 - 与全局CSS变量保持一致
         'gold': '#B8860B',             // 主强调色
         'charcoal': '#2C2C2C',         // 主文字色
         'seal': '#DC2626',             // 错误/警告色
