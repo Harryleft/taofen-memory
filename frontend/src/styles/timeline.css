@@ -2,7 +2,9 @@
 :root {
   /* 邹韬奋时间轴专用色彩系统 */
   --timeline-primary: #1B365D;
+  --timeline-primary-rgb: 27, 54, 93;
   --timeline-secondary: #C49B61;
+  --timeline-secondary-rgb: 196, 155, 97;
   --timeline-background: #FAF7F2;
   --timeline-text-primary: #2D3748;
   --timeline-text-secondary: #4A5568;
@@ -1484,6 +1486,43 @@ img {
     
   transform: translateY(-2px);
   transition: all 0.3s ease;
+}
+
+/* ===============================================
+   时间轴圆点按钮样式 - 防止漂移问题
+   =============================================== */
+
+.timeline-dot-button {
+  transition: box-shadow 0.15s ease;
+}
+
+.timeline-dot-button:hover {
+  box-shadow: 0 0 0 6px rgba(var(--timeline-secondary-rgb), 0.25);
+}
+
+/* ===============================================
+   普通事件圆点悬停增强样式
+   =============================================== */
+
+/* 确保圆角矩形背景在圆点下方 */
+.timeline-dot-button > div:first-child {
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* 优化圆点悬停时的外发光效果 */
+.timeline-dot-button:hover > div:nth-child(2) {
+  box-shadow: 
+    0 0 12px rgba(196, 155, 97, 0.3),
+    0 0 24px rgba(196, 155, 97, 0.15),
+    0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* 悬停时内环增强效果 */
+.timeline-dot-button:hover > div:nth-child(2) > div {
+  box-shadow: 
+    inset 0 0 8px rgba(196, 155, 97, 0.4),
+    0 0 4px rgba(196, 155, 97, 0.2);
 }
 
 

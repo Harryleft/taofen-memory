@@ -197,17 +197,93 @@ export function TimelineCard({ event, isActive, isFirstEvent = false, onClick }:
             </motion.div>
           ) : (
             <motion.button
-              whileHover={{ boxShadow: '0 0 0 6px rgba(var(--timeline-secondary-rgb),0.25)' }}
-              transition={{ type: 'tween', duration: 0.15 }}
               onClick={onClick}
               style={{ top: dotY ?? '50%', left: anchorX ?? '50%' }}
-              className={`pointer-events-auto absolute -translate-x-1/2 -translate-y-1/2 origin-center transform-gpu will-change-transform z-20 w-4 h-4 rounded-full border-4 border-white ${
-                isActive
-                  ? 'bg-[var(--timeline-secondary)] shadow-lg shadow-[var(--timeline-secondary)]/30'
-                  : 'bg-[var(--timeline-primary)] hover:bg-[var(--timeline-secondary)]'
-              }`}
+              className="pointer-events-auto absolute -translate-x-1/2 -translate-y-1/2 origin-center transform-gpu will-change-transform z-20 bg-transparent timeline-dot-button"
               aria-label={`${event.year} 时间点`}
-            />
+              whileHover={{
+                scale: 1.1,
+                x: 4,
+                y: 4
+              }}
+              transition={{
+                type: "spring",
+                stiffness: 400,
+                damping: 17
+              }}
+            >
+              {/* 圆角矩形背景 - 悬停时显示 */}
+              <motion.div 
+                className="absolute inset-0 rounded-lg bg-[var(--timeline-primary)]/10 -z-10"
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileHover={{ 
+                  opacity: 1, 
+                  scale: 1.2,
+                  x: 2,
+                  y: 2
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 20
+                }}
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)'
+                }}
+              />
+              
+              {/* 外环 */}
+              <motion.div 
+                className="w-4 h-4 rounded-full border-2 border-white shadow-lg"
+                whileHover={{
+                  scale: 1.2,
+                  borderColor: '#C49B61'
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 400,
+                  damping: 17
+                }}
+              >
+                {/* 内环 - 深蓝色默认，滚动激活时变为金色 */}
+                <motion.div 
+                  className={`w-full h-full rounded-full flex items-center justify-center ${
+                    isActive
+                      ? 'bg-[var(--timeline-secondary)] shadow-inner shadow-[var(--timeline-secondary)]/40'
+                      : 'bg-[var(--timeline-primary)]'
+                  }`}
+                  whileHover={{
+                    scale: 1.1,
+                    backgroundColor: isActive ? '#D4A574' : '#2D4A7C'
+                  }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 450,
+                    damping: 15
+                  }}
+                >
+                  {/* 中心点 */}
+                  <motion.div 
+                    className={`w-1.5 h-1.5 rounded-full bg-white shadow-sm ${
+                      isActive ? 'opacity-100' : 'opacity-70'
+                    }`}
+                    whileHover={{
+                      scale: 1.3,
+                      opacity: 1
+                    }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 500,
+                      damping: 12
+                    }}
+                  />
+                </motion.div>
+              </motion.div>
+            </motion.button>
           )}
         </div>
 
