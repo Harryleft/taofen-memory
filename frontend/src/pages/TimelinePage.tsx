@@ -128,7 +128,7 @@ export default function TimelinePage() {
 
       {/* 时间轴主内容 */}
       <div className="relative max-w-screen-2xl mx-auto px-1 pt-32 pb-20">
-        {/* 中央时间线 */}
+      {/* 中央时间线 */}
         {/* <div className="absolute left-1/2 top-0 w-0.5 h-full -translate-x-0.5 bg-gradient-to-b from-[var(--timeline-secondary)] via-[var(--timeline-primary)] to-[var(--timeline-secondary)] opacity-20" /> */}
 
         {/* 跨轴章首页封面卡 - 替代页面标题 */}
@@ -195,7 +195,7 @@ export default function TimelinePage() {
       </div>
 
       {/* 右侧导航 */}
-      {console.log('[DEBUG] 渲染TimelineNavigation - 事件数量:', timelineData.length)}
+      {/* {console.log('[DEBUG] 渲染TimelineNavigation - 事件数量:', timelineData.length)} */}
       <TimelineNavigation
         events={timelineData}
         activeEventId={activeEventId}
