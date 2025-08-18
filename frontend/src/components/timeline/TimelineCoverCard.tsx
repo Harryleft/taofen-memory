@@ -24,7 +24,7 @@ export function TimelineCoverCard({
         y: [0, -2, 0],
         scale: [1, 1.005, 1],
       }}
-      className="relative w-full max-w-5xl mx-auto px-4 md:px-6 lg:px-8 mb-16 cover-card-breathing"
+      className="relative w-full max-w-7xl mx-auto mb-16 cover-card-breathing"
     >
       {/* 跨轴封面卡主体 */}
       <div className="relative cover-card timeline-cover">
