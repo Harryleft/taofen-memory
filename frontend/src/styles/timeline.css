@@ -1,116 +1,17 @@
-/* 时间轴专用CSS变量定义 - 统一命名系统 */
-:root {
-  /* 邹韬奋时间轴专用色彩系统 */
-  --timeline-primary: #1B365D;
-  --timeline-primary-rgb: 27, 54, 93;
-  --timeline-secondary: #C49B61;
-  --timeline-secondary-rgb: 196, 155, 97;
-  --timeline-background: #FAF7F2;
-  --timeline-text-primary: #2D3748;
-  --timeline-text-secondary: #4A5568;
-  --timeline-text-muted: #A0AEC0;
-  --timeline-card-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  --timeline-card-shadow-hover: 0 4px 12px rgba(0,0,0,0.15);
-}
+/* ================================================
+   时间轴组件结构样式
+   ================================================
+   
+   CSS变量已迁移至 variables.css 文件中的时间轴组件变量部分
+   本文件仅保留组件结构和局部覆盖样式
+   
+   使用的时间轴变量前缀：--timeline-
+   ================================================ */
 
 .timeline-page-root {
-  /* 基础颜色系统 - 60-30-10配色法则 */
-  --bg-primary: #FAF7F2;      /* 60% 背景色 */
-  --text-primary: #2D3748;    /* 30% 主文本色 */
-  --text-secondary: #4A5568;   /* 次要文本色 */
-  --text-tertiary: #A0AEC0;    /* 辅助文本色 */
-  --accent-primary: #1B365D;  /* 主色：深蓝灰 */
-  --accent-secondary: #C49B61;/* 强调色：暖金色 */
-  
-  /* 兼容现有变量名 */
-  --bg-cream: var(--bg-primary);
-  --text-charcoal: var(--text-primary);
-  --text-muted: var(--text-tertiary);
-  --accent-gold: var(--accent-secondary);
-  --surface: #FFFFFF;
-  --border: rgba(0, 0, 0, 0.08);
-  
-  /* 圆角系统 */
-  --radius: 8px;
-  --radius-sm: 6px;
-  --radius-lg: 12px;
-  
-  /* 阴影系统 - Material Design 3.0 */
-  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.1);
-  --shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.12);
-  --shadow-modal: 0 8px 32px rgba(0, 0, 0, 0.16);
-  
-  /* 排版系统 - Modular Scale 1.25比例 */
-  --text-h1: 2.441rem;     /* 39.06px - 人物姓名 */
-  --text-h2: 1.953rem;     /* 31.25px - 阶段标题 */
-  --text-h3: 1.563rem;     /* 25px - 年份标题 */
-  --text-body: 1rem;       /* 16px - 正文内容 */
-  --text-caption: 0.8rem;  /* 12.8px - 图片说明 */
-  --text-small: 0.64rem;   /* 10.24px - 最小字号 */
-  
-  /* 行高系统 - 统一1.6倍行距提升可读性 */
-  --leading-tight: 1.5;
-  --leading-normal: 1.6;
-  --leading-relaxed: 1.7;
-  
-  /* 段落间距 - 1.5em确保信息分层清晰 */
-  --paragraph-spacing: 1.5em;
-  
-  /* 字重系统 */
-  --font-light: 300;
-  --font-regular: 400;
-  --font-medium: 500;
-  --font-semibold: 600;
-  --font-bold: 700;
-  
-  /* 间距系统 - 基于1.6比例的间距体系 */
-  --spacing-xs: 0.25rem;    /* 4px */
-  --spacing-sm: 0.5rem;     /* 8px */
-  --spacing-md: 1rem;       /* 16px */
-  --spacing-lg: 1.6rem;     /* 25.6px */
-  --spacing-xl: 2.5rem;     /* 40px */
-  --spacing-2xl: 4rem;      /* 64px */
-  --spacing-3xl: 6.4rem;    /* 102.4px */
-  
-  /* Z-index层级系统 */
-  --z-background: 0;      /* Background Layer: 页面背景 */
-  --z-content: 10;        /* Content Layer: 主要内容卡片 */
-  --z-navigation: 20;      /* Navigation Layer: 固定导航元素 */
-  --z-modal: 30;          /* Modal Layer: 弹层内容 */
-  --z-tooltip: 40;        /* Tooltip Layer: 工具提示 */
-  
-  /* 卡片设计规范 - 统一间距 */
-  --card-padding-y: var(--spacing-xl);      /* 40px 上下 */
-  --card-padding-x: var(--spacing-lg);      /* 25.6px 左右 */
-  --card-gap-y: var(--spacing-2xl);         /* 64px 垂直间距 */
-  --card-gap-x: var(--spacing-lg);          /* 25.6px 水平间距 */
-  
-  /* 时间轴点专用优化变量 - 使用设计规范色彩 */
-  --dot-gold: var(--accent-secondary);
-  --dot-gold-light: #D4A574;  /* 暖金色变体 */
-  --dot-gray: var(--text-secondary);
-  --dot-gray-light: var(--text-tertiary);
-  --dot-border: #FFFFFF;
-  --dot-shadow-gold: rgba(196, 155, 97, 0.4);
-  --dot-shadow-gray: rgba(74, 85, 104, 0.4);
-  --dot-shadow-dark: rgba(0, 0, 0, 0.2);
-  --dot-size: 14px;
-  --dot-size-mobile: 12px;
-  --dot-border-width: 2px;
-  
-  /* 动画参数 - Material Design规范 */
-  --animation-fast: 0.2s;
-  --animation-normal: 0.4s;     /* 400ms - Material Design建议 */
-  --animation-slow: 0.6s;
-  --animation-slower: 0.8s;
-  
-  /* 缓动函数 - Material Design标准 */
-  --ease-out: cubic-bezier(0.4, 0.0, 0.2, 1);      /* 标准退出缓动 */
-  --ease-in-out: cubic-bezier(0.4, 0.0, 0.2, 1);  /* 标准进出缓动 */
-  --ease-in: cubic-bezier(0.4, 0.0, 0.2, 1);      /* 标准进入缓动 */
-  
-  /* 字体加载优化 */
-  --font-display: swap;
+  /* 关键渲染路径优化 */
+  contain: layout style paint;
+  will-change: auto;
 }
 
 .timeline-container {
@@ -133,14 +34,14 @@
     rgba(0, 0, 0, 0.0) 100%
   );
   transform: translateX(-50%);
-  z-index: var(--z-below);
+  z-index: var(--global-z-below);
   border-radius: 2px;
 }
 
 .timeline-item {
   position: relative;
-  z-index: var(--z-content);
-  color: var(--text-primary);
+  z-index: var(--timeline-z-content);
+  color: var(--timeline-text-primary);
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
 }
 
@@ -149,39 +50,39 @@
   position: absolute;
   top: 12px;
   left: 50%;
-  width: var(--dot-size);
-  height: var(--dot-size);
+  width: var(--timeline-dot-size);
+  height: var(--timeline-dot-size);
   border-radius: 50%;
-  background: var(--dot-gold) !important;
-  border: var(--dot-border-width) solid var(--dot-border) !important;
+  background: var(--timeline-dot-gold) !important;
+  border: var(--timeline-dot-border-width) solid var(--timeline-dot-border) !important;
   box-shadow: 
-    0 0 12px var(--dot-shadow-gold),
-    0 0 4px var(--dot-shadow-dark),
+    0 0 12px var(--timeline-dot-shadow-gold),
+    0 0 4px var(--timeline-dot-shadow-dark),
     inset 0 0 4px rgba(255, 255, 255, 0.6) !important;
   transform: translateX(-50%) translateZ(0);
-  z-index: var(--z-content);
+  z-index: var(--timeline-z-content);
   will-change: transform, box-shadow;
   backface-visibility: hidden;
-  transition: transform var(--animation-normal) var(--ease-out), background var(--animation-normal) var(--ease-out);
+  transition: transform var(--timeline-animation-normal) var(--timeline-ease-out), background var(--timeline-animation-normal) var(--timeline-ease-out);
 }
 
 .timeline-dot-gray:not(.hidden)::before {
-  background: var(--dot-gray) !important;
-  border-color: var(--dot-border) !important;
+  background: var(--timeline-dot-gray) !important;
+  border-color: var(--timeline-dot-border) !important;
   box-shadow: 
-    0 0 12px var(--dot-shadow-gray),
-    0 0 4px var(--dot-shadow-dark),
+    0 0 12px var(--timeline-dot-shadow-gray),
+    0 0 4px var(--timeline-dot-shadow-dark),
     inset 0 0 4px rgba(255, 255, 255, 0.6) !important;
 }
 
 /* 悬停效果增强 */
 .timeline-dot:not(.hidden):hover::before {
-  background: var(--dot-gold-light) !important;
+  background: var(--timeline-dot-gold-light) !important;
   transform: translateX(-50%) translateZ(0) scale(1.2);
 }
 
 .timeline-dot-gray:not(.hidden):hover::before {
-  background: var(--dot-gray-light) !important;
+  background: var(--timeline-dot-gray-light) !important;
   transform: translateX(-50%) translateZ(0) scale(1.2);
 }
 
@@ -222,20 +123,20 @@
 
 .first-event-clickable {
   position: relative;
-  border-radius: var(--radius);
-  padding: var(--card-padding-y) var(--card-padding-x);
+  border-radius: var(--timeline-radius);
+  padding: var(--timeline-card-padding-y) var(--timeline-card-padding-x);
   margin: 0;
-  transition: all var(--animation-normal) var(--ease-out);
+  transition: all var(--timeline-animation-normal) var(--timeline-ease-out);
   background: rgba(245, 235, 220, 0.8);
   border: 1px solid rgba(184, 134, 11, 0.15);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--timeline-shadow-card);
   overflow: visible;
   width: 100%;
   text-align: left;
   transform: translateZ(0);
   will-change: transform, box-shadow;
   backface-visibility: hidden;
-  z-index: var(--z-content);
+  z-index: var(--timeline-z-content);
 }
 
 .first-event-clickable::after {
@@ -262,16 +163,16 @@
 .first-event-clickable.expanded {
   background: rgba(240, 230, 210, 0.9);
   border-color: rgba(184, 134, 11, 0.3);
-  box-shadow: var(--shadow-elevated);
-  z-index: var(--z-content);
+  box-shadow: var(--timeline-shadow-elevated);
+  z-index: var(--timeline-z-content);
 }
 
 .first-event-clickable:hover {
   background: rgba(242, 232, 215, 0.9);
   border-color: rgba(184, 134, 11, 0.25);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-elevated);
-  z-index: var(--z-content);
+  box-shadow: var(--timeline-shadow-elevated);
+  z-index: var(--timeline-z-content);
 }
 
 .staggered-animation {
@@ -284,7 +185,7 @@
   background: rgba(248, 240, 225, 0.7);
   border: 1px solid rgba(184, 134, 11, 0.1);
   border-radius: var(--global-radius-lg);
-  padding: var(--card-padding-y) var(--card-padding-x);
+  padding: var(--timeline-card-padding-y) var(--timeline-card-padding-x);
   margin: var(--global-spacing-sm) 0;
   box-shadow: var(--global-shadow-card);
   z-index: var(--global-z-content);
@@ -295,7 +196,7 @@
   background: linear-gradient(90deg, #f2f2f2 25%, #ececec 37%, #f2f2f2 63%);
   background-size: 400% 100%;
   animation: timelineSkeleton 1.2s ease-in-out infinite;
-  border-radius: var(--radius);
+  border-radius: var(--timeline-radius);
 }
 
 @keyframes timelineSkeleton {
@@ -316,7 +217,7 @@
   width: 100%;
   height: 3px;
   background: rgba(0, 0, 0, 0.1);
-  z-index: var(--z-navigation);
+  z-index: var(--timeline-z-navigation);
 }
 
 .timeline-progress-bar {
@@ -331,8 +232,8 @@
   right: 3rem;
   top: 50%;
   transform: translateY(-50%);
-  z-index: var(--z-navigation);
-  transition: all var(--animation-normal) var(--ease-out);
+  z-index: var(--timeline-z-navigation);
+  transition: all var(--timeline-animation-normal) var(--timeline-ease-out);
   will-change: transform, opacity;
   backface-visibility: hidden;
 }
@@ -352,7 +253,7 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  transition: all var(--animation-normal) var(--ease-out);
+  transition: all var(--timeline-animation-normal) var(--timeline-ease-out);
   will-change: transform, box-shadow;
 }
 
@@ -363,7 +264,7 @@
   border-radius: 50%;
   background: radial-gradient(circle, rgba(196, 155, 97, 0.2) 0%, transparent 70%);
   opacity: 0;
-  transition: opacity var(--animation-normal) var(--ease-out);
+  transition: opacity var(--timeline-animation-normal) var(--timeline-ease-out);
   z-index: -1;
 }
 
@@ -418,22 +319,22 @@
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
-  border: 2px solid var(--text-tertiary);
+  border: 2px solid var(--timeline-text-tertiary);
   background: white;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 1rem;
-  transition: all var(--animation-fast) var(--ease-out);
-  box-shadow: var(--shadow-card);
+  transition: all var(--timeline-animation-fast) var(--timeline-ease-out);
+  box-shadow: var(--timeline-shadow-card);
   cursor: pointer;
   will-change: transform, box-shadow;
   backface-visibility: hidden;
 }
 
 .timeline-nav-button:hover {
-  border-color: var(--accent-secondary);
-  background: var(--accent-secondary);
+  border-color: var(--timeline-accent-gold);
+  background: var(--timeline-accent-gold);
   color: white;
   transform: scale(1.1);
   box-shadow: 0 4px 12px rgba(196, 155, 97, 0.3);
@@ -454,7 +355,7 @@
 
 .timeline-year-button {
   position: relative;
-  transition: all var(--animation-normal) var(--ease-out);
+  transition: all var(--timeline-animation-normal) var(--timeline-ease-out);
   cursor: pointer;
   border: 2px solid white;
   border-radius: 50%;
@@ -466,7 +367,7 @@
 .timeline-year-button.active {
   width: 4rem;
   height: 4rem;
-  box-shadow: var(--shadow-elevated);
+  box-shadow: var(--timeline-shadow-elevated);
 }
 
 .timeline-year-button.inactive {
@@ -502,8 +403,8 @@
 }
 
 .timeline-progress-text {
-  font-size: calc(var(--text-caption) * 0.75);
-  color: var(--text-tertiary);
+  font-size: calc(var(--timeline-text-caption) * 0.75);
+  color: var(--timeline-text-tertiary);
   margin-bottom: 0.25rem;
 }
 
@@ -518,34 +419,34 @@
 .timeline-progress-fill {
   height: 100%;
   border-radius: 9999px;
-  background: var(--accent-secondary);
-  transition: width var(--animation-normal) var(--ease-out);
+  background: var(--timeline-accent-gold);
+  transition: width var(--timeline-animation-normal) var(--timeline-ease-out);
 }
 
 /* 侧边滚动索引（第一阶段新增） */
 .timeline-sidenav {
   position: sticky;
-  top: var(--spacing-2xl); /* 64px */
+  top: var(--timeline-spacing-2xl); /* 64px */
   width: 12rem; /* 约等于 w-48 */
-  z-index: var(--z-navigation);
+  z-index: var(--timeline-z-navigation);
 }
 
 .timeline-sidenav-card {
-  border: 1px solid var(--border);
+  border: 1px solid var(--timeline-border);
   background: rgba(255, 255, 255, 0.86);
   -webkit-backdrop-filter: saturate(1.1) blur(6px);
   backdrop-filter: saturate(1.1) blur(6px);
-  border-radius: var(--radius);
-  padding: var(--spacing-lg);
+  border-radius: var(--timeline-radius);
+  padding: var(--timeline-spacing-lg);
   max-height: 70vh;
   overflow: auto;
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--timeline-shadow-card);
 }
 
 .timeline-sidenav-title {
-  font-size: var(--text-caption);
-  color: var(--text-tertiary);
-  margin-bottom: var(--spacing-xs);
+  font-size: var(--timeline-text-caption);
+  color: var(--timeline-text-tertiary);
+  margin-bottom: var(--timeline-spacing-xs);
   letter-spacing: .02em;
 }
 
@@ -559,14 +460,14 @@
   display: block;
   width: 100%;
   text-align: left;
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: var(--timeline-spacing-sm) var(--timeline-spacing-md);
   border-left: 3px solid transparent;
-  border-radius: var(--radius);
+  border-radius: var(--timeline-radius);
   background: transparent;
   border: none;
-  color: var(--text-secondary);
+  color: var(--timeline-text-secondary);
   cursor: pointer;
-  transition: background-color var(--animation-fast) var(--ease-out), color var(--animation-fast) var(--ease-out);
+  transition: background-color var(--timeline-animation-fast) var(--timeline-ease-out), color var(--timeline-animation-fast) var(--timeline-ease-out);
 }
 
 .timeline-sidenav-item:hover {
@@ -575,28 +476,28 @@
 
 .timeline-sidenav-item.active {
   background: rgba(0, 0, 0, 0.08);
-  color: var(--text-charcoal);
+  color: var(--timeline-text-charcoal);
   font-weight: 600;
-  border-left-color: var(--accent-gold);
+  border-left-color: var(--timeline-accent-gold);
 }
 
 /* 过滤栏卡片（吸顶工具条风格） */
 .timeline-filter-card {
   background: rgba(255, 255, 255, 0.9);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-card);
-  padding: var(--spacing-md);
+  border: 1px solid var(--timeline-border);
+  border-radius: var(--timeline-radius);
+  box-shadow: var(--timeline-shadow-card);
+  padding: var(--timeline-spacing-md);
 }
 
 /* 顶部统计卡片（Phase 3） */
 .timeline-summary-card {
   background: rgba(255, 255, 255, 0.92);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-card);
-  padding: var(--card-padding-y) var(--card-padding-x);
-  margin-bottom: var(--spacing-md);
+  border: 1px solid var(--timeline-border);
+  border-radius: var(--timeline-radius);
+  box-shadow: var(--timeline-shadow-card);
+  padding: var(--timeline-card-padding-y) var(--timeline-card-padding-x);
+  margin-bottom: var(--timeline-spacing-md);
 }
 
 .timeline-summary-grid {
@@ -607,21 +508,21 @@
 
 .timeline-summary-tile {
   background: #fff;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: var(--spacing-md);
+  border: 1px solid var(--timeline-border);
+  border-radius: var(--timeline-radius-sm);
+  padding: var(--timeline-spacing-md);
 }
 
 .timeline-summary-label {
   font-size: 12px;
-  color: var(--text-muted);
+  color: var(--timeline-text-muted);
   margin-bottom: 4px;
 }
 
 .timeline-summary-value {
   font-size: 18px;
   font-weight: 600;
-  color: var(--text-charcoal);
+  color: var(--timeline-text-charcoal);
 }
 
 /* 双列布局容器（方案B：使用 Grid 替代 float） */
@@ -653,8 +554,8 @@
   /* 移动端点的大小和位置微调 */
   .timeline-dot:not(.hidden)::before {
     top: 10px;
-    width: var(--dot-size-mobile);
-    height: var(--dot-size-mobile);
+    width: var(--timeline-dot-size-mobile);
+    height: var(--timeline-dot-size-mobile);
   }
 
   .core-event-section {
@@ -683,7 +584,7 @@
 
 /* 次要文字对比度优化 */
 .timeline-meta {
-  color: var(--text-secondary);
+  color: var(--timeline-text-secondary);
   font-weight: 500;
 }
 
@@ -738,7 +639,7 @@
 .scroll-reveal {
   opacity: 0;
   transform: translateY(40px) scale(0.98);
-  transition: all var(--animation-slower) var(--ease-out);
+  transition: all var(--timeline-animation-slower) var(--timeline-ease-out);
   will-change: transform, opacity;
   filter: blur(2px);
   contain: layout style paint;
@@ -754,8 +655,8 @@
 @media (prefers-reduced-motion: no-preference) {
   .scroll-reveal {
     transition-property: transform, opacity, filter;
-    transition-timing-function: var(--ease-out);
-    transition-duration: var(--animation-slower);
+    transition-timing-function: var(--timeline-ease-out);
+    transition-duration: var(--timeline-animation-slower);
   }
 }
 
@@ -768,7 +669,7 @@
 
 /* 核心事件标题动画 - 优雅入场 */
 .core-event-title.scroll-reveal {
-  transition-delay: var(--animation-fast);
+  transition-delay: var(--timeline-animation-fast);
   transform: translateY(20px);
   filter: blur(1px);
 }
@@ -780,19 +681,19 @@
 
 /* 首个事件卡片动画 - 主要内容突出 */
 .first-event-clickable.scroll-reveal {
-  transition-delay: var(--animation-normal);
+  transition-delay: var(--timeline-animation-normal);
   transform: translateY(35px) scale(0.96);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--global-shadow-sm);
 }
 
 .first-event-clickable.scroll-reveal.revealed {
   transform: translateY(0) scale(1);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--global-shadow-md);
 }
 
 /* 展开事件动画 - 层次感递进 */
 .staggered-animation.scroll-reveal {
-  transition-delay: var(--animation-slow);
+  transition-delay: var(--timeline-animation-slow);
   transform: translateY(25px) scale(0.97);
   opacity: 0.7;
 }
@@ -804,7 +705,7 @@
 
 /* 关键历史事件突出动画 - 更强烈的视觉冲击 */
 .key-milestone.scroll-reveal {
-  transition: all 1.5s var(--ease-out);
+  transition: all 1.5s var(--timeline-ease-out);
   transform: translateY(50px) scale(0.92);
   filter: blur(3px) brightness(0.9);
   opacity: 0.6;
@@ -818,7 +719,7 @@
 
 /* 次要事件温和动画 - 轻柔出现 */
 .minor-event.scroll-reveal {
-  transition: all var(--animation-slow) var(--ease-out);
+  transition: all var(--timeline-animation-slow) var(--timeline-ease-out);
   transform: translateY(15px) scale(0.99);
   filter: blur(1px);
   opacity: 0.8;
@@ -832,7 +733,7 @@
 
 /* 背景事件更温和的动画 */
 .background-event.scroll-reveal {
-  transition: all var(--animation-normal) var(--ease-out);
+  transition: all var(--timeline-animation-normal) var(--timeline-ease-out);
   transform: translateY(10px);
   opacity: 0.5;
 }
@@ -950,16 +851,16 @@ img {
 }
 
 .timeline-text-section {
-  font-size: var(--text-h2);
+  font-size: var(--timeline-text-h2);
 }
 
 .timeline-text-body {
-  font-size: var(--text-body);
-  line-height: var(--leading-normal);
+  font-size: var(--timeline-text-body);
+  line-height: var(--timeline-leading-normal);
 }
 
 .timeline-line-height-relaxed {
-  line-height: var(--leading-relaxed);
+  line-height: var(--timeline-leading-relaxed);
 }
 
 .timeline-card-shadow {
