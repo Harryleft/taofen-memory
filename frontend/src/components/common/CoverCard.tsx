@@ -39,12 +39,12 @@ export function CoverCard({ theme, data, className = '' }: CoverCardProps) {
         y: [0, -2, 0],
         scale: [1, 1.005, 1],
       }}
-      className={`relative w-full mx-auto mb-16 cover-card-breathing ${className}`}
+      className={`relative w-full mb-16 cover-card-breathing ${className}`}
     >
       {/* 封面卡主体 */}
       <div className={`relative cover-card ${themeClass}`}>
         {/* 卡片内容 - 居中引导布局 */}
-        <div className="relative z-[2] flex flex-col items-center justify-center p-6 lg:p-10 text-center">
+        <div className="relative z-[2] flex flex-col items-center justify-center p-8 lg:p-12 text-center">
           {/* 主内容区域 */}
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
