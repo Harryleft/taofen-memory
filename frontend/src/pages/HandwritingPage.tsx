@@ -1,6 +1,6 @@
 import React from 'react';
-import HandwritingModule from '../components/handwriting/HandwritingModule.tsx';
-import { AppFooter } from '../components/layout/footer';
+import HandwritingModule from '@/components/handwriting/HandwritingModule.tsx';
+import { AppFooter } from '@/components/layout/footer';
 
 function HandwritingPage() {
   return (

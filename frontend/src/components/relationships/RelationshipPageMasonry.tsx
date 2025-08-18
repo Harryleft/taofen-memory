@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react';
-import { Person } from '../../types/Person.ts';
+import { Person } from '@/types/Person.ts';
 import VirtualScrollMasonry from './VirtualScrollMasonry.tsx';
-import '../../styles/relationships.css';
+import '@/styles/relationships.css';
 
 // 分类映射：将中文分类名映射为英文类名
 const getCategoryClass = (category: string): string => {

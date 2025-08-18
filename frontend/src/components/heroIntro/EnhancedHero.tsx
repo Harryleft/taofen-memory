@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import HeroPageBackdrop from './HeroPageBackdrop.tsx';
-import { CONFIG } from '../../constants/config';
+import { CONFIG } from '@/constants/config';
 
 // ====== 类型定义 ======
 type TitleVariant = 'classic' | 'monumental' | 'editorial';

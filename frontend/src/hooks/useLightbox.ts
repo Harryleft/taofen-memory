@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { BookItem } from '../types/bookTypes';
+import { BookItem } from '@/types/bookTypes';
 
 interface UseLightboxReturn {
   selectedItem: BookItem | null;

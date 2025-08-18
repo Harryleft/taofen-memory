@@ -3,7 +3,7 @@
 
 import { motion } from 'framer-motion';
 import { useState, useRef, useLayoutEffect, type CSSProperties } from 'react';
-import { TimelineEvent } from '../../types/personTypes.ts';
+import { TimelineEvent } from '@/types/personTypes.ts';
 import { ImageWithFallback } from './ImageWithFallback.tsx';
 
 interface TimelineCardProps {

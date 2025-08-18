@@ -1,18 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
-import RelationshipPageMasonry from '../components/relationships/RelationshipPageMasonry.tsx';
-import RelationshipPagePersonModal from '../components/relationships/RelationshipPagePersonModal.tsx';
-import AppHeader from '../components/layout/header/AppHeader.tsx';
+import RelationshipPageMasonry from '@/components/relationships/RelationshipPageMasonry.tsx';
+import RelationshipPagePersonModal from '@/components/relationships/RelationshipPagePersonModal.tsx';
+import AppHeader from '@/components/layout/header/AppHeader.tsx';
 import { AppFooter } from '@/components/layout/footer';
-import BackToTop from '../components/relationships/BackToTop.tsx';
-import PullToRefresh from '../components/relationships/PullToRefresh.tsx';
-import { Person } from '../types/Person';
-import { useRelationshipsData } from '../hooks/useRelationshipsData';
+import BackToTop from '@/components/relationships/BackToTop.tsx';
+import PullToRefresh from '@/components/relationships/PullToRefresh.tsx';
+import { Person } from '@/types/Person';
+import { useRelationshipsData } from '@/hooks/useRelationshipsData';
 import {
   RELATIONSHIPS_CONFIG,
   RELATIONSHIPS_CATEGORIES,
   getCategoryBgClass
-} from '../constants/relationshipsConstants';
-import '../styles/relationships.css';
+} from '@/constants/relationshipsConstants';
+import '@/styles/relationships.css';
 
 export default function RelationshipsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');

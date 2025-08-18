@@ -8,8 +8,8 @@ import {
   TimelineError,
   LoadingState,
   BaseTimelineEvent
-} from '../types/timelineTypes';
-import { timelineDataService } from '../services/timelineDataService';
+} from '@/types/timelineTypes';
+import { timelineDataService } from '@/services/timelineDataService';
 
 // Hook配置接口
 interface UseTimelineDataConfig {

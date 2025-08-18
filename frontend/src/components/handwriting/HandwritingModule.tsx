@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import AppHeader from '../layout/header/AppHeader';
+import AppHeader from '@/components/layout/header/AppHeader';
 import HandwritingLightbox from './HandwritingLightbox.tsx';
 import { useHandwritingData } from '@/hooks/useHandwritingData';
 import { useHandwritingFilters } from '@/hooks/useHandwritingFilters';

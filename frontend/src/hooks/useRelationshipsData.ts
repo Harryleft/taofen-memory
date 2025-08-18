@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Person } from '../types/Person';
+import { Person } from '@/types/Person';
 
 // 韬奋先生的ID，用于从关系数据中过滤掉他本人
 const TAOFEN_ID = 499;

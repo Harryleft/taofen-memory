@@ -1,4 +1,4 @@
-import { PersonData, PersonTimelineEvent, TimelineEvent } from '../types/personTypes';
+import { PersonData, PersonTimelineEvent, TimelineEvent } from '@/types/personTypes';
 
 // 提取事件标题
 const extractTitle = (event: PersonTimelineEvent): string => {

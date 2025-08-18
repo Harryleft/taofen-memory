@@ -6,8 +6,8 @@ import {
   DataLoadConfig, 
   TimelineError,
   LoadingState 
-} from '../types/timelineTypes';
-import { PersonData } from '../types/personTypes';
+} from '@/types/timelineTypes';
+import { PersonData } from '@/types/personTypes';
 import { StaticJsonTransformer, PersonApiTransformer } from './dataTransformers';
 
 // 缓存管理器

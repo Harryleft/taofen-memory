@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { motion } from 'framer-motion';
-import AppHeader from '../components/layout/header/AppHeader';
-import { ZoutaofenFooter } from '../components/layout/footer/ZoutaofenFooter';
-import { TimelineCard } from '../components/timeline/TimelineCard.tsx';
-import { TimelineCoverCard } from '../components/timeline/TimelineCoverCard.tsx';
-import { TimelineNavigation } from '../components/timeline/TimelineNavigation.tsx';
-import { useTimelineData } from '../hooks/useTimelineData.ts';
+import AppHeader from '@/components/layout/header/AppHeader';
+import { ZoutaofenFooter } from '@/components/layout/footer/ZoutaofenFooter';
+import { TimelineCard } from '@/components/timeline/TimelineCard.tsx';
+import { TimelineCoverCard } from '@/components/timeline/TimelineCoverCard.tsx';
+import { TimelineNavigation } from '@/components/timeline/TimelineNavigation.tsx';
+import { useTimelineData } from '@/hooks/useTimelineData.ts';
 
 export default function TimelinePage() {
   const { timelineData, loading, error } = useTimelineData();

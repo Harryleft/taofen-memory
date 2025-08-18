@@ -5,8 +5,8 @@ import {
   CoreEventGroup, 
   TimelineData, 
   DataTransformer 
-} from '../types/timelineTypes';
-import { PersonData, PersonTimelineEvent } from '../types/personTypes';
+} from '@/types/timelineTypes';
+import { PersonData, PersonTimelineEvent } from '@/types/personTypes';
 
 // 原始数据类型定义
 interface RawTimelineEvent {

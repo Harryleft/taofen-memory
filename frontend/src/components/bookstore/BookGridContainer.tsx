@@ -5,7 +5,7 @@
  */
 
 import React, { useEffect, useRef } from 'react';
-import { BookItem } from '../../types/bookTypes';
+import { BookItem } from '@/types/bookTypes';
 import BookCard from './BookCardContainer.tsx';
 
 // 调试开关

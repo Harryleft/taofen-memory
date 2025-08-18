@@ -6,7 +6,7 @@
 
 import React, { useEffect } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
-import { BookItem } from '../../types/bookTypes';
+import { BookItem } from '@/types/bookTypes';
 
 /**
  * @interface BookDetailModalProps

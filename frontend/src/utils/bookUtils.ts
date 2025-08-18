@@ -1,5 +1,5 @@
-import { BookItem } from '../types/bookTypes';
-import { searchKeywordMap } from '../constants/bookConstants';
+import { BookItem } from '@/types/bookTypes';
+import { searchKeywordMap } from '@/constants/bookConstants';
 
 // 通用模糊搜索函数
 export const fuzzyMatch = (searchTerm: string, targetText: string): boolean => {

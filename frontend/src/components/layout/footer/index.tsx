@@ -1,4 +1,4 @@
-import '../../../styles/ZoutaofenFooter.css';
+import '@/styles/ZoutaofenFooter.css';
 
 // 导入新的ZoutaofenFooter组件和类型
 import { 

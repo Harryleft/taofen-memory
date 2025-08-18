@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { adaptTimelineData } from './timelineDataAdapter';
-import { TimelineEvent } from '../types/personTypes.ts';
+import { TimelineEvent } from '@/types/personTypes.ts';
 
 interface RawTimelineEvent {
   time: string;
