@@ -1,134 +1,116 @@
 /* ================================================
-   统一Cover卡片样式系统
+   韬奋主题Cover卡片样式系统 v3.0
    ================================================
    
-   基于TimelineCoverCard和BookstoreCoverCard的统一样式架构
-   消除重复代码，建立可复用的Cover卡片组件系统
+   设计理念：典雅文献风 + 现代交互体验
+   视觉语言：内敛雅致、书卷气息、历史厚重感
    
-   使用统一类名前缀：.cover-card-
-   通过父级类名控制不同主题：.timeline-cover, .bookstore-cover
+   核心特性：
+   - 文献纸张质感
+   - 韬奋主题色彩
+   - 典雅排版层次
+   - 内敛微动效
+   - 知识分子气质
    ================================================ */
 
 /* ================================================
-   基础变量定义
+   韬奋主题设计变量系统 - 基于global.css
    ================================================ */
 
 :root {
-  /* Cover卡片基础变量 */
-  --cover-card-bg-primary: #F8F5F0;
-  --cover-card-border-radius: 16px;
-  --cover-card-padding-y: 3rem;
-  --cover-card-padding-x: 3rem;
-  --cover-card-shadow: 
-    0 12px 40px rgba(0, 0, 0, 0.12),
-    0 4px 12px rgba(0, 0, 0, 0.08),
-    0 1px 3px rgba(0, 0, 0, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  /* 韬奋主题色彩系统 - 来自global.css */
+  --cover-primary: var(--timeline-primary, #1B365D);           /* 深蓝主色 */
+  --cover-secondary: var(--timeline-secondary, #C49B61);       /* 暖金强调色 */
+  --cover-background: var(--timeline-background, #FAF7F2);     /* 米色背景 */
+  --cover-text-primary: var(--timeline-text-primary, #2D3748); /* 主文字色 */
+  --cover-text-secondary: var(--timeline-text-secondary, #4A5568); /* 次要文字色 */
+  --cover-text-tertiary: var(--timeline-text-tertiary, #A0AEC0); /* 辅助文字色 */
   
-  /* 响应式变量 */
-  --cover-card-radius-mobile: 12px;
-  --cover-card-padding-mobile: 1.5rem;
+  /* 文献纸张质感 */
+  --cover-paper-bg: #FFFFFF;
+  --cover-paper-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --cover-paper-border: rgba(196, 155, 97, 0.15);
+  
+  /* 典雅字体系统 */
+  --cover-font-display: 'KaiTi', 'STKaiti', '华文楷体', serif;     /* 楷体标题 */
+  --cover-font-body: 'SimSun', '宋体', 'NSimSun', serif;         /* 宋体正文 */
+  --cover-font-accent: var(--global-font-family-sans, sans-serif); /* 现代字体点缀 */
+  
+  /* 几何参数 - 基于黄金比例 */
+  --cover-radius: var(--global-radius-xl, 1rem);
+  --cover-radius-inner: var(--global-radius-lg, 0.75rem);
+  --cover-padding: var(--global-spacing-3xl, 4rem);
+  --cover-gap: var(--global-spacing-xl, 2rem);
+  
+  /* 响应式参数 */
+  --cover-mobile-radius: var(--global-radius-lg, 0.75rem);
+  --cover-mobile-padding: var(--global-spacing-xl, 2rem);
 }
 
 /* ================================================
-   苹果风格呼吸动画系统
+   典雅动画系统 - 内敛微动效
    ================================================ */
 
-/* 统一呼吸动画基础类 - 苹果风格 */
+/* 文献纸张呼吸动画 - 更加内敛典雅 */
 .cover-card-breathing {
-  animation: appleBreathing 6s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
-  transition: all 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+  animation: paperBreathing 6s var(--timeline-ease-in-out, ease-in-out) infinite;
+  transition: all var(--global-animation-slow, 0.5s) var(--timeline-ease-out, ease-out);
   will-change: transform, box-shadow;
   transform: translateZ(0);
   backface-visibility: hidden;
-  perspective: 1000px;
   position: relative;
 }
 
-/* 苹果风格呼吸动画 - 更细腻的层次 */
-@keyframes appleBreathing {
+/* 文献纸张呼吸动画 */
+@keyframes paperBreathing {
   0%, 100% {
     transform: translateY(0) scale(1);
-    box-shadow: 
-      0 12px 40px rgba(0, 0, 0, 0.12),
-      0 4px 12px rgba(0, 0, 0, 0.08),
-      0 1px 3px rgba(0, 0, 0, 0.06),
-      inset 0 1px 0 rgba(255, 255, 255, 0.7);
-  }
-  25% {
-    transform: translateY(-1px) scale(1.002);
-    box-shadow: 
-      0 14px 45px rgba(0, 0, 0, 0.14),
-      0 5px 15px rgba(0, 0, 0, 0.09),
-      0 1px 4px rgba(0, 0, 0, 0.07),
-      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    box-shadow: var(--cover-paper-shadow);
   }
   50% {
-    transform: translateY(-2px) scale(1.004);
+    transform: translateY(-2px) scale(1.002);
     box-shadow: 
-      0 16px 50px rgba(0, 0, 0, 0.16),
-      0 6px 18px rgba(0, 0, 0, 0.10),
-      0 2px 5px rgba(0, 0, 0, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  }
-  75% {
-    transform: translateY(-1px) scale(1.002);
-    box-shadow: 
-      0 14px 45px rgba(0, 0, 0, 0.14),
-      0 5px 15px rgba(0, 0, 0, 0.09),
-      0 1px 4px rgba(0, 0, 0, 0.07),
-      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      0 6px 10px -2px rgba(0, 0, 0, 0.12),
+      0 4px 6px -1px rgba(0, 0, 0, 0.08);
   }
 }
 
-/* 苹果风格光晕效果 - 更细腻的光影层次 */
+/* 典雅光晕效果 - 金色点缀 */
 .cover-card-breathing::before {
   content: '';
   position: absolute;
-  top: -10px;
-  left: -10px;
-  right: -10px;
-  bottom: -10px;
-  border-radius: 20px;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+  border-radius: inherit;
   background: radial-gradient(
     ellipse at center,
-    rgba(196, 155, 97, 0.08) 0%,
-    rgba(196, 155, 97, 0.04) 30%,
-    rgba(196, 155, 97, 0.02) 60%,
-    transparent 100%
+    rgba(196, 155, 97, 0.05) 0%,
+    rgba(196, 155, 97, 0.02) 40%,
+    transparent 70%
   );
-  opacity: 0.6;
-  animation: appleBreathingGlow 6s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+  opacity: 0.4;
+  animation: gentleGlow 8s var(--timeline-ease-in-out, ease-in-out) infinite;
   pointer-events: none;
   z-index: -1;
-  filter: blur(1px);
 }
 
-/* 苹果风格光晕动画 */
-@keyframes appleBreathingGlow {
+/* 温和光晕动画 */
+@keyframes gentleGlow {
   0%, 100% {
-    opacity: 0.4;
+    opacity: 0.3;
     transform: scale(1);
-    filter: blur(1px);
-  }
-  25% {
-    opacity: 0.6;
-    transform: scale(1.01);
-    filter: blur(1.5px);
   }
   50% {
-    opacity: 0.8;
-    transform: scale(1.02);
-    filter: blur(2px);
-  }
-  75% {
-    opacity: 0.6;
-    transform: scale(1.01);
-    filter: blur(1.5px);  
+    opacity: 0.5;
+    transform: scale(1.005);
   }
 }
 
-/* 苹果风格内部光效 */
+/* 内部纸张纹理层 */
 .cover-card-breathing::after {
   content: '';
   position: absolute;
@@ -137,238 +119,247 @@
   right: 0;
   bottom: 0;
   border-radius: inherit;
-  background: radial-gradient(
-    ellipse at 30% 30%,
-    rgba(255, 255, 255, 0.15) 0%,
-    rgba(255, 255, 255, 0.05) 40%,
-    transparent 70%
-  );
-  opacity: 0;
-  animation: appleInnerGlow 6s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+  background: 
+    radial-gradient(ellipse at 20% 20%, rgba(196, 155, 97, 0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(27, 54, 93, 0.02) 0%, transparent 50%);
+  opacity: 0.6;
   pointer-events: none;
   z-index: 1;
-  mix-blend-mode: overlay;
+  mix-blend-mode: multiply;
 }
 
-/* 内部光效动画 */
-@keyframes appleInnerGlow {
-  0%, 100% {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  50% {
-    opacity: 0.6;
-    transform: scale(1.05);
-  }
-}
-
-/* 苹果风格悬停增强 */
+/* 典雅悬停效果 */
 .cover-card-breathing:hover {
-  animation-duration: 8s;
-  transform: translateY(-3px) scale(1.006);
+  animation-duration: 4s;
+  transform: translateY(-4px) scale(1.003);
   box-shadow: 
-    0 20px 60px rgba(0, 0, 0, 0.18),
-    0 8px 25px rgba(0, 0, 0, 0.12),
-    0 3px 8px rgba(0, 0, 0, 0.10),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    0 10px 25px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 .cover-card-breathing:hover::before {
-  animation-duration: 8s;
-  opacity: 0.8;
+  animation-duration: 4s;
+  opacity: 0.6;
 }
 
-.cover-card-breathing:hover::after {
-  animation-duration: 8s;
-  opacity: 0.8;
-}
-
-/* 苹果风格触摸反馈 */
+/* 内敛触摸反馈 */
 .cover-card-breathing:active {
-  transform: translateY(-1px) scale(1.002);
-  transition: all 0.1s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transform: translateY(-1px) scale(1.001);
+  transition: all var(--global-animation-fast, 0.15s) var(--timeline-ease-out, ease-out);
 }
 
 /* 标题文字的微妙呼吸效果 */
 .cover-card-main-title {
-  animation: titleBreathing 4s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+  animation: titleGentle 5s var(--timeline-ease-in-out, ease-in-out) infinite;
 }
 
-@keyframes titleBreathing {
+@keyframes titleGentle {
   0%, 100% {
     opacity: 0.95;
-    transform: translateY(0);
   }
   50% {
     opacity: 1;
-    transform: translateY(-0.5px);
   }
 }
 
-/* 副标题的延迟呼吸效果 */
+/* 副标题的延迟效果 */
 .cover-card-sub-title {
-  animation: subtitleBreathing 4s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
-  animation-delay: 0.5s;
-}
-
-@keyframes subtitleBreathing {
-  0%, 100% {
-    opacity: 0.9;
-    transform: translateY(0);
-  }
-  50% {
-    opacity: 0.95;
-    transform: translateY(-0.3px);
-  }
-}
-
-/* 描述文字的更微妙呼吸效果 */
-.cover-card-description {
-  animation: descriptionBreathing 5s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+  animation: subtitleGentle 6s var(--timeline-ease-in-out, ease-in-out) infinite;
   animation-delay: 1s;
 }
 
-@keyframes descriptionBreathing {
+@keyframes subtitleGentle {
   0%, 100% {
-    opacity: 0.85;
+    opacity: 0.9;
   }
   50% {
-    opacity: 0.9;
+    opacity: 0.95;
+  }
+}
+
+/* 描述文字的微妙呼吸效果 */
+.cover-card-description {
+  animation: descriptionGentle 7s var(--timeline-ease-in-out, ease-in-out) infinite;
+  animation-delay: 2s;
+}
+
+@keyframes descriptionGentle {
+  0%, 100% {
+    opacity: 0.88;
+  }
+  50% {
+    opacity: 0.92;
   }
 }
 
 /* ================================================
-   主卡片容器样式
+   文献纸张卡片容器样式
    ================================================ */
 
 .cover-card {
   position: relative;
-  background: var(--cover-card-bg-primary);
-  border-radius: var(--cover-card-border-radius);
-  padding: var(--cover-card-padding-y) var(--cover-card-padding-x);
+  border-radius: var(--cover-radius);
+  padding: var(--cover-padding);
+  overflow: hidden;
   
-  /* 多层背景叠加：纸纹 + 拉丝金属 + 微渐变 + 内收晕影 */
+  /* 文献纸张背景 */
+  background: var(--cover-paper-bg);
+  
+  /* 纸张纹理叠加层 */
   background-image:
-    /* 边缘内收晕影效果 */
-    radial-gradient(ellipse 85% 85% at center, transparent 60%, rgba(140, 120, 100, 0.12) 85%, rgba(100, 80, 60, 0.18) 100%),
-
-    /* 极低频纸张纹理 (3-4%) */
-    radial-gradient(circle at 15% 40%, transparent 30%, rgba(139, 123, 107, 0.045) 32%, rgba(139, 123, 107, 0.045) 36%, transparent 38%),
-    radial-gradient(circle at 85% 20%, transparent 25%, rgba(156, 134, 118, 0.04) 27%, rgba(156, 134, 118, 0.04) 31%, transparent 33%),
-    radial-gradient(circle at 60% 80%, transparent 20%, rgba(127, 109, 95, 0.05) 22%, rgba(127, 109, 95, 0.05) 26%, transparent 28%),
-
-    /* 拉丝金属纹理 (4-5%) */
-    linear-gradient(20deg, transparent 45%, rgba(165, 147, 133, 0.055) 47%, rgba(165, 147, 133, 0.055) 50%, transparent 52%),
-    linear-gradient(-20deg, transparent 43%, rgba(158, 140, 126, 0.05) 45%, rgba(158, 140, 126, 0.05) 48%, transparent 50%),
-    linear-gradient(70deg, transparent 40%, rgba(180, 162, 148, 0.06) 42%, rgba(180, 162, 148, 0.06) 45%, transparent 47%),
-
-    /* 增强对比度垂直渐变 */
-    linear-gradient(to bottom, #F8F5F0 0%, #F5F2EC 30%, #F2EFE8 70%, #EFECE5 100%);
-
-  background-size: 
-    100% 100%,          /* 晕影覆盖全部 */
-    220px 220px,        /* 纸纹间距 */
-    280px 280px,
-    180px 180px,
-    120px 120px,        /* 拉丝纹理间距 */
-    160px 160px,
-    100px 100px,
-    100% 100%;          /* 渐变覆盖全部 */
+    /* 微妙的纸张纹理 */
+    radial-gradient(circle at 25% 25%, rgba(196, 155, 97, 0.015) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(27, 54, 93, 0.01) 0%, transparent 50%),
+    /* 细微的划痕效果 */
+    linear-gradient(45deg, transparent 48%, rgba(196, 155, 97, 0.008) 49%, rgba(196, 155, 97, 0.008) 50%, transparent 51%),
+    linear-gradient(-45deg, transparent 48%, rgba(27, 54, 93, 0.005) 49%, rgba(27, 54, 93, 0.005) 50%, transparent 51%);
   
-  /* 统一边框 */
-  border: 1px solid rgba(196, 155, 97, 0.15);
+  /* 典雅边框 */
+  border: 1px solid var(--cover-paper-border);
   
-  /* 卡片阴影 */
-  box-shadow: var(--cover-card-shadow);
-  
-  /* 动画优化 */
-  will-change: transform;
-  transform: translateZ(0);
-  backface-visibility: hidden;
+  /* 文献纸张阴影 */
+  box-shadow: var(--cover-paper-shadow);
   
   /* 性能优化 */
+  will-change: transform, box-shadow;
+  transform: translateZ(0);
+  backface-visibility: hidden;
   contain: layout style paint;
+  
+  /* 平缓过渡 */
+  transition: all var(--global-animation-slow, 0.5s) var(--timeline-ease-out, ease-out);
 }
+
+/* 内容可读性层 - 非常微妙 */
+.cover-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(250, 247, 242, 0.5) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(250, 247, 242, 0.5) 100%
+  );
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.6;
+}
+
+/* 删除过于华丽的光效装饰层 - 保持内敛 */
 
 /* ================================================
-   文字样式系统
+   典雅文字排版系统 - 韬奋主题
    ================================================ */
 
-/* 主标题 - 优雅的垂直节奏 */
+/* 楷体主标题 - 体现文人气质 */
 .cover-card-main-title {
-  font-size: clamp(2rem, 4vw, 2.8rem);
-  font-weight: 700;
-  line-height: 1.15;
-  margin-bottom: 0.75rem;
-  letter-spacing: -0.025em;
-  font-family: 'KaiTi', 'STKaiti', '华文楷体', serif;
+  font-size: clamp(2.2rem, 4.5vw, 3.2rem);
+  font-weight: var(--timeline-font-bold, 700);
+  line-height: var(--timeline-leading-tight, 1.25);
+  margin-bottom: var(--global-spacing-lg, 1.5rem);
+  letter-spacing: 0.02em;
+  font-family: var(--cover-font-display);
   position: relative;
-  display: inline-block;
+  text-align: center;
+  z-index: 2;
+  
+  /* 韬奋主题色彩 */
+  color: var(--cover-primary);
+  
+  /* 典雅文字阴影 */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
-/* 主标题微妙的下划线装饰 */
+/* 典雅装饰线 - 金色点缀 */
 .cover-card-main-title::after {
   content: '';
   position: absolute;
-  bottom: -0.25rem;
-  left: 0;
-  width: 3rem;
+  bottom: -0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
   height: 2px;
-  background: linear-gradient(90deg, var(--global-accent-secondary) 0%, transparent 100%);
-  opacity: 0.6;
-  transition: width 0.3s ease, opacity 0.3s ease;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--cover-secondary) 20%,
+    var(--cover-secondary) 80%,
+    transparent 100%
+  );
+  border-radius: 1px;
+  opacity: 0.7;
+  transition: all var(--global-animation-normal, 0.3s) var(--timeline-ease-out, ease-out);
 }
 
 .cover-card:hover .cover-card-main-title::after {
-  width: 4rem;
-  opacity: 0.8;
+  width: 100px;
+  opacity: 0.9;
 }
 
-/* 副标题 - 精致的间距 */
+/* 宋体副标题 - 温和优雅 */
 .cover-card-sub-title {
-  font-size: clamp(0.95rem, 2vw, 1.1rem);
-  font-weight: 500;
-  margin-bottom: 1.25rem;
-  letter-spacing: 0.015em;
-  font-family: 'SimSun', '宋体', 'NSimSun', serif;
-  opacity: 0.95;
+  font-size: clamp(0.95rem, 2.2vw, 1.3rem);
+  font-weight: var(--timeline-font-medium, 500);
+  margin-bottom: var(--global-spacing-lg, 1.5rem);
+  letter-spacing: 0.05em;
+  font-family: var(--cover-font-body);
   position: relative;
-  padding-left: 1rem;
+  text-align: center;
+  z-index: 2;
+  
+  /* 副标题色彩 */
+  color: var(--cover-secondary);
+  
+  /* 文字阴影 */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 
-/* 副标题左侧装饰线 */
-.cover-card-sub-title::before {
-  content: '';
+/* 典雅装饰元素 - 传统图案 */
+.cover-card-sub-title::before,
+.cover-card-sub-title::after {
+  content: '·';
   position: absolute;
-  left: 0;
   top: 50%;
   transform: translateY(-50%);
-  width: 3px;
-  height: 70%;
-  background: linear-gradient(180deg, transparent 0%, var(--global-accent-secondary) 50%, transparent 100%);
-  opacity: 0.7;
-}
-
-/* 描述文字 - 优雅的阅读体验 */
-.cover-card-description {
-  font-size: clamp(0.9rem, 1.8vw, 1rem);
-  line-height: 1.7;
-  opacity: 0.85;
-  font-family: 'SimSun', '宋体', 'NSimSun', serif;
-  text-align: justify;
-  margin-bottom: 1.5rem;
-  position: relative;
-  padding: 0.5rem 0;
-  max-width: 100%;
-  width: 100%;
-}
-
-/* 描述文字首行缩进优化 */
-.cover-card-description::first-letter {
   font-size: 1.2em;
-  font-weight: 600;
-  color: var(--global-accent-secondary);
-  margin-left: 0.5rem;
+  color: var(--cover-secondary);
+  opacity: 0.6;
+}
+
+.cover-card-sub-title::before {
+  left: -1.5rem;
+}
+
+.cover-card-sub-title::after {
+  right: -1.5rem;
+}
+
+/* 宋体正文描述 - 优雅可读 */
+.cover-card-description {
+  font-size: clamp(0.95rem, 1.8vw, 1.1rem);
+  line-height: var(--timeline-leading-relaxed, 1.7);
+  font-family: var(--cover-font-body);
+  text-align: center;
+  margin-bottom: var(--global-spacing-xl, 2rem);
+  position: relative;
+  padding: var(--global-spacing-lg, 1.5rem);
+  max-width: 85%;
+  margin-left: auto;
+  margin-right: auto;
+  z-index: 2;
+  
+  /* 正文色彩 */
+  color: var(--cover-text-primary);
+  
+  /* 文字阴影 */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  
+  /* 微妙背景提升可读性 */
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: var(--cover-radius-inner);
+  border: 1px solid rgba(196, 155, 97, 0.1);
 }
 
 /* 统一标题容器间距 */
@@ -488,138 +479,136 @@
 }
 
 /* ================================================
-   主题色彩系统
+   韬奋主题色彩系统 - 统一典雅配色
    ================================================ */
 
-/* 时间轴主题 */
+/* 时间轴主题 - 深蓝金色搭配 */
 .timeline-cover .cover-card-main-title {
-  color: #1B365D; /* 时间轴主色调 */
+  color: var(--cover-primary); /* 深蓝主色调 */
 }
 
 .timeline-cover .cover-card-sub-title {
-  color: #C49B61; /* 金色强调色 */
+  color: var(--cover-secondary); /* 暖金强调色 */
 }
 
 .timeline-cover .cover-card-description {
-  color: #2D3748; /* 深灰色文本 */
+  color: var(--cover-text-primary); /* 深灰文本 */
 }
 
 .timeline-cover .cover-card-stat-number {
-  color: #C49B61; /* 金色强调色 */
+  color: var(--cover-secondary); /* 暖金强调色 */
 }
 
 .timeline-cover .cover-card-stat-label {
-  color: #4A5568; /* 次要文本色 */
+  color: var(--cover-text-secondary); /* 次要文本色 */
 }
 
 .timeline-cover .cover-card-scroll-arrow {
-  color: #C49B61; /* 金色强调色 */
+  color: var(--cover-secondary); /* 暖金强调色 */
 }
 
 .timeline-cover .cover-card-scroll-arrow:hover {
-  color: #1B365D; /* 悬停时变为主色调 */
+  color: var(--cover-primary); /* 悬停时变为主色调 */
 }
 
-/* 书店主题 */
+/* 书店主题 - 保持韬奋统一配色 */
 .bookstore-cover .cover-card-main-title {
-  color: #1B365D; /* 使用时间轴的主色调保持一致性 */
+  color: var(--cover-primary); /* 深蓝主色调 */
 }
 
 .bookstore-cover .cover-card-sub-title {
-  color: #C49B61; /* 金色强调色 */
+  color: var(--cover-secondary); /* 暖金强调色 */
 }
 
 .bookstore-cover .cover-card-description {
-  color: #2D3748; /* 深灰色文本 */
+  color: var(--cover-text-primary); /* 深灰文本 */
 }
 
 .bookstore-cover .cover-card-stat-number {
-  color: #C49B61; /* 金色强调色 */
+  color: var(--cover-secondary); /* 暖金强调色 */
 }
 
 .bookstore-cover .cover-card-stat-label {
-  color: #4A5568; /* 次要文本色 */
+  color: var(--cover-text-secondary); /* 次要文本色 */
 }
 
 .bookstore-cover .cover-card-scroll-arrow {
-  color: #C49B61; /* 金色强调色 */
+  color: var(--cover-secondary); /* 暖金强调色 */
 }
 
 .bookstore-cover .cover-card-scroll-arrow:hover {
-  color: #1B365D; /* 悬停时变为主色调 */
+  color: var(--cover-primary); /* 悬停时变为主色调 */
 }
 
-/* 书店主题特殊背景色 */
+/* 书店主题特殊背景 - 文献纸张质感 */
 .bookstore-cover .cover-card {
-  background: #FAF7F2; /* 书店页面主背景色 */
+  background: var(--cover-background); /* 统一使用韬奋背景色 */
   background-image:
-    /* 边缘内收晕影效果 */
-    radial-gradient(ellipse 85% 85% at center, transparent 60%, rgba(196, 155, 97, 0.08) 85%, rgba(139, 69, 19, 0.12) 100%),
-
-    /* 极低频纸张纹理 (2-3%) */
-    radial-gradient(circle at 15% 40%, transparent 30%, rgba(196, 155, 97, 0.025) 32%, rgba(196, 155, 97, 0.025) 36%, transparent 38%),
-    radial-gradient(circle at 85% 20%, transparent 25%, rgba(196, 155, 97, 0.02) 27%, rgba(196, 155, 97, 0.02) 31%, transparent 33%),
-    radial-gradient(circle at 60% 80%, transparent 20%, rgba(196, 155, 97, 0.03) 22%, rgba(196, 155, 97, 0.03) 26%, transparent 28%),
-
-    /* 拉丝金属纹理 (3-4%) */
-    linear-gradient(20deg, transparent 45%, rgba(196, 155, 97, 0.035) 47%, rgba(196, 155, 97, 0.035) 50%, transparent 52%),
-    linear-gradient(-20deg, transparent 43%, rgba(196, 155, 97, 0.03) 45%, rgba(196, 155, 97, 0.03) 48%, transparent 50%),
-    linear-gradient(70deg, transparent 40%, rgba(196, 155, 97, 0.04) 42%, rgba(196, 155, 97, 0.04) 45%, transparent 47%),
-
-    /* 书店页面主题渐变 */
-    linear-gradient(to bottom, #FAF7F2 0%, #F8F5F0 30%, #F5F2ED 70%, #F2EFEB 100%);
+    /* 文献纸张纹理增强 */
+    radial-gradient(circle at 20% 30%, rgba(196, 155, 97, 0.02) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(27, 54, 93, 0.015) 0%, transparent 40%),
+    /* 典雅划痕效果 */
+    linear-gradient(45deg, transparent 48%, rgba(196, 155, 97, 0.01) 49%, rgba(196, 155, 97, 0.01) 50%, transparent 51%),
+    /* 微妙渐变 */
+    linear-gradient(to bottom, var(--cover-background) 0%, rgba(250, 247, 242, 0.98) 100%);
 }
 
 .bookstore-cover .cover-card {
-  box-shadow: 
-    0 12px 40px rgba(139, 69, 19, 0.08),
-    0 4px 12px rgba(139, 69, 19, 0.06),
-    0 1px 3px rgba(139, 69, 19, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  box-shadow: var(--cover-paper-shadow);
+  border: 1px solid var(--cover-paper-border);
 }
 
 /* ================================================
-   悬停和交互效果 - 苹果风格
+   典雅悬停和交互效果 - 文人风范
    ================================================ */
 
+/* 典雅悬停效果 */
 .cover-card:hover {
-  transform: translateY(-2px);
-  transition: all 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transform: translateY(-6px) scale(1.01);
+  
+  /* 增强纸张阴影 */
+  box-shadow: 
+    0 12px 28px -4px rgba(0, 0, 0, 0.12),
+    0 6px 16px -2px rgba(0, 0, 0, 0.08),
+    0 2px 6px -1px rgba(0, 0, 0, 0.06);
+  
+  /* 边框微光 */
+  border: 1px solid rgba(196, 155, 97, 0.25);
+  
+  transition: all var(--global-animation-slow, 0.5s) var(--timeline-ease-out, ease-out);
 }
 
-/* 时间轴主题苹果风格悬停效果 */
+/* 时间轴主题典雅悬停效果 */
 .timeline-cover .cover-card:hover {
   box-shadow: 
-    0 20px 60px rgba(27, 54, 93, 0.18),
-    0 8px 25px rgba(27, 54, 93, 0.12),
-    0 3px 8px rgba(27, 54, 93, 0.10),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    0 12px 28px -4px rgba(27, 54, 93, 0.08),
+    0 6px 16px -2px rgba(27, 54, 93, 0.06),
+    0 2px 6px -1px rgba(27, 54, 93, 0.04);
+  border: 1px solid rgba(27, 54, 93, 0.15);
 }
 
-/* 书店主题苹果风格悬停效果 */
+/* 书店主题典雅悬停效果 */
 .bookstore-cover .cover-card:hover {
   box-shadow: 
-    0 20px 60px rgba(139, 69, 19, 0.12),
-    0 8px 25px rgba(139, 69, 19, 0.10),
-    0 3px 8px rgba(139, 69, 19, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    0 12px 28px -4px rgba(196, 155, 97, 0.08),
+    0 6px 16px -2px rgba(196, 155, 97, 0.06),
+    0 2px 6px -1px rgba(196, 155, 97, 0.04);
+  border: 1px solid rgba(196, 155, 97, 0.2);
 }
 
-/* 苹果风格触摸反馈 */
+/* 内敛触摸反馈 */
 .cover-card:active {
-  transform: translateY(-1px) scale(1.002);
-  transition: all 0.1s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transform: translateY(-2px) scale(1.005);
+  transition: all var(--global-animation-fast, 0.15s) var(--timeline-ease-out, ease-out);
 }
 
-/* 苹果风格焦点状态 */
+/* 典雅焦点状态 */
 .cover-card:focus-within {
-  outline: 2px solid rgba(196, 155, 97, 0.6);
-  outline-offset: 2px;
+  outline: 2px solid rgba(196, 155, 97, 0.4);
+  outline-offset: 3px;
   box-shadow: 
-    0 0 0 4px rgba(196, 155, 97, 0.2),
-    0 12px 40px rgba(0, 0, 0, 0.12),
-    0 4px 12px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    0 0 0 3px rgba(196, 155, 97, 0.1),
+    var(--cover-paper-shadow);
 }
 
 /* ================================================
@@ -667,101 +656,99 @@
   }
 }
 
-@media (max-width: 639px) {
+/* 现代化响应式设计 */
+@media (max-width: 768px) {
   .cover-card {
-    border-radius: var(--cover-card-radius-mobile);
-    padding: var(--cover-card-padding-mobile);
+    border-radius: var(--cover-mobile-radius);
+    padding: var(--cover-mobile-padding);
+    margin: 1rem;
   }
   
-  .cover-card-stats {
-    flex-direction: row;
-    gap: 1rem;
-    padding: 1rem 1.25rem;
+  .cover-card-main-title {
+    font-size: clamp(2rem, 6vw, 2.8rem);
+    margin-bottom: 0.75rem;
   }
   
-  .cover-card-stat-divider {
-    width: 1px;
-    height: 1.5rem;
-    background: linear-gradient(
-      to bottom,
-      transparent 0%,
-      rgba(196, 155, 97, 0.3) 20%,
-      rgba(196, 155, 97, 0.3) 80%,
-      transparent 100%
-    );
+  .cover-card-sub-title {
+    font-size: clamp(0.9rem, 3vw, 1.1rem);
+    padding-left: 1.5rem;
   }
   
-  .cover-card-stat-number {
-    font-size: 1.5rem;
+  .cover-card-description {
+    font-size: clamp(0.85rem, 2.5vw, 1rem);
+    padding: 0.75rem;
+    max-width: 95%;
   }
   
-  .cover-card-stat-label {
-    font-size: 0.8rem;
+  /* 移动端减少动画强度 */
+  .cover-card-breathing {
+    animation-duration: 10s;
+  }
+  
+  .cover-card:hover {
+    transform: translateY(-4px) scale(1.01);
+  }
+}
+
+@media (max-width: 480px) {
+  .cover-card {
+    margin: 0.5rem;
+    padding: 1.5rem;
+  }
+  
+  .cover-card-main-title::after {
+    width: 40px;
+    height: 2px;
+  }
+  
+  .cover-card:hover .cover-card-main-title::after {
+    width: 50px;
+  }
+  
+  .cover-card-sub-title::before {
+    width: 6px;
+    height: 6px;
   }
 }
 
 /* ================================================
-   特殊效果和动画
+   主题特殊效果 - 内敛典雅
    ================================================ */
 
-/* 时间轴主题苹果风格呼吸动画光晕 */
+/* 时间轴主题光晕 - 深蓝韵味 */
 .timeline-cover .cover-card-breathing::before {
   background: radial-gradient(
     ellipse at center,
-    rgba(27, 54, 93, 0.08) 0%,
-    rgba(27, 54, 93, 0.04) 30%,
-    rgba(196, 155, 97, 0.02) 60%,
-    transparent 100%
+    rgba(27, 54, 93, 0.04) 0%,
+    rgba(27, 54, 93, 0.02) 40%,
+    transparent 70%
   );
 }
 
-/* 书店主题苹果风格呼吸动画光晕 */
+/* 书店主题光晕 - 暖金韵味 */
 .bookstore-cover .cover-card-breathing::before {
   background: radial-gradient(
     ellipse at center,
-    rgba(196, 155, 97, 0.08) 0%,
-    rgba(196, 155, 97, 0.04) 30%,
-    rgba(139, 69, 19, 0.02) 60%,
-    transparent 100%
-  );
-}
-
-/* 时间轴主题苹果风格内部光效 */
-.timeline-cover .cover-card-breathing::after {
-  background: radial-gradient(
-    ellipse at 30% 30%,
-    rgba(27, 54, 93, 0.15) 0%,
-    rgba(27, 54, 93, 0.05) 40%,
+    rgba(196, 155, 97, 0.04) 0%,
+    rgba(196, 155, 97, 0.02) 40%,
     transparent 70%
   );
 }
 
-/* 书店主题苹果风格内部光效 */
-.bookstore-cover .cover-card-breathing::after {
-  background: radial-gradient(
-    ellipse at 30% 30%,
-    rgba(196, 155, 97, 0.15) 0%,
-    rgba(196, 155, 97, 0.05) 40%,
-    transparent 70%
-  );
-}
-
-/* 时间轴主题特殊阴影效果 */
+/* 时间轴主题纸张阴影 */
 .timeline-cover .cover-card-breathing {
   box-shadow: 
-    0 12px 40px rgba(27, 54, 93, 0.12),
-    0 4px 12px rgba(27, 54, 93, 0.08),
-    0 1px 3px rgba(27, 54, 93, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    0 6px 20px rgba(27, 54, 93, 0.06),
+    0 2px 8px rgba(27, 54, 93, 0.04),
+    0 1px 3px rgba(27, 54, 93, 0.03);
 }
 
-/* 书店主题特殊阴影效果 */
+/* 书店主题纸张阴影 */
 .bookstore-cover .cover-card-breathing {
   box-shadow: 
-    0 12px 40px rgba(139, 69, 19, 0.08),
-    0 4px 12px rgba(139, 69, 19, 0.06),
-    0 1px 3px rgba(139, 69, 19, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    0 6px 20px rgba(196, 155, 97, 0.06),
+    0 2px 8px rgba(196, 155, 97, 0.04),
+    0 1px 3px rgba(196, 155, 97, 0.03);
 }
 
 /* ================================================
@@ -818,107 +805,9 @@
    兼容性样式
    ================================================ */
 
-/* 兼容旧的类名 - 逐步迁移后可删除 */
-.timeline-cover-card {
-  composes: cover-card;
-}
-
-.bookstore-cover-card {
-  composes: cover-card;
-}
-
-.timeline-cover-main-title {
-  composes: cover-card-main-title;
-}
-
-.bookstore-cover-main-title {
-  composes: cover-card-main-title;
-}
-
-.timeline-cover-sub-title {
-  composes: cover-card-sub-title;
-}
-
-.bookstore-cover-sub-title {
-  composes: cover-card-sub-title;
-}
-
-.timeline-cover-description {
-  composes: cover-card-description;
-}
-
-.bookstore-cover-description {
-  composes: cover-card-description;
-}
-
-.timeline-cover-guide-section {
-  composes: cover-card-guide-section;
-}
-
-.bookstore-cover-guide-section {
-  composes: cover-card-guide-section;
-}
-
-.timeline-cover-stats {
-  composes: cover-card-stats;
-}
-
-.bookstore-cover-stats {
-  composes: cover-card-stats;
-}
-
-.timeline-cover-stat-item {
-  composes: cover-card-stat-item;
-}
-
-.bookstore-cover-stat-item {
-  composes: cover-card-stat-item;
-}
-
-.timeline-cover-stat-number {
-  composes: cover-card-stat-number;
-}
-
-.bookstore-cover-stat-number {
-  composes: cover-card-stat-number;
-}
-
-.timeline-cover-stat-label {
-  composes: cover-card-stat-label;
-}
-
-.bookstore-cover-stat-label {
-  composes: cover-card-stat-label;
-}
-
-.timeline-cover-stat-divider {
-  composes: cover-card-stat-divider;
-}
-
-.bookstore-cover-stat-divider {
-  composes: cover-card-stat-divider;
-}
-
-.timeline-cover-scroll-guide {
-  composes: cover-card-scroll-guide;
-}
-
-.bookstore-cover-scroll-guide {
-  composes: cover-card-scroll-guide;
-}
-
-.timeline-cover-scroll-arrow {
-  composes: cover-card-scroll-arrow;
-}
-
-.bookstore-cover-scroll-arrow {
-  composes: cover-card-scroll-arrow;
-}
-
-.timeline-cover-card-breathing {
-  composes: cover-card-breathing;
-}
-
-.bookstore-cover-card-breathing {
-  composes: cover-card-breathing;
-}
+/* 兼容性类名已迁移到各自的主题文件中：
+   - timeline.css: timeline-cover-* 类名
+   - bookstore.css: bookstore-cover-* 类名
+   
+   这样可以更好地维护主题相关的样式，
+   避免CSS Modules语法兼容性问题。 */

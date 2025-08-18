@@ -39,18 +39,19 @@ export function CoverCard({ theme, data, className = '' }: CoverCardProps) {
         y: [0, -2, 0],
         scale: [1, 1.005, 1],
       }}
+      className={`relative w-full max-w-4xl mx-auto mb-16 ${className}`}
     >
       {/* 封面卡主体 */}
-      <div className={`relative cover-card ${themeClass} cover-card-breathing` }>
+      <div className={`relative cover-card cover-card-breathing ${themeClass}`}>
         {/* 卡片内容 - 居中引导布局 */}
-        <div className="relative z-[2] flex flex-col items-center justify-center p-8 lg:p-12 text-center">
+        <div className="relative z-[2] flex flex-col items-center justify-center p-6 lg:p-8 text-center">
           {/* 主内容区域 */}
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="w-full mx-auto space-y-6"
+            className="max-w-3xl mx-auto space-y-6"
           >
             {/* 主标题 */}
             <h1 className="cover-card-main-title">
@@ -65,7 +66,7 @@ export function CoverCard({ theme, data, className = '' }: CoverCardProps) {
             )}
             
             {/* 描述文字 */}
-            <div className="cover-card-description w-full mx-auto">
+            <div className="cover-card-description max-w-3xl mx-auto">
               {data.description}
             </div>
             
