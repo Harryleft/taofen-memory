@@ -124,7 +124,7 @@
   75% {
     opacity: 0.6;
     transform: scale(1.01);
-    filter: blur(1.5px);
+    filter: blur(1.5px);  
   }
 }
 
