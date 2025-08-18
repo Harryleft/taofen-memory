@@ -74,7 +74,13 @@
       "mcp__ide__getDiagnostics",
       "mcp__filesystem__read_multiple_files",
       "mcp__filesystem__edit_file",
-      "Bash(npm run test:*)"
+      "Bash(npm run test:*)",
+      "Bash(netsh:*)",
+      "Bash(echo:*)",
+      "Bash(reg query:*)",
+      "Bash(powershell:*)",
+      "Bash(set:*)",
+      "Bash(nslookup:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",
