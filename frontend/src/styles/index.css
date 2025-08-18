@@ -11,8 +11,8 @@
 @import 'bookstore.css';          /* 独立组件 */
 @import 'relationships.css';     /* 独立组件 */
 @import 'timeline.css';          /* 独立组件 */
-@import 'ZoutaofenFooter.css';   /* 特定Footer组件 */
 @import 'footer.css';           /* 通用Footer组件 */
+@import 'ZoutaofenFooter.css';   /* 特定Footer组件（覆盖通用样式） */
 
 /* 3. Tailwind CSS */
 /* stylelint-disable-next-line at-rule-no-unknown */
