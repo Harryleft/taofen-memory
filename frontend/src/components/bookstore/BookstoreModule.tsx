@@ -21,7 +21,7 @@ import { downloadCSV } from '@/utils/bookUtils';
 import BookFiltersPanel from './BookFiltersPanel.tsx';
 import BookGrid from './BookGridContainer.tsx';
 import BookDetailModal from './BookDetailModal.tsx';
-import { BookstoreCoverCard } from './BookstoreCoverCard.tsx';
+import { BookstoreCoverCard } from '@/components/common/CoverCard.tsx';
 
 
 import { useBookData } from '@/hooks/useBookData';
