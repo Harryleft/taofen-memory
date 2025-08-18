@@ -24,10 +24,10 @@ export function TimelineCoverCard({
         y: [0, -2, 0],
         scale: [1, 1.005, 1],
       }}
-      className="relative w-full max-w-5xl mx-auto px-4 md:px-6 lg:px-8 mb-16 timeline-cover-card-breathing"
+      className="relative w-full max-w-5xl mx-auto px-4 md:px-6 lg:px-8 mb-16 cover-card-breathing"
     >
       {/* 跨轴封面卡主体 */}
-      <div className="relative timeline-cover-card">
+      <div className="relative cover-card timeline-cover">
         {/* 轴线穿过效果 - 在卡片下方 */}
         {/* <div className="absolute top-1/2 left-0 right-0 h-1 -translate-y-1/2 timeline-cover-axis-line z-[1]" /> */}
 
@@ -42,17 +42,17 @@ export function TimelineCoverCard({
             className="max-w-4xl mx-auto space-y-6"
           >
             {/* 主标题 */}
-            <h1 className="timeline-cover-main-title">
+            <h1 className="cover-card-main-title">
               韬奋·岁月行履
             </h1>
             
             {/* 副标题 */}
-            <h2 className="timeline-cover-sub-title">
+            <h2 className="cover-card-sub-title">
               {/* {yearSpan}  */}
             </h2>
             
             {/* 描述文字 */}
-            <div className="timeline-cover-description max-w-3xl mx-auto">
+            <div className="cover-card-description max-w-3xl mx-auto">
               从福建永安的书香少年到上海滩的新闻巨擘，从《生活》周刊的创办者到民族救亡的呐喊者，
               这是一段跨越半个世纪的传奇征程。让我们一起追寻这位新闻界先驱的足迹，
               探索他如何用笔杆子为民族解放和社会进步奋斗终生。
@@ -64,17 +64,17 @@ export function TimelineCoverCard({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.8 }}
-              className="timeline-cover-guide-section"
+              className="cover-card-guide-section"
             >
-              <div className="timeline-cover-stats mt-8">
+              <div className="cover-card-stats mt-8">
                 <div className="timeline-cover-stat-item">
-                  <span className="timeline-cover-stat-number">{totalEvents}个</span>
-                  <span className="timeline-cover-stat-label">重要事件</span>
+                  <span className="cover-card-stat-number">{totalEvents}个</span>
+                  <span className="cover-card-stat-label">重要事件</span>
                 </div>
-                <div className="timeline-cover-stat-divider"></div>
+                <div className="cover-card-stat-divider"></div>
                 <div className="timeline-cover-stat-item">
-                  <span className="timeline-cover-stat-number">49年</span>
-                  <span className="timeline-cover-stat-label">传奇年华</span>
+                  <span className="cover-card-stat-number">49年</span>
+                  <span className="cover-card-stat-label">传奇年华</span>
                 </div>
               </div>
               
@@ -84,7 +84,7 @@ export function TimelineCoverCard({
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 1.2 }}
-                className="timeline-cover-scroll-guide"
+                className="cover-card-scroll-guide"
               >
                 {/* <span className="timeline-cover-scroll-text">向下滚动，开始时光之旅</span> */}
                 <motion.div
@@ -94,7 +94,7 @@ export function TimelineCoverCard({
                     repeat: Infinity, 
                     ease: "easeInOut" 
                   }}
-                  className="timeline-cover-scroll-arrow"
+                  className="cover-card-scroll-arrow"
                 >
                   <svg 
                     width="24" 
