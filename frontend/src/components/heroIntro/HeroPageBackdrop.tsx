@@ -26,7 +26,7 @@ const CONFIG = {
   V_GAP_PX: 20,
   FALLBACK_ASPECT: 0.8,
   IMAGE_HEIGHT_SCALE: 0.7,
-  REPEAT_TIMES: 6,
+  REPEAT_TIMES: 1,
   VARIATION_INTENSITY: 0.6,
   STABLE_SEED: 'hero-backdrop-v1',
   
@@ -318,10 +318,12 @@ export default function HeroPageBackdrop() {
   const [layoutConfig, setLayoutConfig] = useState<LayoutConfig | null>(null);
   const [remoteItems, setRemoteItems] = useState<BaseMasonryItem[]>([]);
   const [aspectMap, setAspectMap] = useState<Record<number, number>>({});
+  const [isDeferred, setIsDeferred] = useState(false);
 
   // Refs
   const containerRef = useRef<HTMLDivElement>(null);
   const cleanupRef = useRef<(() => void) | null>(null);
+  const deferredRef = useRef<number | null>(null);
 
   // 移除视差滚动效果，保持静态展示
 
@@ -330,23 +332,46 @@ export default function HeroPageBackdrop() {
     setAspectMap((prev) => (prev[id] ? prev : { ...prev, [id]: aspect }));
   }, []);
 
-  // 初始化数据加载和布局计算
+  // 延迟加载初始化
   useEffect(() => {
-    // 计算初始布局配置
+    // 计算初始布局配置（不阻塞）
     const initialConfig = LayoutCalculator.getLayoutConfig();
     setLayoutConfig(initialConfig);
     
-    // 加载图片数据
-    fetchHeroImages()
-      .then(setRemoteItems)
-      .catch((err) => {
-        console.error('[HeroBackdrop] fetchHeroImages error:', err);
-      });
+    // 使用 requestIdleCallback 延迟加载图片数据
+    const loadHeroImages = () => {
+      fetchHeroImages()
+        .then(setRemoteItems)
+        .catch((err) => {
+          console.error('[HeroBackdrop] fetchHeroImages error:', err);
+        })
+        .finally(() => {
+          setIsDeferred(true);
+        });
+    };
+
+    // 延迟加载，优先级较低
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      deferredRef.current = requestIdleCallback(loadHeroImages, { timeout: 2000 });
+    } else {
+      // 降级方案：使用 setTimeout
+      deferredRef.current = setTimeout(loadHeroImages, 100) as unknown as number;
+    }
+
+    return () => {
+      if (deferredRef.current) {
+        if (typeof window !== 'undefined' && 'cancelIdleCallback' in window) {
+          cancelIdleCallback(deferredRef.current);
+        } else {
+          clearTimeout(deferredRef.current);
+        }
+      }
+    };
   }, []);
 
   // 预加载图片并测量真实宽高比（带清理）
   useEffect(() => {
-    if (remoteItems.length > 0) {
+    if (remoteItems.length > 0 && isDeferred) {
       // 使用新的带清理的方法
       const cleanup = ImageProcessor.preloadImagesWithCleanup(remoteItems, handleAspectMeasured);
       cleanupRef.current = cleanup;
@@ -359,7 +384,7 @@ export default function HeroPageBackdrop() {
         }
       };
     }
-  }, [remoteItems, handleAspectMeasured]);
+  }, [remoteItems, handleAspectMeasured, isDeferred]);
 
   // 构建素材池
   const weightedPool = useMemo(() => 
@@ -438,6 +463,17 @@ export default function HeroPageBackdrop() {
   const scrollableStyle = useMemo(() => ({
     filter: `saturate(${CONFIG.BAND_SATURATE}) brightness(${CONFIG.BAND_BRIGHTNESS}) blur(${CONFIG.BAND_BLUR_PX}px)`
   }), []);
+
+  // 如果还没有延迟加载完成，返回空的占位容器
+  if (!isDeferred) {
+    return (
+      <div 
+        ref={containerRef}
+        className="absolute inset-0 overflow-hidden"
+        style={containerStyle}
+      />
+    );
+  }
 
   return (
     <div 
