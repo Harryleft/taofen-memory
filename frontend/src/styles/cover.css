@@ -26,18 +26,18 @@
   --cover-text-secondary: var(--timeline-text-secondary, #4A5568); /* 次要文字色 */
   --cover-text-tertiary: var(--timeline-text-tertiary, #A0AEC0); /* 辅助文字色 */
   
-  /* 文献纸张质感 - 增强对比度 */
-  --cover-paper-bg: #FFFFFF;
+  /* 文献纸张质感 - 增强对比度的米白色 */
+  --cover-paper-bg: #FFFEF9;
   --cover-paper-shadow: 
-    0 10px 25px -3px rgba(0, 0, 0, 0.15),
-    0 4px 12px -2px rgba(0, 0, 0, 0.1),
-    0 2px 6px -1px rgba(0, 0, 0, 0.08);
+    0 12px 30px -3px rgba(0, 0, 0, 0.18),
+    0 6px 16px -2px rgba(0, 0, 0, 0.12),
+    0 3px 8px -1px rgba(0, 0, 0, 0.1);
   --cover-paper-shadow-hover:
-    0 20px 35px -3px rgba(0, 0, 0, 0.18),
-    0 8px 20px -2px rgba(0, 0, 0, 0.12),
-    0 4px 10px -1px rgba(0, 0, 0, 0.1);
-  --cover-paper-border: rgba(196, 155, 97, 0.25);
-  --cover-paper-border-hover: rgba(196, 155, 97, 0.4);
+    0 25px 45px -3px rgba(0, 0, 0, 0.22),
+    0 10px 25px -2px rgba(0, 0, 0, 0.15),
+    0 5px 12px -1px rgba(0, 0, 0, 0.12);
+  --cover-paper-border: rgba(196, 155, 97, 0.3);
+  --cover-paper-border-hover: rgba(196, 155, 97, 0.5);
   
   /* 典雅字体系统 */
   --cover-font-display: 'KaiTi', 'STKaiti', '华文楷体', serif;     /* 楷体标题 */
@@ -47,8 +47,8 @@
   /* 几何参数 - 基于黄金比例 */
   --cover-radius: var(--global-radius-xl, 1rem);
   --cover-radius-inner: var(--global-radius-lg, 0.75rem);
-  --cover-padding: var(--global-spacing-3xl, 4rem);
-  --cover-gap: var(--global-spacing-xl, 2rem);
+  --cover-padding: var(--global-spacing-2xl, 3rem);
+  --cover-gap: var(--global-spacing-lg, 1.5rem);
   
   /* 响应式参数 */
   --cover-mobile-radius: var(--global-radius-lg, 0.75rem);
@@ -239,39 +239,39 @@
   transition: all var(--global-animation-slow, 0.5s) var(--timeline-ease-out, ease-out);
 }
 
-/* 纸张边缘高光效果 - 增强立体感 */
+/* 纸张边缘高光效果 - 增强立体感和对比度 */
 .cover-card::before {
   content: '';
   position: absolute;
   inset: 0;
   background: 
-    /* 左上高光 */
-    linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, transparent 15%),
-    /* 右下轻微阴影 */
-    linear-gradient(-45deg, transparent 85%, rgba(0, 0, 0, 0.03) 100%),
-    /* 整体微妙渐变 */
+    /* 左上高光增强 */
+    linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, transparent 18%),
+    /* 右下轻微阴影增强 */
+    linear-gradient(-45deg, transparent 82%, rgba(0, 0, 0, 0.05) 100%),
+    /* 整体微妙渐变增强 */
     linear-gradient(
       135deg,
-      rgba(255, 255, 255, 0.4) 0%,
-      rgba(255, 255, 255, 0.2) 50%,
-      rgba(250, 247, 242, 0.3) 100%
+      rgba(255, 255, 255, 0.5) 0%,
+      rgba(255, 255, 255, 0.3) 50%,
+      rgba(250, 247, 242, 0.4) 100%
     );
   border-radius: inherit;
   pointer-events: none;
   z-index: 1;
-  opacity: 0.8;
+  opacity: 0.9;
 }
 
-/* 纸张边缘装饰线 */
+/* 纸张边缘装饰线 - 增强对比度 */
 .cover-card::after {
   content: '';
   position: absolute;
   inset: 2px;
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.8);
   border-radius: calc(var(--cover-radius) - 2px);
   pointer-events: none;
   z-index: 1;
-  opacity: 0.5;
+  opacity: 0.7;
 }
 
 /* 删除过于华丽的光效装饰层 - 保持内敛 */
@@ -284,8 +284,8 @@
 .cover-card-main-title {
   font-size: clamp(2.2rem, 4.5vw, 3.2rem);
   font-weight: var(--timeline-font-bold, 700);
-  line-height: var(--timeline-leading-tight, 1.25);
-  margin-bottom: var(--global-spacing-lg, 1.5rem);
+  line-height: var(--timeline-leading-tight, 1.2);
+  margin-bottom: var(--global-spacing-sm, 0.5rem);
   letter-spacing: 0.02em;
   font-family: var(--cover-font-display);
   position: relative;
@@ -303,7 +303,7 @@
 .cover-card-main-title::after {
   content: '';
   position: absolute;
-  bottom: -0.5rem;
+  bottom: -0.3rem;
   left: 50%;
   transform: translateX(-50%);
   width: 80px;
@@ -329,7 +329,7 @@
 .cover-card-sub-title {
   font-size: clamp(0.95rem, 2.2vw, 1.3rem);
   font-weight: var(--timeline-font-medium, 500);
-  margin-bottom: var(--global-spacing-lg, 1.5rem);
+  margin-bottom: var(--global-spacing-sm, 0.5rem);
   letter-spacing: 0.05em;
   font-family: var(--cover-font-body);
   position: relative;
@@ -366,12 +366,12 @@
 /* 宋体正文描述 - 优雅可读 */
 .cover-card-description {
   font-size: clamp(0.95rem, 1.8vw, 1.1rem);
-  line-height: var(--timeline-leading-relaxed, 1.7);
+  line-height: var(--timeline-leading-relaxed, 1.6);
   font-family: var(--cover-font-body);
   text-align: center;
-  margin-bottom: var(--global-spacing-xl, 2rem);
+  margin-bottom: var(--global-spacing-md, 1rem);
   position: relative;
-  padding: var(--global-spacing-lg, 1.5rem);
+  padding: var(--global-spacing-sm, 0.5rem) var(--global-spacing-md, 1rem);
   max-width: 85%;
   margin-left: auto;
   margin-right: auto;
@@ -383,10 +383,13 @@
   /* 文字阴影 */
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   
-  /* 微妙背景提升可读性 */
-  background: rgba(255, 255, 255, 0.4);
+  /* 增强对比度的描述背景 */
+  background: rgba(255, 255, 255, 0.75);
   border-radius: var(--cover-radius-inner);
-  border: 1px solid rgba(196, 155, 97, 0.1);
+  border: 1px solid rgba(196, 155, 97, 0.25);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 /* 统一标题容器间距 */
@@ -401,27 +404,22 @@
   margin-bottom: 1rem;
 }
 
-/* 响应式标题间距调整 */
+/* 响应式标题间距调整 - 保持紧凑 */
 @media (max-width: 767px) {
   .cover-card-main-title {
     margin-bottom: 0.5rem;
-    line-height: 1.2;
+    line-height: 1.15;
   }
   
   .cover-card-sub-title {
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
     padding-left: 0.75rem;
   }
   
   .cover-card-description {
-    margin-bottom: 1rem;
-    line-height: 1.6;
-  }
-  
-  /* 修复移动端内容区域宽度 */
-  .cover-card-description {
-    padding-left: 0;
-    padding-right: 0;
+    margin-bottom: 0.75rem;
+    line-height: 1.5;
+    padding: 0.5rem 0.75rem;
   }
 }
 
@@ -430,11 +428,11 @@
    ================================================ */
 
 .cover-card-guide-section {
-  margin-top: 2rem;
+  margin-top: var(--global-spacing-sm, 0.5rem);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: var(--global-spacing-md, 1rem);
 }
 
 .cover-card-stats {
@@ -769,20 +767,22 @@
   );
 }
 
-/* 时间轴主题纸张阴影 */
+/* 时间轴主题纸张阴影 - 增强对比度 */
 .timeline-cover .cover-card-breathing {
   box-shadow: 
-    0 6px 20px rgba(27, 54, 93, 0.06),
-    0 2px 8px rgba(27, 54, 93, 0.04),
-    0 1px 3px rgba(27, 54, 93, 0.03);
+    0 10px 25px -3px rgba(27, 54, 93, 0.1),
+    0 4px 12px -2px rgba(27, 54, 93, 0.06),
+    0 2px 6px -1px rgba(27, 54, 93, 0.04);
+  border: 1px solid rgba(27, 54, 93, 0.2);
 }
 
-/* 书店主题纸张阴影 */
+/* 书店主题纸张阴影 - 增强对比度 */
 .bookstore-cover .cover-card-breathing {
   box-shadow: 
-    0 6px 20px rgba(196, 155, 97, 0.06),
-    0 2px 8px rgba(196, 155, 97, 0.04),
-    0 1px 3px rgba(196, 155, 97, 0.03);
+    0 10px 25px -3px rgba(196, 155, 97, 0.1),
+    0 4px 12px -2px rgba(196, 155, 97, 0.06),
+    0 2px 6px -1px rgba(196, 155, 97, 0.04);
+  border: 1px solid rgba(196, 155, 97, 0.25);
 }
 
 /* ================================================
