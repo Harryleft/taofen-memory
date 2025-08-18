@@ -1,29 +1,29 @@
 /* Zoutaofen Footer 专用样式 */
 
-/* 基础样式 */
+/* 基础样式 - 使用通用 footer 组件样式 */
 .zoutaofen-footer {
   position: relative;
   margin-top: auto;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-  color: #ffffff;
-  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  border-top: 1px solid var(--footer-border, rgba(255, 255, 255, 0.1));
+  background: linear-gradient(135deg, var(--footer-bg-primary, #1f2937) 0%, var(--footer-bg-secondary, #111827) 100%);
+  color: var(--footer-text-primary, #ffffff);
+  font-family: var(--global-font-family-sans, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif);
 }
 
 /* 容器样式 */
 .zoutaofen-footer .footer-container {
-  max-width: 1400px;
+  max-width: var(--footer-container-max-width, 1400px);
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 var(--footer-padding-horizontal, 1rem);
 }
 
-/* 主导航栏目样式 */
+/* 主导航栏目样式 - 继承通用样式 */
 .zoutaofen-footer .nav-category-title {
-  color: #fbbf24;
-  font-weight: 600;
-  margin-bottom: 1rem;
+  color: var(--footer-accent, #fbbf24);
+  font-weight: var(--global-font-weight-semibold, 600);
+  margin-bottom: var(--global-spacing-md, 1rem);
   position: relative;
-  font-size: 1.125rem;
+  font-size: var(--global-font-size-lg, 1.125rem);
 }
 
 .zoutaofen-footer .nav-category-title::after {
@@ -33,21 +33,22 @@
   left: 0;
   width: 40px;
   height: 2px;
-  background: linear-gradient(to right, #fbbf24, #f59e0b);
+  background: linear-gradient(to right, var(--footer-accent, #fbbf24), var(--footer-accent-secondary, #f59e0b));
 }
 
+/* 导航链接样式 - 继承通用样式 */
 .zoutaofen-footer .nav-link {
   display: block;
-  padding: 0.5rem 0;
-  color: #d1d5db;
+  padding: var(--global-spacing-xs, 0.5rem) 0;
+  color: var(--footer-text-secondary, #d1d5db);
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: all var(--global-animation-normal, 0.3s) var(--global-ease-out, ease);
   position: relative;
-  font-size: 0.875rem;
+  font-size: var(--global-font-size-sm, 0.875rem);
 }
 
 .zoutaofen-footer .nav-link:hover {
-  color: #ffffff;
+  color: var(--footer-text-primary, #ffffff);
   transform: translateX(4px);
 }
 
@@ -55,22 +56,22 @@
   content: '•';
   position: absolute;
   left: -12px;
-  color: #fbbf24;
+  color: var(--footer-accent, #fbbf24);
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity var(--global-animation-normal, 0.3s) var(--global-ease-out, ease);
 }
 
 .zoutaofen-footer .nav-link:hover::before {
   opacity: 1;
 }
 
-/* 外部资源链接样式 - 纯文字链接 */
+/* 外部资源链接样式 */
 .zoutaofen-footer .resources-title {
-  color: #fbbf24;
-  font-weight: 600;
-  margin-bottom: 1rem;
+  color: var(--footer-accent, #fbbf24);
+  font-weight: var(--global-font-weight-semibold, 600);
+  margin-bottom: var(--global-spacing-md, 1rem);
   position: relative;
-  font-size: 1.125rem;
+  font-size: var(--global-font-size-lg, 1.125rem);
 }
 
 .zoutaofen-footer .resources-title::after {
@@ -80,84 +81,65 @@
   left: 0;
   width: 40px;
   height: 2px;
-  background: linear-gradient(to right, #fbbf24, #f59e0b);
+  background: linear-gradient(to right, var(--footer-accent, #fbbf24), var(--footer-accent-secondary, #f59e0b));
 }
 
 .zoutaofen-footer .resource-link {
-  color: #d1d5db;
+  color: var(--footer-text-secondary, #d1d5db);
   text-decoration: none;
-  font-size: 0.875rem;
-  padding: 0.5rem 0;
+  font-size: var(--global-font-size-sm, 0.875rem);
+  padding: var(--global-spacing-xs, 0.5rem) 0;
   border-left: 2px solid transparent;
-  padding-left: 1rem;
-  transition: all 0.3s ease;
+  padding-left: var(--global-spacing-md, 1rem);
+  transition: all var(--global-animation-normal, 0.3s) var(--global-ease-out, ease);
   display: block;
 }
 
 .zoutaofen-footer .resource-link:hover {
-  color: #ffffff;
-  border-left-color: #fbbf24;
+  color: var(--footer-text-primary, #ffffff);
+  border-left-color: var(--footer-accent, #fbbf24);
   transform: translateX(4px);
 }
 
 /* 版权信息样式 */
 .zoutaofen-footer .copyright {
-  color: #9ca3af;
-  font-size: 0.875rem;
-  line-height: 1.5;
+  color: var(--footer-text-tertiary, #9ca3af);
+  font-size: var(--global-font-size-sm, 0.875rem);
+  line-height: var(--global-line-height-normal, 1.5);
 }
 
 .zoutaofen-footer .team-name {
-  color: #fbbf24;
-  font-weight: 600;
-  font-size: 1rem;
+  color: var(--footer-accent, #fbbf24);
+  font-weight: var(--global-font-weight-semibold, 600);
+  font-size: var(--global-font-size-base, 1rem);
 }
 
 .zoutaofen-footer .competition-info {
-  color: #6b7280;
-  font-size: 0.75rem;
-  line-height: 1.4;
-}
-
-/* 两列布局样式 */
-.zoutaofen-footer .section-title {
-  color: #fbbf24;
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-  position: relative;
-  font-size: 1.25rem;
-}
-
-.zoutaofen-footer .section-title::after {
-  content: '';
-  position: absolute;
-  bottom: -6px;
-  left: 0;
-  width: 60px;
-  height: 3px;
-  background: linear-gradient(to right, #fbbf24, #f59e0b);
+  color: var(--footer-text-tertiary, #6b7280);
+  font-size: var(--global-font-size-xs, 0.75rem);
+  line-height: var(--global-line-height-relaxed, 1.4);
 }
 
 /* 栏目竖向布局 */
 .zoutaofen-footer .categories-list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--global-spacing-md, 0.75rem);
 }
 
 .zoutaofen-footer .category-link {
-  color: #d1d5db;
+  color: var(--footer-text-secondary, #d1d5db);
   text-decoration: none;
-  font-size: 0.875rem;
-  padding: 0.5rem 0;
+  font-size: var(--global-font-size-sm, 0.875rem);
+  padding: var(--global-spacing-xs, 0.5rem) 0;
   border-left: 2px solid transparent;
-  padding-left: 1rem;
-  transition: all 0.3s ease;
+  padding-left: var(--global-spacing-md, 1rem);
+  transition: all var(--global-animation-normal, 0.3s) var(--global-ease-out, ease);
 }
 
 .zoutaofen-footer .category-link:hover {
-  color: #ffffff;
-  border-left-color: #fbbf24;
+  color: var(--footer-text-primary, #ffffff);
+  border-left-color: var(--footer-accent, #fbbf24);
   transform: translateX(4px);
 }
 
@@ -165,7 +147,7 @@
 .zoutaofen-footer .resources-list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--global-spacing-md, 0.75rem);
 }
 
 /* 响应式布局优化 */
@@ -280,70 +262,21 @@
   padding: 4rem 0;
 }
 
-/* 动画效果 */
+/* 动画效果 - 继承通用样式 */
 .zoutaofen-footer .nav-link,
 .zoutaofen-footer .resource-link {
-  transition: all 0.3s ease;
+  transition: all var(--global-animation-normal, 0.3s) var(--global-ease-out, ease);
 }
 
-/* 无障碍支持 */
+/* 无障碍支持 - 继承通用样式 */
 .zoutaofen-footer .nav-link:focus,
 .zoutaofen-footer .resource-link:focus {
-  outline: 2px solid #fbbf24;
+  outline: 2px solid var(--footer-accent, #fbbf24);
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: var(--global-radius-md, 4px);
 }
 
-/* 打印样式 */
-@media print {
-  .zoutaofen-footer {
-    background: white !important;
-    color: black !important;
-    border-top: 1px solid #ccc;
-  }
-  
-  .zoutaofen-footer .nav-link,
-  .zoutaofen-footer .resource-link {
-    color: black !important;
-    text-decoration: underline;
-  }
-  
-  .zoutaofen-footer .nav-category-title,
-  .zoutaofen-footer .resources-title,
-  .zoutaofen-footer .team-name {
-    color: black !important;
-  }
-}
-
-/* 高对比度模式支持 */
-@media (prefers-contrast: high) {
-  .zoutaofen-footer {
-    border-top: 2px solid currentColor;
-  }
-  
-  .zoutaofen-footer .nav-link:hover,
-  .zoutaofen-footer .resource-link:hover {
-    border: 1px solid currentColor;
-  }
-}
-
-/* 减少动画模式支持 */
-@media (prefers-reduced-motion: reduce) {
-  .zoutaofen-footer .nav-link,
-  .zoutaofen-footer .resource-link {
-    transition: none;
-    transform: none;
-  }
-}
-
-/* 深色模式优化 */
-@media (prefers-color-scheme: dark) {
-  .zoutaofen-footer {
-    background: linear-gradient(135deg, #0f172a 0%, #020617 100%);
-  }
-}
-
-/* 性能优化 */
+/* 性能优化 - 继承通用样式 */
 .zoutaofen-footer .nav-link,
 .zoutaofen-footer .resource-link {
   will-change: transform, color;
@@ -353,18 +286,17 @@
   contain: layout style paint;
 }
 
-
-/* 主题色变量 */
+/* 主题色变量 - 继承通用变量 */
 .zoutaofen-footer {
-  --theme-primary: #fbbf24;
-  --theme-secondary: #f59e0b;
-  --theme-accent: #d97706;
-  --text-primary: #ffffff;
-  --text-secondary: #d1d5db;
-  --text-tertiary: #9ca3af;
-  --bg-primary: #1f2937;
-  --bg-secondary: #111827;
-  --border-color: rgba(255, 255, 255, 0.1);
+  --theme-primary: var(--footer-accent, #fbbf24);
+  --theme-secondary: var(--footer-accent-secondary, #f59e0b);
+  --theme-accent: var(--footer-accent-tertiary, #d97706);
+  --text-primary: var(--footer-text-primary, #ffffff);
+  --text-secondary: var(--footer-text-secondary, #d1d5db);
+  --text-tertiary: var(--footer-text-tertiary, #9ca3af);
+  --bg-primary: var(--footer-bg-primary, #1f2937);
+  --bg-secondary: var(--footer-bg-secondary, #111827);
+  --border-color: var(--footer-border, rgba(255, 255, 255, 0.1));
 }
 
 /* 使用CSS变量 */
