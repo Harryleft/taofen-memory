@@ -1,5 +1,5 @@
-import { BookItem, FilterOptions, BookData, PaginatedResponse } from '../types/bookTypes';
-import { fuzzyMatch } from '../utils/bookUtils';
+import { BookItem, FilterOptions, BookData, PaginatedResponse } from '@/types/bookTypes';
+import { fuzzyMatch } from '@/utils/bookUtils';
 
 let allBooksCache: BookItem[] | null = null;
 

@@ -14,8 +14,8 @@
  */
 
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { BookItem } from '../../types/bookTypes';
-import { downloadCSV } from '../../utils/bookUtils';
+import { BookItem } from '@/types/bookTypes';
+import { downloadCSV } from '@/utils/bookUtils';
 
 
 import BookFiltersPanel from './BookFiltersPanel.tsx';
@@ -24,10 +24,10 @@ import BookDetailModal from './BookDetailModal.tsx';
 import { BookstoreCoverCard } from './BookstoreCoverCard.tsx';
 
 
-import { useBookData } from '../../hooks/useBookData';
-import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
-import { useLightbox } from '../../hooks/useLightbox';
-import { useResponsiveColumns } from '../../hooks/useResponsiveColumns';
+import { useBookData } from '@/hooks/useBookData';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
+import { useLightbox } from '@/hooks/useLightbox';
+import { useResponsiveColumns } from '@/hooks/useResponsiveColumns';
 
 // 使用配置常量
 const SEARCH_DEBOUNCE_DELAY = 300; // ms

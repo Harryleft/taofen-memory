@@ -1,7 +1,7 @@
 import React from 'react';
-import EnhancedHero from '../components/heroIntro/EnhancedHero.tsx';
-import { AppFooter } from '../components/layout/footer';
-import AppHeader from '../components/layout/header/AppHeader.tsx';
+import EnhancedHero from '@/components/heroIntro/EnhancedHero.tsx';
+import { AppFooter } from '@/components/layout/footer';
+import AppHeader from '@/components/layout/header/AppHeader.tsx';
 
 function HomePage() {
 

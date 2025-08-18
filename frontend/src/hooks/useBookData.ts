@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { BookItem, FilterOptions } from '../types/bookTypes';
-import { PAGE_SIZE } from '../constants/bookConstants';
-import { loadAllBooksData, loadBooksDataPaginated } from '../services/bookDataService';
+import { BookItem, FilterOptions } from '@/types/bookTypes';
+import { PAGE_SIZE } from '@/constants/bookConstants';
+import { loadAllBooksData, loadBooksDataPaginated } from '@/services/bookDataService';
 
 interface UseBookDataReturn {
   allData: BookItem[];

@@ -1,4 +1,4 @@
-import { Person } from '../types/Person';
+import { Person } from '@/types/Person';
 
 /**
  * 计算两个字符串之间的Levenshtein距离

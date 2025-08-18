@@ -1,4 +1,4 @@
-import { HeaderConfig, NavigationItem } from '../components/layout/header/BaseHeader';
+import { HeaderConfig, NavigationItem } from '@/components/layout/header/BaseHeader';
 
 // 统一导航菜单配置 - 所有页面使用相同的导航
 const NAVIGATION_ITEMS: NavigationItem[] = [

@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { BookItem } from '../../types/bookTypes';
+import { BookItem } from '@/types/bookTypes';
 
 /**
  * @interface BookCardProps

@@ -1,5 +1,5 @@
-import { TimelineEvent } from '../types/personTypes.ts';
-import { TimelineData } from './useTimelineData.ts';
+import { TimelineEvent } from '@/types/personTypes.ts';
+import { TimelineData } from '@/hooks/useTimelineData.ts';
 
 /**
  * 时间线数据适配器

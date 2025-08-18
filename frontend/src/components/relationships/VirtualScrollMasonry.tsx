@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { Person } from '../../types/Person.ts';
+import { Person } from '@/types/Person.ts';
 
 interface VirtualScrollMasonryProps {
   items: Person[];
