@@ -51,7 +51,7 @@ export function CoverCard({ theme, data, className = '' }: CoverCardProps) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="max-w-4xl mx-auto space-y-6"
+            className="w-full mx-auto space-y-6"
           >
             {/* 主标题 */}
             <h1 className="cover-card-main-title">
@@ -66,7 +66,7 @@ export function CoverCard({ theme, data, className = '' }: CoverCardProps) {
             )}
             
             {/* 描述文字 */}
-            <div className="cover-card-description max-w-3xl mx-auto">
+            <div className="cover-card-description w-full mx-auto">
               {data.description}
             </div>
             
