@@ -26,12 +26,18 @@
   --cover-text-secondary: var(--timeline-text-secondary, #4A5568); /* 次要文字色 */
   --cover-text-tertiary: var(--timeline-text-tertiary, #A0AEC0); /* 辅助文字色 */
   
-  /* 文献纸张质感 */
+  /* 文献纸张质感 - 增强对比度 */
   --cover-paper-bg: #FFFFFF;
   --cover-paper-shadow: 
-    0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --cover-paper-border: rgba(196, 155, 97, 0.15);
+    0 10px 25px -3px rgba(0, 0, 0, 0.15),
+    0 4px 12px -2px rgba(0, 0, 0, 0.1),
+    0 2px 6px -1px rgba(0, 0, 0, 0.08);
+  --cover-paper-shadow-hover:
+    0 20px 35px -3px rgba(0, 0, 0, 0.18),
+    0 8px 20px -2px rgba(0, 0, 0, 0.12),
+    0 4px 10px -1px rgba(0, 0, 0, 0.1);
+  --cover-paper-border: rgba(196, 155, 97, 0.25);
+  --cover-paper-border-hover: rgba(196, 155, 97, 0.4);
   
   /* 典雅字体系统 */
   --cover-font-display: 'KaiTi', 'STKaiti', '华文楷体', serif;     /* 楷体标题 */
@@ -214,11 +220,14 @@
     linear-gradient(45deg, transparent 48%, rgba(196, 155, 97, 0.008) 49%, rgba(196, 155, 97, 0.008) 50%, transparent 51%),
     linear-gradient(-45deg, transparent 48%, rgba(27, 54, 93, 0.005) 49%, rgba(27, 54, 93, 0.005) 50%, transparent 51%);
   
-  /* 典雅边框 */
+  /* 增强边框对比度 */
   border: 1px solid var(--cover-paper-border);
   
-  /* 文献纸张阴影 */
+  /* 增强纸张阴影层次 */
   box-shadow: var(--cover-paper-shadow);
+  
+  /* 纸张边缘高光效果 */
+  position: relative;
   
   /* 性能优化 */
   will-change: transform, box-shadow;
@@ -230,21 +239,39 @@
   transition: all var(--global-animation-slow, 0.5s) var(--timeline-ease-out, ease-out);
 }
 
-/* 内容可读性层 - 非常微妙 */
+/* 纸张边缘高光效果 - 增强立体感 */
 .cover-card::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    135deg,
-    rgba(250, 247, 242, 0.5) 0%,
-    rgba(255, 255, 255, 0.3) 50%,
-    rgba(250, 247, 242, 0.5) 100%
-  );
+  background: 
+    /* 左上高光 */
+    linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, transparent 15%),
+    /* 右下轻微阴影 */
+    linear-gradient(-45deg, transparent 85%, rgba(0, 0, 0, 0.03) 100%),
+    /* 整体微妙渐变 */
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.4) 0%,
+      rgba(255, 255, 255, 0.2) 50%,
+      rgba(250, 247, 242, 0.3) 100%
+    );
   border-radius: inherit;
   pointer-events: none;
   z-index: 1;
-  opacity: 0.6;
+  opacity: 0.8;
+}
+
+/* 纸张边缘装饰线 */
+.cover-card::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: calc(var(--cover-radius) - 2px);
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.5;
 }
 
 /* 删除过于华丽的光效装饰层 - 保持内敛 */
@@ -562,38 +589,45 @@
    典雅悬停和交互效果 - 文人风范
    ================================================ */
 
-/* 典雅悬停效果 */
+/* 典雅悬停效果 - 增强对比度 */
 .cover-card:hover {
-  transform: translateY(-6px) scale(1.01);
+  transform: translateY(-8px) scale(1.015);
   
-  /* 增强纸张阴影 */
-  box-shadow: 
-    0 12px 28px -4px rgba(0, 0, 0, 0.12),
-    0 6px 16px -2px rgba(0, 0, 0, 0.08),
-    0 2px 6px -1px rgba(0, 0, 0, 0.06);
+  /* 使用增强的悬停阴影 */
+  box-shadow: var(--cover-paper-shadow-hover);
   
-  /* 边框微光 */
-  border: 1px solid rgba(196, 155, 97, 0.25);
+  /* 增强边框对比度 */
+  border: 1px solid var(--cover-paper-border-hover);
   
   transition: all var(--global-animation-slow, 0.5s) var(--timeline-ease-out, ease-out);
 }
 
-/* 时间轴主题典雅悬停效果 */
-.timeline-cover .cover-card:hover {
-  box-shadow: 
-    0 12px 28px -4px rgba(27, 54, 93, 0.08),
-    0 6px 16px -2px rgba(27, 54, 93, 0.06),
-    0 2px 6px -1px rgba(27, 54, 93, 0.04);
-  border: 1px solid rgba(27, 54, 93, 0.15);
+/* 悬停时增强纸张边缘效果 */
+.cover-card:hover::before {
+  opacity: 1;
 }
 
-/* 书店主题典雅悬停效果 */
+.cover-card:hover::after {
+  opacity: 0.8;
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+/* 时间轴主题典雅悬停效果 - 增强对比度 */
+.timeline-cover .cover-card:hover {
+  box-shadow: 
+    0 20px 35px -3px rgba(27, 54, 93, 0.12),
+    0 8px 20px -2px rgba(27, 54, 93, 0.08),
+    0 4px 10px -1px rgba(27, 54, 93, 0.06);
+  border: 1px solid rgba(27, 54, 93, 0.3);
+}
+
+/* 书店主题典雅悬停效果 - 增强对比度 */
 .bookstore-cover .cover-card:hover {
   box-shadow: 
-    0 12px 28px -4px rgba(196, 155, 97, 0.08),
-    0 6px 16px -2px rgba(196, 155, 97, 0.06),
-    0 2px 6px -1px rgba(196, 155, 97, 0.04);
-  border: 1px solid rgba(196, 155, 97, 0.2);
+    0 20px 35px -3px rgba(196, 155, 97, 0.12),
+    0 8px 20px -2px rgba(196, 155, 97, 0.08),
+    0 4px 10px -1px rgba(196, 155, 97, 0.06);
+  border: 1px solid rgba(196, 155, 97, 0.35);
 }
 
 /* 内敛触摸反馈 */
