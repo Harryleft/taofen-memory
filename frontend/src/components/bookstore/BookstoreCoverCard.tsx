@@ -42,7 +42,7 @@ export function BookstoreCoverCard({
           >
             {/* 主标题 */}
             <h1 className="bookstore-cover-main-title">
-              韬奋·书香藏
+              韬奋·时光书影
             </h1>
             
             {/* 副标题 */}
