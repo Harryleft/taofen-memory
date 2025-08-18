@@ -168,20 +168,112 @@
 
 /* === 时间轴组件变量 === */
 :root {
-  /* 时间轴专用色彩 */
+  /* 邹韬奋时间轴专用色彩系统 */
+  --timeline-primary: #1B365D;
+  --timeline-primary-rgb: 27, 54, 93;
+  --timeline-secondary: #C49B61;
+  --timeline-secondary-rgb: 196, 155, 97;
+  --timeline-background: #FAF7F2;
+  --timeline-text-primary: #2D3748;
+  --timeline-text-secondary: #4A5568;
+  --timeline-text-muted: #A0AEC0;
+  --timeline-card-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  --timeline-card-shadow-hover: 0 4px 12px rgba(0,0,0,0.15);
+  
+  /* 时间轴专用色彩 - 全局变量映射 */
   --timeline-bg-primary: var(--global-bg-primary);
-  --timeline-text-primary: var(--global-text-primary);
-  --timeline-text-secondary: var(--global-text-secondary);
   --timeline-accent-primary: var(--global-accent-primary);
   --timeline-accent-secondary: var(--global-accent-secondary);
   
-  /* 时间轴点样式 */
+  /* 基础颜色系统 - 60-30-10配色法则 */
+  --timeline-bg-cream: #FAF7F2;      /* 60% 背景色 */
+  --timeline-text-charcoal: #2D3748;    /* 30% 主文本色 */
+  --timeline-text-tertiary: #A0AEC0;    /* 辅助文本色 */
+  --timeline-accent-gold: #C49B61;     /* 强调色：暖金色 */
+  --timeline-surface: #FFFFFF;
+  --timeline-border: rgba(0, 0, 0, 0.08);
+  
+  /* 圆角系统 */
+  --timeline-radius: 8px;
+  --timeline-radius-sm: 6px;
+  --timeline-radius-lg: 12px;
+  
+  /* 阴影系统 - Material Design 3.0 */
+  --timeline-shadow-card: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --timeline-shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --timeline-shadow-modal: 0 8px 32px rgba(0, 0, 0, 0.16);
+  
+  /* 排版系统 - Modular Scale 1.25比例 */
+  --timeline-text-h1: 2.441rem;     /* 39.06px - 人物姓名 */
+  --timeline-text-h2: 1.953rem;     /* 31.25px - 阶段标题 */
+  --timeline-text-h3: 1.563rem;     /* 25px - 年份标题 */
+  --timeline-text-body: 1rem;       /* 16px - 正文内容 */
+  --timeline-text-caption: 0.8rem;  /* 12.8px - 图片说明 */
+  --timeline-text-small: 0.64rem;   /* 10.24px - 最小字号 */
+  
+  /* 行高系统 - 统一1.6倍行距提升可读性 */
+  --timeline-leading-tight: 1.5;
+  --timeline-leading-normal: 1.6;
+  --timeline-leading-relaxed: 1.7;
+  
+  /* 段落间距 - 1.5em确保信息分层清晰 */
+  --timeline-paragraph-spacing: 1.5em;
+  
+  /* 字重系统 */
+  --timeline-font-light: 300;
+  --timeline-font-regular: 400;
+  --timeline-font-medium: 500;
+  --timeline-font-semibold: 600;
+  --timeline-font-bold: 700;
+  
+  /* 间距系统 - 基于1.6比例的间距体系 */
+  --timeline-spacing-xs: 0.25rem;    /* 4px */
+  --timeline-spacing-sm: 0.5rem;     /* 8px */
+  --timeline-spacing-md: 1rem;       /* 16px */
+  --timeline-spacing-lg: 1.6rem;     /* 25.6px */
+  --timeline-spacing-xl: 2.5rem;     /* 40px */
+  --timeline-spacing-2xl: 4rem;      /* 64px */
+  --timeline-spacing-3xl: 6.4rem;    /* 102.4px */
+  
+  /* Z-index层级系统 */
+  --timeline-z-background: 0;      /* Background Layer: 页面背景 */
+  --timeline-z-content: 10;        /* Content Layer: 主要内容卡片 */
+  --timeline-z-navigation: 20;      /* Navigation Layer: 固定导航元素 */
+  --timeline-z-modal: 30;          /* Modal Layer: 弹层内容 */
+  --timeline-z-tooltip: 40;        /* Tooltip Layer: 工具提示 */
+  
+  /* 卡片设计规范 - 统一间距 */
+  --timeline-card-padding-y: 2.5rem;      /* 40px 上下 */
+  --timeline-card-padding-x: 1.6rem;      /* 25.6px 左右 */
+  --timeline-card-gap-y: 4rem;         /* 64px 垂直间距 */
+  --timeline-card-gap-x: 1.6rem;          /* 25.6px 水平间距 */
+  
+  /* 时间轴点专用优化变量 - 使用设计规范色彩 */
+  --timeline-dot-gold: var(--timeline-accent-gold);
+  --timeline-dot-gold-light: #D4A574;  /* 暖金色变体 */
+  --timeline-dot-gray: var(--timeline-text-secondary);
+  --timeline-dot-gray-light: var(--timeline-text-tertiary);
+  --timeline-dot-border: #FFFFFF;
+  --timeline-dot-shadow-gold: rgba(196, 155, 97, 0.4);
+  --timeline-dot-shadow-gray: rgba(74, 85, 104, 0.4);
+  --timeline-dot-shadow-dark: rgba(0, 0, 0, 0.2);
   --timeline-dot-size: 14px;
   --timeline-dot-size-mobile: 12px;
   --timeline-dot-border-width: 2px;
-  --timeline-dot-color: var(--timeline-accent-secondary);
-  --timeline-dot-border-color: #ffffff;
-  --timeline-dot-shadow: 0 0 12px rgba(196, 155, 97, 0.4);
+  
+  /* 动画参数 - Material Design规范 */
+  --timeline-animation-fast: 0.2s;
+  --timeline-animation-normal: 0.4s;     /* 400ms - Material Design建议 */
+  --timeline-animation-slow: 0.6s;
+  --timeline-animation-slower: 0.8s;
+  
+  /* 缓动函数 - Material Design标准 */
+  --timeline-ease-out: cubic-bezier(0.4, 0.0, 0.2, 1);      /* 标准退出缓动 */
+  --timeline-ease-in-out: cubic-bezier(0.4, 0.0, 0.2, 1);  /* 标准进出缓动 */
+  --timeline-ease-in: cubic-bezier(0.4, 0.0, 0.2, 1);      /* 标准进入缓动 */
+  
+  /* 字体加载优化 */
+  --timeline-font-display: swap;
   
   /* 时间轴线条 */
   --timeline-line-width: 2px;
