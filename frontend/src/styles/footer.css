@@ -1,7 +1,8 @@
-/* Footer组件样式 */
+/* Footer组件样式 - 通用基础样式 */
 
 /* Footer基础样式 */
-.footer-component {
+.footer-component,
+.zoutaofen-footer {
   position: relative;
   margin-top: auto;
   border-top: 1px solid var(--footer-border);
@@ -10,7 +11,13 @@
   font-family: var(--global-font-family-sans);
 }
 
-.footer-component .footer-container {
+/* ZoutaofenFooter 特殊背景 */
+.zoutaofen-footer {
+  background: linear-gradient(135deg, var(--footer-bg-primary, #1f2937) 0%, var(--footer-bg-secondary, #111827) 100%);
+}
+
+.footer-component .footer-container,
+.zoutaofen-footer .footer-container {
   max-width: var(--footer-container-max-width);
   margin: 0 auto;
   padding: 0 var(--footer-padding-horizontal);
@@ -18,20 +25,23 @@
 
 /* 响应式布局调整 */
 @media (max-width: calc(var(--global-breakpoint-md) - 1px)) {
-  .footer-component .footer-container {
+  .footer-component .footer-container,
+  .zoutaofen-footer .footer-container {
     padding: 0 1rem;
   }
 }
 
 /* 网格布局 */
-.footer-component .footer-grid {
+.footer-component .footer-grid,
+.zoutaofen-footer .footer-content {
   display: grid;
   grid-template-columns: repeat(var(--footer-grid-columns), 1fr);
   gap: var(--footer-grid-gap);
 }
 
 @media (min-width: 768px) {
-  .footer-component .footer-grid {
+  .footer-component .footer-grid,
+  .zoutaofen-footer .footer-content {
     grid-template-columns: repeat(3, 1fr);
     gap: 3rem;
   }
@@ -69,12 +79,17 @@
   text-align: left;
 }
 
-/* 导航区域样式 */
-.footer-component .nav-category {
+/* 导航区域样式 - 通用 */
+.footer-component .nav-category,
+.zoutaofen-footer .nav-section {
   margin-bottom: var(--global-spacing-lg);
 }
 
-.footer-component .nav-title {
+.footer-component .nav-title,
+.footer-component .contact-title,
+.footer-component .social-title,
+.zoutaofen-footer .nav-category-title,
+.zoutaofen-footer .resources-title {
   color: var(--footer-accent);
   font-size: var(--global-font-size-base);
   font-weight: var(--global-font-weight-semibold);
@@ -82,7 +97,11 @@
   position: relative;
 }
 
-.nav-title::after {
+.nav-title::after,
+.contact-title::after,
+.social-title::after,
+.zoutaofen-footer .nav-category-title::after,
+.zoutaofen-footer .resources-title::after {
   content: '';
   position: absolute;
   bottom: -4px;
@@ -92,13 +111,27 @@
   background: linear-gradient(to right, #fbbf24, #f59e0b);
 }
 
-.footer-component .nav-links {
+.zoutaofen-footer .nav-category-title::after,
+.zoutaofen-footer .resources-title::after {
+  width: 40px;
+}
+
+.footer-component .nav-links,
+.zoutaofen-footer .categories-list,
+.zoutaofen-footer .resources-list {
   list-style: none;
   padding: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--global-spacing-md);
 }
 
-.footer-component .nav-link {
+/* 通用导航链接样式 */
+.footer-component .nav-link,
+.zoutaofen-footer .nav-link,
+.zoutaofen-footer .category-link,
+.zoutaofen-footer .resource-link {
   display: block;
   padding: var(--global-spacing-xs) 0;
   color: var(--footer-text-secondary);
@@ -107,12 +140,16 @@
   position: relative;
 }
 
-.footer-component .nav-link:hover {
+.footer-component .nav-link:hover,
+.zoutaofen-footer .nav-link:hover,
+.zoutaofen-footer .category-link:hover,
+.zoutaofen-footer .resource-link:hover {
   color: var(--footer-text-primary);
   transform: translateX(4px);
 }
 
-.nav-link::before {
+.footer-component .nav-link::before,
+.zoutaofen-footer .nav-link::before {
   content: '•';
   position: absolute;
   left: -12px;
@@ -121,28 +158,25 @@
   transition: opacity 0.3s ease;
 }
 
-.nav-link:hover::before {
+.footer-component .nav-link:hover::before,
+.zoutaofen-footer .nav-link:hover::before {
   opacity: 1;
 }
 
-/* 联系信息区域样式 */
-.footer-component .contact-title {
-  color: var(--footer-accent);
-  font-size: var(--global-font-size-base);
-  font-weight: var(--global-font-weight-semibold);
-  margin-bottom: var(--global-spacing-md);
-  position: relative;
+/* ZoutaofenFooter 特殊边框样式 */
+.zoutaofen-footer .category-link,
+.zoutaofen-footer .resource-link {
+  border-left: 2px solid transparent;
+  padding-left: var(--global-spacing-md);
 }
 
-.contact-title::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  width: 30px;
-  height: 2px;
-  background: linear-gradient(to right, #fbbf24, #f59e0b);
+.zoutaofen-footer .category-link:hover,
+.zoutaofen-footer .resource-link:hover {
+  border-left-color: var(--footer-accent);
 }
+
+/* 联系信息区域样式 */
+/* 已合并到导航区域样式中 */
 
 .footer-component .contact-items {
   display: flex;
@@ -176,23 +210,7 @@
 }
 
 /* 社交媒体区域样式 */
-.footer-component .social-title {
-  color: var(--footer-accent);
-  font-size: var(--global-font-size-base);
-  font-weight: var(--global-font-weight-semibold);
-  margin-bottom: var(--global-spacing-md);
-  position: relative;
-}
-
-.social-title::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  width: 30px;
-  height: 2px;
-  background: linear-gradient(to right, #fbbf24, #f59e0b);
-}
+/* 已合并到导航区域样式中 */
 
 .footer-component .social-links {
   display: flex;
@@ -281,31 +299,37 @@
 
 /* 响应式优化 */
 @media (max-width: calc(var(--global-breakpoint-sm) - 1px)) {
-  .footer-component .footer-grid {
+  .footer-component .footer-grid,
+  .zoutaofen-footer .footer-content {
     grid-template-columns: 1fr;
     gap: var(--global-spacing-xl);
     padding: var(--global-spacing-xl) 0;
   }
   
-  .footer-component .brand-section {
+  .footer-component .brand-section,
+  .zoutaofen-footer .brand-section {
     align-items: center;
     text-align: center;
   }
   
-  .footer-component .brand-description {
+  .footer-component .brand-description,
+  .zoutaofen-footer .brand-description {
     text-align: center;
     margin: 0 auto;
   }
   
   .footer-component .nav-category,
   .footer-component .contact-section,
-  .footer-component .social-section {
+  .footer-component .social-section,
+  .zoutaofen-footer .nav-section {
     text-align: center;
   }
   
   .nav-title::after,
   .contact-title::after,
-  .social-title::after {
+  .social-title::after,
+  .zoutaofen-footer .nav-category-title::after,
+  .zoutaofen-footer .resources-title::after {
     left: 50%;
     transform: translateX(-50%);
   }
@@ -317,19 +341,43 @@
   .social-links {
     justify-content: center;
   }
+  
+  /* ZoutaofenFooter 特殊响应式样式 */
+  .zoutaofen-footer .footer-container {
+    padding: 0 0.5rem;
+  }
+  
+  .zoutaofen-footer .categories-list,
+  .zoutaofen-footer .resources-list {
+    gap: 0.5rem;
+  }
+  
+  .zoutaofen-footer .category-link,
+  .zoutaofen-footer .resource-link {
+    font-size: 0.813rem;
+    padding: 0.375rem 0;
+    padding-left: 0.75rem;
+  }
 }
 
 /* 动画效果 */
 .footer-component .nav-link,
 .footer-component .social-link,
-.footer-component .contact-item {
+.footer-component .contact-item,
+.zoutaofen-footer .nav-link,
+.zoutaofen-footer .category-link,
+.zoutaofen-footer .resource-link {
   transition: all var(--global-animation-normal) var(--global-ease-out);
+  will-change: transform, color;
 }
 
 /* 无障碍支持 */
 .footer-component .nav-link:focus,
 .footer-component .social-link:focus,
-.footer-component .contact-item:focus {
+.footer-component .contact-item:focus,
+.zoutaofen-footer .nav-link:focus,
+.zoutaofen-footer .category-link:focus,
+.zoutaofen-footer .resource-link:focus {
   outline: 2px solid var(--footer-accent);
   outline-offset: 2px;
   border-radius: var(--global-radius-md);
@@ -366,8 +414,87 @@
 @media (prefers-reduced-motion: reduce) {
   .footer-component .nav-link,
   .footer-component .social-link,
-  .footer-component .contact-item {
+  .footer-component .contact-item,
+  .zoutaofen-footer .nav-link,
+  .zoutaofen-footer .category-link,
+  .zoutaofen-footer .resource-link {
     transition: none;
     transform: none;
   }
+}
+
+/* ZoutaofenFooter 特有样式 */
+.zoutaofen-footer .copyright {
+  color: var(--footer-text-tertiary);
+  font-size: var(--global-font-size-sm);
+  line-height: var(--global-line-height-normal);
+}
+
+.zoutaofen-footer .team-name {
+  color: var(--footer-accent);
+  font-weight: var(--global-font-weight-semibold);
+  font-size: var(--global-font-size-base);
+}
+
+.zoutaofen-footer .competition-info {
+  color: var(--footer-text-tertiary);
+  font-size: var(--global-font-size-xs);
+  line-height: var(--global-line-height-relaxed);
+}
+
+/* 版本特定样式 */
+.zoutaofen-footer.version-responsive {
+  padding: 3rem 0;
+}
+
+.zoutaofen-footer.version-minimal {
+  padding: 2rem 0;
+}
+
+.zoutaofen-footer.version-full {
+  padding: 4rem 0;
+}
+
+/* 性能优化 */
+.zoutaofen-footer .nav-link,
+.zoutaofen-footer .category-link,
+.zoutaofen-footer .resource-link {
+  contain: layout style paint;
+}
+
+/* 主题色变量映射 */
+.zoutaofen-footer {
+  --theme-primary: var(--footer-accent);
+  --theme-secondary: var(--footer-accent-secondary);
+  --theme-accent: var(--footer-accent-tertiary);
+  --text-primary: var(--footer-text-primary);
+  --text-secondary: var(--footer-text-secondary);
+  --text-tertiary: var(--footer-text-tertiary);
+  --bg-primary: var(--footer-bg-primary);
+  --bg-secondary: var(--footer-bg-secondary);
+  --border-color: var(--footer-border);
+}
+
+/* 使用映射变量 */
+.zoutaofen-footer .nav-category-title,
+.zoutaofen-footer .resources-title,
+.zoutaofen-footer .team-name {
+  color: var(--theme-primary);
+}
+
+.zoutaofen-footer .nav-link,
+.zoutaofen-footer .category-link,
+.zoutaofen-footer .resource-link {
+  color: var(--text-secondary);
+}
+
+.zoutaofen-footer .nav-link:hover,
+.zoutaofen-footer .category-link:hover,
+.zoutaofen-footer .resource-link:hover {
+  color: var(--text-primary);
+}
+
+.zoutaofen-footer .copyright,
+.zoutaofen-footer .competition-info {
+  color: var(--text-tertiary);
 }
