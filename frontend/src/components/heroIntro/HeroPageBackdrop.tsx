@@ -194,24 +194,62 @@ class ImageProcessor {
     return Utils.stableShuffle(base, seed);
   }
 
-  // 预加载图片并获取真实尺寸
+  // 预加载图片并获取真实尺寸（支持清理）
+  static preloadImagesWithCleanup(
+    items: BaseMasonryItem[],
+    onAspectMeasured: (id: number, aspect: number) => void
+  ): () => void {
+    const abortController = new AbortController();
+    const imageObjects: HTMLImageElement[] = [];
+    
+    items.forEach((item) => {
+      const img = new Image();
+      imageObjects.push(img);
+      
+      const handleLoad = () => {
+        if (img.naturalWidth > 0 && img.naturalHeight > 0 && !abortController.signal.aborted) {
+          const ratio = img.naturalHeight / img.naturalWidth;
+          onAspectMeasured(item.id, ratio);
+        }
+        // 清理事件监听器
+        img.onload = null;
+        img.onerror = null;
+      };
+      
+      const handleError = () => {
+        if (!abortController.signal.aborted) {
+          Utils.debugLog(CONFIG.DEBUG, `图片加载失败: ${item.src}`);
+        }
+        // 清理事件监听器
+        img.onload = null;
+        img.onerror = null;
+      };
+      
+      img.onload = handleLoad;
+      img.onerror = handleError;
+      img.src = item.src;
+    });
+    
+    // 返回清理函数
+    return () => {
+      abortController.abort();
+      imageObjects.forEach(img => {
+        // 清理事件监听器
+        img.onload = null;
+        img.onerror = null;
+        // 取消图片加载
+        img.src = '';
+      });
+      imageObjects.length = 0; // 清空数组
+    };
+  }
+
+  // 保持原有方法向后兼容
   static preloadImages(
     items: BaseMasonryItem[],
     onAspectMeasured: (id: number, aspect: number) => void
   ): void {
-    items.forEach((item) => {
-      const img = new Image();
-      img.src = item.src;
-      img.onload = () => {
-        if (img.naturalWidth > 0 && img.naturalHeight > 0) {
-          const ratio = img.naturalHeight / img.naturalWidth;
-          onAspectMeasured(item.id, ratio);
-        }
-      };
-      img.onerror = () => {
-        Utils.debugLog(CONFIG.DEBUG, `图片加载失败: ${item.src}`);
-      };
-    });
+    this.preloadImagesWithCleanup(items, onAspectMeasured);
   }
 }
 
@@ -283,6 +321,7 @@ export default function HeroPageBackdrop() {
 
   // Refs
   const containerRef = useRef<HTMLDivElement>(null);
+  const cleanupRef = useRef<(() => void) | null>(null);
 
   // 移除视差滚动效果，保持静态展示
 
@@ -305,10 +344,20 @@ export default function HeroPageBackdrop() {
       });
   }, []);
 
-  // 预加载图片并测量真实宽高比
+  // 预加载图片并测量真实宽高比（带清理）
   useEffect(() => {
     if (remoteItems.length > 0) {
-      ImageProcessor.preloadImages(remoteItems, handleAspectMeasured);
+      // 使用新的带清理的方法
+      const cleanup = ImageProcessor.preloadImagesWithCleanup(remoteItems, handleAspectMeasured);
+      cleanupRef.current = cleanup;
+      
+      // 返回清理函数
+      return () => {
+        if (cleanupRef.current) {
+          cleanupRef.current();
+          cleanupRef.current = null;
+        }
+      };
     }
   }, [remoteItems, handleAspectMeasured]);
 
