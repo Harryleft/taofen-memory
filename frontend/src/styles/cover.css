@@ -22,13 +22,13 @@
   --cover-primary: var(--timeline-primary, #1B365D);           /* 深蓝主色 */
   --cover-secondary: var(--timeline-secondary, #C49B61);       /* 暖金强调色 */
   --cover-background: var(--timeline-background, #FAF7F2);     /* 米色背景 */
-  --cover-text-primary: var(--timeline-text-primary, #2D3748); /* 主文字色 */
+  --cover-text-primary: #000000;
   --cover-text-secondary: var(--timeline-text-secondary, #4A5568); /* 次要文字色 */
   --cover-text-tertiary: var(--timeline-text-tertiary, #A0AEC0); /* 辅助文字色 */
   
   /* 方案B: 分区色块系统 - 基于global.css生态 */
   --cover-hero-zone-bg: var(--global-bg-secondary, #FCFAF7);  /* Hero带状区 - 比背景更亮 */
-  --cover-paper-bg: #FFFEF9;  /* 卡片表面 - 最亮层级 */
+  --cover-paper-bg: #FFFFFF;  /* 卡片表面 - 最亮层级 */
   --cover-info-capsule-bg: rgba(196, 155, 97, 0.06);  /* 信息胶囊 - 浅金米白 */
   --cover-paper-shadow: 
     0 12px 30px -3px rgba(0, 0, 0, 0.18),
@@ -38,7 +38,7 @@
     0 25px 45px -3px rgba(0, 0, 0, 0.22),
     0 10px 25px -2px rgba(0, 0, 0, 0.15),
     0 5px 12px -1px rgba(0, 0, 0, 0.12);
-  --cover-paper-border: rgba(196, 155, 97, 0.3);
+  --cover-paper-border: rgba(0, 0, 0, 0.1);
   --cover-paper-border-hover: rgba(196, 155, 97, 0.5);
   
   /* 方案B: 纸纹质感系统 - 乔布斯式细节精雕 */
