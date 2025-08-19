@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import RelationshipPageMasonry from '@/components/relationships/RelationshipPageMasonry.tsx';
 import RelationshipPagePersonModal from '@/components/relationships/RelationshipPagePersonModal.tsx';
+import RelationshipsCoverCard from '@/components/relationships/RelationshipsCoverCard.tsx';
 import AppHeader from '@/components/layout/header/AppHeader.tsx';
 import { AppFooter } from '@/components/layout/footer';
 import BackToTop from '@/components/relationships/BackToTop.tsx';
@@ -101,6 +102,16 @@ export default function RelationshipsPage() {
         </div>
       </div>
 
+      {/* 封面卡片 */}
+      <div className="bg-cream py-20">
+        <div className="max-w-7xl mx-auto px-6">
+          <RelationshipsCoverCard
+            totalPersons={persons.length}
+            totalCategories={RELATIONSHIPS_CATEGORIES.length - 1} // 减去"全部"分类
+          />
+        </div>
+      </div>
+
       {/* Category Filter */}
       <div className="relationships-main-content-container">
         {/* 移动端筛选器头部 */}
@@ -191,18 +202,6 @@ export default function RelationshipsPage() {
                 );
               })}
             </div>
-          </div>
-        </div>
-
-        {/* Statistics */}
-        <div className="relationships-stats-container">
-          <div className="relationships-stat-item">
-            <span className="relationships-stat-number">{persons.length}</span>
-            <span className="relationships-stat-label">位人物</span>
-          </div>
-          <div className="relationships-stat-item">
-            <span className="relationships-stat-number">{filteredPersons.length}</span>
-            <span className="relationships-stat-label">当前显示</span>
           </div>
         </div>
       </div>
