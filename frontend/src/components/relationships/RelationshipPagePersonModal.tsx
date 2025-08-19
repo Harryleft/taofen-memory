@@ -170,10 +170,11 @@ const RelationshipPagePersonModal: React.FC<PersonDetailModalProps> = ({ person,
           {/* 关系线索 */}
           {person.extra?.relationships && person.extra.relationships.length > 0 && (
             <div>
-              <h3 className="flex items-center text-lg font-medium text-gray-900 mb-3">
+              <h3 className="flex items-center text-lg font-medium text-gray-900 mb-1">
                 <Tags size={18} className="mr-2 text-gray-600" />
                 关系线索
               </h3>
+              <p className="text-xs text-gray-500 mb-3">以下关系类型、维度和证据摘要由 AI 根据人物资料与语境自动生成，仅供参考。</p>
               <div className="space-y-4">
                 {person.extra.relationships
                   .slice() // 不修改原数组
