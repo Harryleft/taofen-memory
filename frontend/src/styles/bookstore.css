@@ -96,6 +96,8 @@
     @apply relative block w-full px-4 py-3 text-left text-primary/80 hover:bg-accent-gold/10 hover:text-primary focus:bg-accent-gold/15 focus:text-primary focus:outline-none transition-all duration-200 ease-in-out border-l-4 border-transparent hover:border-accent-gold/40 focus:border-accent-gold/60;
     font-size: 0.95rem;
     font-weight: 500;
+    background-color: transparent !important; /* 覆盖全局button的蓝色背景 */
+    color: var(--global-text-primary) !important; /* 覆盖全局button的白色文字 */
   }
 
   .bookstore-year-option:hover {
@@ -380,6 +382,31 @@
   /* 键盘导航优化 */
   .bookstore-year-option:focus {
     @apply outline-none ring-2 ring-accent-gold/40 ring-offset-2;
+    background-color: transparent !important;
+  }
+  
+  /* 防止浏览器默认蓝色背景和全局button样式影响 */
+  .bookstore-year-option,
+  .bookstore-year-option:focus,
+  .bookstore-year-option:focus-visible,
+  .bookstore-year-option:active {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    color: var(--global-text-primary) !important;
+  }
+  
+  /* 悬停状态保持金色背景 */
+  .bookstore-year-option:hover {
+    background-color: rgba(212, 175, 55, 0.1) !important;
+    color: var(--global-text-primary) !important;
+  }
+  
+  /* 确保内部元素也没有蓝色背景 */
+  .bookstore-year-option span,
+  .bookstore-year-option svg,
+  .bookstore-year-option * {
+    background-color: transparent !important;
+    box-shadow: none !important;
   }
 
   /* 加载状态动画 */

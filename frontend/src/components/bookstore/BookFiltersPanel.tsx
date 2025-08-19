@@ -121,8 +121,6 @@ const BookFiltersPanel: React.FC<BookstoreFiltersProps> = ({
                 setSelectedYear('all');
                 setYearDropdownOpen(false);
               }}
-              onFocus={(e) => e.target.classList.add('focus')}
-              onBlur={(e) => e.target.classList.remove('focus')}
             >
               <span className="flex items-center">
                 <Calendar className="mr-2 h-4 w-4 text-primary/60" />
@@ -140,11 +138,9 @@ const BookFiltersPanel: React.FC<BookstoreFiltersProps> = ({
                   setSelectedYear(year.toString());
                   setYearDropdownOpen(false);
                 }}
-                onFocus={(e) => e.target.classList.add('focus')}
-                onBlur={(e) => e.target.classList.remove('focus')}
               >
                 <span className="flex items-center">
-                  <span className="mr-2 h-4 w-4 text-primary/60">{year}</span>
+                  <Calendar className="mr-2 h-4 w-4 text-primary/60" />
                   {year}年
                 </span>
               </button>
