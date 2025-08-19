@@ -18,33 +18,35 @@
    ================================================ */
 
 :root {
-  /* 韬奋主题色彩系统 - 来自global.css */
-  --cover-primary: var(--timeline-primary, #1B365D);           /* 深蓝主色 */
-  --cover-secondary: var(--timeline-secondary, #C49B61);       /* 暖金强调色 */
-  --cover-background: var(--timeline-background, #FAF7F2);     /* 米色背景 */
-  --cover-text-primary: #000000;
-  --cover-text-secondary: var(--timeline-text-secondary, #4A5568); /* 次要文字色 */
-  --cover-text-tertiary: var(--timeline-text-tertiary, #A0AEC0); /* 辅助文字色 */
+  /* === 方案二·精进版：黑白分明的色彩系统 === */
+  --cover-primary: #000000;                                    /* 主标题纯黑 */
+  --cover-secondary: var(--timeline-secondary, #C49B61);       /* 暖金强调色 - 保持不变 */
+  --cover-background: var(--timeline-background, #FAF7F2);     /* 米色背景 - 保持不变 */
+  --cover-text-primary: #000000;                               /* 正文纯黑 */
+  --cover-text-secondary: #333333;                             /* 次要文字深灰 */
+  --cover-text-tertiary: #666666;                              /* 辅助文字中灰 */
   
-  /* 方案B: 分区色块系统 - 基于global.css生态 */
-  --cover-hero-zone-bg: var(--global-bg-secondary, #FCFAF7);  /* Hero带状区 - 比背景更亮 */
-  --cover-paper-bg: #FFFFFF;  /* 卡片表面 - 最亮层级 */
-  --cover-info-capsule-bg: rgba(196, 155, 97, 0.06);  /* 信息胶囊 - 浅金米白 */
+  /* === 简化的分区系统：3层变2层 === */
+  --cover-hero-zone-bg: transparent;                           /* 删除Hero带状区 */
+  --cover-paper-bg: #FFFFFF;                                   /* 卡片表面纯白 */
+  --cover-info-capsule-bg: rgba(0, 0, 0, 0.02);               /* 信息胶囊极简灰 */
+  
+  /* === 强化的阴影系统：增强卡片边界 === */
   --cover-paper-shadow: 
-    0 12px 30px -3px rgba(0, 0, 0, 0.18),
-    0 6px 16px -2px rgba(0, 0, 0, 0.12),
-    0 3px 8px -1px rgba(0, 0, 0, 0.1);
-  --cover-paper-shadow-hover:
-    0 25px 45px -3px rgba(0, 0, 0, 0.22),
-    0 10px 25px -2px rgba(0, 0, 0, 0.15),
-    0 5px 12px -1px rgba(0, 0, 0, 0.12);
-  --cover-paper-border: rgba(0, 0, 0, 0.1);
-  --cover-paper-border-hover: rgba(196, 155, 97, 0.5);
+    0 6px 16px rgba(0, 0, 0, 0.1),
+    0 2px 6px rgba(0, 0, 0, 0.06);                            /* 双层阴影提升立体感 */
+  --cover-paper-shadow-hover: 
+    0 12px 32px rgba(0, 0, 0, 0.12),
+    0 4px 12px rgba(0, 0, 0, 0.08);                           /* 悬停时明显提升 */
   
-  /* 方案B: 纸纹质感系统 - 乔布斯式细节精雕 */
-  --cover-paper-texture-opacity: 0.03;  /* 极微妙纸纹 - 感知而不干扰 */
-  --cover-zone-divider: rgba(196, 155, 97, 0.15);  /* 带状区分隔线 - 来自accent-secondary */
-  --cover-accent-point: rgba(196, 155, 97, 0.2);   /* 视觉锚点 - 左右装饰点 */
+  /* === 强化的边框系统：清晰边界 === */
+  --cover-paper-border: rgba(0, 0, 0, 0.12);                  /* 加深边框 */
+  --cover-paper-border-hover: rgba(0, 0, 0, 0.18);            /* 悬停时显著加深 */
+  
+  /* === 删除装饰噪音系统 === */
+  --cover-paper-texture-opacity: 0;                            /* 彻底删除纸纹 */
+  --cover-zone-divider: transparent;                           /* 删除分割线 */
+  --cover-accent-point: transparent;                           /* 删除装饰点 */
   
   /* 典雅字体系统 */
   --cover-font-display: 'KaiTi', 'STKaiti', '华文楷体', serif;     /* 楷体标题 */
@@ -214,89 +216,44 @@
 .cover-card {
   position: relative;
   border-radius: var(--cover-radius);
-  padding: var(--cover-padding-vertical) var(--cover-padding-horizontal);  /* 上下紧凑，左右宽敞 */
+  padding: var(--cover-padding-vertical) var(--cover-padding-horizontal);
   overflow: hidden;
   
-  /* 方案B: Hero带状区背景 - 创造三级分层(背景-分区-卡片) */
-  background: 
-    /* 卡片主表面 */
-    var(--cover-paper-bg),
-    /* Hero带状区(顶部30%) */
-    linear-gradient(to bottom, 
-      var(--cover-hero-zone-bg) 0%, 
-      var(--cover-hero-zone-bg) 30%, 
-      transparent 30%
-    );
+  /* === 方案二·精进版：简洁的单层背景 === */
+  background: var(--cover-paper-bg);              /* 纯白背景，无复杂层次 */
   
-  /* 方案B: 精雕纸纹质感 - 乔布斯式微妙细节 */
-  background-image:
-    /* Hero区域专属纹理 - 更细腻 */
-    radial-gradient(circle at 20% 15%, rgba(196, 155, 97, var(--cover-paper-texture-opacity)) 0%, transparent 40%),
-    radial-gradient(circle at 80% 20%, rgba(27, 54, 93, calc(var(--cover-paper-texture-opacity) * 0.7)) 0%, transparent 40%),
-    /* 卡片区域纹理 - 对比差异 */
-    radial-gradient(circle at 30% 70%, rgba(196, 155, 97, calc(var(--cover-paper-texture-opacity) * 0.8)) 0%, transparent 50%),
-    radial-gradient(circle at 70% 80%, rgba(27, 54, 93, calc(var(--cover-paper-texture-opacity) * 0.5)) 0%, transparent 50%);
+  /* === 删除所有复杂背景图像 === */
+  background-image: none;                         /* 彻底清理纸纹和渐变 */
   
-  /* 增强边框对比度 */
-  border: 1px solid var(--cover-paper-border);
+  /* === 强化边框和阴影 === */
+  border: 1px solid var(--cover-paper-border);   /* 清晰边框 */
+  box-shadow: var(--cover-paper-shadow);          /* 双层阴影 */
   
-  /* 增强纸张阴影层次 */
-  box-shadow: var(--cover-paper-shadow);
-  
-  /* 纸张边缘高光效果 */
-  position: relative;
-  
-  /* 性能优化 */
+  /* === 性能优化保持 === */
   will-change: transform, box-shadow;
   transform: translateZ(0);
   backface-visibility: hidden;
   contain: layout style paint;
   
-  /* 平缓过渡 */
+  /* === 平缓过渡 === */
   transition: all var(--global-animation-slow, 0.5s) var(--timeline-ease-out, ease-out);
 }
 
-/* 纸张边缘高光效果 - 增强立体感和对比度 */
+/* === 简化的微妙高光效果 === */
 .cover-card::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: 
-    /* 左上高光增强 */
-    linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, transparent 18%),
-    /* 右下轻微阴影增强 */
-    linear-gradient(-45deg, transparent 82%, rgba(0, 0, 0, 0.05) 100%),
-    /* 整体微妙渐变增强 */
-    linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.5) 0%,
-      rgba(255, 255, 255, 0.3) 50%,
-      rgba(250, 247, 242, 0.4) 100%
-    );
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, transparent 25%);
   border-radius: inherit;
   pointer-events: none;
   z-index: 1;
-  opacity: 0.9;
+  opacity: 0.6;
 }
 
-/* 方案B: Hero带状区分隔线 - 乔布斯式功能性美学 */
+/* === 删除分隔线：无Hero区域，无需分割 === */
 .cover-card::after {
-  content: '';
-  position: absolute;
-  top: 30%;  /* 与Hero区域下沿对齐 */
-  left: 5%;
-  right: 5%;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    var(--cover-zone-divider) 20%,
-    var(--cover-zone-divider) 80%,
-    transparent 100%
-  );
-  pointer-events: none;
-  z-index: 2;
-  opacity: 0.8;
+  display: none;                                  /* 彻底隐藏分隔线 */
 }
 
 /* 乔布斯减法思维：专注核心功能，去除非必要装饰 */
@@ -469,13 +426,24 @@
   display: flex;
   align-items: center;
   gap: 2rem;
-  padding: 1.5rem 2rem;
-  background: rgba(255, 255, 255, 0.4);
-  border: 1px solid rgba(196, 155, 97, 0.2);
-  border-radius: 16px;
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+  padding: 1.5rem 0;                             /* 只保留上下内边距，左右去除 */
+  
+  /* === 完全融入背景：无任何视觉分离 === */
+  background: transparent;                       /* 完全透明背景 */
+  border: none;                                  /* 无边框 */
+  border-radius: 0;                              /* 无圆角 */
+  
+  /* === 删除所有效果 === */
+  box-shadow: none;                              /* 无阴影 */
+  -webkit-backdrop-filter: none;                /* 无模糊 */
+  backdrop-filter: none;                        /* 无模糊 */
+  
+  /* === 删除过渡动画 === */
+  transition: none;                              /* 无动画 */
 }
+
+/* === 统计数据悬停效果：完全删除 === */
+/* .cover-card:hover .cover-card-stats 规则已删除，无任何悬停效果，完全融入卡片背景 */
 
 .cover-card-stat-item {
   display: flex;
@@ -489,24 +457,32 @@
   font-weight: 700;
   line-height: 1;
   font-family: 'KaiTi', 'STKaiti', '华文楷体', serif;
+  
+  /* === 方案二·精进版：保持金色强调 === */
+  color: var(--cover-secondary);                 /* 保持金色数字 */
 }
 
 .cover-card-stat-label {
   font-size: 0.9rem;
   font-weight: 500;
-  opacity: 0.8;
   white-space: nowrap;
   font-family: 'SimSun', '宋体', 'NSimSun', serif;
+  
+  /* === 方案二·精进版：黑色标签文字 === */
+  color: var(--cover-text-secondary);            /* 深灰标签 */
+  opacity: 1;                                    /* 去除透明度，直接用颜色控制 */
 }
 
 .cover-card-stat-divider {
   width: 1px;
   height: 2rem;
+  
+  /* === 方案二·精进版：简洁的黑色分隔线 === */
   background: linear-gradient(
     to bottom,
     transparent 0%,
-    rgba(196, 155, 97, 0.3) 20%,
-    rgba(196, 155, 97, 0.3) 80%,
+    rgba(0, 0, 0, 0.15) 20%,
+    rgba(0, 0, 0, 0.15) 80%,
     transparent 100%
   );
 }
@@ -708,17 +684,19 @@
   .cover-card-stats {
     flex-direction: column;
     gap: 1rem;
-    padding: 1.25rem 1.5rem;
+    padding: 1.25rem 0;                              /* 移动端也去除左右内边距 */
   }
   
   .cover-card-stat-divider {
     width: 2rem;
     height: 1px;
+    
+    /* === 移动端也使用黑色分隔线 === */
     background: linear-gradient(
       to right,
       transparent 0%,
-      rgba(196, 155, 97, 0.3) 20%,
-      rgba(196, 155, 97, 0.3) 80%,
+      rgba(0, 0, 0, 0.15) 20%,
+      rgba(0, 0, 0, 0.15) 80%,
       transparent 100%
     );
   }
@@ -868,8 +846,9 @@
   }
   
   .cover-card-stats {
-    border: 2px solid currentColor;
-    background: rgba(255, 255, 255, 0.9);
+    border: none;                                /* 高对比度模式下也隐藏边框 */
+    background: transparent;                     /* 高对比度模式下也保持透明 */
+    box-shadow: none;                            /* 删除边框模拟效果 */
   }
 }
 
