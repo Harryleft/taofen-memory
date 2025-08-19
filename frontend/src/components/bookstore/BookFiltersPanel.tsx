@@ -76,15 +76,15 @@ const BookFiltersPanel: React.FC<BookstoreFiltersProps> = ({
   
   return (
   <div className="mb-8 space-y-4 mx-auto max-w-4xl">
-    <div className="flex flex-wrap gap-4 items-center justify-center">
-      <div className="relative flex-1 min-w-64 max-w-md">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+    <div className="flex flex-wrap gap-2 items-center justify-center">
+      <div className="bookstore-search-input-container min-w-64 max-w-md">
+        <Search className="bookstore-search-input-icon" size={20} />
         <input
           type="text"
           placeholder="搜索书籍、作者、出版社..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-serif"
+          className="bookstore-search-input font-serif"
         />
       </div>
 
