@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react';
 import { Person } from '@/types/Person.ts';
 import VirtualScrollMasonry from './VirtualScrollMasonry.tsx';
+import { tagMatcher } from '@/utils/tagMatcher';
+import { RELATIONSHIPS_CONFIG } from '@/constants/relationshipsConstants';
 import '@/styles/relationships.css';
 
 // 分类映射：将中文分类名映射为英文类名
@@ -109,6 +111,8 @@ interface MasonryGridProps {
   onItemClick: (person: Person) => void;
   categories: Array<{ id: string; name: string; icon: React.ComponentType<{ size?: number; className?: string }>; color: string }>;
   onTagClick?: (tag: { kind: 'type' | 'aspect'; value: string }) => void;
+  selectedTypes?: string[];
+  selectedAspects?: string[];
 }
 
 interface MasonryItem {
@@ -122,7 +126,9 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
   items,
   onItemClick,
   categories,
-  onTagClick
+  onTagClick,
+  selectedTypes = [],
+  selectedAspects = []
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [masonryItems, setMasonryItems] = useState<MasonryItem[]>([]);
@@ -744,30 +750,82 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
 
                 {(person.extra?.tags?.relationshipTypes?.length || person.extra?.tags?.aspects?.length) && (
                   <div className="mt-3 flex flex-wrap gap-2 justify-center">
-                    {person.extra?.tags?.relationshipTypes?.slice(0, 2).map((t) => (
-                      <button
-                        key={`type-${person.id}-${t}`}
-                        className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onTagClick && onTagClick({ kind: 'type', value: t });
-                        }}
-                      >
-                        {t}
-                      </button>
-                    ))}
-                    {person.extra?.tags?.aspects?.slice(0, 2).map((a) => (
-                      <button
-                        key={`aspect-${person.id}-${a}`}
-                        className="px-2 py-0.5 text-xs rounded-full bg-gray-50 text-gray-600 hover:bg-gray-200 transition-colors"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onTagClick && onTagClick({ kind: 'aspect', value: a });
-                        }}
-                      >
-                        {a}
-                      </button>
-                    ))}
+                    {person.extra?.tags?.relationshipTypes?.slice(0, 2).map((t) => {
+                      // 检查是否为强匹配、弱匹配或无匹配
+                      let matchType: 'strong' | 'weak' | 'none' = 'none';
+                      for (const selectedType of selectedTypes) {
+                        if (t === selectedType) {
+                          matchType = 'strong';
+                          break;
+                        }
+                        const similarity = tagMatcher.semanticSimilarity(selectedType, t);
+                        if (similarity >= RELATIONSHIPS_CONFIG.tagMatcher.thresholds.strong) {
+                          matchType = 'strong';
+                          break;
+                        } else if (similarity >= RELATIONSHIPS_CONFIG.tagMatcher.thresholds.weak) {
+                          matchType = 'weak';
+                        }
+                      }
+                      
+                      const baseClass = "px-2 py-0.5 text-xs rounded-full transition-colors";
+                      const styleClass = matchType === 'strong' 
+                        ? "bg-blue-100 text-blue-700 hover:bg-blue-200 ring-1 ring-blue-300"
+                        : matchType === 'weak'
+                        ? "bg-blue-50 text-blue-600 hover:bg-blue-100 border border-dashed border-blue-300"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200";
+                      
+                      return (
+                        <button
+                          key={`type-${person.id}-${t}`}
+                          className={`${baseClass} ${styleClass}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onTagClick && onTagClick({ kind: 'type', value: t });
+                          }}
+                          title={matchType === 'weak' ? '模糊匹配' : undefined}
+                        >
+                          {t}
+                        </button>
+                      );
+                    })}
+                    {person.extra?.tags?.aspects?.slice(0, 2).map((a) => {
+                      // 检查是否为强匹配、弱匹配或无匹配
+                      let matchType: 'strong' | 'weak' | 'none' = 'none';
+                      for (const selectedAspect of selectedAspects) {
+                        if (a === selectedAspect) {
+                          matchType = 'strong';
+                          break;
+                        }
+                        const similarity = tagMatcher.semanticSimilarity(selectedAspect, a);
+                        if (similarity >= RELATIONSHIPS_CONFIG.tagMatcher.thresholds.strong) {
+                          matchType = 'strong';
+                          break;
+                        } else if (similarity >= RELATIONSHIPS_CONFIG.tagMatcher.thresholds.weak) {
+                          matchType = 'weak';
+                        }
+                      }
+                      
+                      const baseClass = "px-2 py-0.5 text-xs rounded-full transition-colors";
+                      const styleClass = matchType === 'strong' 
+                        ? "bg-green-100 text-green-700 hover:bg-green-200 ring-1 ring-green-300"
+                        : matchType === 'weak'
+                        ? "bg-green-50 text-green-600 hover:bg-green-100 border border-dashed border-green-300"
+                        : "bg-gray-50 text-gray-600 hover:bg-gray-200";
+                      
+                      return (
+                        <button
+                          key={`aspect-${person.id}-${a}`}
+                          className={`${baseClass} ${styleClass}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onTagClick && onTagClick({ kind: 'aspect', value: a });
+                          }}
+                          title={matchType === 'weak' ? '模糊匹配' : undefined}
+                        >
+                          {a}
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
 

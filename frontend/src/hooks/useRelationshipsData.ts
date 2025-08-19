@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Person } from '@/types/Person';
+import { tagMatcher } from '@/utils/tagMatcher';
+import { RELATIONSHIPS_CONFIG } from '@/constants/relationshipsConstants';
 
 // 统一默认配置，避免魔法数字
 const DEFAULTS = {
@@ -51,6 +53,7 @@ export function useRelationshipsData() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [meta, setMeta] = useState<{ centerId?: number; palette?: Record<string, string> } | null>(null);
+  const [tagIndex, setTagIndex] = useState<{ types: Set<string>; aspects: Set<string> } | null>(null);
 
   const transformNewNodeToPerson = (node: NewRawNode): Person => {
     const relationshipTypes = new Set<string>();
@@ -125,6 +128,19 @@ export function useRelationshipsData() {
         const filtered = transformed.filter(p => p.id !== centerId);
         setPersons(filtered);
         setMeta({ centerId: centerId, palette: (newData.meta as any)?.palette });
+        
+        // 构建标签索引
+        const allTypes = new Set<string>();
+        const allAspects = new Set<string>();
+        filtered.forEach(person => {
+          person.extra?.tags?.relationshipTypes?.forEach(t => allTypes.add(t));
+          person.extra?.tags?.aspects?.forEach(a => allAspects.add(a));
+        });
+        setTagIndex({ types: allTypes, aspects: allAspects });
+        
+        // 初始化标签匹配器
+        tagMatcher.updateConfig(RELATIONSHIPS_CONFIG.tagMatcher);
+        
         // 动态注入 CSS 变量
         const palette = (newData.meta as any)?.palette as Record<string, string> | undefined;
         if (palette && typeof document !== 'undefined') {
@@ -154,6 +170,7 @@ export function useRelationshipsData() {
       const filteredLegacy = personsLegacy.filter(p => p.id !== DEFAULTS.centerId);
       setPersons(filteredLegacy);
       setMeta({ centerId: DEFAULTS.centerId });
+      setTagIndex({ types: new Set(), aspects: new Set() }); // 旧数据无标签索引
     } catch (e) {
       setError(e instanceof Error ? e : new Error('Unknown error'));
     } finally {
@@ -165,5 +182,5 @@ export function useRelationshipsData() {
     loadData();
   }, []);
 
-  return { persons, loading, error, refetch: loadData };
+  return { persons, loading, error, refetch: loadData, meta, tagIndex };
 }
