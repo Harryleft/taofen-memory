@@ -151,7 +151,7 @@ const BookFiltersPanel: React.FC<BookstoreFiltersProps> = ({
 
       <button
         onClick={onDownload}
-        className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
+        className="bookstore-download-button"
         title="下载数据"
       >
         <Download size={18} className="mr-2" />
