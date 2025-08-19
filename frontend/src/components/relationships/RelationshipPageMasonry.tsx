@@ -108,6 +108,7 @@ interface MasonryGridProps {
   items: Person[];
   onItemClick: (person: Person) => void;
   categories: Array<{ id: string; name: string; icon: React.ComponentType<{ size?: number; className?: string }>; color: string }>;
+  onTagClick?: (tag: { kind: 'type' | 'aspect'; value: string }) => void;
 }
 
 interface MasonryItem {
@@ -120,7 +121,8 @@ interface MasonryItem {
 const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
   items,
   onItemClick,
-  categories
+  categories,
+  onTagClick
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [masonryItems, setMasonryItems] = useState<MasonryItem[]>([]);
@@ -568,9 +570,10 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
     const itemsPerLoad = isMobile ? MASONRY_CONFIG.lazyLoad.MOBILE_ITEMS_PER_LOAD : MASONRY_CONFIG.lazyLoad.ITEMS_PER_LOAD;
     
     // 网络状况检测（简化版）
-    const isSlowNetwork = navigator.connection ? 
-      navigator.connection.effectiveType.includes('2g') || 
-      navigator.connection.saveData : false;
+    const navConn = (navigator as unknown as { connection?: { effectiveType?: string; saveData?: boolean } }).connection;
+    const isSlowNetwork = navConn ? 
+      (navConn.effectiveType?.includes('2g') ?? false) || 
+      (navConn.saveData ?? false) : false;
     
     // 根据网络状况调整延迟
     const loadDelay = isSlowNetwork ? MASONRY_CONFIG.lazyLoad.LOAD_DELAY * 2 : MASONRY_CONFIG.lazyLoad.LOAD_DELAY;
@@ -672,7 +675,7 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
               onClick={() => onItemClick(person)}
               onTouchStart={(e) => {
                 const card = e.currentTarget;
-                handleTouchStart(e, card, person);
+                handleTouchStart(e, card);
               }}
               onTouchMove={handleTouchMove}
               onTouchEnd={(e) => handleTouchEnd(e, person)}
@@ -739,6 +742,34 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
                   </p>
                 )}
 
+                {(person.extra?.tags?.relationshipTypes?.length || person.extra?.tags?.aspects?.length) && (
+                  <div className="mt-3 flex flex-wrap gap-2 justify-center">
+                    {person.extra?.tags?.relationshipTypes?.slice(0, 2).map((t) => (
+                      <button
+                        key={`type-${person.id}-${t}`}
+                        className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onTagClick && onTagClick({ kind: 'type', value: t });
+                        }}
+                      >
+                        {t}
+                      </button>
+                    ))}
+                    {person.extra?.tags?.aspects?.slice(0, 2).map((a) => (
+                      <button
+                        key={`aspect-${person.id}-${a}`}
+                        className="px-2 py-0.5 text-xs rounded-full bg-gray-50 text-gray-600 hover:bg-gray-200 transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onTagClick && onTagClick({ kind: 'aspect', value: a });
+                        }}
+                      >
+                        {a}
+                      </button>
+                    ))}
+                  </div>
+                )}
 
               </div>
             </div>

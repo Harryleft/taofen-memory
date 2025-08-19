@@ -18,6 +18,8 @@ import '@/styles/relationships.css';
 export default function RelationshipsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [selectedAspects, setSelectedAspects] = useState<string[]>([]);
   const { persons, loading, error, refetch } = useRelationshipsData();
   const filterContainerRef = useRef<HTMLDivElement>(null);
   // 处理下拉刷新
@@ -48,9 +50,36 @@ export default function RelationshipsPage() {
   )?.nameInData || 'all';
 
   // 过滤后的人物列表
-  const filteredPersons = selectedCategory === 'all'
+  const categoryFiltered = selectedCategory === 'all'
     ? persons
     : persons.filter(person => person.category === selectedCategoryInData);
+
+  const filteredPersons = categoryFiltered.filter((person) => {
+    const t = person.extra?.tags?.relationshipTypes || [];
+    const a = person.extra?.tags?.aspects || [];
+    const typeOk = selectedTypes.length === 0 || t.some(v => selectedTypes.includes(v));
+    const aspectOk = selectedAspects.length === 0 || a.some(v => selectedAspects.includes(v));
+    return typeOk && aspectOk;
+  });
+
+  const handleTagClick = (tag: { kind: 'type' | 'aspect'; value: string }) => {
+    if (tag.kind === 'type') {
+      setSelectedTypes(prev => prev.includes(tag.value)
+        ? prev.filter(v => v !== tag.value)
+        : [...prev, tag.value]
+      );
+    } else {
+      setSelectedAspects(prev => prev.includes(tag.value)
+        ? prev.filter(v => v !== tag.value)
+        : [...prev, tag.value]
+      );
+    }
+  };
+
+  const clearAllTags = () => {
+    setSelectedTypes([]);
+    setSelectedAspects([]);
+  };
 
   // 类型适配：将 LucideIcon 转换为 RelationshipPageMasonry 期望的组件类型
   const adaptedCategories = RELATIONSHIPS_CATEGORIES.map(category => ({
@@ -208,6 +237,36 @@ export default function RelationshipsPage() {
 
       {/* Main Content */}
       <div className="relationships-main-content-container flex-1 pt-0">
+        {(selectedTypes.length > 0 || selectedAspects.length > 0) && (
+          <div className="max-w-7xl mx-auto px-6 mb-4">
+            <div className="flex flex-wrap items-center gap-2">
+              {selectedTypes.map((t) => (
+                <button
+                  key={`sel-type-${t}`}
+                  className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  onClick={() => handleTagClick({ kind: 'type', value: t })}
+                >
+                  {t} ×
+                </button>
+              ))}
+              {selectedAspects.map((a) => (
+                <button
+                  key={`sel-aspect-${a}`}
+                  className="px-2 py-0.5 text-xs rounded-full bg-gray-50 text-gray-600 hover:bg-gray-200"
+                  onClick={() => handleTagClick({ kind: 'aspect', value: a })}
+                >
+                  {a} ×
+                </button>
+              ))}
+              <button
+                className="ml-auto text-xs text-blue-600 hover:underline"
+                onClick={clearAllTags}
+              >
+                清空标签筛选
+              </button>
+            </div>
+          </div>
+        )}
         <PullToRefresh onRefresh={handleRefresh}>
           {filteredPersons.length === 0 ? (
             <div className="relationships-empty-state-container">
@@ -219,6 +278,7 @@ export default function RelationshipsPage() {
               items={filteredPersons}
               onItemClick={setSelectedPerson}
               categories={adaptedCategories}
+              onTagClick={handleTagClick}
             />
           )}
         </PullToRefresh>
