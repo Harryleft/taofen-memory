@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import AppHeader from '@/components/layout/header/AppHeader';
 import HandwritingLightbox from './HandwritingLightbox.tsx';
+import HandwritingCoverCard from './HandwritingCoverCard.tsx';
 import { useHandwritingData } from '@/hooks/useHandwritingData';
 import { useHandwritingFilters } from '@/hooks/useHandwritingFilters';
 import { useHandwritingPagination } from '@/hooks/useHandwritingPagination';
@@ -74,6 +75,11 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
       <AppHeader moduleId="handwriting" />
       <section className={`py-20 bg-cream ${className}`}>
         <div className="max-w-7xl mx-auto px-6">
+          {/* 封面卡片 */}
+          <HandwritingCoverCard
+            totalHandwritings={handwritingItems.length}
+          />
+          
           {/* 过滤器控件 */}
           <HandwritingFilterControls
             searchTerm={searchTerm}
