@@ -107,8 +107,15 @@
   @apply text-white shadow-lg shadow-black/10 scale-105 ring-2 ring-white/20;
 }
 
+.relationships-category-button-mobile.selected:hover {
+  /* 保持原有背景色不变，只增强阴影效果 */
+  @apply shadow-xl shadow-black/15 scale-105;
+  /* 覆盖全局button:hover样式，阻止变成金色 */
+  transform: scale(1.05);
+}
+
 .relationships-category-button-mobile.not-selected {
-  @apply bg-white/80 text-gray-700 hover:bg-white hover:shadow-md hover:shadow-black/5 hover:scale-105 border border-gray-200/60 hover:border-gray-300/60;
+  @apply bg-white text-gray-700 hover:bg-gray-50 hover:shadow-md hover:shadow-black/5 hover:scale-105 border border-gray-200/60 hover:border-gray-300/60;
 }
 
 /* 移动端滚动提示 */
@@ -207,8 +214,15 @@
   @apply text-white shadow-lg shadow-black/10 scale-105 ring-2 ring-white/20;
 }
 
+.relationships-category-button.selected:hover {
+  /* 保持原有背景色不变，只增强阴影效果 */
+  @apply shadow-xl shadow-black/15 scale-105;
+  /* 覆盖全局button:hover样式，阻止变成金色 */
+  transform: scale(1.05);
+}
+
 .relationships-category-button.not-selected {
-  @apply bg-white/80 text-gray-700 hover:bg-white hover:shadow-md hover:shadow-black/5 hover:scale-105 border border-gray-200/60 hover:border-gray-300/60;
+  @apply bg-white text-gray-700 hover:bg-gray-50 hover:shadow-md hover:shadow-black/5 hover:scale-105 border border-gray-200/60 hover:border-gray-300/60;
 }
 
 /* 模态框样式已移除 - 组件使用 Tailwind 内联样式 */
