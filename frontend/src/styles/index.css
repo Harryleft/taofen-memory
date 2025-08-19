@@ -7,7 +7,10 @@
 /* 1. 统一变量系统 */
 @import 'global.css';
 
-/* 2. 组件样式 - 按依赖关系和字母顺序 */
+/* 2. 通用工具样式 */
+@import 'utils.css';             /* 通用标签系统和工具样式 */
+
+/* 3. 组件样式 - 按依赖关系和字母顺序 */
 @import 'bookstore.css';          /* 独立组件 */
 @import 'cover.css';             /* Cover卡片组件 */
 @import 'relationships.css';     /* 独立组件 */
@@ -15,7 +18,7 @@
 @import 'footer.css';           /* 通用Footer组件 */
 @import 'ZoutaofenFooter.css';   /* 特定Footer组件（覆盖通用样式） */
 
-/* 3. Tailwind CSS */
+/* 4. Tailwind CSS */
 /* stylelint-disable-next-line at-rule-no-unknown */
 @tailwind base;
 /* stylelint-disable-next-line at-rule-no-unknown */
