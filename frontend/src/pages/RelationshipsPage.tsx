@@ -113,7 +113,7 @@ export default function RelationshipsPage() {
       </div>
 
       {/* Category Filter */}
-      <div className="relationships-main-content-container">
+      <div className="relationships-main-content-container mb-8">
         {/* 移动端筛选器头部 */}
         <div className="md:hidden mb-4">
           <div className="flex items-center justify-between">
