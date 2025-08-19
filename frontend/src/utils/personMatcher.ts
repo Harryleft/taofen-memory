@@ -48,8 +48,9 @@ export class PersonMatcher {
     const base = (import.meta as { env?: { BASE_URL?: string } }).env?.BASE_URL || '/';
     const normalizedBase = base.replace(/\/$/, '');
     const candidates = [
-      `${normalizedBase}/data/json/relationships.json`, // 实际存在
-      `${normalizedBase}/data/relationships.json`        // 兼容旧路径
+      `${normalizedBase}/data/json/relationships_new.json`, // 新数据优先
+      `${normalizedBase}/data/json/relationships.json`,      // 旧数据
+      `${normalizedBase}/data/relationships.json`            // 兼容旧路径
     ];
 
     let lastError: Error | null = null;
@@ -67,13 +68,39 @@ export class PersonMatcher {
           throw new Error(`Invalid content-type: ${contentType}. Snippet: ${snippet}`);
         }
 
-        const data: { persons: Person[] } = JSON.parse(text);
-        if (!data || !Array.isArray(data.persons)) {
+        // 尝试解析两种结构：新结构（nodes）与旧结构（persons）
+        const json: unknown = JSON.parse(text);
+        let personsPayload: Person[] | null = null;
+        let centerId: number = 499;
+
+        if (json && typeof json === 'object') {
+          const maybeNew = json as { meta?: { centerId?: number }, nodes?: Array<any> };
+          if (Array.isArray(maybeNew.nodes)) {
+            // 新结构不直接适配为 Person，这里仅用于 matcher，简单映射基础字段
+            centerId = maybeNew.meta?.centerId ?? 499;
+            personsPayload = maybeNew.nodes.map(n => ({
+              id: n.id,
+              name: n.name,
+              category: n.category,
+              img: n.image_url || '',
+              description: n.description || '',
+              sources: n.sources || [],
+              link: n.links || []
+            }));
+          } else {
+            const maybeOld = json as { persons?: Person[] };
+            if (Array.isArray(maybeOld.persons)) {
+              personsPayload = maybeOld.persons;
+            }
+          }
+        }
+
+        if (!personsPayload) {
           throw new Error('Invalid persons payload structure');
         }
 
-        // 过滤掉邹韬奋本人（ID: 499）
-        this.personsCache = data.persons.filter(person => person.id !== 499);
+        // 过滤掉中心人物（优先使用 meta.centerId）
+        this.personsCache = personsPayload.filter(person => person.id !== centerId);
         
         // 创建姓名到人物的映射
         this.personsMap.clear();
