@@ -19,5 +19,20 @@ export interface Person {
     };
     tier?: string;
     importance?: number;
+    relationships?: Array<{
+      relationshipType?: string;
+      relationshipSubtype?: string;
+      confidence?: number;
+      strength?: string;
+      emotionalTone?: string;
+      significance?: string;
+      aspects?: string[];
+      evidence?: Array<{
+        quote?: string;
+        source?: string;
+        context?: string;
+        relevance?: number;
+      }>;
+    }>;
   };
 }

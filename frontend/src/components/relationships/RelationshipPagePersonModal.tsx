@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { BookOpen, ExternalLink, FileText, X } from 'lucide-react';
+import { BookOpen, ExternalLink, FileText, X, Link as LinkIcon, Tags } from 'lucide-react';
 import { Person } from '@/types/Person.ts';
 import { getCategoryClass } from '@/constants/relationshipsConstants';
 
@@ -164,6 +164,93 @@ const RelationshipPagePersonModal: React.FC<PersonDetailModalProps> = ({ person,
               <p className="text-gray-700 leading-relaxed">
                 {person.description}
               </p>
+            </div>
+          )}
+
+          {/* 关系线索 */}
+          {person.extra?.relationships && person.extra.relationships.length > 0 && (
+            <div>
+              <h3 className="flex items-center text-lg font-medium text-gray-900 mb-3">
+                <Tags size={18} className="mr-2 text-gray-600" />
+                关系线索
+              </h3>
+              <div className="space-y-4">
+                {person.extra.relationships
+                  .slice() // 不修改原数组
+                  .sort((a, b) => {
+                    const aConf = a.confidence ?? 0;
+                    const bConf = b.confidence ?? 0;
+                    // 先按置信度排序，次按 evidence 数量
+                    const byConf = bConf - aConf;
+                    if (byConf !== 0) return byConf;
+                    const ae = a.evidence?.length ?? 0;
+                    const be = b.evidence?.length ?? 0;
+                    return be - ae;
+                  })
+                  .slice(0, 5)
+                  .map((rel, idx) => (
+                    <div key={idx} className="bg-gray-50 rounded-lg p-4">
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        {rel.relationshipType && (
+                          <span className="px-2 py-0.5 text-xs rounded-full bg-gray-200 text-gray-800">
+                            {rel.relationshipType}
+                          </span>
+                        )}
+                        {rel.relationshipSubtype && (
+                          <span className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700">
+                            {rel.relationshipSubtype}
+                          </span>
+                        )}
+                        {rel.strength && (
+                          <span className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700">
+                            强度: {rel.strength}
+                          </span>
+                        )}
+                        {typeof rel.confidence === 'number' && (
+                          <span className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700">
+                            置信度: {Math.round(rel.confidence * 100)}%
+                          </span>
+                        )}
+                        {rel.significance && (
+                          <span className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700">
+                            重要性: {rel.significance}
+                          </span>
+                        )}
+                        {rel.emotionalTone && (
+                          <span className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700">
+                            情感: {rel.emotionalTone}
+                          </span>
+                        )}
+                        {rel.aspects?.slice(0, 3).map((a) => (
+                          <span key={a} className="px-2 py-0.5 text-xs rounded-full bg-white border border-gray-200 text-gray-700">
+                            {a}
+                          </span>
+                        ))}
+                      </div>
+                      {rel.evidence && rel.evidence.length > 0 && (
+                        <ul className="space-y-2 list-disc list-inside text-sm text-gray-700">
+                          {rel.evidence.slice(0, 3).map((ev, i) => (
+                            <li key={i} className="pl-1">
+                              {ev.quote && (
+                                <span className="">
+                                  “{ev.quote}”
+                                </span>
+                              )}
+                              {ev.source && (
+                                <span className="ml-2 inline-flex items-center gap-1 text-blue-600">
+                                  <LinkIcon size={14} /> {ev.source}
+                                </span>
+                              )}
+                              {ev.context && (
+                                <span className="ml-2 text-gray-500">({ev.context})</span>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+              </div>
             </div>
           )}
 
