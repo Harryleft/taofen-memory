@@ -50,16 +50,28 @@ export function useRelationshipsData() {
   const [persons, setPersons] = useState<Person[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [meta, setMeta] = useState<{ centerId?: number; palette?: Record<string, string> } | null>(null);
 
   const transformNewNodeToPerson = (node: NewRawNode): Person => {
     const relationshipTypes = new Set<string>();
     const aspects = new Set<string>();
+    const relationshipsNormalized: NonNullable<Person['extra']>['relationships'] = [];
     if (Array.isArray(node.relationships)) {
       node.relationships.forEach(rel => {
         if (rel?.relationshipType) relationshipTypes.add(rel.relationshipType);
         if (Array.isArray(rel?.aspects)) {
           rel.aspects.forEach(a => a && aspects.add(a));
         }
+        relationshipsNormalized.push({
+          relationshipType: rel?.relationshipType,
+          relationshipSubtype: (rel as any)?.relationshipSubtype,
+          confidence: typeof rel?.confidence === 'number' ? rel?.confidence : undefined,
+          strength: (rel as any)?.strength,
+          emotionalTone: (rel as any)?.emotionalTone,
+          significance: (rel as any)?.significance,
+          aspects: Array.isArray(rel?.aspects) ? rel?.aspects : undefined,
+          evidence: Array.isArray((rel as any)?.evidence) ? (rel as any)?.evidence : undefined,
+        });
       });
     }
     return {
@@ -77,6 +89,7 @@ export function useRelationshipsData() {
         },
         tier: node.tier,
         importance: typeof node.importance === 'number' ? node.importance : undefined,
+        relationships: relationshipsNormalized,
       },
     };
   };
@@ -111,6 +124,21 @@ export function useRelationshipsData() {
         const transformed = nodes.map(transformNewNodeToPerson);
         const filtered = transformed.filter(p => p.id !== centerId);
         setPersons(filtered);
+        setMeta({ centerId: centerId, palette: (newData.meta as any)?.palette });
+        // 动态注入 CSS 变量
+        const palette = (newData.meta as any)?.palette as Record<string, string> | undefined;
+        if (palette && typeof document !== 'undefined') {
+          const root = document.documentElement;
+          const setVar = (key: string, val?: string) => {
+            if (val) root.style.setProperty(key, val);
+          };
+          setVar('--rel-family', palette['亲人家属']);
+          setVar('--rel-media', palette['新闻出版']);
+          setVar('--rel-academic', palette['学术文化']);
+          setVar('--rel-political', palette['政治社会']);
+          setVar('--rel-all', palette['邹韬奋']);
+          // 可选：根据主色计算深浅变体，现阶段保持回退色由 CSS 提供
+        }
         return; // 成功使用新数据后返回
       }
 
@@ -125,6 +153,7 @@ export function useRelationshipsData() {
       const personsLegacy = transformLegacyToPersons(legacy);
       const filteredLegacy = personsLegacy.filter(p => p.id !== DEFAULTS.centerId);
       setPersons(filteredLegacy);
+      setMeta({ centerId: DEFAULTS.centerId });
     } catch (e) {
       setError(e instanceof Error ? e : new Error('Unknown error'));
     } finally {

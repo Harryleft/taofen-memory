@@ -50,13 +50,13 @@
   
   .relationships-category-button-mobile {
     @apply relative flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 font-medium text-sm backdrop-blur-sm;
-    min-width: fit-content;
+    min-width: -webkit-fill-available;
     min-height: 44px; /* iOS推荐的最小触摸目标 */
     /* 移动端优化 */
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
-    user-select: none;
     -webkit-user-select: none;
+    user-select: none;
   }
   
   .relationships-category-button-mobile:active {
@@ -100,7 +100,7 @@
 
 .relationships-category-button-mobile {
   @apply relative flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 font-medium text-sm backdrop-blur-sm;
-  min-width: fit-content;
+  min-width: -webkit-fill-available;
 }
 
 .relationships-category-button-mobile.selected {
@@ -229,35 +229,35 @@
 
 /* CSS 变量已迁移到 tailwind.config.js 中的 category-* 颜色定义 */
 
-/* 动态色彩应用 - 使用 Tailwind CSS 变量 */
+/* 动态色彩应用 - 使用可注入的 CSS 变量并提供回退 */
 .masonry-card-base.family {
-  --category-color: #ef4444;
-  --category-color-dark: #dc2626;
-  --category-color-light: #f87171;
+  --category-color: var(--rel-family, #ef4444);
+  --category-color-dark: var(--rel-family-dark, #dc2626);
+  --category-color-light: var(--rel-family-light, #f87171);
 }
 
 .masonry-card-base.media {
-  --category-color: #3b82f6;
-  --category-color-dark: #2563eb;
-  --category-color-light: #60a5fa;
+  --category-color: var(--rel-media, #3b82f6);
+  --category-color-dark: var(--rel-media-dark, #2563eb);
+  --category-color-light: var(--rel-media-light, #60a5fa);
 }
 
 .masonry-card-base.academic {
-  --category-color: #8b5cf6;
-  --category-color-dark: #7c3aed;
-  --category-color-light: #a78bfa;
+  --category-color: var(--rel-academic, #8b5cf6);
+  --category-color-dark: var(--rel-academic-dark, #7c3aed);
+  --category-color-light: var(--rel-academic-light, #a78bfa);
 }
 
 .masonry-card-base.political {
-  --category-color: #10b981;
-  --category-color-dark: #059669;
-  --category-color-light: #34d399;
+  --category-color: var(--rel-political, #10b981);
+  --category-color-dark: var(--rel-political-dark, #059669);
+  --category-color-light: var(--rel-political-light, #34d399);
 }
 
 .masonry-card-base.all {
-  --category-color: #6b7280;
-  --category-color-dark: #4b5563;
-  --category-color-light: #9ca3af;
+  --category-color: var(--rel-all, #6b7280);
+  --category-color-dark: var(--rel-all-dark, #4b5563);
+  --category-color-light: var(--rel-all-light, #9ca3af);
 }
 
 /* Masonry Grid Styles - Enhanced Design */
@@ -839,8 +839,8 @@
     /* 增大触摸区域 */
     min-height: 140px;
     /* 防止误触 */
-    user-select: none;
     -webkit-user-select: none;
+    user-select: none;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
   }
