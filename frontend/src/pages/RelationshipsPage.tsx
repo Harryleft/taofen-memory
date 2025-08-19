@@ -103,11 +103,11 @@ export default function RelationshipsPage() {
       </div>
 
       {/* 封面卡片 */}
-      <div className="bg-cream py-20">
+      <div className="bg-cream pt-20 pb-1">
         <div className="max-w-7xl mx-auto px-6">
           <RelationshipsCoverCard
             totalPersons={persons.length}
-            totalCategories={RELATIONSHIPS_CATEGORIES.length - 1} // 减去"全部"分类
+            totalCategories={RELATIONSHIPS_CATEGORIES.length - 1} 
           />
         </div>
       </div>
@@ -207,7 +207,7 @@ export default function RelationshipsPage() {
       </div>
 
       {/* Main Content */}
-      <div className="relationships-main-content-container flex-1">
+      <div className="relationships-main-content-container flex-1 pt-0">
         <PullToRefresh onRefresh={handleRefresh}>
           {filteredPersons.length === 0 ? (
             <div className="relationships-empty-state-container">

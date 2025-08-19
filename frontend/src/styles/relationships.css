@@ -9,7 +9,7 @@
 /* 标题和装饰样式已移除 - 使用 BaseHeader 组件 */
 
 .relationships-filter-container {
-  @apply flex flex-wrap justify-center gap-4 mt-12;
+  @apply flex flex-wrap justify-center gap-4 mt-6;
   /* 移动端优化 */
   gap: 12px;
 }
@@ -18,7 +18,7 @@
 @media (max-width: 640px) {
   .relationships-filter-container {
     gap: 8px;
-    margin-top: 8px;
+    margin-top: 4px;
   }
   
   .relationships-category-button {
@@ -125,13 +125,13 @@
 }
 
 .relationships-stats-container {
-  @apply flex justify-center gap-8 mt-8;
+  @apply flex justify-center gap-8 mt-4;
 }
 
 /* 移动端统计信息样式 */
 @media (max-width: 640px) {
   .relationships-stats-container {
-    @apply gap-6 mt-6;
+    @apply gap-6 mt-3;
   }
   
   .relationships-stat-number {
@@ -156,7 +156,7 @@
 }
 
 .relationships-main-content-container {
-  @apply w-full px-6 py-12;
+  @apply w-full px-6 pt-0 pb-2;
 }
 
 .relationships-empty-state-container {
