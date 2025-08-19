@@ -191,39 +191,39 @@ const RelationshipPagePersonModal: React.FC<PersonDetailModalProps> = ({ person,
                   .slice(0, 5)
                   .map((rel, idx) => (
                     <div key={idx} className="bg-gray-50 rounded-lg p-4">
-                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <div className="relationship-detail-tags">
                         {rel.relationshipType && (
-                          <span className="px-2 py-0.5 text-xs rounded-full bg-gray-200 text-gray-800">
+                          <span className="relationship-detail-tag primary">
                             {rel.relationshipType}
                           </span>
                         )}
                         {rel.relationshipSubtype && (
-                          <span className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700">
+                          <span className="relationship-detail-tag">
                             {rel.relationshipSubtype}
                           </span>
                         )}
                         {rel.strength && (
-                          <span className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700">
+                          <span className="relationship-detail-tag">
                             强度: {rel.strength}
                           </span>
                         )}
                         {typeof rel.confidence === 'number' && (
-                          <span className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700">
+                          <span className="relationship-detail-tag">
                             置信度: {Math.round(rel.confidence * 100)}%
                           </span>
                         )}
                         {rel.significance && (
-                          <span className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700">
+                          <span className="relationship-detail-tag">
                             重要性: {rel.significance}
                           </span>
                         )}
                         {rel.emotionalTone && (
-                          <span className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700">
+                          <span className="relationship-detail-tag">
                             情感: {rel.emotionalTone}
                           </span>
                         )}
                         {rel.aspects?.slice(0, 3).map((a) => (
-                          <span key={a} className="px-2 py-0.5 text-xs rounded-full bg-white border border-gray-200 text-gray-700">
+                          <span key={a} className="relationship-detail-tag aspect">
                             {a}
                           </span>
                         ))}
