@@ -1,0 +1,404 @@
+/* ================================================
+   通用标签样式系统 - 基于 global.css 设计系统
+   适用于关系界面、手迹界面等多个模块的标签组件
+   ================================================ */
+
+/* 标签基础样式 */
+.masonry-tag-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--global-spacing-xs) var(--global-spacing-sm);
+  border-radius: var(--global-radius-md);
+  font-size: var(--global-font-size-xs);
+  font-weight: var(--global-font-weight-medium);
+  line-height: var(--global-line-height-tight);
+  letter-spacing: 0.025em;
+  transition: var(--global-transition-property) var(--global-transition-duration) var(--global-transition-timing-function);
+  cursor: pointer;
+  border: 1px solid transparent;
+  
+  /* 现代化字体渲染 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  
+  /* 微妙的阴影增强层次感 */
+  box-shadow: var(--global-shadow-xs);
+  
+  /* 防止文本选择和优化触摸 */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* 关系类型标签 - 蓝色系 */
+.masonry-tag-type {
+  @extend .masonry-tag-base;
+}
+
+/* 强匹配 - 关系类型 */
+.masonry-tag-type.strong-match {
+  background: linear-gradient(135deg, 
+    rgba(59, 130, 246, 0.12) 0%, 
+    rgba(37, 99, 235, 0.08) 100%);
+  color: #1e40af;
+  border-color: rgba(59, 130, 246, 0.3);
+  box-shadow: 
+    var(--global-shadow-xs),
+    0 0 0 1px rgba(59, 130, 246, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.masonry-tag-type.strong-match:hover {
+  background: linear-gradient(135deg, 
+    rgba(59, 130, 246, 0.18) 0%, 
+    rgba(37, 99, 235, 0.12) 100%);
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 
+    var(--global-shadow-sm),
+    0 0 0 1px rgba(59, 130, 246, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+/* 弱匹配 - 关系类型（虚线边框） */
+.masonry-tag-type.weak-match {
+  background: linear-gradient(135deg, 
+    rgba(59, 130, 246, 0.06) 0%, 
+    rgba(37, 99, 235, 0.04) 100%);
+  color: #3b82f6;
+  border: 1px dashed rgba(59, 130, 246, 0.4);
+  box-shadow: 
+    var(--global-shadow-xs),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+.masonry-tag-type.weak-match::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  border-radius: var(--global-radius-md);
+  background: linear-gradient(135deg, 
+    rgba(59, 130, 246, 0.1) 0%, 
+    rgba(37, 99, 235, 0.05) 100%);
+  z-index: -1;
+  opacity: 0;
+  transition: opacity var(--global-transition-duration) var(--global-transition-timing-function);
+}
+
+.masonry-tag-type.weak-match:hover::before {
+  opacity: 1;
+}
+
+.masonry-tag-type.weak-match:hover {
+  background: linear-gradient(135deg, 
+    rgba(59, 130, 246, 0.10) 0%, 
+    rgba(37, 99, 235, 0.06) 100%);
+  border-color: rgba(59, 130, 246, 0.5);
+  transform: translateY(-1px);
+}
+
+/* 维度标签 - 绿色系 */
+.masonry-tag-aspect {
+  @extend .masonry-tag-base;
+}
+
+/* 强匹配 - 维度标签 */
+.masonry-tag-aspect.strong-match {
+  background: linear-gradient(135deg, 
+    rgba(34, 197, 94, 0.12) 0%, 
+    rgba(21, 128, 61, 0.08) 100%);
+  color: #15803d;
+  border-color: rgba(34, 197, 94, 0.3);
+  box-shadow: 
+    var(--global-shadow-xs),
+    0 0 0 1px rgba(34, 197, 94, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.masonry-tag-aspect.strong-match:hover {
+  background: linear-gradient(135deg, 
+    rgba(34, 197, 94, 0.18) 0%, 
+    rgba(21, 128, 61, 0.12) 100%);
+  border-color: rgba(34, 197, 94, 0.4);
+  box-shadow: 
+    var(--global-shadow-sm),
+    0 0 0 1px rgba(34, 197, 94, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+/* 弱匹配 - 维度标签（虚线边框） */
+.masonry-tag-aspect.weak-match {
+  background: linear-gradient(135deg, 
+    rgba(34, 197, 94, 0.06) 0%, 
+    rgba(21, 128, 61, 0.04) 100%);
+  color: #22c55e;
+  border: 1px dashed rgba(34, 197, 94, 0.4);
+  box-shadow: 
+    var(--global-shadow-xs),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+.masonry-tag-aspect.weak-match::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  border-radius: var(--global-radius-md);
+  background: linear-gradient(135deg, 
+    rgba(34, 197, 94, 0.1) 0%, 
+    rgba(21, 128, 61, 0.05) 100%);
+  z-index: -1;
+  opacity: 0;
+  transition: opacity var(--global-transition-duration) var(--global-transition-timing-function);
+}
+
+.masonry-tag-aspect.weak-match:hover::before {
+  opacity: 1;
+}
+
+.masonry-tag-aspect.weak-match:hover {
+  background: linear-gradient(135deg, 
+    rgba(34, 197, 94, 0.10) 0%, 
+    rgba(21, 128, 61, 0.06) 100%);
+  border-color: rgba(34, 197, 94, 0.5);
+  transform: translateY(-1px);
+}
+
+/* 默认标签 - 灰色系 */
+.masonry-tag-default {
+  @extend .masonry-tag-base;
+  background: linear-gradient(135deg, 
+    rgba(156, 163, 175, 0.08) 0%, 
+    rgba(107, 114, 128, 0.06) 100%);
+  color: var(--global-text-secondary);
+  border-color: rgba(156, 163, 175, 0.2);
+  box-shadow: 
+    var(--global-shadow-xs),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.masonry-tag-default:hover {
+  background: linear-gradient(135deg, 
+    rgba(156, 163, 175, 0.12) 0%, 
+    rgba(107, 114, 128, 0.08) 100%);
+  border-color: rgba(156, 163, 175, 0.3);
+  box-shadow: 
+    var(--global-shadow-sm),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+/* 标签计数器 */
+.masonry-tag-more {
+  @extend .masonry-tag-base;
+  background: linear-gradient(135deg, 
+    rgba(249, 250, 251, 0.8) 0%, 
+    rgba(243, 244, 246, 0.9) 100%);
+  color: var(--global-text-tertiary);
+  border-color: rgba(209, 213, 219, 0.3);
+  cursor: default;
+  box-shadow: 
+    inset 0 1px 2px rgba(0, 0, 0, 0.05),
+    0 1px 3px rgba(0, 0, 0, 0.1);
+  font-weight: var(--global-font-weight-normal);
+}
+
+/* 手迹界面专用标签样式 - 金色系 */
+.handwriting-tag {
+  @extend .masonry-tag-base;
+  background: rgba(251, 191, 36, 0.1); /* bg-gold/10 */
+  color: #d97706; /* text-gold */
+  border-color: rgba(251, 191, 36, 0.2);
+  padding: var(--global-spacing-xs) calc(var(--global-spacing-xs) * 1.5);
+  font-size: var(--global-font-size-xs);
+}
+
+.handwriting-tag:hover {
+  background: rgba(251, 191, 36, 0.15);
+  border-color: rgba(251, 191, 36, 0.3);
+  transform: translateY(-1px);
+}
+
+/* 手迹详情页标签样式 - 更大尺寸 */
+.handwriting-tag-detail {
+  @extend .handwriting-tag;
+  padding: var(--global-spacing-xs) var(--global-spacing-sm);
+  font-size: var(--global-font-size-sm);
+  border-radius: var(--global-radius-full); /* rounded-full */
+}
+
+/* 手迹分类标签样式 */
+.handwriting-category-tag {
+  @extend .masonry-tag-base;
+  padding: var(--global-spacing-xs) calc(var(--global-spacing-xs) * 1.5);
+  border-radius: var(--global-radius-full); /* rounded-full */
+  font-size: var(--global-font-size-xs);
+  color: white;
+  border: none;
+}
+
+/* 分类标签颜色变体 */
+.handwriting-category-tag.category-题词 {
+  background: #3b82f6; /* bg-blue-500 */
+}
+
+.handwriting-category-tag.category-文稿 {
+  background: #d97706; /* bg-gold */
+}
+
+.handwriting-category-tag.category-书简 {
+  background: #22c55e; /* bg-green-500 */
+}
+
+/* 标签容器 */
+.masonry-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--global-spacing-xs);
+  margin-top: var(--global-spacing-sm);
+  justify-content: center;
+  align-items: center;
+}
+
+/* 手迹标签容器 */
+.handwriting-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--global-spacing-xs) * 0.75);
+}
+
+/* 响应式调整 */
+@media (max-width: 640px) {
+  .masonry-tag-base {
+    padding: calc(var(--global-spacing-xs) * 0.75) var(--global-spacing-xs);
+    font-size: calc(var(--global-font-size-xs) * 0.9);
+  }
+  
+  .masonry-card-tags {
+    gap: calc(var(--global-spacing-xs) * 0.75);
+    margin-top: calc(var(--global-spacing-sm) * 0.75);
+  }
+  
+  /* 手迹标签移动端优化 */
+  .handwriting-tag {
+    padding: calc(var(--global-spacing-xs) * 0.75) var(--global-spacing-xs);
+    font-size: calc(var(--global-font-size-xs) * 0.9);
+  }
+  
+  .handwriting-tag-detail {
+    padding: calc(var(--global-spacing-xs) * 0.75) calc(var(--global-spacing-xs) * 1.25);
+    font-size: var(--global-font-size-xs);
+  }
+  
+  .handwriting-category-tag {
+    padding: calc(var(--global-spacing-xs) * 0.75) calc(var(--global-spacing-xs) * 1.25);
+    font-size: calc(var(--global-font-size-xs) * 0.9);
+  }
+  
+  .handwriting-tags {
+    gap: calc(var(--global-spacing-xs) * 0.5);
+  }
+}
+
+/* 暗色模式适配 */
+@media (prefers-color-scheme: dark) {
+  .masonry-tag-type.strong-match {
+    background: linear-gradient(135deg, 
+      rgba(59, 130, 246, 0.2) 0%, 
+      rgba(37, 99, 235, 0.15) 100%);
+    color: #93c5fd;
+    border-color: rgba(59, 130, 246, 0.4);
+  }
+  
+  .masonry-tag-type.weak-match {
+    background: linear-gradient(135deg, 
+      rgba(59, 130, 246, 0.1) 0%, 
+      rgba(37, 99, 235, 0.08) 100%);
+    color: #60a5fa;
+    border-color: rgba(59, 130, 246, 0.5);
+  }
+  
+  .masonry-tag-aspect.strong-match {
+    background: linear-gradient(135deg, 
+      rgba(34, 197, 94, 0.2) 0%, 
+      rgba(21, 128, 61, 0.15) 100%);
+    color: #86efac;
+    border-color: rgba(34, 197, 94, 0.4);
+  }
+  
+  .masonry-tag-aspect.weak-match {
+    background: linear-gradient(135deg, 
+      rgba(34, 197, 94, 0.1) 0%, 
+      rgba(21, 128, 61, 0.08) 100%);
+    color: #4ade80;
+    border-color: rgba(34, 197, 94, 0.5);
+  }
+  
+  .masonry-tag-default {
+    background: linear-gradient(135deg, 
+      rgba(156, 163, 175, 0.15) 0%, 
+      rgba(107, 114, 128, 0.12) 100%);
+    color: #d1d5db;
+    border-color: rgba(156, 163, 175, 0.3);
+  }
+  
+  /* 手迹标签暗色模式适配 */
+  .handwriting-tag {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+    border-color: rgba(251, 191, 36, 0.4);
+  }
+  
+  .handwriting-tag-detail {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+    border-color: rgba(251, 191, 36, 0.4);
+  }
+}
+
+/* 高对比度模式适配 */
+@media (prefers-contrast: high) {
+  .masonry-tag-base {
+    border-width: 2px;
+    font-weight: var(--global-font-weight-semibold);
+  }
+  
+  .masonry-tag-type.strong-match {
+    background: #dbeafe;
+    color: #1e3a8a;
+    border-color: #3b82f6;
+  }
+  
+  .masonry-tag-type.weak-match {
+    background: #f0f9ff;
+    color: #1e40af;
+    border-color: #3b82f6;
+    border-style: dashed;
+    border-width: 2px;
+  }
+  
+  .masonry-tag-aspect.strong-match {
+    background: #dcfce7;
+    color: #14532d;
+    border-color: #22c55e;
+  }
+  
+  .masonry-tag-aspect.weak-match {
+    background: #f0fdf4;
+    color: #15803d;
+    border-color: #22c55e;
+    border-style: dashed;
+    border-width: 2px;
+  }
+}

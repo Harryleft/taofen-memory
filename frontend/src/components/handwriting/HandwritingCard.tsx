@@ -1,6 +1,6 @@
 import { useMemo, memo, useState } from 'react';
 import { ZoomIn, Image } from 'lucide-react';
-import { highlightSearchText, categoryLabels, categoryColors } from '@/utils/handwritingUtils.ts';
+import { highlightSearchText, categoryLabels } from '@/utils/handwritingUtils.ts';
 import type { TransformedHandwritingItem } from '@/hooks/useHandwritingData.ts';
 
 interface HandwritingCardProps {
@@ -85,7 +85,7 @@ const HandwritingCard = memo(({
         </div>
         <div className="p-4">
           <div className="flex items-center gap-2 mb-2">
-            <span className={`px-2 py-1 rounded-full text-xs text-white ${categoryColors[item.category]}`}>
+            <span className={`handwriting-category-tag category-${item.category}`}>
               {categoryLabels[item.category]}
             </span>
             <span className="text-xs text-charcoal/60">{item.year}年</span>
@@ -96,9 +96,9 @@ const HandwritingCard = memo(({
           <p className="text-sm text-charcoal/70 mb-2 line-clamp-2">
             {highlightedDescription}
           </p>
-          <div className="flex flex-wrap gap-1">
+          <div className="handwriting-tags">
             {item.tags.filter(tag => !tag.includes('年')).slice(0, 2).map((tag, index) => (
-              <span key={index} className="text-xs bg-gold/10 text-gold px-2 py-1 rounded">
+              <span key={index} className="handwriting-tag">
                 {tag}
               </span>
             ))}

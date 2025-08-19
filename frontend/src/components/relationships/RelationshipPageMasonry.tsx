@@ -749,7 +749,7 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
                 )}
 
                 {(person.extra?.tags?.relationshipTypes?.length || person.extra?.tags?.aspects?.length) && (
-                  <div className="mt-3 flex flex-wrap gap-2 justify-center">
+                  <div className="masonry-card-tags">
                     {person.extra?.tags?.relationshipTypes?.slice(0, 2).map((t) => {
                       // 检查是否为强匹配、弱匹配或无匹配
                       let matchType: 'strong' | 'weak' | 'none' = 'none';
@@ -767,17 +767,16 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
                         }
                       }
                       
-                      const baseClass = "px-2 py-0.5 text-xs rounded-full transition-colors";
                       const styleClass = matchType === 'strong' 
-                        ? "bg-blue-100 text-blue-700 hover:bg-blue-200 ring-1 ring-blue-300"
+                        ? "masonry-tag-type strong-match"
                         : matchType === 'weak'
-                        ? "bg-blue-50 text-blue-600 hover:bg-blue-100 border border-dashed border-blue-300"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200";
+                        ? "masonry-tag-type weak-match"
+                        : "masonry-tag-default";
                       
                       return (
                         <button
                           key={`type-${person.id}-${t}`}
-                          className={`${baseClass} ${styleClass}`}
+                          className={styleClass}
                           onClick={(e) => {
                             e.stopPropagation();
                             onTagClick && onTagClick({ kind: 'type', value: t });
@@ -805,17 +804,16 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
                         }
                       }
                       
-                      const baseClass = "px-2 py-0.5 text-xs rounded-full transition-colors";
                       const styleClass = matchType === 'strong' 
-                        ? "bg-green-100 text-green-700 hover:bg-green-200 ring-1 ring-green-300"
+                        ? "masonry-tag-aspect strong-match"
                         : matchType === 'weak'
-                        ? "bg-green-50 text-green-600 hover:bg-green-100 border border-dashed border-green-300"
-                        : "bg-gray-50 text-gray-600 hover:bg-gray-200";
+                        ? "masonry-tag-aspect weak-match"
+                        : "masonry-tag-default";
                       
                       return (
                         <button
                           key={`aspect-${person.id}-${a}`}
-                          className={`${baseClass} ${styleClass}`}
+                          className={styleClass}
                           onClick={(e) => {
                             e.stopPropagation();
                             onTagClick && onTagClick({ kind: 'aspect', value: a });

@@ -1,6 +1,6 @@
 import { useMemo, memo } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
-import { categoryLabels, categoryColors, highlightSearchText } from '@/utils/handwritingUtils.ts';
+import { categoryLabels, highlightSearchText } from '@/utils/handwritingUtils.ts';
 import type { TransformedHandwritingItem } from '@/hooks/useHandwritingData.ts';
 
 interface LightboxProps {
@@ -66,7 +66,7 @@ const HandwritingLightbox = memo(({
           {/* Details */}
           <div className="w-full lg:w-96 p-6 overflow-y-auto">
             <div className="flex items-center gap-3 mb-4">
-              <span className={`px-3 py-1 rounded-full text-sm text-white ${categoryColors[selectedItem.category]}`}>
+              <span className={`handwriting-category-tag category-${selectedItem.category}`}>
                 {categoryLabels[selectedItem.category]}
               </span>
               <span className="text-gold font-bold">{selectedItem.year}年</span>
@@ -116,7 +116,7 @@ const HandwritingLightbox = memo(({
               <h4 className="font-bold text-charcoal mb-2">标签</h4>
               <div className="flex flex-wrap gap-2">
                 {selectedItem.tags.map((tag, index) => (
-                  <span key={index} className="bg-gold/10 text-gold px-3 py-1 rounded-full text-sm">
+                  <span key={index} className="handwriting-tag-detail">
                     {tag}
                   </span>
                 ))}
