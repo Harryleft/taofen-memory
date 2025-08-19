@@ -13,6 +13,7 @@ import {
   RELATIONSHIPS_CATEGORIES,
   getCategoryBgClass
 } from '@/constants/relationshipsConstants';
+import { tagMatcher } from '@/utils/tagMatcher';
 import '@/styles/relationships.css';
 
 export default function RelationshipsPage() {
@@ -57,8 +58,27 @@ export default function RelationshipsPage() {
   const filteredPersons = categoryFiltered.filter((person) => {
     const t = person.extra?.tags?.relationshipTypes || [];
     const a = person.extra?.tags?.aspects || [];
-    const typeOk = selectedTypes.length === 0 || t.some(v => selectedTypes.includes(v));
-    const aspectOk = selectedAspects.length === 0 || a.some(v => selectedAspects.includes(v));
+    
+    // 关系类型模糊匹配
+    const typeOk = selectedTypes.length === 0 || selectedTypes.some(selectedType => 
+      t.some(personType => {
+        // 先尝试严格匹配（快速路径）
+        if (personType === selectedType) return true;
+        // 再尝试模糊匹配
+        return tagMatcher.semanticSimilarity(selectedType, personType) >= RELATIONSHIPS_CONFIG.tagMatcher.thresholds.weak;
+      })
+    );
+    
+    // 维度标签模糊匹配
+    const aspectOk = selectedAspects.length === 0 || selectedAspects.some(selectedAspect => 
+      a.some(personAspect => {
+        // 先尝试严格匹配（快速路径）
+        if (personAspect === selectedAspect) return true;
+        // 再尝试模糊匹配
+        return tagMatcher.semanticSimilarity(selectedAspect, personAspect) >= RELATIONSHIPS_CONFIG.tagMatcher.thresholds.weak;
+      })
+    );
+    
     return typeOk && aspectOk;
   });
 
@@ -279,6 +299,8 @@ export default function RelationshipsPage() {
               onItemClick={setSelectedPerson}
               categories={adaptedCategories}
               onTagClick={handleTagClick}
+              selectedTypes={selectedTypes}
+              selectedAspects={selectedAspects}
             />
           )}
         </PullToRefresh>
