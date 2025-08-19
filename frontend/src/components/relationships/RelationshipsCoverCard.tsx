@@ -19,15 +19,15 @@ export function RelationshipsCoverCard({
     <CoverCard
       theme="timeline" // 复用timeline主题样式
       data={{
-        title: "韬奋·人物星图",
+        title: "韬奋·同行群像",
         subtitle: "关系网络 · 历史群像",
         description: "这里汇聚着邹韬奋先生一生中的重要人物，从挚爱亲友到志同道合的战友，从学界泰斗到新闻界同仁。通过这张人物关系网络，我们可以深入了解那个时代知识分子的社交圈层和思想交流，感受韬奋先生如何在复杂的人际关系中坚持理想、传播真理。",
         stats: [
-          { value: `${totalPersons}位`, label: "相关人物" },
-          { value: `${totalCategories}类`, label: "关系分类" }
+          { value: `${totalPersons}位`, label: "人物" },
+          { value: `${totalCategories}类`, label: "亲人·出版·文化·政治" }
         ]
       }}
-      className={className}
+      className={`mb-0 ${className}`}
     />
   );
 }
