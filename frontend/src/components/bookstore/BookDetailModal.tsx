@@ -62,6 +62,8 @@ const BookDetailModal: React.FC<BookLightboxProps> = ({
         <button
           onClick={onClose}
           className="absolute top-4 right-4 z-10 p-2 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-70 transition-all"
+          aria-label="关闭详情窗口"
+          title="关闭"
         >
           <X size={24} />
         </button>
@@ -69,6 +71,8 @@ const BookDetailModal: React.FC<BookLightboxProps> = ({
         <button
           onClick={onPrev}
           className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 p-2 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-70 transition-all"
+          aria-label="上一本书籍"
+          title="上一本"
         >
           <ChevronLeft size={32} />
         </button>
@@ -76,6 +80,8 @@ const BookDetailModal: React.FC<BookLightboxProps> = ({
         <button
           onClick={onNext}
           className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 p-2 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-70 transition-all"
+          aria-label="下一本书籍"
+          title="下一本"
         >
           <ChevronRight size={32} />
         </button>
