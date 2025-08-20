@@ -83,13 +83,13 @@ export const AIInterpretationButton = ({
         disabled={isLoading}
         className={`
           group relative inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium
-          transition-all duration-300 transform hover:scale-105 active:scale-95
+          transition-all duration-300 transform active:scale-95
           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500
           ${isLoading 
             ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg cursor-wait' 
             : error 
-              ? 'bg-gradient-to-r from-red-50 to-red-100 text-red-600 hover:from-red-100 hover:to-red-200 border border-red-200' 
-              : 'bg-gradient-to-r from-cyan-50 to-blue-50 text-cyan-600 hover:from-cyan-100 hover:to-blue-100 shadow-md hover:shadow-lg border border-cyan-100'
+              ? 'bg-gradient-to-r from-red-50 to-red-100 text-red-600 border border-red-200' 
+              : 'bg-gradient-to-r from-cyan-50 to-blue-50 text-cyan-600 shadow-md border border-cyan-100 hover:bg-yellow-400 hover:text-white hover:border-yellow-500'
           }
         `}
         title={error ? '点击重试' : 'AI智能解读'}
@@ -166,14 +166,14 @@ export const AIInterpretationButton = ({
 
 
       {/* 使用提示 */}
-      {!isLoading && !error && (
+      {/* {!isLoading && !error && (
         <div className="mt-2 text-center">
           <p className="text-xs text-gray-500">
             <Brain className="w-3 h-3 inline mr-1" />
             点击获取AI智能解读，深入理解原文内涵
           </p>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

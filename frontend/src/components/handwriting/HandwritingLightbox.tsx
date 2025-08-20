@@ -1,4 +1,4 @@
-import { useMemo, useState, memo } from 'react';
+import { useMemo, useState, memo, useEffect } from 'react';
 import { X, ChevronLeft, ChevronRight, Eye, EyeOff } from 'lucide-react';
 import { categoryLabels, highlightSearchText } from '@/utils/handwritingUtils.ts';
 import { AIInterpretationButton } from './AIInterpretationButton';
@@ -28,16 +28,27 @@ const HandwritingLightbox = memo(({
   const [aiInterpretation, setAiInterpretation] = useState<string>('');
   const [showAIInterpretation, setShowAIInterpretation] = useState(false);
   const [isTypingComplete, setIsTypingComplete] = useState(false);
+  const [isFirstInterpretation, setIsFirstInterpretation] = useState(true);
   const { messages, removeToast } = useToast();
 
   const highlightedTitle = useMemo(() => highlightSearchText(selectedItem.title, searchTerm), [selectedItem.title, searchTerm]);
   const highlightedContent = useMemo(() => highlightSearchText(selectedItem.originalData.原文, searchTerm), [selectedItem.originalData.原文, searchTerm]);
   const highlightedNotes = useMemo(() => highlightSearchText(selectedItem.originalData.注释, searchTerm), [selectedItem.originalData.注释, searchTerm]);
 
+  // 当切换到不同的手稿项目时，重置第一次解读状态
+  useEffect(() => {
+    setIsFirstInterpretation(true);
+    setAiInterpretation('');
+    setShowAIInterpretation(false);
+    setIsTypingComplete(false);
+  }, [selectedItem.id]); // 使用 selectedItem.id 作为依赖，确保项目切换时重置
+
   const handleInterpretationReady = (interpretation: string) => {
     setAiInterpretation(interpretation);
     setShowAIInterpretation(true);
     setIsTypingComplete(false);
+    // 每次生成新解读后，标记为不是第一次
+    setIsFirstInterpretation(false);
   };
 
   const handleTypingComplete = () => {
@@ -57,6 +68,7 @@ const HandwritingLightbox = memo(({
         <button
           onClick={onClose}
           className="absolute top-4 right-4 z-10 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+          title="关闭详情"
         >
           <X size={24} />
         </button>
@@ -64,6 +76,7 @@ const HandwritingLightbox = memo(({
         <button
           onClick={onPrev}
           className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+          title="上一页"
         >
           <ChevronLeft size={32} />
         </button>
@@ -71,6 +84,7 @@ const HandwritingLightbox = memo(({
         <button
           onClick={onNext}
           className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+          title="下一页"
         >
           <ChevronRight size={32} />
         </button>
@@ -145,12 +159,18 @@ const HandwritingLightbox = memo(({
                 {aiInterpretation && (
                   <div className={`text-blue-800/90 leading-relaxed bg-blue-50 p-4 rounded-lg transition-all duration-300
                     ${showAIInterpretation ? 'opacity-100 relative' : 'opacity-0 absolute inset-0'}`}>
-                    <TypewriterText 
-                      text={aiInterpretation} 
-                      speed={25}
-                      onComplete={handleTypingComplete}
-                    />
-                    {isTypingComplete && (
+                    {isFirstInterpretation ? (
+                      <TypewriterText
+                        text={aiInterpretation}
+                        speed={25}
+                        onComplete={handleTypingComplete}
+                      />
+                    ) : (
+                      <div className="whitespace-pre-wrap">
+                        {aiInterpretation}
+                      </div>
+                    )}
+                    {isTypingComplete && isFirstInterpretation && (
                       <div className="mt-3 pt-3 border-t border-blue-200">
                         <div className="flex items-center gap-2 text-xs text-blue-600">
                           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
