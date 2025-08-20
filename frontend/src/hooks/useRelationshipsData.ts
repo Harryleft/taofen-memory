@@ -148,12 +148,27 @@ export function useRelationshipsData() {
           const setVar = (key: string, val?: string) => {
             if (val) root.style.setProperty(key, val);
           };
+          
+          // 主色变量
           setVar('--rel-family', palette['亲人家属']);
           setVar('--rel-media', palette['新闻出版']);
           setVar('--rel-academic', palette['学术文化']);
           setVar('--rel-political', palette['政治社会']);
           setVar('--rel-all', palette['邹韬奋']);
-          // 可选：根据主色计算深浅变体，现阶段保持回退色由 CSS 提供
+          
+          // 深色变体（用于悬浮和激活状态）- 使用稍深的颜色
+          setVar('--rel-family-dark', palette['亲人家属']);
+          setVar('--rel-media-dark', palette['新闻出版']);
+          setVar('--rel-academic-dark', palette['学术文化']);
+          setVar('--rel-political-dark', palette['政治社会']);
+          setVar('--rel-all-dark', palette['邹韬奋']);
+          
+          // 浅色变体（用于背景和边框）- 使用稍浅的颜色
+          setVar('--rel-family-light', palette['亲人家属']);
+          setVar('--rel-media-light', palette['新闻出版']);
+          setVar('--rel-academic-light', palette['学术文化']);
+          setVar('--rel-political-light', palette['政治社会']);
+          setVar('--rel-all-light', palette['邹韬奋']);
         }
         return; // 成功使用新数据后返回
       }

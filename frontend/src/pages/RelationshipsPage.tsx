@@ -10,8 +10,7 @@ import { Person } from '@/types/Person';
 import { useRelationshipsData } from '@/hooks/useRelationshipsData';
 import {
   RELATIONSHIPS_CONFIG,
-  RELATIONSHIPS_CATEGORIES,
-  getCategoryBgClass
+  RELATIONSHIPS_CATEGORIES
 } from '@/constants/relationshipsConstants';
 import { tagMatcher } from '@/utils/tagMatcher';
 import '@/styles/relationships.css';
@@ -183,7 +182,7 @@ export default function RelationshipsPage() {
                 <button
                   key={category.id}
                   onClick={() => setSelectedCategory(category.id)}
-                  className={`relationships-category-button ${isSelected ? 'selected' : 'not-selected'} ${isSelected ? getCategoryBgClass(category.color) : ''}`}
+                  className={`relationships-category-button ${category.id} ${isSelected ? 'selected' : 'not-selected'}`}
                 >
                   <Icon
                     size={RELATIONSHIPS_CONFIG.ui.iconSizes.CATEGORY_BUTTON}
@@ -238,7 +237,7 @@ export default function RelationshipsPage() {
                         }
                       }, 100);
                     }}
-                    className={`relationships-category-button-mobile flex-shrink-0 ${isSelected ? 'selected' : 'not-selected'} ${isSelected ? getCategoryBgClass(category.color) : ''}`}
+                    className={`relationships-category-button-mobile ${category.id} flex-shrink-0 ${isSelected ? 'selected' : 'not-selected'}`}
                   >
                     <Icon
                       size={16}

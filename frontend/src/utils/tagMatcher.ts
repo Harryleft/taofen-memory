@@ -3,6 +3,19 @@
  * 提供归一化、多算法组合评分、同义词映射与缓存功能
  */
 
+/**
+ * 统一的描述验证函数
+ * 确保在所有组件中一致地处理描述数据
+ * @param description - 要验证的描述内容
+ * @returns 是否为有效的描述（非空字符串）
+ */
+export const hasValidDescription = (description: unknown): boolean => {
+  if (typeof description !== 'string') {
+    return false;
+  }
+  return description.trim().length > 0;
+};
+
 // LRU 缓存实现
 class LRUCache<K, V> {
   private cache = new Map<K, V>();

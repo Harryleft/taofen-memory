@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react';
 import { Person } from '@/types/Person.ts';
 import VirtualScrollMasonry from './VirtualScrollMasonry.tsx';
-import { tagMatcher } from '@/utils/tagMatcher';
+import { tagMatcher, hasValidDescription } from '@/utils/tagMatcher';
 import { RELATIONSHIPS_CONFIG } from '@/constants/relationshipsConstants';
 import '@/styles/relationships.css';
 
@@ -187,7 +187,7 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
     
     let height = baseHeight;
 
-    if (person.description) {
+    if (hasValidDescription(person.description)) {
       const descLength = Math.min(person.description.length, descMaxLength);
       const additionalHeight = Math.min(
         descLength * MASONRY_CONFIG.layout.HEIGHT_PER_CHAR,
@@ -739,7 +739,7 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
                   {person.name}
                 </h3>
 
-                {person.description && (
+                {hasValidDescription(person.description) && (
                   <p className={`masonry-card-description ${textAlign}`}>
                     {person.description.length > (responsiveConfig?.DESC_MAX_LENGTH || MASONRY_CONFIG.ui.DESC_MAX_LENGTH)
                       ? `${person.description.substring(0, responsiveConfig?.DESC_MAX_LENGTH || MASONRY_CONFIG.ui.DESC_MAX_LENGTH)}...`

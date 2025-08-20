@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { BookOpen, ExternalLink, FileText, X, Link as LinkIcon, Tags } from 'lucide-react';
 import { Person } from '@/types/Person.ts';
 import { getCategoryClass } from '@/constants/relationshipsConstants';
+import { hasValidDescription } from '@/utils/tagMatcher';
 
 interface PersonDetailModalProps {
   person: Person | null;
@@ -155,7 +156,7 @@ const RelationshipPagePersonModal: React.FC<PersonDetailModalProps> = ({ person,
         {/* 内容 */}
         <div className="p-6 space-y-6">
           {/* 描述 */}
-          {person.description && (
+          {hasValidDescription(person.description) && (
             <div>
               <h3 className="flex items-center text-lg font-medium text-gray-900 mb-3">
                 <FileText size={18} className="mr-2 text-gray-600" />
