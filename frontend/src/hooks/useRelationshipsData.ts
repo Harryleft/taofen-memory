@@ -82,7 +82,7 @@ export function useRelationshipsData() {
       name: node.name,
       category: node.category,
       img: node.image_url || '',
-      description: hasValidDescription(node.description) ? node.description : '',
+      description: hasValidDescription(node.description) ? node.description : undefined,
       sources: node.sources || [],
       link: node.links || [],
       extra: {
@@ -103,7 +103,7 @@ export function useRelationshipsData() {
       name: rawPerson.name,
       category: (rawPerson as unknown as { category?: string }).category || '未知',
       img: (rawPerson as unknown as { img?: string }).img || '',
-      description: hasValidDescription(rawPerson.desc) ? rawPerson.desc : '',
+      description: hasValidDescription(rawPerson.desc) ? rawPerson.desc : undefined,
       sources: rawPerson.sources || [],
       link: rawPerson.link || [],
     }));
