@@ -2,6 +2,8 @@ import { useMemo, useState, memo } from 'react';
 import { X, ChevronLeft, ChevronRight, Eye, EyeOff } from 'lucide-react';
 import { categoryLabels, highlightSearchText } from '@/utils/handwritingUtils.ts';
 import { AIInterpretationButton } from './AIInterpretationButton';
+import { TypewriterText } from './TypewriterText';
+import { Toast, useToast } from './Toast';
 import type { TransformedHandwritingItem } from '@/hooks/useHandwritingData.ts';
 
 interface LightboxProps {
@@ -25,6 +27,8 @@ const HandwritingLightbox = memo(({
 }: LightboxProps) => {
   const [aiInterpretation, setAiInterpretation] = useState<string>('');
   const [showAIInterpretation, setShowAIInterpretation] = useState(false);
+  const [isTypingComplete, setIsTypingComplete] = useState(false);
+  const { messages, removeToast } = useToast();
 
   const highlightedTitle = useMemo(() => highlightSearchText(selectedItem.title, searchTerm), [selectedItem.title, searchTerm]);
   const highlightedContent = useMemo(() => highlightSearchText(selectedItem.originalData.原文, searchTerm), [selectedItem.originalData.原文, searchTerm]);
@@ -33,6 +37,11 @@ const HandwritingLightbox = memo(({
   const handleInterpretationReady = (interpretation: string) => {
     setAiInterpretation(interpretation);
     setShowAIInterpretation(true);
+    setIsTypingComplete(false);
+  };
+
+  const handleTypingComplete = () => {
+    setIsTypingComplete(true);
   };
 
   const toggleInterpretation = () => {
@@ -93,50 +102,63 @@ const HandwritingLightbox = memo(({
             
             <p className="text-charcoal/60 mb-4">{selectedItem.originalData.时间}</p>
             
+            {/* AI解读按钮 - 移到更显眼的位置 */}
+            <div className="mb-4">
+              <AIInterpretationButton 
+                item={selectedItem}
+                onInterpretationReady={handleInterpretationReady}
+              />
+            </div>
+            
             <div className="mb-6">
               <div className="flex items-center justify-between mb-2">
                 <h4 className="font-bold text-charcoal">
                   {showAIInterpretation ? 'AI解读' : '原文'}
                 </h4>
-                <div className="flex items-center gap-2">
-                  <AIInterpretationButton 
-                    item={selectedItem}
-                    onInterpretationReady={handleInterpretationReady}
-                    className="text-xs"
-                  />
-                  {aiInterpretation && (
-                    <button
-                      onClick={toggleInterpretation}
-                      className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-md
-                        bg-gray-100 text-gray-600 hover:bg-gray-200 active:bg-gray-300
-                        transition-colors"
-                      title={showAIInterpretation ? '查看原文' : '查看AI解读'}
-                    >
-                      {showAIInterpretation ? (
-                        <>
-                          <EyeOff className="w-3 h-3" />
-                          原文
-                        </>
-                      ) : (
-                        <>
-                          <Eye className="w-3 h-3" />
-                          解读
-                        </>
-                      )}
-                    </button>
-                  )}
-                </div>
+                {aiInterpretation && (
+                  <button
+                    onClick={toggleInterpretation}
+                    className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-md
+                      bg-gray-100 text-gray-600 hover:bg-gray-200 active:bg-gray-300
+                      transition-colors"
+                    title={showAIInterpretation ? '查看原文' : '查看AI解读'}
+                  >
+                    {showAIInterpretation ? (
+                      <>
+                        <EyeOff className="w-3 h-3" />
+                        原文
+                      </>
+                    ) : (
+                      <>
+                        <Eye className="w-3 h-3" />
+                        解读
+                      </>
+                    )}
+                  </button>
+                )}
               </div>
               <div className="relative">
-                <p className={`text-charcoal/80 leading-relaxed bg-gray-50 p-4 rounded-lg whitespace-pre-wrap
+                <div className={`text-charcoal/80 leading-relaxed bg-gray-50 p-4 rounded-lg whitespace-pre-wrap transition-all duration-300
                   ${showAIInterpretation && aiInterpretation ? 'opacity-0 absolute inset-0' : 'opacity-100'}`}>
                   {highlightedContent}
-                </p>
+                </div>
                 {aiInterpretation && (
-                  <p className={`text-blue-800/90 leading-relaxed bg-blue-50 p-4 rounded-lg whitespace-pre-wrap
-                    ${showAIInterpretation ? 'opacity-100' : 'opacity-0 absolute inset-0'} transition-opacity duration-200`}>
-                    {aiInterpretation}
-                  </p>
+                  <div className={`text-blue-800/90 leading-relaxed bg-blue-50 p-4 rounded-lg transition-all duration-300
+                    ${showAIInterpretation ? 'opacity-100 relative' : 'opacity-0 absolute inset-0'}`}>
+                    <TypewriterText 
+                      text={aiInterpretation} 
+                      speed={25}
+                      onComplete={handleTypingComplete}
+                    />
+                    {isTypingComplete && (
+                      <div className="mt-3 pt-3 border-t border-blue-200">
+                        <div className="flex items-center gap-2 text-xs text-blue-600">
+                          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                          AI解读完成
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             </div>
@@ -185,6 +207,11 @@ const HandwritingLightbox = memo(({
           </div>
         </div>
       </div>
+      
+      {/* Toast 提示 */}
+      {messages.map(message => (
+        <Toast key={message.id} message={message} onDismiss={removeToast} />
+      ))}
     </div>
   );
 });
