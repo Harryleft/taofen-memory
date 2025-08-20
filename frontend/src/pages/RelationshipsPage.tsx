@@ -263,7 +263,7 @@ export default function RelationshipsPage() {
               {selectedTypes.map((t) => (
                 <button
                   key={`sel-type-${t}`}
-                  className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  className="selected-tag-type"
                   onClick={() => handleTagClick({ kind: 'type', value: t })}
                 >
                   {t} ×
@@ -272,14 +272,14 @@ export default function RelationshipsPage() {
               {selectedAspects.map((a) => (
                 <button
                   key={`sel-aspect-${a}`}
-                  className="px-2 py-0.5 text-xs rounded-full bg-gray-50 text-gray-600 hover:bg-gray-200"
+                  className="selected-tag-aspect"
                   onClick={() => handleTagClick({ kind: 'aspect', value: a })}
                 >
                   {a} ×
                 </button>
               ))}
               <button
-                className="ml-auto text-xs text-blue-600 hover:underline"
+                className="ml-auto text-xs"
                 onClick={clearAllTags}
               >
                 清空标签筛选

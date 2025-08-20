@@ -489,6 +489,101 @@
   gap: calc(var(--global-spacing-xs) * 0.75);
 }
 
+/* 选中状态标签 - 用于过滤器中的已选择标签 */
+.selected-tag-type {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--global-spacing-xs) var(--global-spacing-sm);
+  border-radius: var(--global-radius-md);
+  font-size: var(--global-font-size-xs);
+  font-weight: var(--global-font-weight-medium);
+  line-height: var(--global-line-height-tight);
+  letter-spacing: 0.025em;
+  transition: var(--global-transition-property) var(--global-transition-duration) var(--global-transition-timing-function);
+  cursor: pointer;
+  border: 1px solid transparent;
+  
+  /* 现代化字体渲染 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  
+  /* 微妙的阴影增强层次感 */
+  box-shadow: var(--global-shadow-xs);
+  
+  /* 防止文本选择和优化触摸 */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  
+  /* 选中的关系类型标签 - 深蓝色 */
+  background: linear-gradient(135deg, 
+    rgba(59, 130, 246, 0.15) 0%, 
+    rgba(37, 99, 235, 0.1) 100%);
+  color: #1e40af;
+  border-color: rgba(59, 130, 246, 0.3);
+  box-shadow: 
+    var(--global-shadow-xs),
+    0 0 0 1px rgba(59, 130, 246, 0.1);
+}
+
+.selected-tag-type:hover {
+  background: linear-gradient(135deg, 
+    rgba(59, 130, 246, 0.2) 0%, 
+    rgba(37, 99, 235, 0.15) 100%);
+  border-color: rgba(59, 130, 246, 0.4);
+  transform: translateY(-1px);
+}
+
+.selected-tag-aspect {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--global-spacing-xs) var(--global-spacing-sm);
+  border-radius: var(--global-radius-md);
+  font-size: var(--global-font-size-xs);
+  font-weight: var(--global-font-weight-medium);
+  line-height: var(--global-line-height-tight);
+  letter-spacing: 0.025em;
+  transition: var(--global-transition-property) var(--global-transition-duration) var(--global-transition-timing-function);
+  cursor: pointer;
+  border: 1px solid transparent;
+  
+  /* 现代化字体渲染 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  
+  /* 微妙的阴影增强层次感 */
+  box-shadow: var(--global-shadow-xs);
+  
+  /* 防止文本选择和优化触摸 */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  
+  /* 选中的维度标签 - 深绿色 */
+  background: linear-gradient(135deg, 
+    rgba(34, 197, 94, 0.15) 0%, 
+    rgba(21, 128, 61, 0.1) 100%);
+  color: #15803d;
+  border-color: rgba(34, 197, 94, 0.3);
+  box-shadow: 
+    var(--global-shadow-xs),
+    0 0 0 1px rgba(34, 197, 94, 0.1);
+}
+
+.selected-tag-aspect:hover {
+  background: linear-gradient(135deg, 
+    rgba(34, 197, 94, 0.2) 0%, 
+    rgba(21, 128, 61, 0.15) 100%);
+  border-color: rgba(34, 197, 94, 0.4);
+  transform: translateY(-1px);
+}
+
 /* 关系界面详情页标签样式 */
 .relationship-detail-tag {
   display: inline-flex;
@@ -662,6 +757,22 @@
       rgba(107, 114, 128, 0.12) 100%);
     color: #d1d5db;
     border-color: rgba(156, 163, 175, 0.3);
+  }
+  
+  .selected-tag-type {
+    background: linear-gradient(135deg, 
+      rgba(59, 130, 246, 0.2) 0%, 
+      rgba(37, 99, 235, 0.15) 100%);
+    color: #93c5fd;
+    border-color: rgba(59, 130, 246, 0.4);
+  }
+  
+  .selected-tag-aspect {
+    background: linear-gradient(135deg, 
+      rgba(34, 197, 94, 0.2) 0%, 
+      rgba(21, 128, 61, 0.15) 100%);
+    color: #86efac;
+    border-color: rgba(34, 197, 94, 0.4);
   }
   
   /* 手迹标签暗色模式适配 */
