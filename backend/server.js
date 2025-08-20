@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const fetch = require('node-fetch');
+const https = require('https');
 require('dotenv').config();
 
 const app = express();
@@ -14,7 +14,7 @@ app.use(express.json());
 const AI_API_CONFIG = {
   url: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
   apiKey: process.env.AI_API_KEY || '2cdde2240d0a446b9bd7962a8c5a25fe.suOORlOs7kv84ZEF',
-  model: 'glm-4-5'
+  model: 'glm-4-flash'
 };
 
 // AI解读接口
@@ -48,23 +48,53 @@ app.post('/api/ai/interpret', async (req, res) => {
 请直接开始解读，不需要额外说明：`;
 
     // 调用AI API
-    const response = await fetch(AI_API_CONFIG.url, {
+    const postData = JSON.stringify({
+      model: AI_API_CONFIG.model,
+      messages: [
+        {
+          role: 'user',
+          content: prompt
+        }
+      ],
+      temperature: 0.7,
+      max_tokens: 1000
+    });
+
+    const requestOptions = {
+      hostname: 'open.bigmodel.cn',
+      port: 443,
+      path: '/api/paas/v4/chat/completions',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${AI_API_CONFIG.apiKey}`
-      },
-      body: JSON.stringify({
-        model: AI_API_CONFIG.model,
-        messages: [
-          {
-            role: 'user',
-            content: prompt
+        'Authorization': `Bearer ${AI_API_CONFIG.apiKey}`,
+        'Content-Length': Buffer.byteLength(postData),
+        'User-Agent': 'Node.js-App'
+      }
+    };
+
+    const response = await new Promise((resolve, reject) => {
+      const req = https.request(requestOptions, (res) => {
+        let data = '';
+        res.on('data', (chunk) => {
+          data += chunk;
+        });
+        res.on('end', () => {
+          try {
+            resolve({
+              ok: res.statusCode >= 200 && res.statusCode < 300,
+              status: res.statusCode,
+              json: () => Promise.resolve(JSON.parse(data))
+            });
+          } catch (parseError) {
+            reject(parseError);
           }
-        ],
-        temperature: 0.7,
-        max_tokens: 1000
-      })
+        });
+      });
+
+      req.on('error', reject);
+      req.write(postData);
+      req.end();
     });
 
     if (!response.ok) {

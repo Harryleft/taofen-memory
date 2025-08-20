@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Brain, Loader2, RefreshCw, AlertCircle } from 'lucide-react';
+import { Brain, Loader2, AlertCircle } from 'lucide-react';
 import { aiService, type AIInterpretationResponse } from '@/services/aiService';
 import type { TransformedHandwritingItem } from '@/hooks/useHandwritingData.ts';
 
@@ -36,17 +36,14 @@ export const AIInterpretationButton = ({
       } else {
         setError(response.error || '解读失败，请稍后重试');
       }
-    } catch (err) {
+    } catch {
       setError('网络请求失败，请检查网络连接');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleRetry = () => {
-    handleInterpret();
-  };
-
+  
   return (
     <div className={`ai-interpretation-container ${className}`}>
       <button
