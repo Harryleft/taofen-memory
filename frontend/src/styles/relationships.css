@@ -983,9 +983,12 @@
   align-items: center;
   justify-content: center;
   
-  /* 基础样式 */
-  background: transparent;
-  border: 1px solid transparent;
+  /* 基础样式 - 使用全局金色变量 */
+  background: linear-gradient(135deg, var(--global-accent-secondary) 0%, var(--global-accent-tertiary) 100%);
+  border: 1px solid var(--global-accent-secondary);
+  box-shadow: 
+    0 2px 8px rgba(196, 155, 97, 0.2),
+    0 1px 3px rgba(196, 155, 97, 0.1);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   
   /* 平板端 */
@@ -994,36 +997,36 @@
     height: 40px;
   }
   
-  /* 悬停状态 - 优雅的红色背景 */
+  /* 悬停状态 - 保持金色主题一致性 */
   &:hover {
     transform: scale(1.1);
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    border-color: #dc2626;
+    background: linear-gradient(135deg, var(--global-accent-secondary) 0%, var(--global-accent-tertiary) 100%);
+    border-color: var(--global-accent-secondary);
     box-shadow: 
-      0 2px 8px rgba(239, 68, 68, 0.3),
-      0 1px 3px rgba(239, 68, 68, 0.2);
+      0 4px 12px rgba(196, 155, 97, 0.3),
+      0 2px 6px rgba(196, 155, 97, 0.2);
     
-    /* 图标颜色变为白色 */
+    /* 图标颜色保持白色 */
     svg {
       color: white !important;
     }
   }
   
-  /* 激活状态 */
+  /* 激活状态 - 稍微深一点的金色 */
   &:active {
     transform: scale(0.95);
-    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-    border-color: #b91c1c;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--global-accent-secondary) 80%, black) 0%, color-mix(in srgb, var(--global-accent-tertiary) 80%, black) 100%);
+    border-color: color-mix(in srgb, var(--global-accent-secondary) 80%, black);
     box-shadow: 
-      0 1px 4px rgba(239, 68, 68, 0.4),
-      0 1px 2px rgba(239, 68, 68, 0.3);
+      0 1px 4px rgba(196, 155, 97, 0.4),
+      0 1px 2px rgba(196, 155, 97, 0.3);
   }
   
   /* 图标尺寸和颜色 */
   svg {
     width: 18px;
     height: 18px;
-    color: #6b7280;
+    color: white;
     transition: color 0.2s ease;
     
     @media (min-width: 768px) {
@@ -1035,17 +1038,20 @@
   /* 焦点状态 - 无障碍访问 */
   &:focus {
     outline: none;
-    border-color: #ef4444;
-    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+    border-color: var(--global-accent-secondary);
+    box-shadow: 
+      0 0 0 3px rgba(196, 155, 97, 0.3),
+      0 2px 8px rgba(196, 155, 97, 0.2),
+      0 1px 3px rgba(196, 155, 97, 0.1);
   }
   
   /* 焦点+悬停状态 */
   &:focus:hover {
-    border-color: #dc2626;
+    border-color: var(--global-accent-secondary);
     box-shadow: 
-      0 0 0 3px rgba(239, 68, 68, 0.2),
-      0 2px 8px rgba(239, 68, 68, 0.3),
-      0 1px 3px rgba(239, 68, 68, 0.2);
+      0 0 0 3px rgba(196, 155, 97, 0.3),
+      0 4px 12px rgba(196, 155, 97, 0.3),
+      0 2px 6px rgba(196, 155, 97, 0.2);
   }
 }
 

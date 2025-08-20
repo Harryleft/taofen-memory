@@ -388,7 +388,7 @@ export default function EnhancedHero() {
         <div className="max-w-7xl mx-auto px-6 py-20 overflow-visible">
           <div className="text-center mb-20">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              探索历史足迹
+              探索邹韬奋先生足迹
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               通过不同的视角，深入了解邹韬奋的人生历程与时代贡献
