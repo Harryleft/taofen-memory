@@ -19,9 +19,8 @@ export interface AIInterpretationResponse {
 
 // AI API服务
 class AIService {
-  private readonly baseUrl = process.env.NODE_ENV === 'development' 
-    ? 'http://localhost:3001/api' 
-    : '/api';
+  private readonly baseUrl = import.meta.env.VITE_API_BASE_URL || 
+    (import.meta.env.DEV ? 'http://localhost:3001/api' : 'https://ai4dh.com/api');
 
   async interpretHandwriting(request: AIInterpretationRequest): Promise<AIInterpretationResponse> {
     try {
