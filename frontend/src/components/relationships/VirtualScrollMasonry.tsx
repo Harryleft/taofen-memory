@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Person } from '@/types/Person.ts';
+import { hasValidDescription } from '@/utils/tagMatcher';
 
 interface VirtualScrollMasonryProps {
   items: Person[];
@@ -48,7 +49,7 @@ const VirtualScrollMasonry: React.FC<VirtualScrollMasonryProps> = ({
       const columnIndex = columnHeights.indexOf(minHeight);
 
       // 计算项目高度（这里简化处理，实际应该根据内容计算）
-      const height = itemHeight + (person.description ? person.description.length * 0.5 : 0);
+      const height = itemHeight + (hasValidDescription(person.description) ? person.description.length * 0.5 : 0);
 
       virtualItems.push({
         person,
@@ -230,7 +231,7 @@ const VirtualScrollMasonry: React.FC<VirtualScrollMasonryProps> = ({
                   {item.person.name}
                 </h3>
 
-                {item.person.description && (
+                {hasValidDescription(item.person.description) && (
                   <p className="masonry-card-description text-align-center text-sm">
                     {item.person.description.length > 80
                       ? `${item.person.description.substring(0, 80)}...`
