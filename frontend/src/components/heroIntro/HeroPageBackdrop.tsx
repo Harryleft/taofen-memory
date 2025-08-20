@@ -49,8 +49,13 @@ const CONFIG = {
   DEBUG: false,
   
   // 并发控制
-  MAX_CONCURRENT_PRELOADS: 6
+  MAX_CONCURRENT_PRELOADS: 6,
+  // 每列首屏直接加载的图片数量（避免空窗），集中管理避免魔法数字
+  VISIBLE_ITEMS_PER_COLUMN: 3
 } as const;
+
+// 占位图片，避免空 src 触发无效请求
+const PLACEHOLDER_SRC = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
 
 // 列节奏模板
 const RHYTHM_PATTERN = [-0.06, 0.0, 0.05, -0.03, 0.02] as const;
@@ -344,6 +349,7 @@ export default function HeroPageBackdrop() {
   const containerRef = useRef<HTMLDivElement>(null);
   const cleanupRef = useRef<(() => void) | null>(null);
   const deferredRef = useRef<number | null>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   // 移除视差滚动效果，保持静态展示
 
@@ -370,12 +376,23 @@ export default function HeroPageBackdrop() {
         });
     };
 
-    // 延迟加载，优先级较低
-    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-      deferredRef.current = requestIdleCallback(loadHeroImages, { timeout: 2000 });
+    // 根据网络状况与省流量偏好调整策略
+    const nav = typeof navigator !== 'undefined' ? (navigator as any) : null;
+    const connection = nav && nav.connection ? nav.connection : null;
+    const saveData = connection && connection.saveData === true;
+    const effectiveType = connection && typeof connection.effectiveType === 'string' ? connection.effectiveType : '';
+    const isSlowNetwork = effectiveType === 'slow-2g' || effectiveType === '2g';
+    const shouldDefer = !saveData && !isSlowNetwork;
+
+    if (!shouldDefer) {
+      // 慢网或省流量：立即加载，避免空窗
+      loadHeroImages();
+    } else if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      // 延迟加载，设置较短超时，避免等待过长
+      deferredRef.current = requestIdleCallback(loadHeroImages, { timeout: 1200 });
     } else {
-      // 降级方案：使用 setTimeout
-      deferredRef.current = setTimeout(loadHeroImages, 100) as unknown as number;
+      // 降级方案：使用 setTimeout，短延迟
+      deferredRef.current = setTimeout(loadHeroImages, 120) as unknown as number;
     }
 
     return () => {
@@ -428,6 +445,28 @@ export default function HeroPageBackdrop() {
     [repeatedItems, layoutConfig, aspectMap]
   );
 
+  // 注册懒加载图片（需在 ImageItem 定义前）
+  const registerLazyImage = useCallback((el: HTMLImageElement | null, src: string) => {
+    if (!el) return;
+    const supportsObserver = typeof IntersectionObserver !== 'undefined';
+    if (!supportsObserver) {
+      // 回退：不支持 IO 时直接加载真实图片，避免停留在占位符
+      el.src = src;
+      return;
+    }
+    // 初始设置占位
+    if (!el.dataset || el.dataset.src !== src) {
+      el.dataset.src = src;
+      el.src = PLACEHOLDER_SRC;
+    }
+    if (observerRef.current) {
+      observerRef.current.observe(el);
+    } else {
+      // 再次回退：observer 尚未初始化时也直接加载，确保显示
+      el.src = src;
+    }
+  }, []);
+
   // 图片项目组件
   const ImageItem = useCallback(({ 
     item, 
@@ -437,22 +476,36 @@ export default function HeroPageBackdrop() {
     item: MasonryItem & { calculatedHeight: number };
     columnIndex: number;
     itemIndex: number;
-  }) => (
-    <div
-      key={`${item.id}-${columnIndex}-${itemIndex}`}
-      className="relative overflow-hidden rounded-lg shadow-lg"
-      style={{ height: `${item.calculatedHeight}px` }}
-    >
-      <img
-        src={item.src}
-        alt={item.title}
-        className="w-full h-full object-cover"
-        loading="lazy"
-        decoding="async"
-        fetchPriority="low"
-      />
-    </div>
-  ), []);
+  }) => {
+    const isVisibleBucket = itemIndex < CONFIG.VISIBLE_ITEMS_PER_COLUMN;
+    return (
+      <div
+        key={`${item.id}-${columnIndex}-${itemIndex}`}
+        className="relative overflow-hidden rounded-lg shadow-lg"
+        style={{ height: `${item.calculatedHeight}px` }}
+      >
+        {isVisibleBucket ? (
+          <img
+            src={item.src}
+            alt={item.title}
+            className="w-full h-full object-cover"
+            loading="eager"
+            decoding="async"
+            fetchPriority="high"
+          />
+        ) : (
+          <img
+            ref={(el) => registerLazyImage(el, item.src)}
+            alt={item.title}
+            className="w-full h-full object-cover"
+            loading="lazy"
+            decoding="async"
+            fetchPriority="low"
+          />
+        )}
+      </div>
+    );
+  }, [registerLazyImage]);
 
   // 列组件
   const Column = useCallback(({ 
@@ -485,6 +538,38 @@ export default function HeroPageBackdrop() {
   const scrollableStyle = useMemo(() => ({
     filter: `saturate(${CONFIG.BAND_SATURATE}) brightness(${CONFIG.BAND_BRIGHTNESS}) blur(${CONFIG.BAND_BLUR_PX}px)`
   }), []);
+
+  // 懒加载：创建 IntersectionObserver（仅赋值不可见区图片的 src）
+  useEffect(() => {
+    if (observerRef.current) return;
+    if (typeof window === 'undefined') return;
+    if (typeof IntersectionObserver === 'undefined') {
+      // 环境不支持 IO，保持为空以触发回退逻辑
+      return;
+    }
+
+    observerRef.current = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        const el = entry.target as HTMLImageElement;
+        if (entry.isIntersecting) {
+          const realSrc = el.dataset && el.dataset.src ? el.dataset.src : '';
+          if (realSrc) {
+            el.src = realSrc;
+          }
+          observerRef.current && observerRef.current.unobserve(el);
+        }
+      });
+    }, { root: null, rootMargin: '100px', threshold: 0.01 });
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+        observerRef.current = null;
+      }
+    };
+  }, []);
+
+  
 
   // 如果还没有延迟加载完成，返回空的占位容器
   if (!isDeferred) {
