@@ -5,6 +5,28 @@ import { tagMatcher, hasValidDescription } from '@/utils/tagMatcher';
 import { RELATIONSHIPS_CONFIG } from '@/constants/relationshipsConstants';
 import '@/styles/relationships.css';
 
+// 安全的描述显示函数，确保不会显示"0"或其他无效值
+const renderSafeDescription = (description: string | undefined, maxLength: number) => {
+  if (!hasValidDescription(description)) {
+    return null;
+  }
+  
+  // 双重保护，确保即使有遗漏的数据也不会显示"0"
+  const desc = description || '';
+  const trimmed = desc.trim();
+  
+  // 明确过滤掉各种形式的"0"
+  if (trimmed === '0' || trimmed === '' || trimmed === 'null' || trimmed === 'undefined') {
+    return null;
+  }
+  
+  if (trimmed.length > maxLength) {
+    return `${trimmed.substring(0, maxLength)}...`;
+  }
+  
+  return trimmed;
+};
+
 // 分类映射：将中文分类名映射为英文类名
 const getCategoryClass = (category: string): string => {
   const categoryMap: Record<string, string> = {
@@ -739,14 +761,15 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
                   {person.name}
                 </h3>
 
-                {hasValidDescription(person.description) && (
-                  <p className={`masonry-card-description ${textAlign}`}>
-                    {person.description.length > (responsiveConfig?.DESC_MAX_LENGTH || MASONRY_CONFIG.ui.DESC_MAX_LENGTH)
-                      ? `${person.description.substring(0, responsiveConfig?.DESC_MAX_LENGTH || MASONRY_CONFIG.ui.DESC_MAX_LENGTH)}...`
-                      : person.description
-                    }
-                  </p>
-                )}
+                {(() => {
+                  const maxLength = responsiveConfig?.DESC_MAX_LENGTH || MASONRY_CONFIG.ui.DESC_MAX_LENGTH;
+                  const descriptionText = renderSafeDescription(person.description, maxLength);
+                  return descriptionText ? (
+                    <p className={`masonry-card-description ${textAlign}`}>
+                      {descriptionText}
+                    </p>
+                  ) : null;
+                })()}
 
                 {(person.extra?.tags?.relationshipTypes?.length || person.extra?.tags?.aspects?.length) && (
                   <div className="masonry-card-tags">
