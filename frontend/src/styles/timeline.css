@@ -296,6 +296,7 @@
   font-weight: 700;
   color: white;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  -webkit-user-select: none;
   user-select: none;
   white-space: nowrap;
 }
@@ -1231,8 +1232,8 @@ img {
   background: rgba(255, 255, 255, 0.4);
   border: 1px solid rgba(196, 155, 97, 0.2);
   border-radius: 16px;
-  backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
 }
 
 .timeline-cover-stat-item {
@@ -1504,8 +1505,8 @@ img {
 
 /* 圆点按钮悬停效果优化 */
 .timeline-dot-button {
-  appearance: none;
   -webkit-appearance: none;
+  appearance: none;
   border: 0;
   padding: 0;
   background: transparent;
