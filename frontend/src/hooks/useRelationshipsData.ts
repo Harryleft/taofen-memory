@@ -3,6 +3,16 @@ import { Person } from '@/types/Person';
 import { tagMatcher, hasValidDescription } from '@/utils/tagMatcher';
 import { RELATIONSHIPS_CONFIG } from '@/constants/relationshipsConstants';
 
+// 数据清理函数：统一处理各种无效描述情况
+const sanitizeDescription = (desc: any): string | undefined => {
+  if (typeof desc !== 'string') return undefined;
+  const trimmed = desc.trim();
+  if (trimmed === '' || trimmed === '0' || trimmed === 'null' || trimmed === 'undefined') {
+    return undefined;
+  }
+  return trimmed;
+};
+
 // 统一默认配置，避免魔法数字
 const DEFAULTS = {
   centerId: 499, // 若新数据未提供 meta.centerId，则回退
@@ -82,7 +92,7 @@ export function useRelationshipsData() {
       name: node.name,
       category: node.category,
       img: node.image_url || '',
-      description: hasValidDescription(node.description) ? node.description : undefined,
+      description: sanitizeDescription(node.description),
       sources: node.sources || [],
       link: node.links || [],
       extra: {
@@ -97,13 +107,18 @@ export function useRelationshipsData() {
     };
   };
 
-  const transformLegacyToPersons = (rawData: { persons: LegacyRawPerson[] }): Person[] => {
-    return rawData.persons.map((rawPerson: LegacyRawPerson) => ({
+  const transformLegacyToPersons = (rawData: any): Person[] => {
+    // 处理 relationships.json 格式：{ records, extend, page, data: [...] }
+    // 其中 data[0].data 才是真正的人物数组
+    const personData = rawData.data?.[0]?.data || rawData.persons || [];
+    
+    return personData.map((rawPerson: any) => ({
       id: rawPerson.id,
       name: rawPerson.name,
-      category: (rawPerson as unknown as { category?: string }).category || '未知',
-      img: (rawPerson as unknown as { img?: string }).img || '',
-      description: hasValidDescription(rawPerson.desc) ? rawPerson.desc : undefined,
+      category: rawPerson.category || '未知',
+      img: rawPerson.pic || rawPerson.img || '',
+      // 关键修复：将 "sub" 字段映射到 description
+      description: sanitizeDescription(rawPerson.sub),
       sources: rawPerson.sources || [],
       link: rawPerson.link || [],
     }));
