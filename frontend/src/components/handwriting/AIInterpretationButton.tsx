@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Brain, Loader2, AlertCircle, Sparkles } from 'lucide-react';
 import { aiService, type AIInterpretationResponse } from '@/services/aiService';
 import { useToast } from './Toast';
@@ -27,7 +27,7 @@ export const AIInterpretationButton = ({
   const [error, setError] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(0);
-  const { showSuccess, showError, showInfo } = useToast();
+  const { showSuccess, showError } = useToast();
 
   // 处理AI解读请求
   const handleInterpret = async () => {
