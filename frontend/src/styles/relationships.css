@@ -1055,4 +1055,32 @@
   }
 }
 
+/* 在现有的 .masonry-avatar-placeholder 样式后添加以下内容 */
+
+/* 为不同分类的占位符添加颜色支持 */
+.masonry-avatar-placeholder.family {
+  --category-color: var(--rel-family, #ef4444);
+  --category-color-dark: var(--rel-family-dark, #dc2626);
+}
+
+.masonry-avatar-placeholder.media {
+  --category-color: var(--rel-media, #3b82f6);
+  --category-color-dark: var(--rel-media-dark, #2563eb);
+}
+
+.masonry-avatar-placeholder.academic {
+  --category-color: var(--rel-academic, #8b5cf6);
+  --category-color-dark: var(--rel-academic-dark, #7c3aed);
+}
+
+.masonry-avatar-placeholder.political {
+  --category-color: var(--rel-political, #10b981);
+  --category-color-dark: var(--rel-political-dark, #059669);
+}
+
+.masonry-avatar-placeholder.all {
+  --category-color: var(--rel-all, #6b7280);
+  --category-color-dark: var(--rel-all-dark, #4b5563);
+}
+
 
