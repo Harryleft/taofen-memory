@@ -17,7 +17,7 @@ export function HandwritingCoverCard({
     <CoverCard
       theme="timeline" // 复用timeline主题样式
       data={{
-        title: "韬奋·墨迹流年",
+        title: "韬奋·笔下风骨",
         subtitle: "笔墨传承 · 历史见证",
         description: "邹韬奋先生手迹，见证知识分子心路历程与家国情怀。",
         stats: [

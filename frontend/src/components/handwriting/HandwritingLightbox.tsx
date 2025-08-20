@@ -75,7 +75,7 @@ const HandwritingLightbox = memo(({
         
         <button
           onClick={onPrev}
-          className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
           title="上一页"
         >
           <ChevronLeft size={32} />
@@ -83,7 +83,7 @@ const HandwritingLightbox = memo(({
         
         <button
           onClick={onNext}
-          className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
           title="下一页"
         >
           <ChevronRight size={32} />
