@@ -83,7 +83,8 @@
       "Bash(nslookup:*)",
       "mcp__spec-workflow-mcp__specs-workflow",
       "Bash(npm start:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "mcp__browser-tools-mcp__runAccessibilityAudit"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",
