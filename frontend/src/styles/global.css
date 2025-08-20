@@ -119,36 +119,9 @@
   --global-transition-timing-function: var(--global-ease-in-out);
 }
 
-/* === 暗色模式变量 === */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --global-bg-primary: #0f172a;
-    --global-bg-secondary: #1e293b;
-    --global-bg-tertiary: #334155;
-    
-    --global-text-primary: #f8fafc;
-    --global-text-secondary: #e2e8f0;
-    --global-text-tertiary: #cbd5e1;
-    --global-text-muted: #94a3b8;
-    
-    --global-border-light: rgba(255, 255, 255, 0.1);
-    --global-border-medium: rgba(255, 255, 255, 0.2);
-    --global-border-strong: rgba(255, 255, 255, 0.3);
-  }
-}
+/* MVP: 暂停暗色模式变量（仅保留浅色主题） */
 
-/* === 高对比度模式 === */
-@media (prefers-contrast: high) {
-  :root {
-    --global-border-light: currentColor;
-    --global-border-medium: currentColor;
-    --global-border-strong: currentColor;
-    
-    --global-text-primary: #000000;
-    --global-text-secondary: #333333;
-    --global-text-tertiary: #666666;
-  }
-}
+/* MVP: 暂停高对比度模式（仅保留浅色主题） */
 
 /* === 减少动画模式 === */
 @media (prefers-reduced-motion: reduce) {

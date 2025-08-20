@@ -839,18 +839,7 @@
   }
 }
 
-/* 高对比度模式支持 */
-@media (prefers-contrast: high) {
-  .cover-card {
-    border: 2px solid currentColor;
-  }
-  
-  .cover-card-stats {
-    border: none;                                /* 高对比度模式下也隐藏边框 */
-    background: transparent;                     /* 高对比度模式下也保持透明 */
-    box-shadow: none;                            /* 删除边框模拟效果 */
-  }
-}
+/* MVP: 暂停高对比度模式支持（仅保留浅色主题） */
 
 /* 键盘导航优化 */
 .cover-card:focus-within {
