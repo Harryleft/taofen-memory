@@ -20,6 +20,10 @@ export const TypewriterText = ({
   useEffect(() => {
     if (!text) return;
 
+    // 当text变化时，立即重置状态
+    setDisplayedText('');
+    setIsTyping(true);
+
     let currentIndex = 0;
     const timer = setInterval(() => {
       if (currentIndex <= text.length) {
