@@ -974,4 +974,40 @@
   }
 }
 
+/* 模态框关闭按钮样式 */
+.relationship-modal-close-button {
+  /* 基础尺寸优化 */
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* 平板端 */
+  @media (min-width: 768px) {
+    width: 40px;
+    height: 40px;
+  }
+  
+  /* 悬停和激活状态优化 */
+  &:hover {
+    transform: scale(1.1);
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+  
+  /* 图标尺寸控制 */
+  svg {
+    width: 18px;
+    height: 18px;
+    
+    @media (min-width: 768px) {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
 
