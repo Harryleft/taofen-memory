@@ -46,7 +46,10 @@ const CONFIG = {
   
   // 性能相关
   DEBOUNCE_DELAY: 250,
-  DEBUG: false
+  DEBUG: false,
+  
+  // 并发控制
+  MAX_CONCURRENT_PRELOADS: 6
 } as const;
 
 // 列节奏模板
@@ -194,41 +197,58 @@ class ImageProcessor {
     return Utils.stableShuffle(base, seed);
   }
 
-  // 预加载图片并获取真实尺寸（支持清理）
+  // 预加载图片并获取真实尺寸（支持清理和并发控制）
   static preloadImagesWithCleanup(
     items: BaseMasonryItem[],
     onAspectMeasured: (id: number, aspect: number) => void
   ): () => void {
     const abortController = new AbortController();
     const imageObjects: HTMLImageElement[] = [];
+    let currentlyLoading = 0;
+    let itemIndex = 0;
     
-    items.forEach((item) => {
-      const img = new Image();
-      imageObjects.push(img);
-      
-      const handleLoad = () => {
-        if (img.naturalWidth > 0 && img.naturalHeight > 0 && !abortController.signal.aborted) {
-          const ratio = img.naturalHeight / img.naturalWidth;
-          onAspectMeasured(item.id, ratio);
-        }
-        // 清理事件监听器
-        img.onload = null;
-        img.onerror = null;
-      };
-      
-      const handleError = () => {
-        if (!abortController.signal.aborted) {
-          Utils.debugLog(CONFIG.DEBUG, `图片加载失败: ${item.src}`);
-        }
-        // 清理事件监听器
-        img.onload = null;
-        img.onerror = null;
-      };
-      
-      img.onload = handleLoad;
-      img.onerror = handleError;
-      img.src = item.src;
-    });
+    const loadNextBatch = () => {
+      while (currentlyLoading < CONFIG.MAX_CONCURRENT_PRELOADS && itemIndex < items.length) {
+        if (abortController.signal.aborted) break;
+        
+        const item = items[itemIndex++];
+        const img = new Image();
+        imageObjects.push(img);
+        currentlyLoading++;
+        
+        const handleLoad = () => {
+          if (img.naturalWidth > 0 && img.naturalHeight > 0 && !abortController.signal.aborted) {
+            const ratio = img.naturalHeight / img.naturalWidth;
+            onAspectMeasured(item.id, ratio);
+          }
+          // 清理事件监听器
+          img.onload = null;
+          img.onerror = null;
+          currentlyLoading--;
+          // 继续加载下一批
+          loadNextBatch();
+        };
+        
+        const handleError = () => {
+          if (!abortController.signal.aborted) {
+            Utils.debugLog(CONFIG.DEBUG, `图片加载失败: ${item.src}`);
+          }
+          // 清理事件监听器
+          img.onload = null;
+          img.onerror = null;
+          currentlyLoading--;
+          // 继续加载下一批
+          loadNextBatch();
+        };
+        
+        img.onload = handleLoad;
+        img.onerror = handleError;
+        img.src = item.src;
+      }
+    };
+    
+    // 开始加载
+    loadNextBatch();
     
     // 返回清理函数
     return () => {
@@ -428,6 +448,8 @@ export default function HeroPageBackdrop() {
         alt={item.title}
         className="w-full h-full object-cover"
         loading="lazy"
+        decoding="async"
+        fetchPriority="low"
       />
     </div>
   ), []);
