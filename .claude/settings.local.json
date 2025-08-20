@@ -80,7 +80,9 @@
       "Bash(reg query:*)",
       "Bash(powershell:*)",
       "Bash(set:*)",
-      "Bash(nslookup:*)"
+      "Bash(nslookup:*)",
+      "mcp__spec-workflow-mcp__specs-workflow",
+      "Bash(npm start:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",
