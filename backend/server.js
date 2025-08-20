@@ -14,7 +14,7 @@ app.use(express.json());
 const AI_API_CONFIG = {
   url: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
   apiKey: process.env.AI_API_KEY || '2cdde2240d0a446b9bd7962a8c5a25fe.suOORlOs7kv84ZEF',
-  model: 'glm-4-flash'
+  model: 'glm-4.5'
 };
 
 // AI解读接口
