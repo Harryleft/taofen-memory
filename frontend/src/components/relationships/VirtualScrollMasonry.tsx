@@ -2,6 +2,28 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { Person } from '@/types/Person.ts';
 import { hasValidDescription } from '@/utils/tagMatcher';
 
+// 安全的描述显示函数，确保不会显示"0"或其他无效值
+const renderSafeDescription = (description: string | undefined, maxLength: number) => {
+  if (!hasValidDescription(description)) {
+    return null;
+  }
+  
+  // 双重保护，确保即使有遗漏的数据也不会显示"0"
+  const desc = description || '';
+  const trimmed = desc.trim();
+  
+  // 明确过滤掉各种形式的"0"
+  if (trimmed === '0' || trimmed === '' || trimmed === 'null' || trimmed === 'undefined') {
+    return null;
+  }
+  
+  if (trimmed.length > maxLength) {
+    return `${trimmed.substring(0, maxLength)}...`;
+  }
+  
+  return trimmed;
+};
+
 interface VirtualScrollMasonryProps {
   items: Person[];
   onItemClick: (person: Person) => void;
@@ -231,14 +253,14 @@ const VirtualScrollMasonry: React.FC<VirtualScrollMasonryProps> = ({
                   {item.person.name}
                 </h3>
 
-                {hasValidDescription(item.person.description) && (
-                  <p className="masonry-card-description text-align-center text-sm">
-                    {item.person.description.length > 80
-                      ? `${item.person.description.substring(0, 80)}...`
-                      : item.person.description
-                    }
-                  </p>
-                )}
+                {(() => {
+                  const descriptionText = renderSafeDescription(item.person.description, 80);
+                  return descriptionText ? (
+                    <p className="masonry-card-description text-align-center text-sm">
+                      {descriptionText}
+                    </p>
+                  ) : null;
+                })()}
               </div>
             </div>
           );
