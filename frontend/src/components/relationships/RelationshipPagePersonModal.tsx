@@ -116,10 +116,10 @@ const RelationshipPagePersonModal: React.FC<PersonDetailModalProps> = ({ person,
         <div className="relative p-6 text-center border-b border-gray-200">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-4 md:p-5 hover:bg-gray-100 rounded-full transition-colors z-10 active:bg-gray-200"
+            className="relationship-modal-close-button absolute top-4 right-4 p-2 md:p-3 hover:bg-gray-100 rounded-full transition-colors z-10 active:bg-gray-100"
             aria-label="关闭"
           >
-            <X size={24} className="text-gray-500 md:w-5 md:h-5" />
+            <X size={18} className="text-gray-500 md:w-4 md:h-4" />
           </button>
 
           {person.img ? (
@@ -202,7 +202,7 @@ const RelationshipPagePersonModal: React.FC<PersonDetailModalProps> = ({ person,
                             {rel.relationshipSubtype}
                           </span>
                         )}
-                        {rel.strength && (
+                        {/* {rel.strength && (
                           <span className="relationship-detail-tag">
                             强度: {rel.strength}
                           </span>
@@ -216,7 +216,7 @@ const RelationshipPagePersonModal: React.FC<PersonDetailModalProps> = ({ person,
                           <span className="relationship-detail-tag">
                             重要性: {rel.significance}
                           </span>
-                        )}
+                        )} */}
                         {rel.emotionalTone && (
                           <span className="relationship-detail-tag">
                             情感: {rel.emotionalTone}
