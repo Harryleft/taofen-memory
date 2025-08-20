@@ -19,6 +19,20 @@ interface HandwritingModuleProps {
   className?: string;
 }
 
+// 默认过滤器配置
+const DEFAULT_FILTERS = {
+  selectedCategory: 'all',
+  selectedYear: 'all',
+  selectedSource: 'all',
+  selectedTag: 'all',
+  sortOrder: 'year_desc'
+} as const;
+
+// 分页配置
+const PAGINATION_CONFIG = {
+  itemsPerPage: 20
+} as const;
+
 export default function HandwritingModule({ className = '' }: HandwritingModuleProps) {
   // 数据获取
   const { handwritingItems, loading, error, refetch } = useHandwritingData();
@@ -27,13 +41,7 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
   const { searchTerm, debouncedSearchTerm, updateSearchTerm } = useHandwritingSearch();
   
   // 过滤器状态
-  const [filters, setFilters] = useState({
-    selectedCategory: 'all',
-    selectedYear: 'all',
-    selectedSource: 'all',
-    selectedTag: 'all',
-    sortOrder: 'year_desc'
-  });
+  const [filters, setFilters] = useState(DEFAULT_FILTERS);
   
   // 数据过滤
   const { filteredItems, uniqueYears, uniqueSources, uniqueTags } = useHandwritingFilters(
@@ -44,7 +52,7 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
   // 分页管理
   const { pagination, paginatedItems, loadMore, resetPagination } = useHandwritingPagination(
     filteredItems, 
-    20
+    PAGINATION_CONFIG.itemsPerPage
   );
   
   // 布局管理
@@ -58,13 +66,12 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
   // 图片预加载
   useHandwritingPreloader(filteredItems, pagination.currentPage, pagination.itemsPerPage);
   
-  // 过滤器更新处理
+  // 事件处理函数
   const handleFilterChange = useCallback((key: string, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
     resetPagination();
   }, [resetPagination]);
   
-  // 搜索处理
   const handleSearchChange = useCallback((term: string) => {
     updateSearchTerm(term);
     resetPagination();
