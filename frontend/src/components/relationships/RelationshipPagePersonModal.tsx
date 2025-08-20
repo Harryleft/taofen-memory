@@ -116,7 +116,7 @@ const RelationshipPagePersonModal: React.FC<PersonDetailModalProps> = ({ person,
         <div className="relative p-6 text-center border-b border-gray-200">
           <button
             onClick={onClose}
-            className="relationship-modal-close-button absolute top-4 right-4 p-2 md:p-3 hover:bg-gray-100 rounded-full transition-colors z-10 active:bg-gray-100"
+            className="relationship-modal-close-button absolute top-4 right-4 p-2 md:p-3 rounded-full z-10"
             aria-label="关闭"
           >
             <X size={18} className="text-gray-500 md:w-4 md:h-4" />
