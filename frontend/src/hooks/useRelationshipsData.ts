@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Person } from '@/types/Person';
-import { tagMatcher } from '@/utils/tagMatcher';
+import { tagMatcher, hasValidDescription } from '@/utils/tagMatcher';
 import { RELATIONSHIPS_CONFIG } from '@/constants/relationshipsConstants';
 
 // 统一默认配置，避免魔法数字
@@ -82,7 +82,7 @@ export function useRelationshipsData() {
       name: node.name,
       category: node.category,
       img: node.image_url || '',
-      description: node.description === 0 || node.description === '0' ? '' : (node.description || ''),
+      description: hasValidDescription(node.description) ? node.description : '',
       sources: node.sources || [],
       link: node.links || [],
       extra: {
@@ -103,7 +103,7 @@ export function useRelationshipsData() {
       name: rawPerson.name,
       category: (rawPerson as unknown as { category?: string }).category || '未知',
       img: (rawPerson as unknown as { img?: string }).img || '',
-      description: rawPerson.desc === 0 || rawPerson.desc === '0' ? '' : rawPerson.desc,
+      description: hasValidDescription(rawPerson.desc) ? rawPerson.desc : '',
       sources: rawPerson.sources || [],
       link: rawPerson.link || [],
     }));
