@@ -8,6 +8,21 @@
   animation: fadeInUp 0.5s ease-out;
 }
 
+/* 确保容器内的按钮不会有任何悬停效果 */
+.ai-interpretation-container * {
+  transition: none !important;
+}
+
+.ai-interpretation-container *:hover {
+  transform: none !important;
+  background-color: inherit !important;
+  border-color: inherit !important;
+  box-shadow: inherit !important;
+  color: inherit !important;
+  opacity: inherit !important;
+  filter: none !important;
+}
+
 /* AI解读标题样式 - 优化版 */
 .ai-interpretation-title {
   position: relative;
@@ -28,6 +43,7 @@
   margin-bottom: 1.5rem;
   letter-spacing: 0.025em;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
 
@@ -122,22 +138,64 @@
   opacity: 1;
 }
 
-/* 按钮悬停时的光晕效果 */
-.ai-interpretation-container button::before {
-  content: '';
-  position: absolute;
-  inset: -4px;
-  border-radius: inherit;
-  background: linear-gradient(45deg, var(--global-accent-primary), var(--global-accent-secondary), var(--timeline-primary));
-  opacity: 0;
-  z-index: -1;
-  transition: opacity 0.3s ease;
-  filter: blur(8px);
+/* AI解读按钮基础样式 */
+.ai-interpretation-button {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+  /* 移除所有悬浮效果 */
 }
 
-.ai-interpretation-container button:hover::before {
-  opacity: 0.3;
-  animation: pulse 2s infinite;
+.ai-interpretation-button:hover {
+  /* 悬浮时保持原样，无颜色变化 */
+  transform: none !important;
+  background-color: inherit !important;
+  border-color: inherit !important;
+  box-shadow: inherit !important;
+  color: inherit !important;
+}
+
+/* 按钮悬停时的光晕效果 - 已禁用 */
+.ai-interpretation-container button::before,
+.ai-interpretation-container button::after {
+  display: none !important;
+}
+
+.ai-interpretation-container button:hover::before,
+.ai-interpretation-container button:hover::after {
+  display: none !important;
+}
+
+/* 禁用所有可能的悬停效果 */
+.ai-interpretation-container button:hover {
+  transform: none !important;
+  background-color: inherit !important;
+  border-color: inherit !important;
+  box-shadow: inherit !important;
+  color: inherit !important;
+  opacity: inherit !important;
+  filter: none !important;
+}
+
+/* 针对AI解读按钮的具体悬停样式 */
+.ai-interpretation-button.ai-normal-state:hover {
+  background-color: rgb(165 243 252) !important; /* bg-cyan-100 */
+  color: rgb(8 145 178) !important; /* text-cyan-600 */
+  border-color: rgb(34 211 238) !important; /* border-cyan-200 */
+}
+
+/* 错误状态的悬停样式 */
+.ai-interpretation-button.ai-error-state:hover {
+  background-color: rgb(254 226 226) !important; /* bg-red-100 */
+  color: rgb(220 38 38) !important; /* text-red-600 */
+  border-color: rgb(254 202 202) !important; /* border-red-200 */
+}
+
+/* 加载状态的悬停样式 */
+.ai-interpretation-button.ai-loading-state:hover {
+  background-color: rgb(6 182 212) !important; /* bg-cyan-500 */
+  color: rgb(255 255 255) !important; /* text-white */
 }
 
 /* 打字机效果容器 */
@@ -153,7 +211,7 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(27, 54, 93, 0.1), transparent);
+  background: linear-gradient(90deg, transparent, rgba(200, 201, 203, 0.1), transparent);
   animation: shimmer 2s infinite;
 }
 

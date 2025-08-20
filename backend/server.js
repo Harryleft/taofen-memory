@@ -14,7 +14,7 @@ app.use(express.json());
 const AI_API_CONFIG = {
   url: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
   apiKey: process.env.AI_API_KEY || '2cdde2240d0a446b9bd7962a8c5a25fe.suOORlOs7kv84ZEF',
-  model: 'glm-4.5'
+  model: 'glm-4.5-air'
 };
 
 // AI解读接口
@@ -45,7 +45,7 @@ app.post('/api/ai/interpret', async (req, res) => {
 背景快闪：用1句话点明时代背景（如“当时正值抗战烽火，百姓苦不堪言”），避免长篇大论。
 鲜活表达：用“就像…比如…”类比复杂概念；把抽象理念转化为具体场景（如“爱国不是口号，是街头卖报时多分给难民半块饼干的行动”）；杜绝“之乎者也”“综上所述”等学术腔。
 篇幅控制：解读字数严格≤原文1.5倍，删减冗余，留白引发思考。
-必须使用自然语言段落的形式输出。`;
+必须使用自然语言段落的形式输出。不需要按照白话金句、背景快闪、鲜活表达的格式输出。`;
 
     // 调用AI API
     const postData = JSON.stringify({

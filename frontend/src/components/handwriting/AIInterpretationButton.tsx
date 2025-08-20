@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Brain, Loader2, AlertCircle, Sparkles } from 'lucide-react';
 import { aiService, type AIInterpretationResponse } from '@/services/aiService';
 import { useToast } from './Toast';
@@ -28,10 +28,55 @@ export const AIInterpretationButton = ({
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(0);
   const { showSuccess, showError } = useToast();
+  
+  // 用于中断请求的控制器
+  const abortControllerRef = useRef<AbortController | null>(null);
+  // 用于跟踪当前请求的item ID
+  const currentItemIdRef = useRef<string>('');
+
+  // 重置所有状态到默认值
+  const resetToDefaultState = () => {
+    setIsLoading(false);
+    setError(null);
+    setCurrentStep(0);
+    setProgress(0);
+    currentItemIdRef.current = '';
+    
+    // 中断正在进行的请求
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+  };
+
+  // 当item变化时，重置状态并中断正在进行的请求
+  useEffect(() => {
+    // 如果当前有正在进行的请求，且item ID发生了变化
+    if (isLoading && currentItemIdRef.current !== item.id) {
+      console.log('用户翻页，中断正在进行的AI解读请求');
+      resetToDefaultState();
+    }
+    
+    // 更新当前item ID
+    currentItemIdRef.current = item.id;
+  }, [item.id, isLoading]);
+
+  // 组件卸载时清理
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
 
   // 处理AI解读请求
   const handleInterpret = async () => {
     if (isLoading) return;
+
+    // 创建新的AbortController
+    abortControllerRef.current = new AbortController();
+    currentItemIdRef.current = item.id;
 
     setIsLoading(true);
     setError(null);
@@ -41,11 +86,31 @@ export const AIInterpretationButton = ({
     try {
       // 模拟AI思考过程的步骤展示
       for (let i = 0; i < AI_THINKING_STEPS.length; i++) {
+        // 检查是否被中断
+        if (abortControllerRef.current?.signal.aborted) {
+          console.log('AI解读步骤被中断');
+          return;
+        }
+
         setCurrentStep(i);
-        setProgress(((i + 1) / AI_THINKING_STEPS.length) * 80); // 保留20%给实际API调用
+        setProgress(((i + 1) / AI_THINKING_STEPS.length) * 80);
         
-        // 等待当前步骤的时间
-        await new Promise(resolve => setTimeout(resolve, AI_THINKING_STEPS[i].duration));
+        // 等待当前步骤的时间，但可以被中断
+        await new Promise((resolve, reject) => {
+          const timeout = setTimeout(resolve, AI_THINKING_STEPS[i].duration);
+          
+          // 监听中断信号
+          abortControllerRef.current?.signal.addEventListener('abort', () => {
+            clearTimeout(timeout);
+            reject(new Error('Aborted'));
+          });
+        });
+      }
+
+      // 检查是否被中断
+      if (abortControllerRef.current?.signal.aborted) {
+        console.log('AI解读API调用被中断');
+        return;
       }
 
       // 实际API调用
@@ -55,6 +120,12 @@ export const AIInterpretationButton = ({
         notes: item.originalData.注释 || '',
         time: item.originalData.时间 || ''
       });
+
+      // 再次检查是否被中断
+      if (abortControllerRef.current?.signal.aborted) {
+        console.log('AI解读结果处理被中断');
+        return;
+      }
 
       setProgress(100);
 
@@ -66,11 +137,21 @@ export const AIInterpretationButton = ({
         showError('解读失败', response.error || '请稍后重试');
       }
     } catch (err) {
+      // 如果是中断错误，不显示错误提示
+      if (err instanceof Error && err.message === 'Aborted') {
+        console.log('AI解读被用户中断');
+        return;
+      }
+      
       setError('网络请求失败，请检查网络连接');
       showError('网络错误', '请检查网络连接后重试');
       console.error('AI解读请求失败:', err);
     } finally {
-      setIsLoading(false);
+      // 只有在没有被中断的情况下才重置loading状态
+      if (!abortControllerRef.current?.signal.aborted) {
+        setIsLoading(false);
+        abortControllerRef.current = null;
+      }
     }
   };
 
@@ -82,14 +163,15 @@ export const AIInterpretationButton = ({
         onClick={handleInterpret}
         disabled={isLoading}
         className={`
+          ai-interpretation-button
           group relative inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium
-          transition-all duration-300 transform active:scale-95
+          active:scale-95
           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500
           ${isLoading 
-            ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg cursor-wait' 
+            ? 'bg-cyan-500 text-white shadow-lg cursor-wait ai-loading-state' 
             : error 
-              ? 'bg-gradient-to-r from-red-50 to-red-100 text-red-600 border border-red-200' 
-              : 'bg-gradient-to-r from-cyan-50 to-blue-50 text-cyan-600 shadow-md border border-cyan-100 hover:bg-yellow-400 hover:text-white hover:border-yellow-500'
+              ? 'bg-red-100 text-red-600 border border-red-200 ai-error-state' 
+              : 'bg-cyan-100 text-cyan-600 border border-cyan-200 ai-normal-state'
           }
         `}
         title={error ? '点击重试' : 'AI智能解读'}
