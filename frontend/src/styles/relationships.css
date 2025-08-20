@@ -105,10 +105,14 @@
 
 .relationships-category-button-mobile.selected {
   @apply text-white shadow-lg shadow-black/10 scale-105 ring-2 ring-white/20;
+  background: var(--category-color);
+  border-color: var(--category-color);
 }
 
 .relationships-category-button-mobile.selected:hover {
-  /* 保持原有背景色不变，只增强阴影效果 */
+  /* 使用深色变体作为悬浮效果 */
+  background: var(--category-color-dark) !important;
+  border-color: var(--category-color-dark) !important;
   @apply shadow-xl shadow-black/15 scale-105;
   /* 覆盖全局button:hover样式，阻止变成金色 */
   transform: scale(1.05);
@@ -116,6 +120,42 @@
 
 .relationships-category-button-mobile.not-selected {
   @apply bg-white text-gray-700 hover:bg-gray-50 hover:shadow-md hover:shadow-black/5 hover:scale-105 border border-gray-200/60 hover:border-gray-300/60;
+}
+
+.relationships-category-button-mobile.not-selected:hover {
+  background: #f9fafb !important;
+  border-color: #d1d5db !important;
+}
+
+/* 移动端分类按钮专用样式 */
+.relationships-category-button-mobile.family {
+  --category-color: var(--rel-family, #ef4444);
+  --category-color-dark: var(--rel-family-dark, #dc2626);
+  --category-color-light: var(--rel-family-light, #f87171);
+}
+
+.relationships-category-button-mobile.media {
+  --category-color: var(--rel-media, #3b82f6);
+  --category-color-dark: var(--rel-media-dark, #2563eb);
+  --category-color-light: var(--rel-media-light, #60a5fa);
+}
+
+.relationships-category-button-mobile.academic {
+  --category-color: var(--rel-academic, #8b5cf6);
+  --category-color-dark: var(--rel-academic-dark, #7c3aed);
+  --category-color-light: var(--rel-academic-light, #a78bfa);
+}
+
+.relationships-category-button-mobile.political {
+  --category-color: var(--rel-political, #10b981);
+  --category-color-dark: var(--rel-political-dark, #059669);
+  --category-color-light: var(--rel-political-light, #34d399);
+}
+
+.relationships-category-button-mobile.all {
+  --category-color: var(--rel-all, #6b7280);
+  --category-color-dark: var(--rel-all-dark, #4b5563);
+  --category-color-light: var(--rel-all-light, #9ca3af);
 }
 
 /* 移动端滚动提示 */
@@ -212,10 +252,14 @@
 
 .relationships-category-button.selected {
   @apply text-white shadow-lg shadow-black/10 scale-105 ring-2 ring-white/20;
+  background: var(--category-color);
+  border-color: var(--category-color);
 }
 
 .relationships-category-button.selected:hover {
-  /* 保持原有背景色不变，只增强阴影效果 */
+  /* 使用深色变体作为悬浮效果 - 增强选择器特异性 */
+  background: var(--category-color-dark) !important;
+  border-color: var(--category-color-dark) !important;
   @apply shadow-xl shadow-black/15 scale-105;
   /* 覆盖全局button:hover样式，阻止变成金色 */
   transform: scale(1.05);
@@ -223,6 +267,72 @@
 
 .relationships-category-button.not-selected {
   @apply bg-white text-gray-700 hover:bg-gray-50 hover:shadow-md hover:shadow-black/5 hover:scale-105 border border-gray-200/60 hover:border-gray-300/60;
+}
+
+.relationships-category-button.not-selected:hover {
+  background: #f9fafb !important;
+  border-color: #d1d5db !important;
+}
+
+/* 分类按钮专用样式 - 确保颜色一致性 */
+.relationships-category-button.family {
+  --category-color: var(--rel-family, #ef4444);
+  --category-color-dark: var(--rel-family-dark, #dc2626);
+  --category-color-light: var(--rel-family-light, #f87171);
+}
+
+.relationships-category-button.family.selected:hover {
+  /* family分类的专用悬浮样式 - 增强特异性 */
+  background: var(--rel-family-dark, #dc2626) !important;
+  border-color: var(--rel-family-dark, #dc2626) !important;
+}
+
+.relationships-category-button.media {
+  --category-color: var(--rel-media, #3b82f6);
+  --category-color-dark: var(--rel-media-dark, #2563eb);
+  --category-color-light: var(--rel-media-light, #60a5fa);
+}
+
+.relationships-category-button.media.selected:hover {
+  /* media分类的专用悬浮样式 - 增强特异性 */
+  background: var(--rel-media-dark, #2563eb) !important;
+  border-color: var(--rel-media-dark, #2563eb) !important;
+}
+
+.relationships-category-button.academic {
+  --category-color: var(--rel-academic, #8b5cf6);
+  --category-color-dark: var(--rel-academic-dark, #7c3aed);
+  --category-color-light: var(--rel-academic-light, #a78bfa);
+}
+
+.relationships-category-button.academic.selected:hover {
+  /* academic分类的专用悬浮样式 - 增强特异性 */
+  background: var(--rel-academic-dark, #7c3aed) !important;
+  border-color: var(--rel-academic-dark, #7c3aed) !important;
+}
+
+.relationships-category-button.political {
+  --category-color: var(--rel-political, #10b981);
+  --category-color-dark: var(--rel-political-dark, #059669);
+  --category-color-light: var(--rel-political-light, #34d399);
+}
+
+.relationships-category-button.political.selected:hover {
+  /* political分类的专用悬浮样式 - 增强特异性 */
+  background: var(--rel-political-dark, #059669) !important;
+  border-color: var(--rel-political-dark, #059669) !important;
+}
+
+.relationships-category-button.all {
+  --category-color: var(--rel-all, #6b7280);
+  --category-color-dark: var(--rel-all-dark, #4b5563);
+  --category-color-light: var(--rel-all-light, #9ca3af);
+}
+
+.relationships-category-button.all.selected:hover {
+  /* all分类的专用悬浮样式 - 增强特异性 */
+  background: var(--rel-all-dark, #4b5563) !important;
+  border-color: var(--rel-all-dark, #4b5563) !important;
 }
 
 /* 模态框样式已移除 - 组件使用 Tailwind 内联样式 */
@@ -1063,9 +1173,19 @@
   --category-color-dark: var(--rel-family-dark, #dc2626);
 }
 
+.masonry-avatar-placeholder.family:hover {
+  /* family分类占位符的专用悬浮样式 */
+  background: linear-gradient(135deg, var(--rel-family-dark, #dc2626) 0%, var(--rel-family, #ef4444) 100%) !important;
+}
+
 .masonry-avatar-placeholder.media {
   --category-color: var(--rel-media, #3b82f6);
   --category-color-dark: var(--rel-media-dark, #2563eb);
+}
+
+.masonry-avatar-placeholder.media:hover {
+  /* media分类占位符的专用悬浮样式 */
+  background: linear-gradient(135deg, var(--rel-media-dark, #2563eb) 0%, var(--rel-media, #3b82f6) 100%) !important;
 }
 
 .masonry-avatar-placeholder.academic {
@@ -1073,14 +1193,29 @@
   --category-color-dark: var(--rel-academic-dark, #7c3aed);
 }
 
+.masonry-avatar-placeholder.academic:hover {
+  /* academic分类占位符的专用悬浮样式 */
+  background: linear-gradient(135deg, var(--rel-academic-dark, #7c3aed) 0%, var(--rel-academic, #8b5cf6) 100%) !important;
+}
+
 .masonry-avatar-placeholder.political {
   --category-color: var(--rel-political, #10b981);
   --category-color-dark: var(--rel-political-dark, #059669);
 }
 
+.masonry-avatar-placeholder.political:hover {
+  /* political分类占位符的专用悬浮样式 */
+  background: linear-gradient(135deg, var(--rel-political-dark, #059669) 0%, var(--rel-political, #10b981) 100%) !important;
+}
+
 .masonry-avatar-placeholder.all {
   --category-color: var(--rel-all, #6b7280);
   --category-color-dark: var(--rel-all-dark, #4b5563);
+}
+
+.masonry-avatar-placeholder.all:hover {
+  /* all分类占位符的专用悬浮样式 */
+  background: linear-gradient(135deg, var(--rel-all-dark, #4b5563) 0%, var(--rel-all, #6b7280) 100%) !important;
 }
 
 
