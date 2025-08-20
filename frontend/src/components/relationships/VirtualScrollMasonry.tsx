@@ -4,6 +4,12 @@ import { hasValidDescription } from '@/utils/tagMatcher';
 
 // 安全的描述显示函数，确保不会显示"0"或其他无效值
 const renderSafeDescription = (description: string | undefined, maxLength: number) => {
+  // 首先检查是否为 undefined 或 null
+  if (description === undefined || description === null) {
+    return null;
+  }
+  
+  // 然后使用 hasValidDescription 进行验证
   if (!hasValidDescription(description)) {
     return null;
   }
