@@ -31,9 +31,9 @@ export function CoverCard({ theme, data, className = '' }: CoverCardProps) {
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ 
-        duration: 0.8, 
+        duration: 0.6, 
         ease: [0.4, 0.0, 0.2, 1],
-        delay: 0.2 
+        delay: 0.1 
       }}
       animate={{
         y: [0, -2, 0],
@@ -50,7 +50,7 @@ export function CoverCard({ theme, data, className = '' }: CoverCardProps) {
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.4 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
             className="max-w-3xl mx-auto space-y-6"
           >
             {/* 主标题 */}
@@ -75,7 +75,7 @@ export function CoverCard({ theme, data, className = '' }: CoverCardProps) {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.8 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
               className="cover-card-guide-section"
             >
               <div className="cover-card-stats mt-8">
@@ -97,7 +97,7 @@ export function CoverCard({ theme, data, className = '' }: CoverCardProps) {
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 1.2 }}
+                transition={{ duration: 0.5, delay: 0.6 }}
                 className="cover-card-scroll-guide"
               >
                 <motion.div
@@ -191,7 +191,7 @@ export function BookstoreCoverCard({ totalBooks, featuredCategories }: Bookstore
       data={{
         title: "韬奋·时光书影",
         subtitle: "珍藏经典 · 传承智慧",
-        description: "这里收藏着韬奋先生一生的心血结晶，从《生活》周刊的创办到各类经典著作，每一本书都承载着深厚的历史底蕴和文化内涵。让我们一同翻阅这些珍贵的文献，感受那个时代知识分子的家国情怀和思想光芒。",
+        description: "《生活》周刊的创办到各类经典著作，都承载着深厚的历史底蕴和文化内涵。让我们一同感受那个时代知识分子的家国情怀和思想光芒。",
         stats: [
           { value: `${totalBooks}本`, label: "珍贵藏书" },
           { value: `${featuredCategories}个`, label: "精选分类" }

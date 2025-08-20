@@ -5,12 +5,12 @@ import React from 'react';
 import { CoverCard } from '@/components/common/CoverCard';
 
 export interface HandwritingCoverCardProps {
-  totalHandwritings: number;
+  totalHandwritings?: number;
   className?: string;
 }
 
 export function HandwritingCoverCard({ 
-  totalHandwritings, 
+  totalHandwritings = 0, 
   className = '' 
 }: HandwritingCoverCardProps) {
   return (
@@ -19,9 +19,9 @@ export function HandwritingCoverCard({
       data={{
         title: "韬奋·墨迹流年",
         subtitle: "笔墨传承 · 历史见证",
-        description: "这里珍藏着邹韬奋先生一生的手迹真迹，从早期的求学笔记到后期的抗战檄文，每一页手稿都承载着深厚的历史内涵和人文精神。通过这些珍贵的手迹，我们可以触摸到那个风云激荡年代里，一位知识分子的心路历程和家国情怀。",
+        description: "邹韬奋先生手迹，见证知识分子心路历程与家国情怀。",
         stats: [
-          { value: `${totalHandwritings}份`, label: "珍贵手迹" },
+          { value: totalHandwritings > 0 ? `${totalHandwritings}份` : '加载中...', label: "珍贵手迹" },
           { value: "3类", label: "题词·文稿·书简" }
         ]
       }}

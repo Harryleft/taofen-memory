@@ -75,9 +75,9 @@ export default function HandwritingModule({ className = '' }: HandwritingModuleP
       <AppHeader moduleId="handwriting" />
       <section className={`py-20 bg-cream ${className}`}>
         <div className="max-w-7xl mx-auto px-6">
-          {/* 封面卡片 */}
+          {/* 封面卡片 - 立即显示，数据到达后更新 */}
           <HandwritingCoverCard
-            totalHandwritings={handwritingItems.length}
+            totalHandwritings={loading ? undefined : handwritingItems.length}
           />
           
           {/* 过滤器控件 */}
