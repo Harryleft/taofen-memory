@@ -13,7 +13,14 @@ export const hasValidDescription = (description: unknown): boolean => {
   if (typeof description !== 'string') {
     return false;
   }
-  return description.trim().length > 0;
+  
+  // 处理特殊情况：数字0、字符串"0"、null、undefined等
+  const trimmed = description.trim();
+  if (trimmed === '0' || trimmed === '' || trimmed === 'null' || trimmed === 'undefined') {
+    return false;
+  }
+  
+  return trimmed.length > 0;
 };
 
 // LRU 缓存实现
