@@ -98,18 +98,29 @@ export const renderSafeDescription = (description: unknown, maxLength?: number):
   
   const trimmed = strDesc.trim();
   
-  // 检查无效值
+  // 检查无效值 - 增强版，包含更多可能的0变体
   const invalidValues = [
     '', '0', 'null', 'undefined', 'false', 'true', 
-    'NaN', 'Infinity', '-Infinity', 'none', 'None', 'NONE'
+    'NaN', 'Infinity', '-Infinity', 'none', 'None', 'NONE',
+    '0 ', ' 0', ' 0 ', '0\n', '\n0', '\n0\n', '0\t', '\t0', '\t0\t'
   ];
   
   if (invalidValues.includes(trimmed)) {
     return null;
   }
   
-  // 防止纯数字或符号被意外显示
+  // 防止纯数字或符号被意外显示 - 增强版
   if (/^[\d\s\W]+$/.test(trimmed) && trimmed.length < 2) {
+    return null;
+  }
+  
+  // 特殊处理：如果只是0的各种变体，直接返回null
+  if (/^[\s\t\n]*0[\s\t\n]*$/.test(trimmed)) {
+    return null;
+  }
+  
+  // 特殊处理：空字符串或只包含空白字符的字符串
+  if (/^[\s\t\n]+$/.test(trimmed)) {
     return null;
   }
   

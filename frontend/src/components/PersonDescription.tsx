@@ -50,8 +50,21 @@ const PersonDescription: React.FC<PersonDescriptionProps> = ({
   // 获取安全的描述文本
   const descriptionText = renderSafeDescription(description, maxLength);
   
-  // 如果没有有效描述，简洁模式下不渲染任何内容
-  if (!descriptionText) {
+  // 调试日志：追踪描述处理过程
+  if (process.env.NODE_ENV === 'development') {
+    console.log('PersonDescription Debug:', {
+      originalDescription: description,
+      descriptionText,
+      compact,
+      isValid: !!descriptionText
+    });
+  }
+  
+  // 双重验证：确保不会显示任何形式的"0"
+  const isInvalidZero = descriptionText === "0" || descriptionText === 0 || descriptionText === " 0 " || descriptionText === "0 ";
+  
+  // 如果没有有效描述或是无效的"0"，简洁模式下不渲染任何内容
+  if (!descriptionText || isInvalidZero) {
     if (compact) {
       return null;
     }
