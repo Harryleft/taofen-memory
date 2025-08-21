@@ -243,7 +243,7 @@ const HandwritingLightbox = memo(({
             
             <div className="mb-6">
               <h4 className="font-bold text-charcoal mb-2">数据来源</h4>
-              {selectedItem.originalData.图片位置 && 
+              {Boolean(selectedItem.originalData.图片位置) && 
                selectedItem.originalData.图片位置.length > 0 && 
                selectedItem.originalData.图片位置[0].remote_url ? (
                 <a 

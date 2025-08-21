@@ -209,17 +209,17 @@ const RelationshipPagePersonModal: React.FC<PersonDetailModalProps> = ({ person,
                   .map((rel, idx) => (
                     <div key={idx} className="bg-gray-50 rounded-lg p-4">
                       <div className="relationship-detail-tags">
-                        {rel.relationshipType && (
+                        {Boolean(rel.relationshipType) && (
                           <span className="relationship-detail-tag primary">
                             {rel.relationshipType}
                           </span>
                         )}
-                        {rel.relationshipSubtype && (
+                        {Boolean(rel.relationshipSubtype) && (
                           <span className="relationship-detail-tag">
                             {rel.relationshipSubtype}
                           </span>
                         )}
-                        {/* {rel.strength && (
+                        {/* {Boolean(rel.strength) && (
                           <span className="relationship-detail-tag">
                             强度: {rel.strength}
                           </span>
@@ -229,12 +229,12 @@ const RelationshipPagePersonModal: React.FC<PersonDetailModalProps> = ({ person,
                             置信度: {Math.round(rel.confidence * 100)}%
                           </span>
                         )}
-                        {rel.significance && (
+                        {Boolean(rel.significance) && (
                           <span className="relationship-detail-tag">
                             重要性: {rel.significance}
                           </span>
                         )} */}
-                        {rel.emotionalTone && (
+                        {Boolean(rel.emotionalTone) && (
                           <span className="relationship-detail-tag">
                             情感: {rel.emotionalTone}
                           </span>
@@ -249,17 +249,17 @@ const RelationshipPagePersonModal: React.FC<PersonDetailModalProps> = ({ person,
                         <ul className="space-y-2 list-disc list-inside text-sm text-gray-700">
                           {rel.evidence.slice(0, 3).map((ev, i) => (
                             <li key={i} className="pl-1">
-                              {ev.quote && (
+                              {Boolean(ev.quote) && (
                                 <span className="">
-                                  “{ev.quote}”
+                                  "{ev.quote}"
                                 </span>
                               )}
-                              {ev.source && (
+                              {Boolean(ev.source) && (
                                 <span className="ml-2 inline-flex items-center gap-1 text-blue-600">
                                   <LinkIcon size={14} /> {ev.source}
                                 </span>
                               )}
-                              {ev.context && (
+                              {Boolean(ev.context) && (
                                 <span className="ml-2 text-gray-500">({ev.context})</span>
                               )}
                             </li>

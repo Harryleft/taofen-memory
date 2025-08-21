@@ -74,7 +74,7 @@ export const Toast = ({ message, onDismiss }: ToastProps) => {
           </div>
           <div className="flex-1 min-w-0">
             <h4 className="text-sm font-semibold mb-1">{message.title}</h4>
-            {message.message && (
+            {Boolean(message.message) && (
               <p className="text-sm opacity-90">{message.message}</p>
             )}
           </div>

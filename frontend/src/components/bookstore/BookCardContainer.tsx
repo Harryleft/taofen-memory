@@ -102,17 +102,17 @@ const BookCardContainer: React.FC<BookCardProps> = ({
           </h3>
           
           <div className="space-y-1 text-xs text-gray-600">
-            {item.author && (
+            {Boolean(item.author) && (
               <p className="line-clamp-1">
                 <span className="font-medium">作者：</span>{item.author}
               </p>
             )}
-            {item.publisher && (
+            {Boolean(item.publisher) && (
               <p className="line-clamp-1">
                 <span className="font-medium">出版：</span>{item.publisher}
               </p>
             )}
-            {item.year && (
+            {Boolean(item.year) && (
               <p>
                 <span className="font-medium">年份：</span>{item.year}
               </p>

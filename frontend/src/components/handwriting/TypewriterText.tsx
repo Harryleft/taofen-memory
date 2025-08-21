@@ -41,7 +41,7 @@ export const TypewriterText = ({
 
   // 自动滚动到底部
   useEffect(() => {
-    if (containerRef.current && isTyping) {
+    if (Boolean(containerRef.current) && isTyping) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight;
     }
   }, [displayedText, isTyping]);

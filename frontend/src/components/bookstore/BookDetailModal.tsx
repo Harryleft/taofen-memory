@@ -110,7 +110,7 @@ const BookDetailModal: React.FC<BookLightboxProps> = ({
               <p className="text-base font-serif">
                 <span className="font-semibold">出版社：</span>{selectedItem.publisher}
               </p>
-              {selectedItem.year && (
+              {Boolean(selectedItem.year) && (
                 <p className="text-base font-serif">
                   <span className="font-semibold">年份：</span>{selectedItem.year}
                 </p>

@@ -81,7 +81,7 @@ const generateTags = (item: HandwritingItem, year: number): string[] => {
 
 // 工具函数：获取图片路径
 const getImagePath = (item: HandwritingItem): string => {
-  if (item.图片位置 && item.图片位置.length > 0) {
+  if (Boolean(item.图片位置) && item.图片位置.length > 0) {
     return item.图片位置[0].local_path.replace('public/', '/');
   }
   return '/images/placeholder.png';

@@ -157,7 +157,7 @@ export function CoverCard({ theme, data, className = '' }: CoverCardProps) {
             </h1>
             
             {/* 副标题 */}
-            {data.subtitle && (
+            {Boolean(data.subtitle) && (
               <h2 className="cover-card-sub-title">
                 {data.subtitle}
               </h2>
