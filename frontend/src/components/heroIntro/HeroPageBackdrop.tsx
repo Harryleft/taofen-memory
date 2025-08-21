@@ -4,7 +4,6 @@ import PerformanceMonitor, { measureAsyncPerformance } from '@/utils/performance
 import { StateBatcher } from '@/utils/StateBatcher';
 import { IntersectionObserverManager } from '@/utils/IntersectionObserverManager';
 import HeroBackdropErrorBoundary from './HeroBackdropErrorBoundary';
-import ImageItem from './ImageItem';
 import Column from './Column';
 
 // =============== 类型定义 ===============
@@ -85,9 +84,6 @@ const CONFIG = {
 const NETWORK_CONDITIONS = {
   SLOW_TYPES: ['slow-2g', '2g'] as const,
 } as const;
-
-// 占位图片，避免空 src 触发无效请求
-const PLACEHOLDER_SRC = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
 
 // 列节奏模板
 const RHYTHM_PATTERN = [-0.06, 0.0, 0.05, -0.03, 0.02] as const;
@@ -225,13 +221,13 @@ class NetworkDetector {
     effectiveType: string;
     isSlowNetwork: boolean;
   } {
-    const nav = typeof navigator !== 'undefined' ? (navigator as any) : null;
+    const nav = typeof navigator !== 'undefined' ? (navigator as Navigator & { connection?: NetworkInformation }) : null;
     const connection = Boolean(nav) && nav.connection ? nav.connection : null;
     const saveData = Boolean(connection) && connection.saveData === true;
     const effectiveType = Boolean(connection) && typeof connection.effectiveType === 'string' 
       ? connection.effectiveType 
       : '';
-    const isSlowNetwork = NETWORK_CONDITIONS.SLOW_TYPES.includes(effectiveType as any);
+    const isSlowNetwork = NETWORK_CONDITIONS.SLOW_TYPES.includes(effectiveType as typeof NETWORK_CONDITIONS.SLOW_TYPES[number]);
     
     return { saveData, effectiveType, isSlowNetwork };
   }
@@ -492,20 +488,12 @@ export default function HeroPageBackdrop() {
   const [remoteItems, setRemoteItems] = useState<BaseMasonryItem[]>([]);
   const [aspectMap, setAspectMap] = useState<Record<number, number>>({});
   const [isDataLoaded, setIsDataLoaded] = useState(false);
-  const [isInitialRender, setIsInitialRender] = useState(true);
 
   // Refs
   const containerRef = useRef<HTMLDivElement>(null);
   const cleanupRef = useRef<(() => void) | null>(null);
-  const deferredRef = useRef<number | null>(null);
-  const observerRef = useRef<IntersectionObserver | null>(null);
   const aspectBatcher = useRef<StateBatcher<Record<number, number>> | null>(null);
   const observerManager = useRef<IntersectionObserverManager | null>(null);
-
-  // 宽高比测量回调
-  const handleAspectMeasured = useCallback((id: number, aspect: number) => {
-    aspectBatcher.current?.add(id.toString(), aspect);
-  }, []);
 
   // 初始化批量更新器
   useEffect(() => {
@@ -525,6 +513,11 @@ export default function HeroPageBackdrop() {
     };
   }, []);
 
+  // 宽高比测量回调
+  const handleAspectMeasured = useCallback((id: number, aspect: number) => {
+    aspectBatcher.current?.add(id.toString(), aspect);
+  }, []);
+
   // 初始化布局和数据加载
   useEffect(() => {
     PerformanceMonitor.markStart('hero-backdrop-init');
@@ -539,7 +532,7 @@ export default function HeroPageBackdrop() {
     const loadInitialData = async () => {
       try {
         PerformanceMonitor.markStart('hero-initial-data-load');
-        const items = await measureAsyncPerformance('hero-data-fetch', () => fetchHeroImages());
+        const items = await measureAsyncPerformance('data-fetch', () => fetchHeroImages());
         setRemoteItems(items);
         setIsDataLoaded(true);
         PerformanceMonitor.markEnd('hero-initial-data-load');
@@ -580,16 +573,7 @@ export default function HeroPageBackdrop() {
         cleanupRef.current = null;
       }
     };
-  }, []);
-
-  // 组件卸载时标记初始渲染完成
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsInitialRender(false);
-    }, 100);
-    
-    return () => clearTimeout(timer);
-  }, []);
+  }, [handleAspectMeasured]);
 
   // 构建素材池
   const weightedPool = useMemo(() => {
@@ -621,18 +605,6 @@ export default function HeroPageBackdrop() {
     return result;
   }, [repeatedItems, layoutConfig, aspectMap]);
 
-  // 注册懒加载图片
-  const registerLazyImage = useCallback((el: HTMLImageElement | null, src: string) => {
-    if (!el || !observerManager.current) return;
-    
-    observerManager.current.observe(el, src, () => {
-      // 图片加载完成回调
-      console.log(`Image loaded: ${src}`);
-    });
-  }, []);
-
-  
-  
   // 容器样式
   const containerStyle = useMemo(() => ({
     height: layoutConfig ? `${layoutConfig.height}px` : '100vh'
@@ -642,8 +614,6 @@ export default function HeroPageBackdrop() {
     filter: `saturate(${CONFIG.VISUAL.BAND_SATURATE}) brightness(${CONFIG.VISUAL.BAND_BRIGHTNESS}) blur(${CONFIG.VISUAL.BAND_BLUR_PX}px)`
   }), []);
 
-  
-  
   // 监控组件完整渲染时间
   useEffect(() => {
     if (isDataLoaded && layoutConfig) {
@@ -659,14 +629,6 @@ export default function HeroPageBackdrop() {
   
   // 如果数据还没加载，显示骨架屏
   if (!isDataLoaded || !layoutConfig) {
-    // 记录骨架屏显示时间
-    useEffect(() => {
-      PerformanceMonitor.markStart('hero-skeleton-display');
-      return () => {
-        PerformanceMonitor.markEnd('hero-skeleton-display');
-      };
-    }, []);
-    
     return (
       <div 
         ref={containerRef}
