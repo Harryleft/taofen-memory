@@ -50,16 +50,6 @@ const PersonDescription: React.FC<PersonDescriptionProps> = ({
   // 获取安全的描述文本
   const descriptionText = renderSafeDescription(description, maxLength);
   
-  // 调试日志：追踪描述处理过程
-  if (process.env.NODE_ENV === 'development') {
-    console.log('PersonDescription Debug:', {
-      originalDescription: description,
-      descriptionText,
-      compact,
-      isValid: !!descriptionText
-    });
-  }
-  
   // 双重验证：确保不会显示任何形式的"0"
   const isInvalidZero = descriptionText === "0" || descriptionText === 0 || descriptionText === " 0 " || descriptionText === "0 ";
   
