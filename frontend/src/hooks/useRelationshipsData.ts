@@ -54,6 +54,79 @@ const sanitizeDescription = (desc: unknown): string | undefined => {
   return trimmed;
 };
 
+// 验证人物名称的有效性
+const validatePersonName = (name: unknown): string => {
+  if (!name || name === null || name === undefined) {
+    return '未知人物';
+  }
+  
+  // 处理数字0的情况
+  if (name === 0) {
+    return '未知人物';
+  }
+  
+  // 转换为字符串
+  let strName: string;
+  try {
+    strName = String(name);
+  } catch {
+    return '未知人物';
+  }
+  
+  const trimmed = strName.trim();
+  
+  // 检查无效值
+  const invalidValues = [
+    '', '0', 'null', 'undefined', 'false', 'true', 
+    'NaN', 'Infinity', '-Infinity', 'none', 'None', 'NONE'
+  ];
+  
+  if (invalidValues.includes(trimmed)) {
+    return '未知人物';
+  }
+  
+  // 防止纯数字或符号被作为名称
+  if (/^[\d\s\W]+$/.test(trimmed)) {
+    return '未知人物';
+  }
+  
+  return trimmed || '未知人物';
+};
+
+// 验证人物类别的有效性
+const validatePersonCategory = (category: unknown): string => {
+  if (!category || category === null || category === undefined) {
+    return '未知';
+  }
+  
+  // 处理数字0的情况
+  if (category === 0) {
+    return '未知';
+  }
+  
+  // 转换为字符串
+  let strCategory: string;
+  try {
+    strCategory = String(category);
+  } catch {
+    return '未知';
+  }
+  
+  const trimmed = strCategory.trim();
+  
+  // 检查无效值
+  const invalidValues = [
+    '', '0', 'null', 'undefined', 'false', 'true', 
+    'NaN', 'Infinity', '-Infinity', 'none', 'None', 'NONE'
+  ];
+  
+  if (invalidValues.includes(trimmed)) {
+    return '未知';
+  }
+  
+  return trimmed || '未知';
+};
+
 // 统一默认配置，避免魔法数字
 const DEFAULTS = {
   centerId: 499, // 若新数据未提供 meta.centerId，则回退
@@ -125,8 +198,8 @@ export function useRelationshipsData() {
     }
     return {
       id: node.id,
-      name: node.name,
-      category: node.category,
+      name: validatePersonName(node.name),
+      category: validatePersonCategory(node.category),
       img: node.image_url || '',
       description: sanitizeDescription(node.description),
       sources: node.sources || [],
@@ -151,8 +224,8 @@ export function useRelationshipsData() {
     
     return (personData as Array<{ id: number; name: string; desc?: string; category?: string; pic?: string; img?: string; sources?: string[]; link?: string[] }>).map((rawPerson) => ({
       id: rawPerson.id,
-      name: rawPerson.name,
-      category: rawPerson.category || '未知',
+      name: validatePersonName(rawPerson.name),
+      category: validatePersonCategory(rawPerson.category),
       img: rawPerson.pic || rawPerson.img || '',
       // 关键修复：将 "desc" 字段映射到 description
       description: sanitizeDescription(rawPerson.desc),

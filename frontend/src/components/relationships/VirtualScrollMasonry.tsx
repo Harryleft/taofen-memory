@@ -218,7 +218,7 @@ const VirtualScrollMasonry: React.FC<VirtualScrollMasonryProps> = ({
                     <div className="masonry-card-avatar-wrapper">
                       <div className="masonry-avatar-container w-12 h-12">
                         <div className={`masonry-avatar-placeholder ${getCategoryClass(item.person.category)}`}>
-                          {item.person.name.charAt(0)}
+                          {item.person.name && item.person.name !== '未知人物' ? item.person.name.charAt(0) : '?'}
                         </div>
                       </div>
                     </div>

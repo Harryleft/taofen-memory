@@ -83,56 +83,33 @@ export const renderSafeDescription = (description: unknown, maxLength?: number):
     return null;
   }
   
-  // 处理可能的非字符串值（防御性编程）
-  if (typeof description !== 'string') {
-    // 如果是数字0，直接过滤
-    if (description === 0) {
-      return null;
-    }
-    // 尝试转换为字符串，但保持防御性
-    try {
-      description = String(description);
-    } catch {
-      return null;
-    }
-  }
-  
-  // 然后使用 hasValidDescription 进行验证
-  if (!hasValidDescription(description)) {
+  // 处理数字0的情况
+  if (description === 0) {
     return null;
   }
   
-  // 四重保护，确保万无一失
-  const desc = description || '';
-  const trimmed = desc.trim();
+  // 转换为字符串
+  let strDesc: string;
+  try {
+    strDesc = String(description);
+  } catch {
+    return null;
+  }
   
-  // 更全面的无效值检查
+  const trimmed = strDesc.trim();
+  
+  // 检查无效值
   const invalidValues = [
     '', '0', 'null', 'undefined', 'false', 'true', 
     'NaN', 'Infinity', '-Infinity', 'none', 'None', 'NONE'
   ];
   
   if (invalidValues.includes(trimmed)) {
-    // 添加调试日志
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[renderSafeDescription] 过滤无效描述:', { 
-        original: description, 
-        trimmed,
-        reason: 'invalid_value' 
-      });
-    }
     return null;
   }
   
   // 防止纯数字或符号被意外显示
   if (/^[\d\s\W]+$/.test(trimmed) && trimmed.length < 2) {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[renderSafeDescription] 过滤纯数字/符号:', { 
-        original: description, 
-        trimmed,
-        reason: 'pure_number_or_symbol' 
-      });
-    }
     return null;
   }
   
