@@ -189,29 +189,7 @@ class LayoutCalculator {
 }
 
 // =============== 懒加载工具 ===============
-class LazyLoadingManager {
-  // 检测是否支持 IntersectionObserver
-  static isSupported(): boolean {
-    return typeof IntersectionObserver !== 'undefined';
-  }
-
-  // 创建 IntersectionObserver 配置
-  static createObserverConfig(): IntersectionObserverInit {
-    return {
-      root: null,
-      rootMargin: CONFIG.LAZY_LOADING.ROOT_MARGIN,
-      threshold: CONFIG.LAZY_LOADING.THRESHOLD,
-    };
-  }
-
-  // 处理图片懒加载逻辑
-  static handleImageLoad(el: HTMLImageElement): void {
-    const realSrc = Boolean(el.dataset) && el.dataset.src ? el.dataset.src : '';
-    if (realSrc) {
-      el.src = realSrc;
-    }
-  }
-}
+// LazyLoadingManager 类已被移除，其功能已集成到 IntersectionObserverManager 中
 
 // =============== 网络检测工具 ===============
 class NetworkDetector {
@@ -234,7 +212,7 @@ class NetworkDetector {
 
   // 判断是否应该延迟加载
   static shouldDeferLoading(): boolean {
-    const { saveData, isSlowNetwork } = NetworkDetector.getConnectionInfo();
+    const { saveData, isSlowNetwork } = this.getConnectionInfo();
     return !saveData && !isSlowNetwork;
   }
 }
@@ -428,58 +406,7 @@ class MasonryLayouter {
 }
 
 // =============== 数据加载管理器 ===============
-class DataLoadingManager {
-  // 创建数据加载器
-  static createImageLoader(
-    onSuccess: (items: BaseMasonryItem[]) => void,
-    onFinally: () => void
-  ): () => void {
-    return async () => {
-      try {
-        PerformanceMonitor.markStart('hero-data-fetch');
-        const items = await measureAsyncPerformance('hero-api-call', () => fetchHeroImages());
-        PerformanceMonitor.markEnd('hero-data-fetch');
-        onSuccess(items);
-      } catch (err) {
-        console.error('[HeroBackdrop] fetchHeroImages error:', err);
-      } finally {
-        onFinally();
-      }
-    };
-  }
-
-  // 调度加载策略
-  static scheduleLoading(
-    loader: () => void,
-    deferredRef: React.MutableRefObject<number | null>
-  ): void {
-    const shouldDefer = NetworkDetector.shouldDeferLoading();
-
-    if (!shouldDefer) {
-      // 慢网或省流量：立即加载，避免空窗
-      loader();
-    } else if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-      // 延迟加载，设置较短超时，避免等待过长
-      deferredRef.current = requestIdleCallback(loader, { 
-        timeout: CONFIG.PERFORMANCE.IDLE_TIMEOUT_MS 
-      });
-    } else {
-      // 降级方案：使用 setTimeout，短延迟
-      deferredRef.current = setTimeout(loader, CONFIG.PERFORMANCE.FALLBACK_DELAY_MS) as unknown as number;
-    }
-  }
-
-  // 清理调度
-  static cleanupScheduled(deferredRef: React.MutableRefObject<number | null>): void {
-    if (deferredRef.current) {
-      if (typeof window !== 'undefined' && 'cancelIdleCallback' in window) {
-        cancelIdleCallback(deferredRef.current);
-      } else {
-        clearTimeout(deferredRef.current);
-      }
-    }
-  }
-}
+// DataLoadingManager 类已被移除，其功能已直接集成到组件中
 
 // =============== 主组件 ===============
 export default function HeroPageBackdrop() {
