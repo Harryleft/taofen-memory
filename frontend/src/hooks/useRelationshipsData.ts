@@ -28,26 +28,11 @@ const sanitizeDescription = (desc: unknown): string | undefined => {
   ];
   
   if (invalidValues.includes(trimmed)) {
-    // 添加调试日志
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[sanitizeDescription] 过滤无效描述:', { 
-        original: desc, 
-        trimmed,
-        reason: 'invalid_value' 
-      });
-    }
     return undefined;
   }
   
   // 防止纯数字或符号被意外显示
   if (/^[\d\s\W]+$/.test(trimmed) && trimmed.length < 2) {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[sanitizeDescription] 过滤纯数字/符号:', { 
-        original: desc, 
-        trimmed,
-        reason: 'pure_number_or_symbol' 
-      });
-    }
     return undefined;
   }
   
