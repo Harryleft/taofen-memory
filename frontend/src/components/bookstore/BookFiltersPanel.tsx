@@ -115,7 +115,7 @@ const BookFiltersPanel: React.FC<BookstoreFiltersProps> = ({
           >
             <button
               role="option"
-              aria-selected={selectedYear === 'all'}
+              aria-selected={selectedYear === 'all' ? "true" : "false"}
               className={`bookstore-year-option ${selectedYear === 'all' ? 'selected' : ''}`}
               onClick={() => {
                 setSelectedYear('all');
@@ -132,7 +132,7 @@ const BookFiltersPanel: React.FC<BookstoreFiltersProps> = ({
               <button
                 key={year}
                 role="option"
-                aria-selected={selectedYear === year.toString()}
+                aria-selected={selectedYear === year.toString() ? "true" : "false"}
                 className={`bookstore-year-option ${selectedYear === year.toString() ? 'selected' : ''}`}
                 onClick={() => {
                   setSelectedYear(year.toString());
@@ -155,7 +155,7 @@ const BookFiltersPanel: React.FC<BookstoreFiltersProps> = ({
         title="下载数据"
       >
         <Download size={18} className="mr-2" />
-        <span className="font-medium">导出数据</span>
+        <span>导出数据</span>
       </button>
     </div>
   </div>
