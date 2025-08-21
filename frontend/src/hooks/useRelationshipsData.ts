@@ -85,8 +85,8 @@ const validatePersonName = (name: unknown): string => {
     return '未知人物';
   }
   
-  // 防止纯数字或符号被作为名称
-  if (/^[\d\s\W]+$/.test(trimmed)) {
+  // 防止单个字符的纯数字或符号被作为名称（但允许中文等）
+  if (trimmed.length === 1 && /^[\d\W]$/.test(trimmed)) {
     return '未知人物';
   }
   
@@ -121,6 +121,11 @@ const validatePersonCategory = (category: unknown): string => {
   ];
   
   if (invalidValues.includes(trimmed)) {
+    return '未知';
+  }
+  
+  // 防止单个字符的纯数字或符号被作为类别（但允许中文等）
+  if (trimmed.length === 1 && /^[\d\W]$/.test(trimmed)) {
     return '未知';
   }
   
@@ -196,6 +201,18 @@ export function useRelationshipsData() {
         });
       });
     }
+    
+    // 调试信息：记录原始数据和验证结果
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[transformNewNodeToPerson] 原始数据:', {
+        id: node.id,
+        originalName: node.name,
+        originalCategory: node.category,
+        validatedName: validatePersonName(node.name),
+        validatedCategory: validatePersonCategory(node.category)
+      });
+    }
+    
     return {
       id: node.id,
       name: validatePersonName(node.name),
@@ -222,16 +239,31 @@ export function useRelationshipsData() {
     const data = rawData as { data?: Array<{ data?: unknown[] }>; persons?: unknown[] };
     const personData = data.data?.[0]?.data || data.persons || [];
     
-    return (personData as Array<{ id: number; name: string; desc?: string; category?: string; pic?: string; img?: string; sources?: string[]; link?: string[] }>).map((rawPerson) => ({
-      id: rawPerson.id,
-      name: validatePersonName(rawPerson.name),
-      category: validatePersonCategory(rawPerson.category),
-      img: rawPerson.pic || rawPerson.img || '',
-      // 关键修复：将 "desc" 字段映射到 description
-      description: sanitizeDescription(rawPerson.desc),
-      sources: rawPerson.sources || [],
-      link: rawPerson.link || [],
-    }));
+    const result = (personData as Array<{ id: number; name: string; desc?: string; category?: string; pic?: string; img?: string; sources?: string[]; link?: string[] }>).map((rawPerson) => {
+      // 调试信息：记录原始数据和验证结果
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[transformLegacyToPersons] 原始数据:', {
+          id: rawPerson.id,
+          originalName: rawPerson.name,
+          originalCategory: rawPerson.category,
+          validatedName: validatePersonName(rawPerson.name),
+          validatedCategory: validatePersonCategory(rawPerson.category)
+        });
+      }
+      
+      return {
+        id: rawPerson.id,
+        name: validatePersonName(rawPerson.name),
+        category: validatePersonCategory(rawPerson.category),
+        img: rawPerson.pic || rawPerson.img || '',
+        // 关键修复：将 "desc" 字段映射到 description
+        description: sanitizeDescription(rawPerson.desc),
+        sources: rawPerson.sources || [],
+        link: rawPerson.link || [],
+      };
+    });
+    
+    return result;
   };
 
   const loadData = async () => {
