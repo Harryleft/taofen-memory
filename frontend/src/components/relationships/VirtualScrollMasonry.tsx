@@ -96,7 +96,7 @@ const VirtualScrollMasonry: React.FC<VirtualScrollMasonryProps> = ({
       const columnIndex = columnHeights.indexOf(minHeight);
 
       // 计算项目高度（这里简化处理，实际应该根据内容计算）
-      const height = itemHeight + (hasValidDescription(person.description) ? person.description.length * 0.5 : 0);
+      const height = itemHeight + (hasValidDescription(person.description) && person.description ? person.description.length * 0.5 : 0);
 
       virtualItems.push({
         person,

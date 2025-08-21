@@ -234,7 +234,8 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
     
     let height = baseHeight;
 
-    if (hasValidDescription(person.description)) {
+    // 安全地处理描述文本长度计算
+    if (hasValidDescription(person.description) && person.description) {
       const descLength = Math.min(person.description.length, descMaxLength);
       const additionalHeight = Math.min(
         descLength * MASONRY_CONFIG.layout.HEIGHT_PER_CHAR,
