@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { MasonryItem } from '@/services/heroImageService';
 import PerformanceMonitor from '@/utils/performanceMonitor';
 
@@ -12,14 +12,16 @@ interface ImageItemProps {
 }
 
 // 创建共享的事件处理器以减少内存分配
-const createImageHandlers = (itemId: number, itemSrc: string, onLoad?: (id: number) => void, onError?: (id: number) => void) => {
+const createImageHandlers = (itemId: number, itemSrc: string, setImageState: (state: 'loading' | 'loaded' | 'error') => void, onLoad?: (id: number) => void, onError?: (id: number) => void) => {
   const handleLoad = () => {
     PerformanceMonitor.trackImageEnd(itemId, true, false);
+    setImageState('loaded');
     onLoad?.(itemId);
   };
 
   const handleError = () => {
     PerformanceMonitor.trackImageEnd(itemId, false, false);
+    setImageState('error');
     onError?.(itemId);
   };
 
@@ -32,12 +34,12 @@ const ImageItem = React.memo(({
   onImageLoad,
   onImageError 
 }: ImageItemProps) => {
-  const [imageState] = useState<'loading' | 'loaded' | 'error'>('loading');
+  const [imageState, setImageState] = useState<'loading' | 'loaded' | 'error'>('loading');
 
   // 使用memoized的事件处理器
   const { handleLoad, handleError } = useMemo(
-    () => createImageHandlers(item.id, item.src, onImageLoad, onImageError),
-    [item.id, item.src, onImageLoad, onImageError]
+    () => createImageHandlers(item.id, item.src, setImageState, onImageLoad, onImageError),
+    [item.id, item.src, setImageState, onImageLoad, onImageError]
   );
 
   useEffect(() => {
