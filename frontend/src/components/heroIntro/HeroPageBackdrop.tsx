@@ -459,7 +459,7 @@ export default function HeroPageBackdrop() {
     const loadInitialData = async () => {
       try {
         PerformanceMonitor.markStart('hero-initial-data-load');
-        const items = await measureAsyncPerformance('data-fetch', () => fetchHeroImages());
+        const items = await measureAsyncPerformance('hero-data-fetch', () => fetchHeroImages());
         setRemoteItems(items);
         setIsDataLoaded(true);
         PerformanceMonitor.markEnd('hero-initial-data-load');
