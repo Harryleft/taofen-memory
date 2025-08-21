@@ -278,22 +278,11 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
           const viewportWidth = window.innerWidth - (padding * 2);
           width = Math.min(width, viewportWidth);
         }
-        
-        console.log('Masonry Debug: Container width updated:', {
-          width,
-          offsetWidth,
-          clientWidth,
-          scrollWidth,
-          rectWidth,
-          viewportWidth: window.innerWidth,
-          responsiveConfig: responsiveConfig ? 'mobile' : 'desktop'
-        });
       } else {
         // 如果容器ref不存在，使用窗口宽度作为后备
         const responsiveConfig = getResponsiveConfig();
         const padding = responsiveConfig?.PADDING || 24;
         width = window.innerWidth - padding; // 减去页面padding
-        console.log('Masonry Debug: Using window width as fallback:', width);
       }
       
       if (width > 0) {
@@ -335,20 +324,11 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
 
   // 防抖的重新布局
   const triggerLayout = useDebouncedCallback(() => {
-    console.log('Masonry Debug: Trigger layout called with:', {
-      containerWidth,
-      itemsLength: items.length,
-      visibleItems,
-      columnCount: getColumnCount(containerWidth)
-    });
-    
     if (containerWidth <= 0) {
-      console.warn('Masonry Debug: Container width is 0, attempting to recalculate');
       // 强制重新计算宽度
       if (containerRef.current) {
         const newWidth = containerRef.current.offsetWidth;
         if (newWidth > 0) {
-          console.log('Masonry Debug: Found new width:', newWidth);
           setContainerWidth(newWidth);
           return;
         }
@@ -359,12 +339,6 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
     const visiblePersons = items.slice(0, visibleItems);
     const effectiveWidth = containerWidth > 0 ? containerWidth : 1200; // 默认宽度
     const layoutItems = calculateMasonryLayout(visiblePersons, effectiveWidth);
-    console.log('Masonry Debug: Layout calculated:', {
-      visiblePersonsLength: visiblePersons.length,
-      layoutItemsLength: layoutItems.length,
-      containerHeight: Math.max(...layoutItems.map(item => item.top + item.height)) + MASONRY_CONFIG.layout.VERTICAL_GAP,
-      effectiveWidth
-    });
     setMasonryItems(layoutItems);
   }, 80);
 
@@ -376,8 +350,6 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
   // 专门处理容器宽度为0的情况
   useEffect(() => {
     if (containerWidth <= 0 && containerRef.current) {
-      console.log('Masonry Debug: Container width is 0, trying to recover...');
-      
       // 尝试多种方式获取宽度
       const recoverWidth = () => {
         if (!containerRef.current) return;
@@ -385,12 +357,6 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
         const width = containerRef.current.offsetWidth;
         const clientWidth = containerRef.current.clientWidth;
         const scrollWidth = containerRef.current.scrollWidth;
-        
-        console.log('Masonry Debug: Width recovery attempt:', {
-          width,
-          clientWidth,
-          scrollWidth
-        });
         
         // 使用任何可用的宽度
         const availableWidth = Math.max(width, clientWidth, scrollWidth);
@@ -840,11 +806,11 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
         </div>
       )}
 
-      {visibleItems >= items.length && items.length > 0 && (
+      {/* {visibleItems >= items.length && items.length > 0 && (
         <div className="masonry-complete-container">
           已显示全部 {items.length} 位人物
         </div>
-      )}
+      )} */}
     </div>
   );
 };
