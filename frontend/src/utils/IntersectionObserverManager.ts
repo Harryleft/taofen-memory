@@ -73,7 +73,8 @@ export class IntersectionObserverManager {
 
   disconnect(): void {
     this.observer?.disconnect();
-    this.observedElements.clear();
+    // WeakMap 没有 clear() 方法，需要重新创建
+    this.observedElements = new WeakMap<HTMLImageElement, string>();
     this.callbacks.clear();
   }
 }

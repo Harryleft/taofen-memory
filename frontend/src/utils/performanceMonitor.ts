@@ -1,5 +1,20 @@
 // =============== 性能监控类型定义 ===============
 
+interface LayoutShiftEntry extends PerformanceEntry {
+  value: number;
+  hadRecentInput: boolean;
+}
+
+interface FirstInputEntry extends PerformanceEntry {
+  processingStart: number;
+}
+
+interface PerformanceMemory {
+  usedJSHeapSize: number;
+  totalJSHeapSize: number;
+  jsHeapSizeLimit: number;
+}
+
 export interface PerformanceMetrics {
   // 服务器启动性能
   serverStartup: {
@@ -221,7 +236,7 @@ class PerformanceMonitor {
         let clsValue = 0;
         list.getEntries().forEach((entry) => {
           if (!entry.hadRecentInput) {
-            clsValue += (entry as any).value;
+            clsValue += (entry as LayoutShiftEntry).value;
           }
         });
         this.metrics.pageLoad!.cls = clsValue;
@@ -236,9 +251,9 @@ class PerformanceMonitor {
     try {
       const fidObserver = new PerformanceObserver((list) => {
         const entries = list.getEntries();
-        const fidEntry = entries[0];
+        const fidEntry = entries[0] as FirstInputEntry | undefined;
         if (fidEntry) {
-          this.metrics.pageLoad!.fid = (fidEntry as any).processingStart - fidEntry.startTime;
+          this.metrics.pageLoad!.fid = fidEntry.processingStart - fidEntry.startTime;
         }
       });
       fidObserver.observe({ entryTypes: ['first-input'] });
@@ -268,39 +283,61 @@ class PerformanceMonitor {
 
   static markStart(name: string): void {
     const instance = PerformanceMonitor.getInstance();
-    const markName = `hero-${name}-start`;
-    performance.mark(markName);
-    instance.customMarks.set(name, { startTime: performance.now() });
+    const markName = name.startsWith('hero-') ? `${name}-start` : `hero-${name}-start`;
+    
+    // 安全检查：确保 performance API 可用
+    if (typeof performance === 'undefined' || typeof performance.mark !== 'function') {
+      console.warn('Performance API not available, skipping mark:', markName);
+      return;
+    }
+    
+    try {
+      performance.mark(markName);
+      instance.customMarks.set(name, { startTime: performance.now() });
+    } catch (error) {
+      console.warn('Failed to create performance mark:', markName, error);
+    }
   }
 
   static markEnd(name: string): number {
     const instance = PerformanceMonitor.getInstance();
-    const startMark = `hero-${name}-start`;
-    const endMark = `hero-${name}-end`;
+    const startMark = name.startsWith('hero-') ? `${name}-start` : `hero-${name}-start`;
+    const endMark = name.startsWith('hero-') ? `${name}-end` : `hero-${name}-end`;
     
-    performance.mark(endMark);
-    performance.measure(name, startMark, endMark);
-    
-    const measures = performance.getEntriesByName(name);
-    const duration = measures.length > 0 ? measures[measures.length - 1].duration : 0;
-    
-    const markData = instance.customMarks.get(name);
-    if (markData) {
-      markData.endTime = performance.now();
-      instance.metrics.customMarks?.push({
-        name,
-        startTime: markData.startTime,
-        endTime: markData.endTime,
-        duration,
-      });
+    // 安全检查：确保 performance API 可用
+    if (typeof performance === 'undefined' || typeof performance.mark !== 'function') {
+      console.warn('Performance API not available, skipping mark:', endMark);
+      return 0;
     }
     
-    // 清理标记
-    performance.clearMarks(startMark);
-    performance.clearMarks(endMark);
-    performance.clearMeasures(name);
-    
-    return duration;
+    try {
+      performance.mark(endMark);
+      performance.measure(name, startMark, endMark);
+      
+      const measures = performance.getEntriesByName(name);
+      const duration = measures.length > 0 ? measures[measures.length - 1].duration : 0;
+      
+      const markData = instance.customMarks.get(name);
+      if (markData) {
+        markData.endTime = performance.now();
+        instance.metrics.customMarks?.push({
+          name,
+          startTime: markData.startTime,
+          endTime: markData.endTime,
+          duration,
+        });
+      }
+      
+      // 清理标记
+      performance.clearMarks(startMark);
+      performance.clearMarks(endMark);
+      performance.clearMeasures(name);
+      
+      return duration;
+    } catch (error) {
+      console.warn('Failed to measure performance:', name, error);
+      return 0;
+    }
   }
 
   // =============== 图片加载监控 ===============
@@ -413,7 +450,7 @@ class PerformanceMonitor {
 
   static updateNetworkInfo(): void {
     const instance = PerformanceMonitor.getInstance();
-    const nav = navigator as any;
+    const nav = navigator as Navigator & { connection?: NetworkInformation };
     
     if (nav.connection) {
       instance.metrics.network = {
@@ -430,7 +467,7 @@ class PerformanceMonitor {
 
   static updateMemoryInfo(): void {
     const instance = PerformanceMonitor.getInstance();
-    const perf = performance as any;
+    const perf = performance as Performance & { memory?: PerformanceMemory };
     
     if (perf.memory) {
       instance.metrics.memory = {
