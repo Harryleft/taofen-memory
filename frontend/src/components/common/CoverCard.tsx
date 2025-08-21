@@ -3,6 +3,7 @@
 
 import { motion } from 'framer-motion';
 import React from 'react';
+import PersonDescription from '@/components/PersonDescription.tsx';
 
 export type CoverCardTheme = 'timeline' | 'bookstore';
 
@@ -164,7 +165,12 @@ export function CoverCard({ theme, data, className = '' }: CoverCardProps) {
             
             {/* 描述文字 */}
             <div className="cover-card-description max-w-3xl mx-auto">
-              {data.description}
+              <PersonDescription 
+                description={data.description}
+                maxLength={400}
+                className="cover-card-description max-w-3xl mx-auto"
+                compact={false}
+              />
             </div>
             
             {/* 引导提示 */}

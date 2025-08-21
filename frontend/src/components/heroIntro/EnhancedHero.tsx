@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import HeroPageBackdrop from './HeroPageBackdrop.tsx';
 import { CONFIG } from '@/constants/config';
+import PersonDescription from '@/components/PersonDescription.tsx';
 
 // ====== 类型定义 ======
 type TitleVariant = 'classic' | 'monumental' | 'editorial';
@@ -313,9 +314,12 @@ export default function EnhancedHero() {
         {/* Content */}
         <div className="relative z-10 flex flex-col justify-end h-full p-8">
           <div className={`transform transition-all duration-[${ANIMATION.duration.slow}]`}>
-            <p className="text-white/95 text-base md:text-lg leading-relaxed font-light">
-              {module.description}
-            </p>
+            <PersonDescription 
+              description={module.description}
+              maxLength={120}
+              className="text-white/95 text-base md:text-lg leading-relaxed font-light"
+              compact={false}
+            />
           </div>
         </div>
 
