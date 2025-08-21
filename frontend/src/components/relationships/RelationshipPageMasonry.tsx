@@ -1,56 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react';
 import { Person } from '@/types/Person.ts';
 import VirtualScrollMasonry from './VirtualScrollMasonry.tsx';
-import { tagMatcher, hasValidDescription } from '@/utils/tagMatcher';
+import { tagMatcher } from '@/utils/tagMatcher';
 import { RELATIONSHIPS_CONFIG } from '@/constants/relationshipsConstants';
+import { getSafeDescriptionLength } from '@/utils/personDescription';
+import PersonDescription from '@/components/PersonDescription.tsx';
 import '@/styles/relationships.css';
 
-// 安全的描述显示函数，确保不会显示"0"或其他无效值
-const renderSafeDescription = (description: string | undefined, maxLength: number) => {
-  // 首先检查是否为 undefined 或 null
-  if (description === undefined || description === null) {
-    return null;
-  }
-  
-  // 处理可能的非字符串值（防御性编程）
-  if (typeof description !== 'string') {
-    // 如果是数字0，直接过滤
-    if (description === 0) {
-      return null;
-    }
-    // 尝试转换为字符串，但保持防御性
-    try {
-      description = String(description);
-    } catch {
-      return null;
-    }
-  }
-  
-  // 然后使用 hasValidDescription 进行验证
-  if (!hasValidDescription(description)) {
-    return null;
-  }
-  
-  // 三重保护，确保即使有遗漏的数据也不会显示"0"
-  const desc = description || '';
-  const trimmed = desc.trim();
-  
-  // 明确过滤掉各种形式的"0"和无效值
-  if (trimmed === '0' || trimmed === '' || trimmed === 'null' || trimmed === 'undefined' || trimmed === 'false' || trimmed === 'true') {
-    return null;
-  }
-  
-  // 防止纯数字或符号被意外显示
-  if (/^[\d\s\W]+$/.test(trimmed) && trimmed.length < 2) {
-    return null;
-  }
-  
-  if (trimmed.length > maxLength) {
-    return `${trimmed.substring(0, maxLength)}...`;
-  }
-  
-  return trimmed;
-};
 
 // 分类映射：将中文分类名映射为英文类名
 const getCategoryClass = (category: string): string => {
@@ -230,13 +186,12 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
   const estimateCardHeight = useCallback((person: Person) => {
     const responsiveConfig = getResponsiveConfig();
     const baseHeight = responsiveConfig?.BASE_HEIGHT || MASONRY_CONFIG.layout.BASE_HEIGHT;
-    const descMaxLength = responsiveConfig?.DESC_MAX_LENGTH || MASONRY_CONFIG.ui.DESC_MAX_LENGTH;
     
     let height = baseHeight;
 
     // 安全地处理描述文本长度计算
-    if (hasValidDescription(person.description) && person.description) {
-      const descLength = Math.min(person.description.length, descMaxLength);
+    const descLength = getSafeDescriptionLength(person.description);
+    if (descLength > 0) {
       const additionalHeight = Math.min(
         descLength * MASONRY_CONFIG.layout.HEIGHT_PER_CHAR,
         MASONRY_CONFIG.layout.MAX_HEIGHT - baseHeight
@@ -787,15 +742,11 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
                   {person.name}
                 </h3>
 
-                {(() => {
-                  const maxLength = responsiveConfig?.DESC_MAX_LENGTH || MASONRY_CONFIG.ui.DESC_MAX_LENGTH;
-                  const descriptionText = renderSafeDescription(person.description, maxLength);
-                  return descriptionText ? (
-                    <p className={`masonry-card-description ${textAlign}`}>
-                      {descriptionText}
-                    </p>
-                  ) : null;
-                })()}
+                <PersonDescription 
+                  description={person.description}
+                  maxLength={responsiveConfig?.DESC_MAX_LENGTH || MASONRY_CONFIG.ui.DESC_MAX_LENGTH}
+                  className={`masonry-card-description ${textAlign}`}
+                />
 
                 {(person.extra?.tags?.relationshipTypes?.length || person.extra?.tags?.aspects?.length) && (
                   <div className="masonry-card-tags">
