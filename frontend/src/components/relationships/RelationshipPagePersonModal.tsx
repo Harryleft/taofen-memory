@@ -159,6 +159,7 @@ const RelationshipPagePersonModal: React.FC<PersonDetailModalProps> = ({ person,
           {/* 描述 */}
           <PersonDescription 
             description={person.description}
+            maxLength={undefined}  // 移除字数限制
             placeholder={
               <div>
                 <h3 className="flex items-center text-lg font-medium text-gray-900 mb-3">
