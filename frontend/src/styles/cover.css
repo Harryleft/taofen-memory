@@ -29,7 +29,7 @@
   /* === 简化的分区系统：3层变2层 === */
   --cover-hero-zone-bg: transparent;                           /* 删除Hero带状区 */
   --cover-paper-bg: #FFFFFF;                                   /* 卡片表面纯白 */
-  --cover-info-capsule-bg: rgba(0, 0, 0, 0.02);               /* 信息胶囊极简灰 */
+  /* 删除信息胶囊变量 - 极简主义设计 */
   
   /* === 强化的阴影系统：增强卡片边界 === */
   --cover-paper-shadow: 
@@ -348,12 +348,54 @@
 /* 极简描述样式 - Linus式好品味 */
 .cover-card-description {
   font-size: clamp(0.95rem, 1.8vw, 1.1rem);
-  line-height: 1.6;
+  line-height: 1.7;  /* 优化行高，提升可读性 */
+  letter-spacing: 0.02em;  /* 优化字间距 */
   font-family: var(--cover-font-body);
   text-align: center;
-  color: #000000;
-  max-width: 85%;
-  margin: 0 auto 1rem;
+  color: var(--cover-text-primary);  /* 使用CSS变量，保持主题一致性 */
+  max-width: 90%;  /* 适当放宽宽度，提升阅读体验 */
+  margin: 1.5rem auto;  /* 优雅的垂直间距 */
+  position: relative;
+  
+  /* 移除所有装饰效果 */
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+  padding: 0;
+  
+  /* 简洁的过渡效果 */
+  transition: opacity 0.3s ease;
+}
+
+/* 优雅的分隔线设计 - 替代复杂的胶囊条 */
+.cover-card-description::before,
+.cover-card-description::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(196, 155, 97, 0.3) 50%,
+    transparent 100%
+  );
+  margin: 1rem auto;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+}
+
+/* 悬停效果 - 简洁而优雅 */
+.cover-card-description:hover {
+  opacity: 0.9;
+}
+
+.cover-card-description:hover::before,
+.cover-card-description:hover::after {
+  width: 80px;
+  opacity: 1;
 }
 
 /* 统一标题容器间距 */
@@ -381,9 +423,16 @@
   }
   
   .cover-card-description {
-    margin-bottom: 0.75rem;
-    line-height: 1.5;
-    padding: 0.5rem 0.75rem;
+    margin: 1rem auto;  /* 移动端减少间距 */
+    line-height: 1.6;  /* 移动端优化行高 */
+    max-width: 95%;  /* 移动端进一步放宽宽度 */
+  }
+  
+  /* 移动端分隔线调整 */
+  .cover-card-description::before,
+  .cover-card-description::after {
+    width: 40px;
+    margin: 0.75rem auto;
   }
 }
 
@@ -598,14 +647,7 @@
   opacity: 1;  /* 分隔线在悬停时更清晰 */
 }
 
-/* 胶囊条悬停微提升 - 增强信息层次 */
-.cover-card:hover .cover-card-description {
-  transform: translateY(-1px);
-  box-shadow: 
-    var(--global-shadow-md),  /* 使用全局阴影提升 */
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  border-color: rgba(196, 155, 97, 0.18);
-}
+/* 删除胶囊条悬停效果 - 极简主义设计 */
 
 /* 时间轴主题典雅悬停效果 - 增强对比度 */
 .timeline-cover .cover-card:hover {
@@ -707,8 +749,8 @@
   
   .cover-card-description {
     font-size: clamp(0.85rem, 2.5vw, 1rem);
-    padding: 0.75rem;
-    max-width: 95%;
+    margin: 1rem auto;  /* 保持一致的间距 */
+    max-width: 95%;  /* 移动端放宽宽度 */
   }
   
   /* 移动端减少动画强度 */
