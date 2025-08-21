@@ -45,6 +45,8 @@ const MASONRY_CONFIG = {
         MIN_CARD_WIDTH: 160, // 移动端最小卡片宽度
         MAX_COLUMNS: 2, // 移动端最大2列
         MIN_HEIGHT: 200, // 移动端最小卡片高度
+        COMPACT_HEIGHT: 140, // 移动端紧凑高度（无描述无标签）
+        MEDIUM_HEIGHT: 180, // 移动端中等高度（无描述有标签）
         PADDING: 8 // 移动端内边距
       },
       tablet: {
@@ -57,6 +59,8 @@ const MASONRY_CONFIG = {
         MIN_CARD_WIDTH: 220,
         MAX_COLUMNS: 3,
         MIN_HEIGHT: 280, // 平板端最小卡片高度
+        COMPACT_HEIGHT: 200, // 平板端紧凑高度
+        MEDIUM_HEIGHT: 240, // 平板端中等高度
         PADDING: 12
       },
       desktop: {
@@ -69,6 +73,8 @@ const MASONRY_CONFIG = {
         MIN_CARD_WIDTH: 280,
         MAX_COLUMNS: 4,
         MIN_HEIGHT: 340, // 桌面端最小卡片高度
+        COMPACT_HEIGHT: 260, // 桌面端紧凑高度
+        MEDIUM_HEIGHT: 300, // 桌面端中等高度
         PADDING: 16
       }
     }
@@ -191,12 +197,32 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
 
     // 安全地处理描述文本长度计算
     const descLength = getSafeDescriptionLength(person.description);
+    const hasTags = (person.extra?.tags?.relationshipTypes?.length || 0) > 0 || 
+                   (person.extra?.tags?.aspects?.length || 0) > 0;
+    
     if (descLength > 0) {
+      // 有描述时的完整高度
       const additionalHeight = Math.min(
         descLength * MASONRY_CONFIG.layout.HEIGHT_PER_CHAR,
         MASONRY_CONFIG.layout.MAX_HEIGHT - baseHeight
       );
       height += additionalHeight;
+    } else if (!hasTags) {
+      // 无描述且无标签时的紧凑高度
+      const compactHeight = responsiveConfig?.COMPACT_HEIGHT || 
+        (responsiveConfig?.BASE_HEIGHT ? responsiveConfig.BASE_HEIGHT * 0.6 : baseHeight * 0.6);
+      height = Math.max(
+        responsiveConfig?.COMPACT_HEIGHT || MASONRY_CONFIG.layout.MIN_HEIGHT * 0.7,
+        compactHeight
+      );
+    } else {
+      // 无描述但有标签时的中等高度
+      const mediumHeight = responsiveConfig?.MEDIUM_HEIGHT || 
+        (responsiveConfig?.BASE_HEIGHT ? responsiveConfig.BASE_HEIGHT * 0.8 : baseHeight * 0.8);
+      height = Math.max(
+        responsiveConfig?.MEDIUM_HEIGHT || MASONRY_CONFIG.layout.MIN_HEIGHT * 0.8,
+        mediumHeight
+      );
     }
 
     const randomSeed = person.id * 9301 + 49297;
@@ -205,7 +231,7 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
     height += heightVariation;
 
     return Math.max(
-      MASONRY_CONFIG.layout.MIN_HEIGHT,
+      MASONRY_CONFIG.layout.MIN_HEIGHT * 0.7,
       Math.min(MASONRY_CONFIG.layout.MAX_HEIGHT, height)
     );
   }, [getResponsiveConfig]);
@@ -712,6 +738,7 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
                   description={person.description}
                   maxLength={responsiveConfig?.DESC_MAX_LENGTH || MASONRY_CONFIG.ui.DESC_MAX_LENGTH}
                   className={`masonry-card-description ${textAlign}`}
+                  compact={true}
                 />
 
                 {(person.extra?.tags?.relationshipTypes?.length || person.extra?.tags?.aspects?.length) && (
@@ -745,7 +772,9 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
                           className={styleClass}
                           onClick={(e) => {
                             e.stopPropagation();
-                            onTagClick && onTagClick({ kind: 'type', value: t });
+                            if (onTagClick) {
+                              onTagClick({ kind: 'type', value: t });
+                            }
                           }}
                           title={matchType === 'weak' ? '模糊匹配' : undefined}
                         >
@@ -782,7 +811,9 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
                           className={styleClass}
                           onClick={(e) => {
                             e.stopPropagation();
-                            onTagClick && onTagClick({ kind: 'aspect', value: a });
+                            if (onTagClick) {
+                              onTagClick({ kind: 'aspect', value: a });
+                            }
                           }}
                           title={matchType === 'weak' ? '模糊匹配' : undefined}
                         >
@@ -805,12 +836,6 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
           <div className="masonry-loading-spinner"></div>
         </div>
       )}
-
-      {/* {visibleItems >= items.length && items.length > 0 && (
-        <div className="masonry-complete-container">
-          已显示全部 {items.length} 位人物
-        </div>
-      )} */}
     </div>
   );
 };

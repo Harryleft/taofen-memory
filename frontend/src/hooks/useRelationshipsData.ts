@@ -1,15 +1,56 @@
 import { useState, useEffect } from 'react';
 import { Person } from '@/types/Person';
-import { tagMatcher, hasValidDescription } from '@/utils/tagMatcher';
+import { tagMatcher } from '@/utils/tagMatcher';
 import { RELATIONSHIPS_CONFIG } from '@/constants/relationshipsConstants';
 
 // 数据清理函数：统一处理各种无效描述情况
-const sanitizeDescription = (desc: any): string | undefined => {
-  if (typeof desc !== 'string') return undefined;
-  const trimmed = desc.trim();
-  if (trimmed === '' || trimmed === '0' || trimmed === 'null' || trimmed === 'undefined') {
+const sanitizeDescription = (desc: unknown): string | undefined => {
+  // 增强的类型检查
+  if (desc === null || desc === undefined) return undefined;
+  
+  // 处理数字0的情况
+  if (desc === 0) return undefined;
+  
+  // 转换为字符串
+  let strDesc: string;
+  try {
+    strDesc = String(desc);
+  } catch {
     return undefined;
   }
+  
+  const trimmed = strDesc.trim();
+  
+  // 更全面的无效值检查
+  const invalidValues = [
+    '', '0', 'null', 'undefined', 'false', 'true', 
+    'NaN', 'Infinity', '-Infinity', 'none', 'None', 'NONE'
+  ];
+  
+  if (invalidValues.includes(trimmed)) {
+    // 添加调试日志
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[sanitizeDescription] 过滤无效描述:', { 
+        original: desc, 
+        trimmed,
+        reason: 'invalid_value' 
+      });
+    }
+    return undefined;
+  }
+  
+  // 防止纯数字或符号被意外显示
+  if (/^[\d\s\W]+$/.test(trimmed) && trimmed.length < 2) {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[sanitizeDescription] 过滤纯数字/符号:', { 
+        original: desc, 
+        trimmed,
+        reason: 'pure_number_or_symbol' 
+      });
+    }
+    return undefined;
+  }
+  
   return trimmed;
 };
 
@@ -18,15 +59,7 @@ const DEFAULTS = {
   centerId: 499, // 若新数据未提供 meta.centerId，则回退
 };
 
-// 旧数据原始类型定义
-interface LegacyRawPerson {
-  id: number;
-  name: string;
-  desc: string;
-  sources?: string[];
-  link?: string[];
-  [key: string]: unknown;
-}
+// 旧数据原始类型定义（简化版）
 
 // 新数据原始类型定义（relationships_new.json）
 interface NewRawNode {
@@ -41,10 +74,13 @@ interface NewRawNode {
   importance?: number;
   relationships?: Array<{
     relationshipType?: string;
-    aspects?: string[];
+    relationshipSubtype?: string;
     confidence?: number;
-    significance?: string;
     strength?: string;
+    emotionalTone?: string;
+    significance?: string;
+    aspects?: string[];
+    evidence?: unknown[];
   }>;
   [key: string]: unknown;
 }
@@ -77,13 +113,13 @@ export function useRelationshipsData() {
         }
         relationshipsNormalized.push({
           relationshipType: rel?.relationshipType,
-          relationshipSubtype: (rel as any)?.relationshipSubtype,
+          relationshipSubtype: (rel as { relationshipSubtype?: string })?.relationshipSubtype,
           confidence: typeof rel?.confidence === 'number' ? rel?.confidence : undefined,
-          strength: (rel as any)?.strength,
-          emotionalTone: (rel as any)?.emotionalTone,
-          significance: (rel as any)?.significance,
+          strength: (rel as { strength?: string })?.strength,
+          emotionalTone: (rel as { emotionalTone?: string })?.emotionalTone,
+          significance: (rel as { significance?: string })?.significance,
           aspects: Array.isArray(rel?.aspects) ? rel?.aspects : undefined,
-          evidence: Array.isArray((rel as any)?.evidence) ? (rel as any)?.evidence : undefined,
+          evidence: Array.isArray((rel as { evidence?: unknown[] })?.evidence) ? (rel as { evidence?: unknown[] })?.evidence : undefined,
         });
       });
     }
@@ -107,12 +143,13 @@ export function useRelationshipsData() {
     };
   };
 
-  const transformLegacyToPersons = (rawData: any): Person[] => {
+  const transformLegacyToPersons = (rawData: unknown): Person[] => {
     // 处理 relationships.json 格式：{ records, extend, page, data: [...] }
     // 其中 data[0].data 才是真正的人物数组
-    const personData = rawData.data?.[0]?.data || rawData.persons || [];
+    const data = rawData as { data?: Array<{ data?: unknown[] }>; persons?: unknown[] };
+    const personData = data.data?.[0]?.data || data.persons || [];
     
-    return personData.map((rawPerson: any) => ({
+    return (personData as Array<{ id: number; name: string; desc?: string; category?: string; pic?: string; img?: string; sources?: string[]; link?: string[] }>).map((rawPerson) => ({
       id: rawPerson.id,
       name: rawPerson.name,
       category: rawPerson.category || '未知',
@@ -142,7 +179,7 @@ export function useRelationshipsData() {
         const transformed = nodes.map(transformNewNodeToPerson);
         const filtered = transformed.filter(p => p.id !== centerId);
         setPersons(filtered);
-        setMeta({ centerId: centerId, palette: (newData.meta as any)?.palette });
+        setMeta({ centerId: centerId, palette: (newData.meta as { palette?: Record<string, string> })?.palette });
         
         // 构建标签索引
         const allTypes = new Set<string>();
@@ -157,7 +194,7 @@ export function useRelationshipsData() {
         tagMatcher.updateConfig(RELATIONSHIPS_CONFIG.tagMatcher);
         
         // 动态注入 CSS 变量
-        const palette = (newData.meta as any)?.palette as Record<string, string> | undefined;
+        const palette = (newData.meta as { palette?: Record<string, string> })?.palette;
         if (palette && typeof document !== 'undefined') {
           const root = document.documentElement;
           const setVar = (key: string, val?: string) => {
@@ -210,6 +247,7 @@ export function useRelationshipsData() {
 
   useEffect(() => {
     loadData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return { persons, loading, error, refetch: loadData, meta, tagIndex };

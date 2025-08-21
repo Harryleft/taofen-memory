@@ -22,6 +22,8 @@ interface PersonDescriptionProps {
   showTooltip?: boolean;
   /** 自定义渲染函数 */
   render?: (descriptionText: string) => React.ReactNode;
+  /** 是否为简洁模式（仅在有描述时显示） */
+  compact?: boolean;
 }
 
 /**
@@ -43,12 +45,16 @@ const PersonDescription: React.FC<PersonDescriptionProps> = ({
   onClick,
   showTooltip = true,
   render,
+  compact = false,
 }) => {
   // 获取安全的描述文本
   const descriptionText = renderSafeDescription(description, maxLength);
   
-  // 如果没有有效描述，显示占位符或不渲染
+  // 如果没有有效描述，简洁模式下不渲染任何内容
   if (!descriptionText) {
+    if (compact) {
+      return null;
+    }
     return placeholder ? <div className={className}>{placeholder}</div> : null;
   }
   
