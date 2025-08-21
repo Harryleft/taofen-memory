@@ -3,12 +3,14 @@ export class StateBatcher<T> {
   private queue = new Map<string, T>();
   private timeoutId: number | null = null;
   private updateFunction: (updater: (prev: T) => T) => void;
+  private delay: number;
 
   constructor(
     updateFunction: (updater: (prev: T) => T) => void,
     delay: number = 16 // 约60fps
   ) {
     this.updateFunction = updateFunction;
+    this.delay = delay;
   }
 
   add(key: string, value: T): void {
@@ -17,7 +19,7 @@ export class StateBatcher<T> {
     if (!this.timeoutId) {
       this.timeoutId = setTimeout(() => {
         this.flush();
-      }, delay) as unknown as number;
+      }, this.delay) as unknown as number;
     }
   }
 

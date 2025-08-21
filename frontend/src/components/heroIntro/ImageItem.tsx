@@ -13,28 +13,26 @@ interface ImageItemProps {
 
 // 创建共享的事件处理器以减少内存分配
 const createImageHandlers = (itemId: number, itemSrc: string, onLoad?: (id: number) => void, onError?: (id: number) => void) => {
-  const handleLoad = useCallback(() => {
+  const handleLoad = () => {
     PerformanceMonitor.trackImageEnd(itemId, true, false);
     onLoad?.(itemId);
-  }, [itemId, onLoad]);
+  };
 
-  const handleError = useCallback(() => {
+  const handleError = () => {
     PerformanceMonitor.trackImageEnd(itemId, false, false);
     onError?.(itemId);
-  }, [itemId, onError]);
+  };
 
   return { handleLoad, handleError };
 };
 
 const ImageItem = React.memo(({ 
   item, 
-  columnIndex, 
-  itemIndex,
   isVisible,
   onImageLoad,
   onImageError 
 }: ImageItemProps) => {
-  const [imageState, setImageState] = useState<'loading' | 'loaded' | 'error'>('loading');
+  const [imageState] = useState<'loading' | 'loaded' | 'error'>('loading');
 
   // 使用memoized的事件处理器
   const { handleLoad, handleError } = useMemo(
