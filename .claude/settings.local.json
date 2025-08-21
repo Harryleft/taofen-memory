@@ -87,7 +87,8 @@
       "mcp__browser-tools-mcp__runAccessibilityAudit",
       "WebFetch(domain:github.com)",
       "Bash(git clone:*)",
-      "Bash(rg:*)"
+      "Bash(rg:*)",
+      "mcp__filesystem__read_text_file"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",
