@@ -323,7 +323,7 @@ export function TimelineCard({ event, isActive, isFirstEvent = false, isLastEven
             <span className="font-bold timeline-secondary timeline-text-body">
               {event.year}
             </span>
-            {event.location?.trim() && (
+            {event.location?.trim().length > 0 && (
               <span className="font-bold timeline-secondary timeline-text-body">
                 {event.location}
               </span>

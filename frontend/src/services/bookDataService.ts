@@ -14,7 +14,7 @@ export const loadAllBooksData = async (): Promise<BookItem[]> => {
   const booksData: BookData[] = await response.json();
   
   allBooksCache = booksData
-    .filter(book => book.image && book.year >= 1900 && book.year <= 1949)
+    .filter(book => book.image?.trim().length > 0 && book.year >= 1900 && book.year <= 1949)
     .map(book => {
       let category = '其他出版社';
       const isLifeBookstore = 

@@ -197,7 +197,7 @@ export class PersonApiTransformer implements DataTransformer<PersonData> {
     return periods.map((period, index) => {
       const periodEvents = sortedEvents.filter(event => {
         const year = this.extractYear(event.time);
-        return year && year >= period.startYear && year <= period.endYear;
+        return year !== null && year !== undefined && year >= period.startYear && year <= period.endYear;
       });
 
       return {
