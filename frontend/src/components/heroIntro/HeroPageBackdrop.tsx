@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useState, useRef, useCallback } from 'react';
 import { fetchHeroImages, type MasonryItem as BaseMasonryItem } from '@/services/heroImageService';
 import PerformanceMonitor, { measureAsyncPerformance } from '@/utils/performanceMonitor';
+import { StateBatcher } from '@/utils/StateBatcher';
+import { IntersectionObserverManager } from '@/utils/IntersectionObserverManager';
+import HeroBackdropErrorBoundary from './HeroBackdropErrorBoundary';
+import ImageItem from './ImageItem';
+import Column from './Column';
 
 // =============== 类型定义 ===============
 type MasonryItem = BaseMasonryItem & { 
@@ -494,10 +499,30 @@ export default function HeroPageBackdrop() {
   const cleanupRef = useRef<(() => void) | null>(null);
   const deferredRef = useRef<number | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const aspectBatcher = useRef<StateBatcher<Record<number, number>> | null>(null);
+  const observerManager = useRef<IntersectionObserverManager | null>(null);
 
   // 宽高比测量回调
   const handleAspectMeasured = useCallback((id: number, aspect: number) => {
-    setAspectMap((prev) => (prev[id] ? prev : { ...prev, [id]: aspect }));
+    aspectBatcher.current?.add(id.toString(), aspect);
+  }, []);
+
+  // 初始化批量更新器
+  useEffect(() => {
+    aspectBatcher.current = new StateBatcher(setAspectMap, 50);
+    
+    return () => {
+      aspectBatcher.current?.clear();
+    };
+  }, []);
+
+  // 初始化Observer管理器
+  useEffect(() => {
+    observerManager.current = new IntersectionObserverManager();
+    
+    return () => {
+      observerManager.current?.disconnect();
+    };
   }, []);
 
   // 初始化布局和数据加载
@@ -596,141 +621,18 @@ export default function HeroPageBackdrop() {
     return result;
   }, [repeatedItems, layoutConfig, aspectMap]);
 
-  // 注册懒加载图片（需在 ImageItem 定义前）
+  // 注册懒加载图片
   const registerLazyImage = useCallback((el: HTMLImageElement | null, src: string) => {
-    if (!el) return;
+    if (!el || !observerManager.current) return;
     
-    if (!LazyLoadingManager.isSupported() || !observerRef.current) {
-      // 回退：直接加载真实图片
-      el.src = src;
-      return;
-    }
-    
-    // 设置占位和数据属性
-    if (!el.dataset || el.dataset.src !== src) {
-      el.dataset.src = src;
-      el.src = PLACEHOLDER_SRC;
-    }
-    
-    observerRef.current.observe(el);
+    observerManager.current.observe(el, src, () => {
+      // 图片加载完成回调
+      console.log(`Image loaded: ${src}`);
+    });
   }, []);
 
-  // 图片项目组件
-  const ImageItem = useCallback(({ 
-    item, 
-    columnIndex, 
-    itemIndex 
-  }: { 
-    item: MasonryItem & { calculatedHeight: number };
-    columnIndex: number;
-    itemIndex: number;
-  }) => {
-    const [imageState, setImageState] = useState<'loading' | 'loaded' | 'error'>('loading');
-    const isVisibleBucket = itemIndex < CONFIG.PERFORMANCE.VISIBLE_ITEMS_PER_COLUMN;
-    
-    // 监控图片加载
-    const handleImageLoad = useCallback(() => {
-      PerformanceMonitor.trackImageEnd(item.id, true, false);
-      setImageState('loaded');
-    }, [item.id]);
-    
-    const handleImageError = useCallback(() => {
-      PerformanceMonitor.trackImageEnd(item.id, false, false);
-      setImageState('error');
-    }, [item.id]);
-    
-    // 开始追踪图片加载
-    useEffect(() => {
-      if (isVisibleBucket) {
-        PerformanceMonitor.trackImageStart(item.id, item.src);
-      }
-    }, [item.id, item.src, isVisibleBucket]);
-    
-    return (
-      <div
-        key={`${item.id}-${columnIndex}-${itemIndex}`}
-        className="relative overflow-hidden rounded-lg shadow-lg bg-gray-100"
-        style={{ height: `${item.calculatedHeight}px` }}
-      >
-        {/* 加载状态 */}
-        {imageState === 'loading' && (
-          <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
-            <div className="w-8 h-8 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-          </div>
-        )}
-        
-        {/* 错误状态 */}
-        {imageState === 'error' && (
-          <div className="absolute inset-0 bg-gray-300 flex items-center justify-center">
-            <span className="text-gray-500 text-sm">加载失败</span>
-          </div>
-        )}
-        
-        {/* 实际图片 */}
-        {isVisibleBucket ? (
-          <img
-            src={item.src}
-            alt={item.title}
-            className={`w-full h-full object-cover transition-opacity duration-300 ${
-              imageState === 'loaded' ? 'opacity-100' : 'opacity-0'
-            }`}
-            loading="eager"
-            decoding="async"
-            fetchPriority="high"
-            onLoad={handleImageLoad}
-            onError={handleImageError}
-          />
-        ) : (
-          <img
-            ref={(el) => registerLazyImage(el, item.src)}
-            alt={item.title}
-            className={`w-full h-full object-cover transition-opacity duration-300 ${
-              imageState === 'loaded' ? 'opacity-100' : 'opacity-0'
-            }`}
-            loading="lazy"
-            decoding="async"
-            fetchPriority="low"
-            onLoad={handleImageLoad}
-            onError={handleImageError}
-          />
-        )}
-      </div>
-    );
-  }, [registerLazyImage]);
-
-  // 列组件
-  const Column = useCallback(({ 
-    column, 
-    columnIndex 
-  }: { 
-    column: MasonryItem[];
-    columnIndex: number;
-  }) => {
-    // 监控列渲染性能
-    useEffect(() => {
-      const renderId = PerformanceMonitor.trackRenderStart(`hero-column-${columnIndex}`, { itemCount: column.length });
-      return () => {
-        PerformanceMonitor.trackRenderEnd(renderId);
-      };
-    }, [column.length, columnIndex]);
-    
-    return (
-      <div key={columnIndex} className="flex-1 space-y-4">
-        {column.map((item, itemIndex) => {
-          const itemWithHeight = item as MasonryItem & { calculatedHeight: number };
-          return (
-            <ImageItem
-              key={`${item.id}-${columnIndex}-${itemIndex}`}
-              item={itemWithHeight}
-              columnIndex={columnIndex}
-              itemIndex={itemIndex}
-            />
-          );
-        })}
-      </div>
-    );
-  }, [ImageItem]);
-
+  
+  
   // 容器样式
   const containerStyle = useMemo(() => ({
     height: layoutConfig ? `${layoutConfig.height}px` : '100vh'
@@ -740,44 +642,7 @@ export default function HeroPageBackdrop() {
     filter: `saturate(${CONFIG.VISUAL.BAND_SATURATE}) brightness(${CONFIG.VISUAL.BAND_BRIGHTNESS}) blur(${CONFIG.VISUAL.BAND_BLUR_PX}px)`
   }), []);
 
-  // 懒加载：创建 IntersectionObserver（仅赋值不可见区图片的 src）
-  useEffect(() => {
-    if (observerRef.current) return;
-    if (typeof window === 'undefined') return;
-    if (!LazyLoadingManager.isSupported()) {
-      // 环境不支持 IO，保持为空以触发回退逻辑
-      return;
-    }
-
-    PerformanceMonitor.markStart('hero-intersection-observer-setup');
-    observerRef.current = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        const el = entry.target as HTMLImageElement;
-        if (entry.isIntersecting) {
-          // 开始追踪懒加载图片
-          const src = el.dataset.src;
-          if (src) {
-            const imgId = parseInt(src.match(/book_(\d+)/)?.[1] || '0', 10);
-            if (imgId) {
-              PerformanceMonitor.trackImageStart(imgId, src);
-            }
-          }
-          
-          LazyLoadingManager.handleImageLoad(el);
-          Boolean(observerRef.current) && observerRef.current.unobserve(el);
-        }
-      });
-    }, LazyLoadingManager.createObserverConfig());
-    PerformanceMonitor.markEnd('hero-intersection-observer-setup');
-
-    return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-        observerRef.current = null;
-      }
-    };
-  }, []);
-
+  
   
   // 监控组件完整渲染时间
   useEffect(() => {
@@ -829,24 +694,32 @@ export default function HeroPageBackdrop() {
   }
 
   return (
-    <div 
-      ref={containerRef}
-      data-testid="hero-backdrop"
-      className="absolute inset-0 overflow-hidden"
-      style={containerStyle}
+    <HeroBackdropErrorBoundary
+      onError={(error, errorInfo) => {
+        console.error('HeroPageBackdrop error:', error, errorInfo);
+        // 可以在这里添加错误上报逻辑
+      }}
     >
       <div 
-        className="flex gap-4 h-full"
-        style={scrollableStyle}
+        ref={containerRef}
+        data-testid="hero-backdrop"
+        className="absolute inset-0 overflow-hidden"
+        style={containerStyle}
       >
-        {columnArrays.map((column, columnIndex) => (
-          <Column
-            key={columnIndex}
-            column={column}
-            columnIndex={columnIndex}
-          />
-        ))}
+        <div 
+          className="flex gap-4 h-full"
+          style={scrollableStyle}
+        >
+          {columnArrays.map((column, columnIndex) => (
+            <Column
+              key={columnIndex}
+              column={column}
+              columnIndex={columnIndex}
+              visibleItemsPerColumn={CONFIG.PERFORMANCE.VISIBLE_ITEMS_PER_COLUMN}
+            />
+          ))}
+        </div>
       </div>
-    </div>
+    </HeroBackdropErrorBoundary>
   );
 }
