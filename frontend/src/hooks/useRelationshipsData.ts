@@ -202,17 +202,7 @@ export function useRelationshipsData() {
       });
     }
     
-    // 调试信息：记录原始数据和验证结果
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[transformNewNodeToPerson] 原始数据:', {
-        id: node.id,
-        originalName: node.name,
-        originalCategory: node.category,
-        validatedName: validatePersonName(node.name),
-        validatedCategory: validatePersonCategory(node.category)
-      });
-    }
-    
+        
     return {
       id: node.id,
       name: validatePersonName(node.name),
