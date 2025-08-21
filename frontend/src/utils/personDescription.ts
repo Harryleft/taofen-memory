@@ -60,17 +60,37 @@ export const renderSafeDescription = (description: unknown, maxLength?: number):
     return null;
   }
   
-  // 三重保护，确保即使有遗漏的数据也不会显示"0"
+  // 四重保护，确保万无一失
   const desc = description || '';
   const trimmed = desc.trim();
   
-  // 明确过滤掉各种形式的"0"和无效值
-  if (trimmed === '0' || trimmed === '' || trimmed === 'null' || trimmed === 'undefined' || trimmed === 'false' || trimmed === 'true') {
+  // 更全面的无效值检查
+  const invalidValues = [
+    '', '0', 'null', 'undefined', 'false', 'true', 
+    'NaN', 'Infinity', '-Infinity', 'none', 'None', 'NONE'
+  ];
+  
+  if (invalidValues.includes(trimmed)) {
+    // 添加调试日志
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[renderSafeDescription] 过滤无效描述:', { 
+        original: description, 
+        trimmed,
+        reason: 'invalid_value' 
+      });
+    }
     return null;
   }
   
   // 防止纯数字或符号被意外显示
   if (/^[\d\s\W]+$/.test(trimmed) && trimmed.length < 2) {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[renderSafeDescription] 过滤纯数字/符号:', { 
+        original: description, 
+        trimmed,
+        reason: 'pure_number_or_symbol' 
+      });
+    }
     return null;
   }
   
