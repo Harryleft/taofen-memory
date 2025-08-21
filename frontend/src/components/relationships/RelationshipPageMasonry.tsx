@@ -45,8 +45,8 @@ const MASONRY_CONFIG = {
         MIN_CARD_WIDTH: 160, // 移动端最小卡片宽度
         MAX_COLUMNS: 2, // 移动端最大2列
         MIN_HEIGHT: 200, // 移动端最小卡片高度
-        COMPACT_HEIGHT: 140, // 移动端紧凑高度（无描述无标签）
-        MEDIUM_HEIGHT: 180, // 移动端中等高度（无描述有标签）
+        COMPACT_HEIGHT: 120, // 移动端紧凑高度（无描述无标签）- 进一步缩小
+        MEDIUM_HEIGHT: 160, // 移动端中等高度（无描述有标签）- 适度缩小
         PADDING: 8 // 移动端内边距
       },
       tablet: {
@@ -59,8 +59,8 @@ const MASONRY_CONFIG = {
         MIN_CARD_WIDTH: 220,
         MAX_COLUMNS: 3,
         MIN_HEIGHT: 280, // 平板端最小卡片高度
-        COMPACT_HEIGHT: 200, // 平板端紧凑高度
-        MEDIUM_HEIGHT: 240, // 平板端中等高度
+        COMPACT_HEIGHT: 180, // 平板端紧凑高度 - 进一步缩小
+        MEDIUM_HEIGHT: 220, // 平板端中等高度 - 适度缩小
         PADDING: 12
       },
       desktop: {
@@ -73,8 +73,8 @@ const MASONRY_CONFIG = {
         MIN_CARD_WIDTH: 280,
         MAX_COLUMNS: 4,
         MIN_HEIGHT: 340, // 桌面端最小卡片高度
-        COMPACT_HEIGHT: 260, // 桌面端紧凑高度
-        MEDIUM_HEIGHT: 300, // 桌面端中等高度
+        COMPACT_HEIGHT: 220, // 桌面端紧凑高度 - 进一步缩小
+        MEDIUM_HEIGHT: 260, // 桌面端中等高度 - 适度缩小
         PADDING: 16
       }
     }
@@ -208,30 +208,30 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
       );
       height += additionalHeight;
     } else if (!hasTags) {
-      // 无描述且无标签时的紧凑高度
+      // 无描述且无标签时的紧凑高度 - 进一步缩小
       const compactHeight = responsiveConfig?.COMPACT_HEIGHT || 
-        (responsiveConfig?.BASE_HEIGHT ? responsiveConfig.BASE_HEIGHT * 0.6 : baseHeight * 0.6);
+        (responsiveConfig?.BASE_HEIGHT ? responsiveConfig.BASE_HEIGHT * 0.5 : baseHeight * 0.5);
       height = Math.max(
-        responsiveConfig?.COMPACT_HEIGHT || MASONRY_CONFIG.layout.MIN_HEIGHT * 0.7,
+        responsiveConfig?.COMPACT_HEIGHT || MASONRY_CONFIG.layout.MIN_HEIGHT * 0.6,
         compactHeight
       );
     } else {
-      // 无描述但有标签时的中等高度
+      // 无描述但有标签时的中等高度 - 适度缩小
       const mediumHeight = responsiveConfig?.MEDIUM_HEIGHT || 
-        (responsiveConfig?.BASE_HEIGHT ? responsiveConfig.BASE_HEIGHT * 0.8 : baseHeight * 0.8);
+        (responsiveConfig?.BASE_HEIGHT ? responsiveConfig.BASE_HEIGHT * 0.7 : baseHeight * 0.7);
       height = Math.max(
-        responsiveConfig?.MEDIUM_HEIGHT || MASONRY_CONFIG.layout.MIN_HEIGHT * 0.8,
+        responsiveConfig?.MEDIUM_HEIGHT || MASONRY_CONFIG.layout.MIN_HEIGHT * 0.7,
         mediumHeight
       );
     }
 
     const randomSeed = person.id * 9301 + 49297;
     const randomFactor = (randomSeed % 1000) / 1000;
-    const heightVariation = (randomFactor - 0.5) * 60;
+    const heightVariation = (randomFactor - 0.5) * 40; // 减少随机变化
     height += heightVariation;
 
     return Math.max(
-      MASONRY_CONFIG.layout.MIN_HEIGHT * 0.7,
+      MASONRY_CONFIG.layout.MIN_HEIGHT * 0.6,
       Math.min(MASONRY_CONFIG.layout.MAX_HEIGHT, height)
     );
   }, [getResponsiveConfig]);
@@ -655,6 +655,12 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
           // 添加动画类名和延迟
           const shouldAnimate = index < visibleItems;
           
+          // 判断是否为紧凑模式（无描述且无标签）
+          const descLength = getSafeDescriptionLength(person.description);
+          const hasTags = (person.extra?.tags?.relationshipTypes?.length || 0) > 0 || 
+                         (person.extra?.tags?.aspects?.length || 0) > 0;
+          const isCompactMode = descLength === 0 && !hasTags;
+          
           return (
             <div
               key={person.id}
@@ -665,13 +671,13 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
                   cardRefs.current.delete(person.id);
                 }
               }}
-              className={`masonry-card-base ${getCategoryClass(person.category)} ${shouldAnimate ? 'animate-in' : ''}`}
+              className={`masonry-card-base ${getCategoryClass(person.category)} ${shouldAnimate ? 'animate-in' : ''} ${isCompactMode ? 'compact-mode' : ''}`}
               style={{
                 left: `${left}px`,
                 top: `${top}px`,
                 width: `${columnWidth}px`,
                 // 移动端优化：增大触摸区域
-                minHeight: responsiveConfig?.BASE_HEIGHT || MASONRY_CONFIG.layout.BASE_HEIGHT
+                minHeight: isCompactMode ? (responsiveConfig?.COMPACT_HEIGHT || MASONRY_CONFIG.layout.MIN_HEIGHT * 0.6) : (responsiveConfig?.BASE_HEIGHT || MASONRY_CONFIG.layout.BASE_HEIGHT)
               }}
               onClick={() => onItemClick(person)}
               onTouchStart={(e) => {
