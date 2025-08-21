@@ -397,7 +397,7 @@
   border-radius: 16px;
   
   /* 平滑的过渡效果 */
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   
   /* 性能优化 - GPU 加速 */
   transform: translateZ(0);
@@ -434,12 +434,18 @@
     rgba(255, 255, 255, 0.98) 0%, 
     rgba(255, 255, 255, 0.99) 100%);
   min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .masonry-card-avatar-container {
-  @apply relative mb-4;
+  @apply relative;
   display: flex;
   justify-content: center;
+  align-items: center;
+  margin-bottom: 16px;
 }
 
 .masonry-card-avatar-wrapper {
@@ -478,7 +484,7 @@
     0 1px 3px rgba(139, 69, 19, 0.08);
   position: relative;
   overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -561,6 +567,8 @@
   transform: translateZ(0);
   will-change: transform, color;
   backface-visibility: hidden;
+  text-align: center;
+  align-self: center;
 }
 
 .masonry-card-name.text-align-left {
@@ -602,6 +610,8 @@
   transform: translateZ(0);
   will-change: opacity;
   backface-visibility: hidden;
+  align-self: center;
+  width: 100%;
 }
 
 .masonry-card-description.text-align-left {
@@ -656,8 +666,38 @@
   }
 }
 
+/* 增强的触摸反馈 */
+@keyframes touchRipple {
+  0% {
+    transform: scale(1);
+    box-shadow: 
+      0 2px 4px rgba(139, 69, 19, 0.08),
+      0 4px 8px rgba(139, 69, 19, 0.12),
+      0 8px 16px rgba(139, 69, 19, 0.16);
+  }
+  50% {
+    transform: scale(0.98);
+    box-shadow: 
+      0 1px 2px rgba(139, 69, 19, 0.06),
+      0 2px 4px rgba(139, 69, 19, 0.10),
+      0 4px 8px rgba(139, 69, 19, 0.14);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 
+      0 2px 4px rgba(139, 69, 19, 0.08),
+      0 4px 8px rgba(139, 69, 19, 0.12),
+      0 8px 16px rgba(139, 69, 19, 0.16);
+  }
+}
+
 .masonry-card-base:active {
-  animation: touchPulse 0.2s ease;
+  animation: touchRipple 0.3s ease;
+}
+
+/* 紧凑模式的触摸反馈 */
+.masonry-card-base.compact-mode:active {
+  animation: touchRipple 0.25s ease;
 }
 
 /* 移动端优化：内容可见性 */
@@ -836,7 +876,7 @@
 @media (min-width: 1024px) {
   .masonry-card-content {
     padding: 28px;
-    min-height: 320px;
+    min-height: 300px;
   }
   
   .masonry-avatar-container {
@@ -851,13 +891,32 @@
   .masonry-card-description {
     font-size: 15px;
   }
+  
+  /* 桌面端紧凑模式优化 */
+  .masonry-card-base.compact-mode {
+    min-height: 220px;
+  }
+  
+  .masonry-card-base.compact-mode .masonry-card-content {
+    padding: 24px;
+    min-height: 220px;
+  }
+  
+  .masonry-card-base.compact-mode .masonry-card-avatar-container {
+    margin-bottom: 14px;
+  }
+  
+  .masonry-card-base.compact-mode .masonry-card-name {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
 }
 
 /* 平板设备优化 */
 @media (min-width: 768px) and (max-width: 1023px) {
   .masonry-card-content {
     padding: 20px;
-    min-height: 260px;
+    min-height: 240px;
   }
   
   .masonry-avatar-container {
@@ -871,6 +930,25 @@
   
   .masonry-card-description {
     font-size: 14px;
+  }
+  
+  /* 平板端紧凑模式优化 */
+  .masonry-card-base.compact-mode {
+    min-height: 180px;
+  }
+  
+  .masonry-card-base.compact-mode .masonry-card-content {
+    padding: 18px;
+    min-height: 180px;
+  }
+  
+  .masonry-card-base.compact-mode .masonry-card-avatar-container {
+    margin-bottom: 10px;
+  }
+  
+  .masonry-card-base.compact-mode .masonry-card-name {
+    font-size: 16px;
+    margin-bottom: 6px;
   }
 }
 
@@ -941,13 +1019,52 @@
   }
 }
 
+/* 紧凑模式 - 用于无描述无标签的卡片 */
+.masonry-card-base.compact-mode {
+  min-height: 160px;
+}
+
+.masonry-card-base.compact-mode .masonry-card-content {
+  padding: 20px;
+  min-height: 160px;
+}
+
+.masonry-card-base.compact-mode .masonry-card-avatar-container {
+  margin-bottom: 12px;
+}
+
+.masonry-card-base.compact-mode .masonry-card-name {
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+/* 移动端紧凑模式 */
+@media (max-width: 768px) {
+  .masonry-card-base.compact-mode {
+    min-height: 120px;
+  }
+  
+  .masonry-card-base.compact-mode .masonry-card-content {
+    padding: 16px;
+    min-height: 120px;
+  }
+  
+  .masonry-card-base.compact-mode .masonry-card-avatar-container {
+    margin-bottom: 8px;
+  }
+  
+  .masonry-card-base.compact-mode .masonry-card-name {
+    font-size: 14px;
+  }
+}
+
 /* 移动端卡片触摸优化 */
 @media (max-width: 768px) {
   .masonry-card-base {
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     /* 增大触摸区域 */
-    min-height: 140px;
+    min-height: 120px;
     /* 防止误触 */
     -webkit-user-select: none;
     user-select: none;
@@ -1002,6 +1119,16 @@
     line-height: 1.4;
     -webkit-line-clamp: 2; /* 移动端减少行数 */
     min-height: 40px; /* 移动端减少最小高度 */
+  }
+  
+  /* 移动端卡片内容优化 */
+  .masonry-card-content {
+    padding: 16px;
+    min-height: 180px;
+  }
+  
+  .masonry-card-avatar-container {
+    margin-bottom: 12px;
   }
   
   /* 移动端优化动画 */
