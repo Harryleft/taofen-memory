@@ -718,7 +718,7 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
                     <div className="masonry-card-avatar-wrapper">
                       <div className="masonry-avatar-container">
                         <div className={`masonry-avatar-placeholder ${getCategoryClass(person.category)}`}>
-                          {person.name.charAt(0)}
+                          {person.name && person.name !== '未知人物' ? person.name.charAt(0) : '?'}
                         </div>
                       </div>
                     </div>

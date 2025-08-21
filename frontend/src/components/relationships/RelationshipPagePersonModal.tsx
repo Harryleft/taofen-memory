@@ -141,7 +141,7 @@ const RelationshipPagePersonModal: React.FC<PersonDetailModalProps> = ({ person,
               <div className="masonry-card-avatar-container position-center">
                 <div className="masonry-avatar-container">
                   <div className={`masonry-avatar-placeholder ${getCategoryClass(person.category)}`}>
-                    {person.name.charAt(0).toUpperCase()}
+                    {person.name && person.name !== '未知人物' ? person.name.charAt(0).toUpperCase() : '?'}
                   </div>
                 </div>
               </div>

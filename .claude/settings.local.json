@@ -84,7 +84,10 @@
       "mcp__spec-workflow-mcp__specs-workflow",
       "Bash(npm start:*)",
       "Bash(taskkill:*)",
-      "mcp__browser-tools-mcp__runAccessibilityAudit"
+      "mcp__browser-tools-mcp__runAccessibilityAudit",
+      "WebFetch(domain:github.com)",
+      "Bash(git clone:*)",
+      "Bash(rg:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",
