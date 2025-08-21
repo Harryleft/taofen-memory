@@ -29,6 +29,48 @@ export const hasValidDescription = (description: unknown): boolean => {
 };
 
 /**
+ * 增强的显示值验证函数 - 用于SafeDisplay组件
+ */
+export const isValidDisplayValue = (value: unknown): boolean => {
+  // 基本类型检查
+  if (value === null || value === undefined) {
+    return false;
+  }
+  
+  // 数字0检查
+  if (value === 0) {
+    return false;
+  }
+  
+  // 转换为字符串
+  let strValue: string;
+  try {
+    strValue = String(value);
+  } catch {
+    return false;
+  }
+  
+  const trimmed = strValue.trim();
+  
+  // 无效值检查
+  const invalidValues = [
+    '', '0', 'null', 'undefined', 'false', 'true',
+    'NaN', 'Infinity', '-Infinity', 'none', 'None', 'NONE'
+  ];
+  
+  if (invalidValues.includes(trimmed)) {
+    return false;
+  }
+  
+  // 防止纯数字或符号被意外显示
+  if (/^[\d\s\W]+$/.test(trimmed) && trimmed.length < 2) {
+    return false;
+  }
+  
+  return trimmed.length > 0;
+};
+
+/**
  * 安全地渲染描述文本
  * 确保不会显示"0"或其他无效值
  * @param description 原始描述文本

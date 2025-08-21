@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useState, useRef, useLayoutEffect, type CSSProperties } from 'react';
 import { TimelineEvent } from '@/types/personTypes.ts';
 import { ImageWithFallback } from './ImageWithFallback.tsx';
+import PersonDescription from '@/components/PersonDescription.tsx';
 
 interface TimelineCardProps {
   event: TimelineEvent & { imageFocus?: string }; // 可选：例如 '50% 20%'
@@ -330,9 +331,14 @@ export function TimelineCard({ event, isActive, isFirstEvent = false, isLastEven
           </div>
 
           {/* 描述 */}
-          <p className="w-full mt-0 mb-4 timeline-text-secondary timeline-text-body timeline-line-height-relaxed">
-            {event.description}
-          </p>
+          <div className="w-full mt-0 mb-4">
+            <PersonDescription 
+              description={event.description}
+              maxLength={300}
+              className="timeline-text-secondary timeline-text-body timeline-line-height-relaxed"
+              compact={false}
+            />
+          </div>
 
           {/* 激活条（可选） */}
           {isActive && (
