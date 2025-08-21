@@ -1,0 +1,40 @@
+{
+  "testInfo": {
+    "startTime": 24.9655,
+    "testType": "Manual Performance Test",
+    "environment": "Development",
+    "endTime": 30.225,
+    "duration": 5.259500000000003
+  },
+  "serverStartup": {
+    "estimatedTime": 599,
+    "status": "Success"
+  },
+  "pageLoad": {
+    "estimatedLoadTime": 1859.1280390861587,
+    "firstContentfulPaint": 1115.476823451695,
+    "largestContentfulPaint": 1487.302431268927,
+    "timeToInteractive": 1673.2152351775428,
+    "cumulativeLayoutShift": 0.05,
+    "status": "Simulated"
+  },
+  "images": {
+    "totalImages": 30,
+    "loadedImages": 28,
+    "failedImages": 2,
+    "cachedImages": 5,
+    "averageLoadTime": 922.2547680537208,
+    "totalLoadTime": 25823.13350550418,
+    "status": "Simulated"
+  },
+  "rendering": {
+    "heroBackdropRenderTime": 365.15739912800404,
+    "totalColumns": 5,
+    "totalDomElements": 1687,
+    "masonryLayoutTime": 255.61017938960282,
+    "status": "Simulated"
+  },
+  "network": {},
+  "memory": {},
+  "customMetrics": {}
+}
