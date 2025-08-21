@@ -283,7 +283,8 @@ class PerformanceMonitor {
 
   static markStart(name: string): void {
     const instance = PerformanceMonitor.getInstance();
-    const markName = name.startsWith('hero-') ? `${name}-start` : `hero-${name}-start`;
+    // 统一使用 hero- 前缀，避免重复前缀
+    const markName = name.startsWith('hero-') ? name : `hero-${name}`;
     
     // 安全检查：确保 performance API 可用
     if (typeof performance === 'undefined' || typeof performance.mark !== 'function') {
@@ -301,8 +302,10 @@ class PerformanceMonitor {
 
   static markEnd(name: string): number {
     const instance = PerformanceMonitor.getInstance();
-    const startMark = name.startsWith('hero-') ? `${name}-start` : `hero-${name}-start`;
-    const endMark = name.startsWith('hero-') ? `${name}-end` : `hero-${name}-end`;
+    // 统一使用 hero- 前缀，确保与markStart一致
+    const startMark = name.startsWith('hero-') ? name : `hero-${name}`;
+    const endMark = `${startMark}-end`;
+    const measureName = name.startsWith('hero-') ? name : `hero-${name}`;
     
     // 安全检查：确保 performance API 可用
     if (typeof performance === 'undefined' || typeof performance.mark !== 'function') {
@@ -311,10 +314,17 @@ class PerformanceMonitor {
     }
     
     try {
-      performance.mark(endMark);
-      performance.measure(name, startMark, endMark);
+      // 检查开始标记是否存在
+      const startMarks = performance.getEntriesByName(startMark, 'mark');
+      if (startMarks.length === 0) {
+        console.warn(`Start mark '${startMark}' does not exist, skipping measurement`);
+        return 0;
+      }
       
-      const measures = performance.getEntriesByName(name);
+      performance.mark(endMark);
+      performance.measure(measureName, startMark, endMark);
+      
+      const measures = performance.getEntriesByName(measureName);
       const duration = measures.length > 0 ? measures[measures.length - 1].duration : 0;
       
       const markData = instance.customMarks.get(name);
@@ -331,7 +341,7 @@ class PerformanceMonitor {
       // 清理标记
       performance.clearMarks(startMark);
       performance.clearMarks(endMark);
-      performance.clearMeasures(name);
+      performance.clearMeasures(measureName);
       
       return duration;
     } catch (error) {
@@ -450,16 +460,26 @@ class PerformanceMonitor {
 
   static updateNetworkInfo(): void {
     const instance = PerformanceMonitor.getInstance();
-    const nav = navigator as Navigator & { connection?: NetworkInformation };
     
-    if (nav.connection) {
-      instance.metrics.network = {
-        ...instance.metrics.network!,
-        networkType: nav.connection.type || 'unknown',
-        effectiveType: nav.connection.effectiveType || 'unknown',
-        downlink: nav.connection.downlink || 0,
-        rtt: nav.connection.rtt || 0,
-      };
+    // 安全检查：确保 navigator API 可用
+    if (typeof navigator === 'undefined') {
+      return;
+    }
+    
+    try {
+      const nav = navigator as Navigator & { connection?: NetworkInformation };
+      
+      if (nav.connection) {
+        instance.metrics.network = {
+          ...instance.metrics.network!,
+          networkType: nav.connection.type || 'unknown',
+          effectiveType: nav.connection.effectiveType || 'unknown',
+          downlink: nav.connection.downlink || 0,
+          rtt: nav.connection.rtt || 0,
+        };
+      }
+    } catch (error) {
+      console.warn('Failed to update network info:', error);
     }
   }
 
@@ -467,14 +487,24 @@ class PerformanceMonitor {
 
   static updateMemoryInfo(): void {
     const instance = PerformanceMonitor.getInstance();
-    const perf = performance as Performance & { memory?: PerformanceMemory };
     
-    if (perf.memory) {
-      instance.metrics.memory = {
-        usedJSHeapSize: perf.memory.usedJSHeapSize,
-        totalJSHeapSize: perf.memory.totalJSHeapSize,
-        jsHeapSizeLimit: perf.memory.jsHeapSizeLimit,
-      };
+    // 安全检查：确保 performance API 可用
+    if (typeof performance === 'undefined') {
+      return;
+    }
+    
+    try {
+      const perf = performance as Performance & { memory?: PerformanceMemory };
+      
+      if (perf.memory) {
+        instance.metrics.memory = {
+          usedJSHeapSize: perf.memory.usedJSHeapSize,
+          totalJSHeapSize: perf.memory.totalJSHeapSize,
+          jsHeapSizeLimit: perf.memory.jsHeapSizeLimit,
+        };
+      }
+    } catch (error) {
+      console.warn('Failed to update memory info:', error);
     }
   }
 
@@ -491,9 +521,9 @@ class PerformanceMonitor {
       instance.metrics.pageLoad!.domComplete = timing.domComplete - timing.navigationStart;
     }
     
-    // 更新网络和内存信息
-    instance.updateNetworkInfo();
-    instance.updateMemoryInfo();
+    // 更新网络和内存信息 - 使用静态方法
+    PerformanceMonitor.updateNetworkInfo();
+    PerformanceMonitor.updateMemoryInfo();
     
     return instance.metrics as PerformanceMetrics;
   }
@@ -543,17 +573,29 @@ class PerformanceMonitor {
 // =============== 便捷函数 ===============
 
 export function measurePerformance<T>(name: string, fn: () => T): T {
-  PerformanceMonitor.markStart(name);
-  const result = fn();
-  PerformanceMonitor.markEnd(name);
-  return result;
+  try {
+    PerformanceMonitor.markStart(name);
+    const result = fn();
+    PerformanceMonitor.markEnd(name);
+    return result;
+  } catch (error) {
+    console.warn(`Performance measurement failed for ${name}:`, error);
+    // 即使性能测量失败，也要确保原函数执行
+    return fn();
+  }
 }
 
 export async function measureAsyncPerformance<T>(name: string, fn: () => Promise<T>): Promise<T> {
-  PerformanceMonitor.markStart(name);
-  const result = await fn();
-  PerformanceMonitor.markEnd(name);
-  return result;
+  try {
+    PerformanceMonitor.markStart(name);
+    const result = await fn();
+    PerformanceMonitor.markEnd(name);
+    return result;
+  } catch (error) {
+    console.warn(`Async performance measurement failed for ${name}:`, error);
+    // 即使性能测量失败，也要确保原函数执行
+    return await fn();
+  }
 }
 
 export default PerformanceMonitor;
