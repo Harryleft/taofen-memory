@@ -741,7 +741,7 @@ const RelationshipPageMasonry: React.FC<MasonryGridProps> = ({
                   compact={true}
                 />
 
-                {(person.extra?.tags?.relationshipTypes?.length || person.extra?.tags?.aspects?.length) && (
+                {(person.extra?.tags?.relationshipTypes?.length > 0 || person.extra?.tags?.aspects?.length > 0) && (
                   <div className="masonry-card-tags">
                     {person.extra?.tags?.relationshipTypes?.slice(0, 2).map((t) => {
                       // 检查是否为强匹配、弱匹配或无匹配
