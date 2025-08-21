@@ -1,7 +1,6 @@
 // RelationshipsCoverCard.tsx - 人物关系页面专用封面卡片组件
 'use client';
 
-import React from 'react';
 import { CoverCard } from '@/components/common/CoverCard';
 
 export interface RelationshipsCoverCardProps {

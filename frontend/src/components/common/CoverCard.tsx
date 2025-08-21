@@ -236,14 +236,14 @@ const BOOKSTORE_DATA = {
   title: "韬奋·时光书影",
   subtitle: "珍藏经典 · 传承智慧",
   description: "《生活》周刊的创办到各类经典著作，都承载着深厚的历史底蕴和文化内涵。让我们一同感受那个时代知识分子的家国情怀和思想光芒。",
-  booksLabel: "珍贵藏书",
+  booksLabel: "珍贵书影",
   categoriesLabel: "精选分类"
 } as const;
 
 export function BookstoreCoverCard({ totalBooks, featuredCategories }: BookstoreCoverCardProps) {
   const bookstoreStats = [
-    { value: `${totalBooks}本`, label: BOOKSTORE_DATA.booksLabel },
-    { value: `${featuredCategories}个`, label: BOOKSTORE_DATA.categoriesLabel }
+    { value: `${totalBooks}份`, label: BOOKSTORE_DATA.booksLabel },
+    // { value: `${featuredCategories}个`, label: BOOKSTORE_DATA.categoriesLabel }
   ];
 
   return (

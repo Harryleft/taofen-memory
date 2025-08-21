@@ -2,8 +2,12 @@ import { useEffect, useMemo, useState, useRef, useCallback } from 'react';
 import { fetchHeroImages, type MasonryItem as BaseMasonryItem } from '@/services/heroImageService';
 
 // =============== 类型定义 ===============
-type MasonryItem = BaseMasonryItem & { calculatedHeight?: number };
-type AspectCategory = 'portrait' | 'square' | 'landscape';
+type MasonryItem = BaseMasonryItem & { 
+  calculatedHeight?: number;
+  // 使用预估宽高比或已测量的宽高比
+  currentAspectRatio?: number;
+};
+type AspectCategory = 'portrait' | 'square' | 'landscape' | 'panorama';
 
 // HeroBackgroundProps 接口已移除，因为不再需要 scrollY 参数
 
@@ -86,7 +90,8 @@ const RHYTHM_PATTERN = [-0.06, 0.0, 0.05, -0.03, 0.02] as const;
 const CATEGORY_WEIGHTS: Record<AspectCategory, number> = {
   portrait: 1,
   square: 3,
-  landscape: 4
+  landscape: 4,
+  panorama: 2
 } as const;
 
 // =============== 工具函数 ===============
@@ -236,20 +241,30 @@ class NetworkDetector {
 class ImageProcessor {
   // 获取宽高比分类
   static getAspectCategory(aspect: number): AspectCategory {
-    if (aspect > 1.05) return 'portrait';
-    if (aspect < 0.85) return 'landscape';
+    if (aspect > 1.3) return 'portrait';
+    if (aspect < 0.7) return 'panorama';
+    if (aspect < 0.9) return 'landscape';
     return 'square';
   }
 
-  // 获取项目的宽高比
+  // 获取项目的宽高比 - 优先使用测量值，其次使用预估值
   static getAspectForItem(
     item: BaseMasonryItem, 
     aspectMap: Record<number, number>
   ): number {
+    // 优先使用实际测量的宽高比
     const measured = aspectMap[item.id];
-    return typeof measured === 'number' && measured > 0 
-      ? measured 
-      : (item.aspectRatio || CONFIG.LAYOUT.FALLBACK_ASPECT);
+    if (typeof measured === 'number' && measured > 0) {
+      return measured;
+    }
+    
+    // 其次使用服务器提供的预估宽高比
+    if (typeof item.estimatedAspectRatio === 'number' && item.estimatedAspectRatio > 0) {
+      return item.estimatedAspectRatio;
+    }
+    
+    // 最后使用默认值
+    return CONFIG.LAYOUT.FALLBACK_ASPECT;
   }
 
   // 构建加权素材池
@@ -466,7 +481,8 @@ export default function HeroPageBackdrop() {
   const [layoutConfig, setLayoutConfig] = useState<LayoutConfig | null>(null);
   const [remoteItems, setRemoteItems] = useState<BaseMasonryItem[]>([]);
   const [aspectMap, setAspectMap] = useState<Record<number, number>>({});
-  const [isDeferred, setIsDeferred] = useState(false);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [isInitialRender, setIsInitialRender] = useState(true);
 
   // Refs
   const containerRef = useRef<HTMLDivElement>(null);
@@ -479,42 +495,57 @@ export default function HeroPageBackdrop() {
     setAspectMap((prev) => (prev[id] ? prev : { ...prev, [id]: aspect }));
   }, []);
 
-  // 延迟加载初始化
+  // 初始化布局和数据加载
   useEffect(() => {
-    // 计算初始布局配置（不阻塞）
+    // 1. 立即计算布局配置
     const initialConfig = LayoutCalculator.getLayoutConfig();
     setLayoutConfig(initialConfig);
     
-    // 创建数据加载器
-    const imageLoader = DataLoadingManager.createImageLoader(
-      setRemoteItems,
-      () => setIsDeferred(true)
-    );
-
-    // 调度加载
-    DataLoadingManager.scheduleLoading(imageLoader, deferredRef);
-
+    // 2. 立即开始加载数据，但不等待预加载
+    const loadInitialData = async () => {
+      try {
+        const items = await fetchHeroImages();
+        setRemoteItems(items);
+        setIsDataLoaded(true);
+        
+        // 3. 数据加载完成后，在空闲时预加载图片
+        if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+          requestIdleCallback(() => {
+            const cleanup = ImageProcessor.preloadImagesWithCleanup(items, handleAspectMeasured);
+            cleanupRef.current = cleanup;
+          }, { timeout: 2000 });
+        } else {
+          // 降级方案：使用短延迟
+          setTimeout(() => {
+            const cleanup = ImageProcessor.preloadImagesWithCleanup(items, handleAspectMeasured);
+            cleanupRef.current = cleanup;
+          }, 500);
+        }
+      } catch (error) {
+        console.error('[HeroBackdrop] Failed to load initial data:', error);
+        setIsDataLoaded(true); // 即使出错也标记为已加载，显示错误状态
+      }
+    };
+    
+    // 立即执行数据加载
+    loadInitialData();
+    
     return () => {
-      DataLoadingManager.cleanupScheduled(deferredRef);
+      if (cleanupRef.current) {
+        cleanupRef.current();
+        cleanupRef.current = null;
+      }
     };
   }, []);
 
-  // 预加载图片并测量真实宽高比（带清理）
+  // 组件卸载时标记初始渲染完成
   useEffect(() => {
-    if (remoteItems.length > 0 && isDeferred) {
-      // 使用新的带清理的方法
-      const cleanup = ImageProcessor.preloadImagesWithCleanup(remoteItems, handleAspectMeasured);
-      cleanupRef.current = cleanup;
-      
-      // 返回清理函数
-      return () => {
-        if (cleanupRef.current) {
-          cleanupRef.current();
-          cleanupRef.current = null;
-        }
-      };
-    }
-  }, [remoteItems, handleAspectMeasured, isDeferred]);
+    const timer = setTimeout(() => {
+      setIsInitialRender(false);
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   // 构建素材池
   const weightedPool = useMemo(() => 
@@ -567,30 +598,63 @@ export default function HeroPageBackdrop() {
     columnIndex: number;
     itemIndex: number;
   }) => {
+    const [imageState, setImageState] = useState<'loading' | 'loaded' | 'error'>('loading');
     const isVisibleBucket = itemIndex < CONFIG.PERFORMANCE.VISIBLE_ITEMS_PER_COLUMN;
+    
+    const handleImageLoad = useCallback(() => {
+      setImageState('loaded');
+    }, []);
+    
+    const handleImageError = useCallback(() => {
+      setImageState('error');
+    }, []);
+    
     return (
       <div
         key={`${item.id}-${columnIndex}-${itemIndex}`}
-        className="relative overflow-hidden rounded-lg shadow-lg"
+        className="relative overflow-hidden rounded-lg shadow-lg bg-gray-100"
         style={{ height: `${item.calculatedHeight}px` }}
       >
+        {/* 加载状态 */}
+        {imageState === 'loading' && (
+          <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
+            <div className="w-8 h-8 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        )}
+        
+        {/* 错误状态 */}
+        {imageState === 'error' && (
+          <div className="absolute inset-0 bg-gray-300 flex items-center justify-center">
+            <span className="text-gray-500 text-sm">加载失败</span>
+          </div>
+        )}
+        
+        {/* 实际图片 */}
         {isVisibleBucket ? (
           <img
             src={item.src}
             alt={item.title}
-            className="w-full h-full object-cover"
+            className={`w-full h-full object-cover transition-opacity duration-300 ${
+              imageState === 'loaded' ? 'opacity-100' : 'opacity-0'
+            }`}
             loading="eager"
             decoding="async"
             fetchPriority="high"
+            onLoad={handleImageLoad}
+            onError={handleImageError}
           />
         ) : (
           <img
             ref={(el) => registerLazyImage(el, item.src)}
             alt={item.title}
-            className="w-full h-full object-cover"
+            className={`w-full h-full object-cover transition-opacity duration-300 ${
+              imageState === 'loaded' ? 'opacity-100' : 'opacity-0'
+            }`}
             loading="lazy"
             decoding="async"
             fetchPriority="low"
+            onLoad={handleImageLoad}
+            onError={handleImageError}
           />
         )}
       </div>
@@ -658,14 +722,30 @@ export default function HeroPageBackdrop() {
 
   
 
-  // 如果还没有延迟加载完成，返回空的占位容器
-  if (!isDeferred) {
+  // 如果数据还没加载，显示骨架屏
+  if (!isDataLoaded || !layoutConfig) {
     return (
       <div 
         ref={containerRef}
-        className="absolute inset-0 overflow-hidden"
+        className="absolute inset-0 overflow-hidden bg-gray-100"
         style={containerStyle}
-      />
+      >
+        <div className="flex gap-4 h-full">
+          {Array.from({ length: layoutConfig?.columns || 5 }).map((_, columnIndex) => (
+            <div key={columnIndex} className="flex-1 space-y-4">
+              {Array.from({ length: 6 }).map((_, itemIndex) => (
+                <div
+                  key={`${columnIndex}-${itemIndex}`}
+                  className="bg-gray-200 rounded-lg animate-pulse"
+                  style={{
+                    height: `${200 + Math.random() * 100}px`,
+                  }}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
     );
   }
 
