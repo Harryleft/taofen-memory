@@ -2,54 +2,8 @@ import React, { useRef } from 'react';
 import { BookOpen, ExternalLink, FileText, X, Link as LinkIcon, Tags } from 'lucide-react';
 import { Person } from '@/types/Person.ts';
 import { getCategoryClass } from '@/constants/relationshipsConstants';
-import { hasValidDescription } from '@/utils/tagMatcher';
+import PersonDescription from '@/components/PersonDescription.tsx';
 
-// 安全的描述显示函数，确保不会显示"0"或其他无效值
-const renderSafeDescription = (description: string | undefined, maxLength?: number) => {
-  // 首先检查是否为 undefined 或 null
-  if (description === undefined || description === null) {
-    return null;
-  }
-  
-  // 处理可能的非字符串值（防御性编程）
-  if (typeof description !== 'string') {
-    // 如果是数字0，直接过滤
-    if (description === 0) {
-      return null;
-    }
-    // 尝试转换为字符串，但保持防御性
-    try {
-      description = String(description);
-    } catch {
-      return null;
-    }
-  }
-  
-  // 然后使用 hasValidDescription 进行验证
-  if (!hasValidDescription(description)) {
-    return null;
-  }
-  
-  // 三重保护，确保即使有遗漏的数据也不会显示"0"
-  const desc = description || '';
-  const trimmed = desc.trim();
-  
-  // 明确过滤掉各种形式的"0"和无效值
-  if (trimmed === '0' || trimmed === '' || trimmed === 'null' || trimmed === 'undefined' || trimmed === 'false' || trimmed === 'true') {
-    return null;
-  }
-  
-  // 防止纯数字或符号被意外显示
-  if (/^[\d\s\W]+$/.test(trimmed) && trimmed.length < 2) {
-    return null;
-  }
-  
-  if (maxLength && trimmed.length > maxLength) {
-    return `${trimmed.substring(0, maxLength)}...`;
-  }
-  
-  return trimmed;
-};
 
 interface PersonDetailModalProps {
   person: Person | null;
@@ -203,9 +157,20 @@ const RelationshipPagePersonModal: React.FC<PersonDetailModalProps> = ({ person,
         {/* 内容 */}
         <div className="p-6 space-y-6">
           {/* 描述 */}
-          {(() => {
-            const descriptionText = renderSafeDescription(person.description);
-            return descriptionText ? (
+          <PersonDescription 
+            description={person.description}
+            placeholder={
+              <div>
+                <h3 className="flex items-center text-lg font-medium text-gray-900 mb-3">
+                  <FileText size={18} className="mr-2 text-gray-600" />
+                  人物简介
+                </h3>
+                <p className="text-gray-700 leading-relaxed">
+                  暂无描述
+                </p>
+              </div>
+            }
+            render={(descriptionText) => (
               <div>
                 <h3 className="flex items-center text-lg font-medium text-gray-900 mb-3">
                   <FileText size={18} className="mr-2 text-gray-600" />
@@ -215,8 +180,8 @@ const RelationshipPagePersonModal: React.FC<PersonDetailModalProps> = ({ person,
                   {descriptionText}
                 </p>
               </div>
-            ) : null;
-          })()}
+            )}
+          />
 
           {/* 关系线索 */}
           {person.extra?.relationships && person.extra.relationships.length > 0 && (
