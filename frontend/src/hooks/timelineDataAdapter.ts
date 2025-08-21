@@ -151,11 +151,11 @@ export function adaptTimelineData(newData: TimelineData): TimelineEvent[] {
  */
 export function validateAdaptedData(events: TimelineEvent[]): boolean {
   return events.every(event => 
-    event.id && 
-    event.year && 
-    event.title && 
-    event.description && 
-    event.period
+    Boolean(event.id) && 
+    Boolean(event.year) && 
+    Boolean(event.title) && 
+    Boolean(event.description) && 
+    Boolean(event.period)
   );
 }
 

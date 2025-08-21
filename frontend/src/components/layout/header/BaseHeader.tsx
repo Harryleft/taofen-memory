@@ -51,7 +51,7 @@ function SiteLogo({ config, onClick }: { config: HeaderConfig['logo']; onClick?:
       className={`header-logo-button group flex items-center gap-2 focus:outline-none rounded-lg p-2 ${config.className || ''}`}
       aria-label="韬奋纪念"
     >
-      {config.showIcon && (
+      {Boolean(config.showIcon) && (
           <div
               className="w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-300">
             <img 
@@ -61,7 +61,7 @@ function SiteLogo({ config, onClick }: { config: HeaderConfig['logo']; onClick?:
             />
           </div>
       )}
-      {config.showText && (
+      {Boolean(config.showText) && (
           <div className="flex flex-col items-start">
           <span
               className="font-bold text-xl text-black transition-all duration-300 group-hover:text-black">
@@ -178,10 +178,10 @@ function HeroLayout({ config, onLogoClick, onNavigation, onMenuToggle, isMenuOpe
   return (
     <div className="w-full h-full px-4 md:px-8 flex items-center justify-between">
       <SiteLogo config={config.logo} onClick={onLogoClick} />
-      {config.navigation && config.showNavigation && (
+      {Boolean(config.navigation) && Boolean(config.showNavigation) && (
         <DesktopNavigation items={config.navigation} onNavigate={onNavigation || (() => {})} />
       )}
-      {config.showMobileMenu && <MobileMenuButton isOpen={isMenuOpen || false} onToggle={onMenuToggle || (() => {})} />}
+      {Boolean(config.showMobileMenu) && <MobileMenuButton isOpen={isMenuOpen || false} onToggle={onMenuToggle || (() => {})} />}
     </div>
   );
 }
@@ -239,7 +239,7 @@ const BaseHeader: React.FC<BaseHeaderProps> = ({ config }) => {
       </header>
 
       {/* 移动端菜单 */}
-      {navigation && showMobileMenu && (
+      {Boolean(navigation) && Boolean(showMobileMenu) && (
         <MobileMenu
           isOpen={isMenuOpen}
           items={navigation}

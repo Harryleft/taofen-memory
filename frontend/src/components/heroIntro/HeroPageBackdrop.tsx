@@ -199,7 +199,7 @@ class LazyLoadingManager {
 
   // 处理图片懒加载逻辑
   static handleImageLoad(el: HTMLImageElement): void {
-    const realSrc = el.dataset && el.dataset.src ? el.dataset.src : '';
+    const realSrc = Boolean(el.dataset) && el.dataset.src ? el.dataset.src : '';
     if (realSrc) {
       el.src = realSrc;
     }
@@ -215,9 +215,9 @@ class NetworkDetector {
     isSlowNetwork: boolean;
   } {
     const nav = typeof navigator !== 'undefined' ? (navigator as any) : null;
-    const connection = nav && nav.connection ? nav.connection : null;
-    const saveData = connection && connection.saveData === true;
-    const effectiveType = connection && typeof connection.effectiveType === 'string' 
+    const connection = Boolean(nav) && nav.connection ? nav.connection : null;
+    const saveData = Boolean(connection) && connection.saveData === true;
+    const effectiveType = Boolean(connection) && typeof connection.effectiveType === 'string' 
       ? connection.effectiveType 
       : '';
     const isSlowNetwork = NETWORK_CONDITIONS.SLOW_TYPES.includes(effectiveType as any);
@@ -643,7 +643,7 @@ export default function HeroPageBackdrop() {
         const el = entry.target as HTMLImageElement;
         if (entry.isIntersecting) {
           LazyLoadingManager.handleImageLoad(el);
-          observerRef.current && observerRef.current.unobserve(el);
+          Boolean(observerRef.current) && observerRef.current.unobserve(el);
         }
       });
     }, LazyLoadingManager.createObserverConfig());
