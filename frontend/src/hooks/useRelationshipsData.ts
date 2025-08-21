@@ -117,8 +117,8 @@ export function useRelationshipsData() {
       name: rawPerson.name,
       category: rawPerson.category || '未知',
       img: rawPerson.pic || rawPerson.img || '',
-      // 关键修复：将 "sub" 字段映射到 description
-      description: sanitizeDescription(rawPerson.sub),
+      // 关键修复：将 "desc" 字段映射到 description
+      description: sanitizeDescription(rawPerson.desc),
       sources: rawPerson.sources || [],
       link: rawPerson.link || [],
     }));
