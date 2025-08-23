@@ -1,4 +1,6 @@
 import BookstoreTimelineModule from '@/components/bookstore/BookstoreModule.tsx';
+import NewspapersModule from '@/components/newspapers/NewspapersModule.tsx';
+import TabSwitcher from '@/components/common/TabSwitcher.tsx';
 import AppHeader from '@/components/layout/header/AppHeader.tsx';
 import { AppFooter } from '@/components/layout/footer';
 
@@ -9,7 +11,10 @@ function BookstoreTimelinePage() {
 
       {/* Main Content */}
       <main className="flex-1">
-        <BookstoreTimelineModule />
+        <TabSwitcher>
+          <BookstoreTimelineModule />
+          <NewspapersModule />
+        </TabSwitcher>
       </main>
       
       {/* Footer */}

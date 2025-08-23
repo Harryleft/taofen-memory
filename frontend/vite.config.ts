@@ -12,6 +12,15 @@ export default defineConfig({
     fs: {
       // 允许访问上级目录的静态资源
       allow: ['..', '.']
+    },
+    // 配置代理解决CORS问题
+    proxy: {
+      // 将 /iiif 请求代理到 https://www.ai4dh.cn/iiif
+      '/iiif': {
+        target: 'https://www.ai4dh.cn',
+        changeOrigin: true,
+        secure: true
+      }
     }
   },
   resolve: {
