@@ -20,7 +20,9 @@ export class NewspaperService {
 
   static async getIssues(publicationId: string): Promise<IIIFCollection> {
     try {
-      const response = await fetch(`${BASE_URL}/3/manifests/${publicationId}/collection.json`);
+      // 对publicationId进行URL编码，确保特殊字符正确处理
+      const encodedPublicationId = encodeURIComponent(publicationId);
+      const response = await fetch(`${BASE_URL}/3/manifests/${encodedPublicationId}/collection.json`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -33,7 +35,9 @@ export class NewspaperService {
 
   static async getManifest(manifestId: string): Promise<IIIFManifest> {
     try {
-      const response = await fetch(`${BASE_URL}/3/manifests/${manifestId}/manifest.json`);
+      // 对manifestId进行URL编码，确保特殊字符正确处理
+      const encodedManifestId = encodeURIComponent(manifestId);
+      const response = await fetch(`${BASE_URL}/3/manifests/${encodedManifestId}/manifest.json`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
