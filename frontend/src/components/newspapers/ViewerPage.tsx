@@ -1,14 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NewspaperService } from './services';
 
-declare global {
-  interface Window {
-    UV: {
-      init: (element: HTMLElement, options: any) => any;
-    };
-  }
-}
-
 interface ViewerPageProps {
   publicationId: string;
   issueId: string;
@@ -18,7 +10,7 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({ publicationId, issueId }
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [manifestUrl, setManifestUrl] = useState<string>('');
-  const uvInitialized = useRef(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
     const loadManifest = async () => {
@@ -28,15 +20,14 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({ publicationId, issueId }
         setLoading(true);
         setError(null);
         
-        // 根据环境生成manifest URL，对路径进行URL编码
+        // 构建manifest URL
         const combinedId = `${publicationId}/${issueId}`;
-        const encodedCombinedId = encodeURIComponent(combinedId);
-        const manifestUrl = import.meta.env.DEV 
-          ? `/iiif/3/manifests/${encodedCombinedId}/manifest.json`
-          : `https://www.ai4dh.cn/iiif/3/manifests/${encodedCombinedId}/manifest.json`;
+        const manifestUrl = NewspaperService.getProxyUrl(
+          `https://www.ai4dh.cn/iiif/3/manifests/${combinedId}/manifest.json`
+        );
         setManifestUrl(manifestUrl);
         
-        const manifest = await NewspaperService.getManifest(`${publicationId}/${issueId}`);
+        const manifest = await NewspaperService.getManifest(combinedId);
         console.log('Manifest loaded:', manifest);
       } catch (err) {
         setError(err instanceof Error ? err.message : '加载失败');
@@ -49,102 +40,41 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({ publicationId, issueId }
   }, [publicationId, issueId]);
 
   useEffect(() => {
-    if (!manifestUrl || loading || uvInitialized.current) return;
+    if (!manifestUrl || loading) return;
 
-    const initUV = () => {
-      try {
-        console.log('=== 开始Universal Viewer初始化 ===');
-        
-        // 确保UV全局对象可用
-        if (typeof window.UV === 'undefined') {
-          console.log('UV未加载，开始加载UV库...');
-          
-          // 首先加载CSS
-          const cssLink = document.createElement('link');
-          cssLink.rel = 'stylesheet';
-          cssLink.href = 'https://cdn.jsdelivr.net/npm/universalviewer@4.2.1/dist/uv.css';
-          document.head.appendChild(cssLink);
-          
-          // 然后加载JS
-          const script = document.createElement('script');
-          script.src = 'https://cdn.jsdelivr.net/npm/universalviewer@4.2.1/dist/umd/UV.js';
-          script.onload = () => {
-            console.log('UV库加载完成，开始初始化...');
-            initUVInternal();
-          };
-          script.onerror = () => {
-            console.error('UV库加载失败');
-            setError('UV库加载失败');
-          };
-          document.head.appendChild(script);
-        } else {
-          console.log('UV已存在，直接初始化...');
-          initUVInternal();
-        }
-      } catch (err) {
-        console.error('❌ UV初始化失败:', err);
-        setError('查看器初始化失败: ' + err.message);
-      }
-    };
-
-    const initUVInternal = () => {
-      try {
-        const uvElement = document.getElementById('uv');
-        if (!uvElement) {
-          console.error('UV容器元素未找到');
-          setError('查看器容器未找到');
-          return;
-        }
-
-        console.log('开始初始化Universal Viewer...');
-        console.log('Manifest URL:', manifestUrl);
-
-        // 清空容器
-        uvElement.innerHTML = '';
-        
-        // 使用UV.init方法
-        const uv = window.UV.init(uvElement, {
-          manifest: manifestUrl,
-          configUri: 'https://universalviewer.io/config.json',
-          embedded: true
-        });
-
-        if (uv) {
-          console.log('✅ Universal Viewer初始化成功');
-          uvInitialized.current = true;
-        } else {
-          console.error('UV初始化返回null');
-          setError('查看器初始化失败');
-        }
-
-        // 窗口大小变化时重新调整
-        const handleResize = () => {
-          try {
-            if (uv && uv.resize) {
-              uv.resize();
-            }
-          } catch (e) {
-            console.warn('调整窗口大小时出错:', e);
-          }
-        };
-
-        window.addEventListener('resize', handleResize);
-
-        return () => {
-          window.removeEventListener('resize', handleResize);
-          if (uv && uv.destroy) {
-            uv.destroy();
-          }
-          uvInitialized.current = false;
-        };
-      } catch (err) {
-        console.error('❌ UV内部初始化失败:', err);
-        setError('查看器初始化失败: ' + err.message);
-      }
-    };
-
-    initUV();
+    // 构建iframe URL
+    const timestamp = Date.now();
+    const iframeSrc = `/uv_simple.html?v=${timestamp}#?iiifManifestId=${encodeURIComponent(manifestUrl)}&embedded=true`;
+    
+    console.log('Loading UV iframe:', iframeSrc);
+    
+    if (iframeRef.current) {
+      iframeRef.current.src = iframeSrc;
+    }
   }, [manifestUrl, loading]);
+
+  // 监听来自iframe的消息
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data.type === 'uv-loaded') {
+        console.log('UV查看器加载完成:', event.data.manifestId);
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, []);
+
+  // 重新加载UV查看器
+  const reloadViewer = () => {
+    if (iframeRef.current) {
+      const timestamp = Date.now();
+      const iframeSrc = `/uv_simple.html?v=${timestamp}#?iiifManifestId=${encodeURIComponent(manifestUrl)}&embedded=true`;
+      iframeRef.current.src = iframeSrc;
+    }
+  };
 
   if (loading) {
     return (
@@ -166,25 +96,16 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({ publicationId, issueId }
             <p className="text-sm mt-1">{error}</p>
           </div>
           <button 
-            onClick={() => window.location.reload()}
+            onClick={reloadViewer}
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mr-4"
           >
-            重新加载页面
+            重新加载查看器
           </button>
           <button 
-            onClick={() => {
-              uvInitialized.current = false;
-              const script = document.createElement('script');
-              script.src = 'https://cdn.jsdelivr.net/npm/universalviewer@4.2.1/dist/umd/UV.js';
-              script.onload = () => {
-                console.log('UV库重新加载完成');
-                window.location.reload();
-              };
-              document.head.appendChild(script);
-            }}
+            onClick={() => window.location.reload()}
             className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
           >
-            重新加载UV库
+            重新加载页面
           </button>
         </div>
       </div>
@@ -193,14 +114,15 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({ publicationId, issueId }
 
   return (
     <div className="h-screen bg-white">
-      <div id="uv" className="w-full h-full">
-        <div className="flex items-center justify-center h-full">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
-            <p className="text-gray-600">正在初始化查看器...</p>
-            <p className="text-gray-400 text-sm mt-2">请稍候，首次加载可能需要几秒钟</p>
-          </div>
-        </div>
+      <div className="uv-frame-wrap h-full border border-gray-300 rounded-lg overflow-hidden">
+        <iframe
+          ref={iframeRef}
+          id="uv-frame"
+          title="Universal Viewer"
+          allowFullScreen
+          className="w-full h-full border-0"
+          sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation"
+        />
       </div>
     </div>
   );
