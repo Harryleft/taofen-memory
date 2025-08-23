@@ -1,6 +1,8 @@
 import { IIIFCollection, IIIFManifest } from './iiifTypes';
 
-const BASE_URL = 'https://www.ai4dh.cn/iiif';
+// 在开发环境中使用相对路径，通过Vite代理访问
+// 在生产环境中使用完整URL
+const BASE_URL = import.meta.env.DEV ? '/iiif' : 'https://www.ai4dh.cn/iiif';
 
 export class NewspaperService {
   static async getPublications(): Promise<IIIFCollection> {
