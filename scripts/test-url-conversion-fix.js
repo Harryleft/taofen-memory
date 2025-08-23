@@ -24,12 +24,8 @@ function convertToIIIFUrl(imageUrl) {
   const baseUrl = imageUrl.split('/iiif/3/')[0];
   const imagePath = imageUrl.split('/iiif/3/')[1];
   
-  // 保留完整路径，只移除文件扩展名
-  const lastSlashIndex = imagePath.lastIndexOf('/');
-  const directoryPath = imagePath.substring(0, lastSlashIndex);
-  const fileName = imagePath.substring(lastSlashIndex + 1);
-  const fileNameWithoutExt = fileName.replace(/\.[^/.]+$/, ''); // 移除扩展名
-  const fullPath = directoryPath ? `${directoryPath}/${fileNameWithoutExt}` : fileNameWithoutExt;
+  // 保留完整路径，包括文件名和扩展名
+  const fullPath = imagePath;
   
   // URL 编码路径部分
   const encodedPath = fullPath.replace(/\//g, '%2F');
@@ -44,13 +40,13 @@ function convertToIIIFUrl(imageUrl) {
 const testCases = [
   {
     name: '您的例子',
-    input: 'https://www.ai4dh.cn/iiif/3/shenghuozhoukan/di01juandi001qi/07.jpg',
-    expected: 'https://www.ai4dh.cn/iiif/3/shenghuozhoukan%2Fdi01juandi001qi%2F07/full/1024,/0/default.jpg'
+    input: 'https://www.ai4dh.cn/iiif/3/shenghuozhoukan/di01juandi001qi/00.jpg',
+    expected: 'https://www.ai4dh.cn/iiif/3/shenghuozhoukan%2Fdi01juandi001qi%2F00.jpg/full/1024,/0/default.jpg'
   },
   {
     name: '原来的例子',
     input: 'https://www.ai4dh.cn/iiif/3/dazhongshenghuozhoukan/1-16-chuangkanhao/page_1.jpg',
-    expected: 'https://www.ai4dh.cn/iiif/3/dazhongshenghuozhoukan%2F1-16-chuangkanhao%2Fpage_1/full/1024,/0/default.jpg'
+    expected: 'https://www.ai4dh.cn/iiif/3/dazhongshenghuozhoukan%2F1-16-chuangkanhao%2Fpage_1.jpg/full/1024,/0/default.jpg'
   },
   {
     name: '已经是IIIF格式',
@@ -89,6 +85,6 @@ if (allPassed) {
 
 console.log('');
 console.log('🔧 关键修复:');
-console.log('- 保留完整路径，包括文件名（不带扩展名）');
+console.log('- 保留完整路径，包括文件名和扩展名');
 console.log('- 正确处理路径分隔符编码');
 console.log('- 符合IIIF Image API标准格式');

@@ -40,12 +40,8 @@
       const baseUrl = imageUrl.split('/iiif/3/')[0];
       const imagePath = imageUrl.split('/iiif/3/')[1];
       
-      // 保留完整路径，只移除文件扩展名
-      const lastSlashIndex = imagePath.lastIndexOf('/');
-      const directoryPath = imagePath.substring(0, lastSlashIndex);
-      const fileName = imagePath.substring(lastSlashIndex + 1);
-      const fileNameWithoutExt = fileName.replace(/\.[^/.]+$/, ''); // 移除扩展名
-      const fullPath = directoryPath ? `${directoryPath}/${fileNameWithoutExt}` : fileNameWithoutExt;
+      // 保留完整路径，包括文件名和扩展名
+      const fullPath = imagePath;
       
       // URL 编码路径部分
       const encodedPath = fullPath.replace(/\//g, '%2F');
