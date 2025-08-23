@@ -5,8 +5,7 @@ const NAVIGATION_ITEMS: NavigationItem[] = [
   { label: '岁月行履', to: '/timeline' },
   { label: '时光书影', to: '/bookstore-timeline' },
   { label: '笔下风骨', to: '/handwriting' },
-  { label: '同行群像', to: '/relationships' },
-  { label: '数字报刊', to: '/newspapers' }
+  { label: '同行群像', to: '/relationships' }
 ];
 
 // 定义所有模块的 Header 配置 - 统一使用首页样式
@@ -90,24 +89,6 @@ export const headerConfigs: Record<string, HeaderConfig> = {
     subtitle: 'Bookstore Management',
     description: '聚焦韬奋先生作为卓越出版家的一面，回顾生活书店的创办、发展及其在文化传播中的重要作用。',
     accentColor: 'red',
-    layout: 'hero',
-    navigation: NAVIGATION_ITEMS,
-    logo: {
-      showText: true,
-      showIcon: true,
-    },
-    showNavigation: true,
-    showMobileMenu: true,
-    backgroundColor: 'white',
-  },
-
-  // 数字报刊 - 其他页面使用白色背景
-  newspapers: {
-    moduleId: 'newspapers',
-    title: '数字报刊',
-    subtitle: 'Digital Newspapers',
-    description: '浏览历史报刊资料，通过IIIF标准查看珍贵的历史文献。',
-    accentColor: 'purple',
     layout: 'hero',
     navigation: NAVIGATION_ITEMS,
     logo: {
