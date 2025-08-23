@@ -28,10 +28,12 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({ publicationId, issueId }
         setLoading(true);
         setError(null);
         
-        // 根据环境生成manifest URL
+        // 根据环境生成manifest URL，对路径进行URL编码
+        const combinedId = `${publicationId}/${issueId}`;
+        const encodedCombinedId = encodeURIComponent(combinedId);
         const manifestUrl = import.meta.env.DEV 
-          ? `/iiif/3/manifests/${publicationId}/${issueId}/manifest.json`
-          : `https://www.ai4dh.cn/iiif/3/manifests/${publicationId}/${issueId}/manifest.json`;
+          ? `/iiif/3/manifests/${encodedCombinedId}/manifest.json`
+          : `https://www.ai4dh.cn/iiif/3/manifests/${encodedCombinedId}/manifest.json`;
         setManifestUrl(manifestUrl);
         
         const manifest = await NewspaperService.getManifest(`${publicationId}/${issueId}`);
