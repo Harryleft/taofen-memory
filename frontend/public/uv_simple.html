@@ -1,154 +1,226 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <title>UV查看器 - IIIF数字化期刊浏览系统</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/universalviewer@4.2.1/dist/uv.css"/>
   <style>
-    body { margin: 0; padding: 0; font-family: 'Microsoft YaHei', Arial, sans-serif; }
-    #uv { width: 100vw; height: 100vh; }
-    .loading { 
-      position: fixed; 
-      top: 50%; 
-      left: 50%; 
-      transform: translate(-50%, -50%); 
-      text-align: center; 
-    }
-    .error { 
-      position: fixed; 
-      top: 50%; 
-      left: 50%; 
-      transform: translate(-50%, -50%); 
-      text-align: center; 
-      color: red; 
-      max-width: 80%; 
-    }
+    html,body{height:100%;margin:0;overflow:hidden;font-family:'Microsoft YaHei',Arial,sans-serif}
+    #uv{width:100%;height:100%}
+    .loading{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:1000}
+    .error{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:1000;max-width:80%;padding:40px;background-color:#f8d7da;border:1px solid #f5c6cb;border-radius:8px;color:#721c24}
+    .error h3{margin-top:0;color:#721c24}
+    .error button{margin-top:15px;padding:10px 20px;background:#007cba;color:white;border:none;border-radius:4px;cursor:pointer}
   </style>
 </head>
 <body>
-  <div id="uv">
+  <div id="uv" class="uv">
     <div class="loading">
       <div>正在加载Universal Viewer...</div>
-      <div style="font-size: 12px; color: #666; margin-top: 10px;">请稍候</div>
+      <div style="font-size:12px;color:#666;margin-top:10px;">请稍候</div>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/universalviewer@4.2.1/dist/umd/UV.js"></script>
   <script>
-    // 从URL参数获取manifest ID
-    function getManifestId() {
-      const hash = window.location.hash.substring(1);
-      const params = new URLSearchParams(hash);
-      return params.get('iiifManifestId');
-    }
-
-    // 获取其他参数
-    function getParam(key) {
-      const hash = window.location.hash.substring(1);
-      const params = new URLSearchParams(hash);
-      return params.get(key);
-    }
-
-    // 初始化Universal Viewer
-    function initUV() {
-      const manifestId = getManifestId();
-      const embedded = getParam('embedded') === 'true';
+    // 1) URL 转换函数 - 将直接文件路径转换为 IIIF Image API 格式
+    function convertToIIIFUrl(imageUrl) {
+      // 检查是否已经是 IIIF Image API 格式
+      if (imageUrl.includes('/full/') && imageUrl.includes('/default.jpg')) {
+        return imageUrl; // 已经是正确格式
+      }
       
-      if (!manifestId) {
-        showError('未找到manifest参数');
-        return;
+      // 如果是代理路径，先解码原始URL
+      if (imageUrl.startsWith('/proxy?url=')) {
+        const urlParams = new URLSearchParams(imageUrl.split('?')[1]);
+        imageUrl = decodeURIComponent(urlParams.get('url'));
       }
+      
+      // 提取基础URL和图像路径
+      const baseUrl = imageUrl.split('/iiif/3/')[0];
+      const imagePath = imageUrl.split('/iiif/3/')[1];
+      
+      // 移除文件名部分，只保留目录路径
+      const pathParts = imagePath.split('/');
+      pathParts.pop(); // 移除最后一个元素（文件名）
+      const directoryPath = pathParts.join('/');
+      
+      // URL 编码路径部分
+      const encodedPath = directoryPath.replace(/\//g, '%2F');
+      
+      // 构建完整的 IIIF Image API URL
+      const iiifUrl = `${baseUrl}/iiif/3/${encodedPath}/full/1024,/0/default.jpg`;
+      console.log('URL转换:', imageUrl, '->', iiifUrl);
+      
+      return iiifUrl;
+    }
 
-      console.log('初始化UV查看器，manifest:', manifestId);
-
-      // 确保UV已加载
-      if (typeof window.UV === 'undefined') {
-        showError('UV库未加载');
-        return;
-      }
-
-      try {
-        const uvElement = document.getElementById('uv');
-        if (!uvElement) {
-          showError('UV容器未找到');
-          return;
-        }
-
-        // 清空容器
-        uvElement.innerHTML = '';
-
-        // 使用UV.init方法
-        const uv = window.UV.init(uvElement, {
-          manifest: manifestId,
-          configUri: 'https://universalviewer.io/config.json',
-          embedded: embedded
-        });
-
-        if (uv) {
-          console.log('✅ Universal Viewer初始化成功');
+    // 2) 拦截并重写所有fetch请求
+    function setupRequestInterceptor() {
+      const originalFetch = window.fetch;
+      
+      window.fetch = function(url, options) {
+        console.log('拦截fetch请求:', url);
+        
+        // 如果是manifest请求，尝试重写
+        if (url.includes('manifest.json')) {
+          console.log('检测到manifest请求，开始处理...');
           
-          // 窗口大小变化时重新调整
-          const handleResize = () => {
-            try {
-              if (uv && uv.resize) {
-                uv.resize();
+          return originalFetch(url, options)
+            .then(response => {
+              if (!response.ok) {
+                return response;
               }
-            } catch (e) {
-              console.warn('调整窗口大小时出错:', e);
-            }
-          };
-
-          window.addEventListener('resize', handleResize);
-
-          // 如果是嵌入式，通知父窗口
-          if (embedded && window.parent !== window) {
-            window.parent.postMessage({
-              type: 'uv-loaded',
-              manifestId: manifestId
-            }, '*');
-          }
-        } else {
-          showError('UV初始化失败');
+              
+              return response.json()
+                .then(manifest => {
+                  console.log('Manifest加载成功，开始重写图像URL...');
+                  
+                  // 递归重写manifest中的图像URL
+                  function rewriteImageUrls(obj, path = '') {
+                    if (typeof obj !== 'object' || obj === null) return obj;
+                    
+                    // 检查是否是图像对象
+                    if (obj.type === 'Image' && obj.id && obj.id.includes('.jpg')) {
+                      console.log(`重写图像URL (${path}):`, obj.id);
+                      obj.id = convertToIIIFUrl(obj.id);
+                    }
+                    
+                    // 递归处理所有属性
+                    for (const key in obj) {
+                      if (obj[key] && typeof obj[key] === 'object') {
+                        rewriteImageUrls(obj[key], path ? `${path}.${key}` : key);
+                      } else if (Array.isArray(obj[key])) {
+                        obj[key].forEach((item, index) => {
+                          rewriteImageUrls(item, path ? `${path}.${key}[${index}]` : `${key}[${index}]`);
+                        });
+                      }
+                    }
+                    
+                    return obj;
+                  }
+                  
+                  const rewrittenManifest = rewriteImageUrls(manifest);
+                  console.log('Manifest重写完成');
+                  
+                  return new Response(
+                    JSON.stringify(rewrittenManifest),
+                    {
+                      status: 200,
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                      }
+                    }
+                  );
+                })
+                .catch(error => {
+                  console.error('重写manifest失败:', error);
+                  return response;
+                });
+            })
+            .catch(error => {
+              console.error('manifest请求失败:', error);
+              return Promise.reject(error);
+            });
         }
+        
+        // 如果是直接的图像文件请求，转换为IIIF Image API请求
+        if (url.includes('.jpg') && !url.includes('/full/') && url.includes('/iiif/3/')) {
+          console.log('检测到直接图像请求，转换为IIIF Image API...');
+          const iiifUrl = convertToIIIFUrl(url);
+          console.log('转换后的URL:', iiifUrl);
+          return originalFetch(iiifUrl, options);
+        }
+        
+        // 其他请求直接放行
+        return originalFetch(url, options);
+      };
+      
+      console.log('请求拦截器已设置');
+    }
+
+    // 3) 初始化Universal Viewer
+    function initUV() {
+      try {
+        console.log('=== 开始Universal Viewer初始化 ===');
+        
+        // 设置请求拦截器
+        setupRequestInterceptor();
+        
+        // URL适配器
+        const urlAdapter = new UV.IIIFURLAdapter();
+        console.log('URL适配器初始化完成');
+        
+        // 获取初始数据
+        const data = urlAdapter.getInitialData({ embedded: true });
+        console.log('初始数据:', data);
+        
+        // 初始化Universal Viewer
+        const uv = UV.init("uv", data);
+        console.log('✅ Universal Viewer初始化成功');
+        
+        // 绑定URL适配器
+        urlAdapter.bindTo(uv);
+        console.log('✅ URL适配器绑定完成');
+        
+        console.log('=== Universal Viewer初始化完成 ===');
+        
+        // 窗口大小变化时重新调整
+        window.addEventListener('resize', () => {
+          try {
+            uv.resize();
+          } catch (e) {
+            console.warn('调整窗口大小时出错:', e);
+          }
+        });
+        
+        // 如果是嵌入式，通知父窗口
+        if (window.parent !== window) {
+          window.parent.postMessage({
+            type: 'uv-loaded',
+            manifestId: data.manifest?.id || 'unknown'
+          }, '*');
+        }
+        
       } catch (error) {
-        console.error('UV初始化错误:', error);
-        showError('UV初始化失败: ' + error.message);
+        console.error('❌ Universal Viewer初始化失败:', error);
+        showError('Universal Viewer加载失败: ' + error.message);
       }
     }
 
+    // 4) 显示错误信息
     function showError(message) {
       const uvElement = document.getElementById('uv');
       if (uvElement) {
         uvElement.innerHTML = `
           <div class="error">
-            <h3>❌ 加载失败</h3>
-            <p>${message}</p>
-            <button onclick="window.location.reload()" style="margin-top: 10px; padding: 8px 16px; background: #007cba; color: white; border: none; border-radius: 4px; cursor: pointer;">
-              重新加载
-            </button>
+            <h3>❌ Universal Viewer加载失败</h3>
+            <p><strong>错误:</strong> ${message}</p>
+            <p>请检查浏览器控制台以获取详细错误信息。</p>
+            <button onclick="location.reload()">重新加载页面</button>
           </div>
         `;
       }
     }
 
-    // 等待DOM和UV库加载完成
+    // 5) 等待UV库加载完成
     function waitForUV() {
-      if (typeof window.UV !== 'undefined') {
+      if (typeof window.UV !== 'undefined' && typeof window.UV.IIIFURLAdapter !== 'undefined') {
         initUV();
       } else {
         setTimeout(waitForUV, 100);
       }
     }
 
-    // 页面加载完成后初始化
+    // 6) 启动初始化
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', waitForUV);
     } else {
       waitForUV();
     }
 
-    // 监听来自父窗口的消息
+    // 7) 监听来自父窗口的消息
     window.addEventListener('message', function(event) {
       if (event.data.type === 'reload-uv') {
         console.log('收到重新加载UV的消息');
