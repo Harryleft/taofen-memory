@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UV查看器 - IIIF数字化期刊浏览系统</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/universalviewer@4.2.1/dist/uv.css"/>
+  <style>
+    body { margin: 0; padding: 0; font-family: 'Microsoft YaHei', Arial, sans-serif; }
+    #uv { width: 100vw; height: 100vh; }
+    .loading { 
+      position: fixed; 
+      top: 50%; 
+      left: 50%; 
+      transform: translate(-50%, -50%); 
+      text-align: center; 
+    }
+    .error { 
+      position: fixed; 
+      top: 50%; 
+      left: 50%; 
+      transform: translate(-50%, -50%); 
+      text-align: center; 
+      color: red; 
+      max-width: 80%; 
+    }
+  </style>
+</head>
+<body>
+  <div id="uv">
+    <div class="loading">
+      <div>正在加载Universal Viewer...</div>
+      <div style="font-size: 12px; color: #666; margin-top: 10px;">请稍候</div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/universalviewer@4.2.1/dist/umd/UV.js"></script>
+  <script>
+    // 从URL参数获取manifest ID
+    function getManifestId() {
+      const hash = window.location.hash.substring(1);
+      const params = new URLSearchParams(hash);
+      return params.get('iiifManifestId');
+    }
+
+    // 获取其他参数
+    function getParam(key) {
+      const hash = window.location.hash.substring(1);
+      const params = new URLSearchParams(hash);
+      return params.get(key);
+    }
+
+    // 初始化Universal Viewer
+    function initUV() {
+      const manifestId = getManifestId();
+      const embedded = getParam('embedded') === 'true';
+      
+      if (!manifestId) {
+        showError('未找到manifest参数');
+        return;
+      }
+
+      console.log('初始化UV查看器，manifest:', manifestId);
+
+      // 确保UV已加载
+      if (typeof window.UV === 'undefined') {
+        showError('UV库未加载');
+        return;
+      }
+
+      try {
+        const uvElement = document.getElementById('uv');
+        if (!uvElement) {
+          showError('UV容器未找到');
+          return;
+        }
+
+        // 清空容器
+        uvElement.innerHTML = '';
+
+        // 使用UV.init方法
+        const uv = window.UV.init(uvElement, {
+          manifest: manifestId,
+          configUri: 'https://universalviewer.io/config.json',
+          embedded: embedded
+        });
+
+        if (uv) {
+          console.log('✅ Universal Viewer初始化成功');
+          
+          // 窗口大小变化时重新调整
+          const handleResize = () => {
+            try {
+              if (uv && uv.resize) {
+                uv.resize();
+              }
+            } catch (e) {
+              console.warn('调整窗口大小时出错:', e);
+            }
+          };
+
+          window.addEventListener('resize', handleResize);
+
+          // 如果是嵌入式，通知父窗口
+          if (embedded && window.parent !== window) {
+            window.parent.postMessage({
+              type: 'uv-loaded',
+              manifestId: manifestId
+            }, '*');
+          }
+        } else {
+          showError('UV初始化失败');
+        }
+      } catch (error) {
+        console.error('UV初始化错误:', error);
+        showError('UV初始化失败: ' + error.message);
+      }
+    }
+
+    function showError(message) {
+      const uvElement = document.getElementById('uv');
+      if (uvElement) {
+        uvElement.innerHTML = `
+          <div class="error">
+            <h3>❌ 加载失败</h3>
+            <p>${message}</p>
+            <button onclick="window.location.reload()" style="margin-top: 10px; padding: 8px 16px; background: #007cba; color: white; border: none; border-radius: 4px; cursor: pointer;">
+              重新加载
+            </button>
+          </div>
+        `;
+      }
+    }
+
+    // 等待DOM和UV库加载完成
+    function waitForUV() {
+      if (typeof window.UV !== 'undefined') {
+        initUV();
+      } else {
+        setTimeout(waitForUV, 100);
+      }
+    }
+
+    // 页面加载完成后初始化
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', waitForUV);
+    } else {
+      waitForUV();
+    }
+
+    // 监听来自父窗口的消息
+    window.addEventListener('message', function(event) {
+      if (event.data.type === 'reload-uv') {
+        console.log('收到重新加载UV的消息');
+        initUV();
+      }
+    });
+  </script>
+</body>
+</html>
