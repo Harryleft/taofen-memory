@@ -1,20 +1,37 @@
+import { useState } from 'react';
 import BookstoreTimelineModule from '@/components/bookstore/BookstoreModule.tsx';
-import NewspapersModule from '@/components/newspapers/NewspapersModule.tsx';
-import TabSwitcher from '@/components/common/TabSwitcher.tsx';
+import { NewspapersModule } from '@/components/newspapers/NewspapersModule.tsx';
+import { TabSwitcher } from '@/components/common/TabSwitcher.tsx';
 import AppHeader from '@/components/layout/header/AppHeader.tsx';
 import { AppFooter } from '@/components/layout/footer';
 
 function BookstoreTimelinePage() {
+  const [activeTab, setActiveTab] = useState('bookstore');
+
+  const tabs = [
+    {
+      id: 'bookstore',
+      label: '时光书影',
+      content: <BookstoreTimelineModule />
+    },
+    {
+      id: 'newspapers',
+      label: '数字报刊',
+      content: <NewspapersModule />
+    }
+  ];
+
   return (
     <div className="min-h-screen bookstore-page-container flex flex-col">
       <AppHeader moduleId="bookstore" />
 
       {/* Main Content */}
-      <main className="flex-1">
-        <TabSwitcher>
-          <BookstoreTimelineModule />
-          <NewspapersModule />
-        </TabSwitcher>
+      <main className="flex-1 container mx-auto px-4 py-8">
+        <TabSwitcher 
+          tabs={tabs}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
       </main>
       
       {/* Footer */}

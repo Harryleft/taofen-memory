@@ -1,66 +1,52 @@
-/**
- * @file TabSwitcher.tsx
- * @description 标签页切换组件，用于在书店和报刊功能之间切换
- * @module components/common/TabSwitcher
- */
-
-import React, { useState } from 'react';
+import React from 'react';
 
 interface TabSwitcherProps {
-  children: React.ReactNode;
-  className?: string;
+  tabs: {
+    id: string;
+    label: string;
+    content: React.ReactNode;
+  }[];
+  activeTab: string;
+  onTabChange: (tabId: string) => void;
 }
 
-interface TabItem {
-  id: string;
-  label: string;
-  icon?: string;
-}
-
-const TabSwitcher: React.FC<TabSwitcherProps> = ({ children, className = '' }) => {
-  const [activeTab, setActiveTab] = useState<'bookstore' | 'newspapers'>('bookstore');
-
-  const tabs: TabItem[] = [
-    { id: 'bookstore', label: '时光书影', icon: '📚' },
-    { id: 'newspapers', label: '数字报刊', icon: '📰' }
-  ];
-
+export const TabSwitcher: React.FC<TabSwitcherProps> = ({ 
+  tabs, 
+  activeTab, 
+  onTabChange 
+}) => {
   return (
-    <div className={`tab-switcher ${className}`}>
-      {/* 标签页导航 */}
-      <div className="flex justify-center mb-8">
-        <div className="inline-flex bg-gray-100 rounded-lg p-1">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as 'bookstore' | 'newspapers')}
-              className={`
-                flex items-center gap-2 px-6 py-3 rounded-md font-medium transition-colors
-                ${activeTab === tab.id 
-                  ? 'bg-white text-gray-900 shadow-sm' 
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                }
-              `}
-            >
-              {tab.icon && <span className="text-lg">{tab.icon}</span>}
-              {tab.label}
-            </button>
-          ))}
-        </div>
+    <div className="w-full">
+      {/* 标签导航 */}
+      <div className="flex border-b border-gray-200 mb-6">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            className={`
+              px-6 py-3 text-sm font-medium transition-colors duration-200
+              ${activeTab === tab.id
+                ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50'
+                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+              }
+            `}
+            onClick={() => onTabChange(tab.id)}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
-      {/* 标签页内容 */}
-      <div className="tab-content">
-        {React.Children.map(children, (child, index) => {
-          if (React.isValidElement(child)) {
-            const tabId = tabs[index]?.id;
-            return tabId === activeTab ? child : null;
-          }
-          return null;
-        })}
+      {/* 标签内容 */}
+      <div className="mt-6">
+        {tabs.map((tab) => (
+          <div
+            key={tab.id}
+            className={activeTab === tab.id ? 'block' : 'hidden'}
+          >
+            {tab.content}
+          </div>
+        ))}
       </div>
     </div>
   );
 };
-
-export default TabSwitcher;

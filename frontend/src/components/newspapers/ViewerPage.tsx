@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useParams, Link } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NewspaperService } from './services';
 
 declare global {
@@ -11,8 +11,12 @@ declare global {
   }
 }
 
-export const ViewerPage: React.FC = () => {
-  const { publicationId, issueId } = useParams<{ publicationId: string; issueId: string }>();
+interface ViewerPageProps {
+  publicationId: string;
+  issueId: string;
+}
+
+export const ViewerPage: React.FC<ViewerPageProps> = ({ publicationId, issueId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [manifestUrl, setManifestUrl] = useState<string>('');
@@ -25,7 +29,10 @@ export const ViewerPage: React.FC = () => {
         setLoading(true);
         setError(null);
         
-        const manifestUrl = `https://www.ai4dh.cn/iiif/3/manifests/${publicationId}/${issueId}/manifest.json`;
+        // 根据环境生成manifest URL
+        const manifestUrl = import.meta.env.DEV 
+          ? `/iiif/3/manifests/${publicationId}/${issueId}/manifest.json`
+          : `https://www.ai4dh.cn/iiif/3/manifests/${publicationId}/${issueId}/manifest.json`;
         setManifestUrl(manifestUrl);
         
         const manifest = await NewspaperService.getManifest(`${publicationId}/${issueId}`);
@@ -113,21 +120,8 @@ export const ViewerPage: React.FC = () => {
   }
 
   return (
-    <div className="h-screen flex flex-col">
-      <div className="bg-white border-b border-gray-200 px-4 py-3">
-        <div className="container mx-auto flex items-center justify-between">
-          <Link 
-            to={`/newspapers/${publicationId}/issues`}
-            className="text-blue-500 hover:text-blue-600"
-          >
-            ← 返回期数列表
-          </Link>
-          <h1 className="text-lg font-semibold text-gray-900">报刊查看器</h1>
-          <div></div>
-        </div>
-      </div>
-      
-      <div id="uv" className="flex-1 bg-gray-100">
+    <div className="h-screen">
+      <div id="uv" className="w-full h-full">
         <div className="flex items-center justify-center h-full">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
