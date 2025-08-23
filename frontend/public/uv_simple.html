@@ -40,13 +40,15 @@
       const baseUrl = imageUrl.split('/iiif/3/')[0];
       const imagePath = imageUrl.split('/iiif/3/')[1];
       
-      // 移除文件名部分，只保留目录路径
-      const pathParts = imagePath.split('/');
-      pathParts.pop(); // 移除最后一个元素（文件名）
-      const directoryPath = pathParts.join('/');
+      // 保留完整路径，只移除文件扩展名
+      const lastSlashIndex = imagePath.lastIndexOf('/');
+      const directoryPath = imagePath.substring(0, lastSlashIndex);
+      const fileName = imagePath.substring(lastSlashIndex + 1);
+      const fileNameWithoutExt = fileName.replace(/\.[^/.]+$/, ''); // 移除扩展名
+      const fullPath = directoryPath ? `${directoryPath}/${fileNameWithoutExt}` : fileNameWithoutExt;
       
       // URL 编码路径部分
-      const encodedPath = directoryPath.replace(/\//g, '%2F');
+      const encodedPath = fullPath.replace(/\//g, '%2F');
       
       // 构建完整的 IIIF Image API URL
       const iiifUrl = `${baseUrl}/iiif/3/${encodedPath}/full/1024,/0/default.jpg`;
