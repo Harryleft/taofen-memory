@@ -4,32 +4,102 @@ import { IIIFCollection, IIIFManifest } from './iiifTypes';
 // 在生产环境中使用完整URL
 const BASE_URL = import.meta.env.DEV ? '/iiif' : 'https://www.ai4dh.cn/iiif';
 
+// 代理函数用于处理CORS
+async function fetchWithProxy(url: string): Promise<Response> {
+  // 如果是本地开发环境且是外部URL，使用代理
+  if (import.meta.env.DEV && url.startsWith('https://')) {
+    const proxyUrl = `/proxy?url=${encodeURIComponent(url)}`;
+    console.log('使用代理:', proxyUrl);
+    return fetch(proxyUrl);
+  }
+  
+  // 直接获取
+  return fetch(url);
+}
+
+export interface PublicationItem {
+  i: number;
+  id: string;
+  collection: string;
+  title: string;
+  name: string;
+  issueCount: number;
+  lastUpdated: string | null;
+}
+
+export interface IssueItem {
+  i: number;
+  manifest: string;
+  title: string;
+  summary: string;
+}
+
 export class NewspaperService {
-  static async getPublications(): Promise<IIIFCollection> {
+  static async getPublications(): Promise<PublicationItem[]> {
+    // 加载顶级刊物集合
+    const url = 'https://www.ai4dh.cn/iiif/3/manifests/collection.json';
+    
     try {
-      const response = await fetch(`${BASE_URL}/manifests/collection.json`);
+      const response = await fetchWithProxy(url);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      return await response.json();
-    } catch (error) {
-      console.error('Failed to fetch publications:', error);
-      throw error;
+      const col = await response.json();
+      
+      const publications = (col.items || []).map((it: any, i: number) => ({
+        i, 
+        id: it.id,
+        collection: it.id,
+        title: (it.label?.zh?.[0]) || (it.label?.['zh-CN']?.[0]) || (it.label?.en?.[0]) || '未知刊物',
+        name: (it.label?.zh?.[0]) || (it.label?.['zh-CN']?.[0]) || (it.label?.en?.[0]) || '未知刊物',
+        issueCount: 0, // 将在后续加载时填充
+        lastUpdated: null // 将在后续加载时填充
+      }));
+      
+      // 异步获取每个刊物的期数信息
+      await Promise.all(publications.map(async (pub, index) => {
+        try {
+          const issues = await this.getIssuesForPublication(pub.collection);
+          publications[index].issueCount = issues.length;
+          // 从第一个期数中获取日期信息
+          if (issues.length > 0) {
+            publications[index].lastUpdated = issues[0].title || issues[0].summary;
+          }
+        } catch (e) {
+          console.warn(`无法获取刊物 ${pub.title} 的期数信息:`, e);
+        }
+      }));
+      
+      return publications;
+    } catch (e) { 
+      console.error('加载刊物列表失败:', e);
+      return []; 
     }
   }
-
-  static async getIssues(publicationId: string): Promise<IIIFCollection> {
+  
+  static async getIssuesForPublication(collectionUrl: string): Promise<IssueItem[]> {
+    let url = collectionUrl;
+    
+    // 如果是相对路径，添加基础URL
+    if (!url.startsWith('http')) {
+      url = `${BASE_URL}/${url.replace(/^\//, '')}`;
+    }
+    
     try {
-      // 对publicationId进行URL编码，确保特殊字符正确处理
-      const encodedPublicationId = encodeURIComponent(publicationId);
-      const response = await fetch(`${BASE_URL}/3/manifests/${encodedPublicationId}/collection.json`);
+      const response = await fetchWithProxy(url);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      return await response.json();
-    } catch (error) {
-      console.error('Failed to fetch issues:', error);
-      throw error;
+      const col = await response.json();
+      return (col.items || []).map((it: any, i: number) => ({
+        i, 
+        manifest: it.id,
+        title: (it.label?.['zh-CN']?.[0]) || (it.label?.zh?.[0]) || (it.label?.en?.[0]) || '未知期刊',
+        summary: (it.summary?.['zh-CN']?.[0]) || (it.summary?.zh?.[0]) || (it.summary?.en?.[0]) || ''
+      }));
+    } catch (e) { 
+      console.error('加载目录失败:', e);
+      return []; 
     }
   }
 
@@ -56,5 +126,50 @@ export class NewspaperService {
   static extractIssueId(manifestUrl: string): string {
     const match = manifestUrl.match(/([^/]+)\/manifest\.json$/);
     return match ? match[1] : '';
+  }
+
+  // 搜索功能
+  static filterPublications(
+    publications: PublicationItem[], 
+    searchTerm: string, 
+    sortBy: 'name' | 'date' | 'count' = 'name'
+  ): PublicationItem[] {
+    let filtered = [...publications];
+    
+    // 搜索过滤
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter(pub => 
+        pub.title.toLowerCase().includes(term) ||
+        pub.name.toLowerCase().includes(term)
+      );
+    }
+    
+    // 排序
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'name':
+          return a.title.localeCompare(b.title, 'zh-CN');
+        case 'count':
+          return b.issueCount - a.issueCount;
+        case 'date':
+          // 按最后更新时间排序（如果有）
+          if (!a.lastUpdated) return 1;
+          if (!b.lastUpdated) return -1;
+          return a.lastUpdated.localeCompare(b.lastUpdated, 'zh-CN');
+        default:
+          return 0;
+      }
+    });
+    
+    return filtered;
+  }
+
+  // 获取代理URL
+  static getProxyUrl(url: string): string {
+    if (import.meta.env.DEV && url.startsWith('https://')) {
+      return `/proxy?url=${encodeURIComponent(url)}`;
+    }
+    return url;
   }
 }
