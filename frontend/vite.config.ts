@@ -20,6 +20,18 @@ export default defineConfig({
         target: 'https://www.ai4dh.cn',
         changeOrigin: true,
         secure: true
+      },
+      // 将 /proxy 请求代理到对应的URL
+      '/proxy': {
+        target: 'https://www.ai4dh.cn',
+        changeOrigin: true,
+        secure: true,
+        rewrite: (path) => {
+          // 从 /proxy?url=https://www.ai4dh.cn/iiif/... 中提取实际URL
+          const urlParams = new URLSearchParams(path.split('?')[1]);
+          const actualUrl = urlParams.get('url');
+          return actualUrl || path;
+        }
       }
     }
   },
