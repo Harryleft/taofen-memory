@@ -16,7 +16,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { BookItem } from '@/types/bookTypes';
 import { downloadCSV } from '@/utils/bookUtils';
-import { TabSwitcher } from '@/components/common/TabSwitcher';
 import { NewspaperService, PublicationItem } from '@/components/newspapers/services';
 import { NewspaperCard } from '@/components/newspapers/NewspaperCard';
 import { IssueCard } from '@/components/newspapers/IssueCard';
@@ -298,17 +297,29 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
   // 报刊标签内容
   const newspapersContent = (
     <>
+      {/* 报刊内容头部 */}
+      <div className="mb-8">
+        <button 
+          onClick={() => setActiveTab('books')}
+          className="text-blue-500 hover:text-blue-600 mb-4 inline-block"
+        >
+          ← 返回书籍
+        </button>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">数字报刊</h1>
+        <p className="text-gray-600">浏览历史报刊资料</p>
+      </div>
+
       {selectedPublication ? (
         <>
           {/* 期数列表头部 */}
-          <div className="mb-8">
+          <div className="mb-6">
             <button 
               onClick={handleBackToPublications}
               className="text-blue-500 hover:text-blue-600 mb-4 inline-block"
             >
               ← 返回刊物列表
             </button>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">{selectedPublication.title}</h1>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">{selectedPublication.title}</h2>
             <p className="text-gray-600">选择期数进行浏览</p>
           </div>
 
@@ -354,15 +365,6 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
         </>
       ) : (
         <>
-          {/* 报刊封面卡 */}
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg p-8 mb-8">
-            <h1 className="text-3xl font-bold mb-2">数字报刊</h1>
-            <p className="text-blue-100">浏览历史报刊资料</p>
-            <div className="mt-4 text-2xl font-bold">
-              共 {publications.length} 种刊物
-            </div>
-          </div>
-
           {/* 报刊网格 */}
           {newspapersLoading ? (
             <div className="flex flex-col items-center justify-center p-12 text-center">
@@ -416,29 +418,12 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
     </>
   );
 
-  // 标签页配置
-  const tabs = [
-    {
-      id: 'books',
-      label: '书籍',
-      content: booksContent
-    },
-    {
-      id: 'newspapers',
-      label: '报刊',
-      content: newspapersContent
-    }
-  ];
-
+  
   return (
     <section className={`relative py-20 ${className}`}>
       <div className="max-w-7xl mx-auto px-6">
-        {/* 标签切换器 */}
-        <TabSwitcher
-          tabs={tabs}
-          activeTab={activeTab}
-          onTabChange={(tabId) => setActiveTab(tabId as 'books' | 'newspapers')}
-        />
+        {/* 根据当前标签显示对应内容 */}
+        {activeTab === 'books' ? booksContent : newspapersContent}
       </div>
 
       {/* 书籍详情灯箱 */}
