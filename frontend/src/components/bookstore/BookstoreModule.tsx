@@ -135,7 +135,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
       setIssuesError(null);
       setSelectedPublication(publication);
       
-      // 直接使用 publication.collection，它已经是完整的collection URL
+      // publication.collection 已经是完整的 collection URL
       const issuesData = await NewspaperService.getIssuesForPublication(publication.collection);
       
       // 转换为 IIIFCollectionItem 格式
