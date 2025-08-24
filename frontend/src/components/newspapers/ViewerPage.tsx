@@ -25,6 +25,7 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({
   const [issuesLoading, setIssuesLoading] = useState(false);
   const [currentPublicationId, setCurrentPublicationId] = useState<string>(publicationId);
   const [currentIssueId, setCurrentIssueId] = useState<string>(issueId);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
@@ -245,13 +246,21 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({
 
   return (
     <div className="h-screen bg-white flex">
-      {/* 左侧主视图区域 - 70%宽度 */}
-      <div className="w-[70%] h-full flex flex-col border-r border-gray-300">
+      {/* 左侧主视图区域 - 动态宽度 */}
+      <div className={`${sidebarCollapsed ? 'w-full' : 'w-[70%]'} h-full flex flex-col ${!sidebarCollapsed ? 'border-r border-gray-300' : ''}`}>
         {/* 顶部工具栏 */}
         <div className="bg-gray-100 border-b border-gray-300 p-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button className="text-blue-600 hover:text-blue-800 font-medium">
               ← 返回书籍
+            </button>
+          </div>
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              className="text-gray-600 hover:text-gray-800 font-medium"
+            >
+              {sidebarCollapsed ? '展开侧栏' : '收起侧栏'}
             </button>
           </div>
         </div>
@@ -279,14 +288,16 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({
         </div>
       </div>
       
-      {/* 右侧抽屉组件 */}
-      <IssueDrawer
-        publicationTitle={publicationTitle}
-        issues={issues}
-        selectedIssue={selectedIssue}
-        onIssueSelect={handleIssueSelect}
-        loading={issuesLoading}
-      />
+      {/* 右侧抽屉组件 - 可收起 */}
+      {!sidebarCollapsed && (
+        <IssueDrawer
+          publicationTitle={publicationTitle}
+          issues={issues}
+          selectedIssue={selectedIssue}
+          onIssueSelect={handleIssueSelect}
+          loading={issuesLoading}
+        />
+      )}
     </div>
   );
 };
