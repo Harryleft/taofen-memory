@@ -312,15 +312,18 @@ export const NewspapersProvider: React.FC<NewspapersProviderProps> = ({ children
     };
   }, []);
 
+  // 使用useMemo优化actions对象
+  const memoizedActions = React.useMemo(() => ({
+    ...actions,
+    loadPublications,
+    loadIssues,
+    loadManifest,
+    filterAndSortPublications
+  }), [actions, loadPublications, loadIssues, loadManifest, filterAndSortPublications]);
+
   const contextValue: NewspapersContextType = {
     state,
-    actions: {
-      ...actions,
-      loadPublications,
-      loadIssues,
-      loadManifest,
-      filterAndSortPublications
-    }
+    actions: memoizedActions
   };
 
   return (

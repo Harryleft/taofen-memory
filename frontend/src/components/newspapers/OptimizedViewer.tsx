@@ -46,29 +46,7 @@ export const OptimizedViewer: React.FC<OptimizedViewerProps> = ({ className = ''
     }, 100);
   }, [loadIframe]);
 
-  // 处理期数切换
-  const handleIssueSelect = useCallback(async (issue: IssueItem) => {
-    try {
-      actions.setLoading(true);
-      actions.setError(null);
-      
-      // 更新选择的期数
-      actions.selectIssue(issue);
-      
-      // 加载新的manifest
-      if (selectedPublication) {
-        const publicationId = NewspaperService.extractPublicationId(selectedPublication.id);
-        const issueId = NewspaperService.extractIssueId(issue.manifest);
-        await actions.loadManifest(publicationId, issueId);
-      }
-      
-    } catch (err) {
-      actions.setError(err instanceof Error ? err.message : '切换期数失败');
-    } finally {
-      actions.setLoading(false);
-    }
-  }, [actions, selectedPublication]);
-
+  
   // 监听来自iframe的消息
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
