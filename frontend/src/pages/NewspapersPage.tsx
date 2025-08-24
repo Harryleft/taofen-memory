@@ -1,8 +1,8 @@
 import React from 'react';
-import NewspaperListPage from '../components/newspapers/NewspaperListPage';
+import { NewspapersIntegratedLayout } from '../components/newspapers/NewspapersIntegratedLayout';
 
 const NewspapersPage: React.FC = () => {
-  return <NewspaperListPage />;
+  return <NewspapersIntegratedLayout />;
 };
 
 export default NewspapersPage;
