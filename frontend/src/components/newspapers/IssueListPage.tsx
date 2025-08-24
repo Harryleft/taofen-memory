@@ -32,7 +32,7 @@ export const IssueListPage: React.FC = () => {
         const issues = await NewspaperService.getIssuesForPublication(publication.collection);
         
         // 为了保持与现有代码的兼容性，我们需要将IssueItem[]转换为IIIFCollectionItem[]
-        const mockCollection: any = {
+        const mockCollection = {
           items: issues.map(issue => ({
             id: issue.id,
             manifest: issue.manifest, // 保留manifest字段
