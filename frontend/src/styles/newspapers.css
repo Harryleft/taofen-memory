@@ -557,24 +557,6 @@
    工具类
    ================================================ */
 
-.newspapers-hide-on-mobile {
-  display: block;
-}
-
-.newspapers-show-on-mobile {
-  display: none;
-}
-
-@media (max-width: 768px) {
-  .newspapers-hide-on-mobile {
-    display: none;
-  }
-  
-  .newspapers-show-on-mobile {
-    display: block;
-  }
-}
-
 /* 确保文本可读性 */
 .newspapers-truncate {
   overflow: hidden;

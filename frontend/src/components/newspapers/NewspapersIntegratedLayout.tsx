@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { NewspaperService, PublicationItem, IssueItem } from './services';
 import AppHeader from '@/components/layout/header/AppHeader.tsx';
-import { NewspapersMobileLayout } from './NewspapersMobileLayout';
 
 interface NewspapersIntegratedLayoutProps {
   onPublicationSelect?: (publicationId: string, publicationTitle: string) => void;
@@ -12,30 +11,6 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
   onPublicationSelect,
   onIssueSelect
 }) => {
-  const [isMobile, setIsMobile] = useState(false);
-
-  // 检测移动端
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  // 移动端使用专用布局
-  if (isMobile) {
-    return (
-      <NewspapersMobileLayout
-        onPublicationSelect={onPublicationSelect}
-        onIssueSelect={onIssueSelect}
-      />
-    );
-  }
-
-  // 桌面端使用一体化布局
   // 简化的状态管理 - 只保留必要状态
   const [publications, setPublications] = useState<PublicationItem[]>([]);
   const [selectedPublication, setSelectedPublication] = useState<PublicationItem | null>(null);
@@ -45,8 +20,24 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
   const [error, setError] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [manifestUrl, setManifestUrl] = useState<string>('');
+  const [isMobile, setIsMobile] = useState(false);
   
   const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // 检测移动端和响应式处理
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      if (mobile) {
+        setSidebarOpen(false);
+      }
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // 加载刊物列表 - 简化为单一数据源
   useEffect(() => {
@@ -108,15 +99,11 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
     try {
       const issueId = NewspaperService.extractIssueId(issue.manifest);
       
-      // 构建完整的manifest URL
-      let fullManifestUrl;
-      if (issue.manifest.startsWith('http')) {
-        fullManifestUrl = issue.manifest;
-      } else {
-        fullManifestUrl = `https://www.ai4dh.cn/iiif/3/manifests/${publicationId}/${issueId}/manifest.json`;
-      }
+      // 直接构建manifest URL，消除特殊情况
+      const fullManifestUrl = issue.manifest.startsWith('http') 
+        ? issue.manifest 
+        : `https://www.ai4dh.cn/iiif/3/manifests/${publicationId}/${issueId}/manifest.json`;
       
-      // 使用代理URL
       const proxyManifestUrl = NewspaperService.getProxyUrl(fullManifestUrl);
       setManifestUrl(proxyManifestUrl);
       
@@ -184,18 +171,7 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [issues, selectedIssue, handleIssueSelect]);
 
-  // 移动端自动关闭侧边栏
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth <= 768) {
-        setSidebarOpen(false);
-      }
-    };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  // 移动端自动关闭侧边栏逻辑已整合到主检测函数中
 
   // 错误状态处理
   if (error) {
@@ -277,13 +253,15 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
           {/* 顶部工具栏 - 简化为核心控制 */}
           <div className="newspapers-toolbar">
             <div className="newspapers-toolbar__left">
-              <button
-                onClick={() => setSidebarOpen(true)}
-                className="newspapers-sidebar-toggle newspapers-show-on-mobile"
-                aria-label="打开侧边栏"
-              >
-                ☰
-              </button>
+              {isMobile && (
+                <button
+                  onClick={() => setSidebarOpen(true)}
+                  className="newspapers-sidebar-toggle"
+                  aria-label="打开侧边栏"
+                >
+                  ☰
+                </button>
+              )}
               
               {selectedPublication && (
                 <div className="newspapers-issue-selector">
@@ -314,8 +292,8 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
             </div>
             
             <div className="newspapers-toolbar__right">
-              {issues.length > 1 && selectedIssue && (
-                <div className="newspapers-issue-nav newspapers-hide-on-mobile">
+              {issues.length > 1 && selectedIssue && !isMobile && (
+                <div className="newspapers-issue-nav">
                   <button
                     onClick={() => {
                       const currentIndex = issues.findIndex(issue => issue.manifest === selectedIssue.manifest);
@@ -343,13 +321,15 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
                 </div>
               )}
               
-              <button
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="newspapers-sidebar-toggle newspapers-hide-on-mobile"
-                aria-label={sidebarOpen ? "关闭侧边栏" : "打开侧边栏"}
-              >
-                {sidebarOpen ? '◀' : '▶'}
-              </button>
+              {!isMobile && (
+                <button
+                  onClick={() => setSidebarOpen(!sidebarOpen)}
+                  className="newspapers-sidebar-toggle"
+                  aria-label={sidebarOpen ? "关闭侧边栏" : "打开侧边栏"}
+                >
+                  {sidebarOpen ? '◀' : '▶'}
+                </button>
+              )}
             </div>
           </div>
           
@@ -363,12 +343,14 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
                   <p className="newspapers-empty__message">
                     请从左侧选择一个刊物开始浏览
                   </p>
-                  <button
-                    onClick={() => setSidebarOpen(true)}
-                    className="btn-newspapers newspapers-show-on-mobile"
-                  >
-                    选择刊物
-                  </button>
+                  {isMobile && (
+                    <button
+                      onClick={() => setSidebarOpen(true)}
+                      className="btn-newspapers"
+                    >
+                      选择刊物
+                    </button>
+                  )}
                 </div>
               </div>
             ) : (
