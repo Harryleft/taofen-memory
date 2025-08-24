@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Download, Calendar, ChevronDown } from 'lucide-react';
+import { Search, Download, Calendar, ChevronDown, Newspaper } from 'lucide-react';
 
 /**
  * @interface BookFiltersPanelProps
@@ -30,6 +30,8 @@ interface BookstoreFiltersProps {
   setSelectedYear: (year: string) => void;
   uniqueYears: number[];
   onDownload: () => void;
+  activeTab?: 'books' | 'newspapers';
+  onTabChange?: (tabId: 'books' | 'newspapers') => void;
 }
 
 /**
@@ -47,6 +49,8 @@ const BookFiltersPanel: React.FC<BookstoreFiltersProps> = ({
   setSelectedYear,
   uniqueYears,
   onDownload,
+  activeTab = 'books',
+  onTabChange,
 }) => {
   const [yearDropdownOpen, setYearDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -148,6 +152,15 @@ const BookFiltersPanel: React.FC<BookstoreFiltersProps> = ({
           </div>
         </div>
       </div>
+
+      <button
+        onClick={() => onTabChange?.('newspapers')}
+        className={`bookstore-download-button ${activeTab === 'newspapers' ? 'bg-blue-100 text-blue-700 border-blue-300' : ''}`}
+        title="查看数字报刊"
+      >
+        <Newspaper size={18} className="mr-2" />
+        <span>数字报刊</span>
+      </button>
 
       <button
         onClick={onDownload}

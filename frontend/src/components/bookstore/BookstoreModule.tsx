@@ -258,6 +258,8 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
         setSelectedYear={setSelectedYear}
         uniqueYears={uniqueYears}
         onDownload={() => downloadCSV(allData)}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
       />
 
       {/* 书籍网格 - 瀑布流布局 */}
