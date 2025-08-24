@@ -131,6 +131,12 @@ export class NewspaperService {
   }
 
   static extractIssueId(manifestUrl: string): string {
+    // 如果是完整的URL，提取最后的ID部分
+    if (manifestUrl.startsWith('http')) {
+      const match = manifestUrl.match(/([^/]+)\/manifest\.json$/);
+      return match ? match[1] : '';
+    }
+    // 如果是相对路径，直接提取
     const match = manifestUrl.match(/([^/]+)\/manifest\.json$/);
     return match ? match[1] : '';
   }
