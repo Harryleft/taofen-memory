@@ -90,7 +90,14 @@
       "Bash(rg:*)",
       "mcp__filesystem__read_text_file",
       "Bash(mkdir:*)",
-      "Bash(git log:*)"
+      "Bash(git log:*)",
+      "WebSearch",
+      "Bash(npm search:*)",
+      "Bash(claude mcp remove:*)",
+      "Bash(uvx:*)",
+      "Read(/C:\\Users\\afkxw/**)",
+      "Bash(npm info:*)",
+      "mcp__sequential-thinking__sequentialthinking"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",

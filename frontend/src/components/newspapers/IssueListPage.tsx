@@ -77,7 +77,7 @@ export const IssueListPage: React.FC = () => {
           <p className="text-red-600 mb-4">加载失败: {error}</p>
           <button 
             onClick={() => window.location.reload()}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            className="btn-newspapers px-4 py-2 rounded"
           >
             重试
           </button>

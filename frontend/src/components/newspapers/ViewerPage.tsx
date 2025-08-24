@@ -229,7 +229,7 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({
           </div>
           <button 
             onClick={reloadViewer}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mr-4"
+            className="btn-newspapers px-4 py-2 rounded mr-4"
           >
             重新加载查看器
           </button>
