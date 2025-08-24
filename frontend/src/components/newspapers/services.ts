@@ -28,7 +28,7 @@ export interface IssueItem {
 
 export class NewspaperService {
   static async getPublications(): Promise<PublicationItem[]> {
-    const collectionUrl = this.buildCollectionUrl('collection.json');
+    const collectionUrl = this.buildCollectionUrl('collection');
     
     try {
       const response = await fetchWithProxy(collectionUrl);
@@ -125,7 +125,7 @@ export class NewspaperService {
   // 简化的getIssues方法 - 基于publicationId获取期数
   static async getIssues(publicationId: string): Promise<IssueItem[]> {
     try {
-      const collectionUrl = this.buildCollectionUrl(`${publicationId}/collection.json`);
+      const collectionUrl = this.buildCollectionUrl(`${publicationId}/collection`);
       return await this.getIssuesForPublication(collectionUrl);
     } catch (error) {
       console.error('Failed to get issues:', error);
