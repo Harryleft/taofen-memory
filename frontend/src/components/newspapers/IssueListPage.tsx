@@ -19,9 +19,36 @@ export const IssueListPage: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        const collection = await NewspaperService.getIssues(publicationId);
-        setIssues(collection.items || []);
-        setPublicationTitle(collection.label.zh?.[0] || collection.label.en?.[0] || '');
+        
+        // 首先获取完整的publication信息，包括collection URL
+        const publications = await NewspaperService.getPublications();
+        const publication = publications.find(pub => pub.id === publicationId);
+        
+        if (!publication) {
+          throw new Error(`未找到刊物: ${publicationId}`);
+        }
+        
+        // 使用publication.collection（完整的collection URL）
+        const issues = await NewspaperService.getIssuesForPublication(publication.collection);
+        
+        // 为了保持与现有代码的兼容性，我们需要将IssueItem[]转换为IIIFCollectionItem[]
+        const mockCollection: any = {
+          items: issues.map(issue => ({
+            id: issue.id,
+            manifest: issue.manifest, // 保留manifest字段
+            type: "Manifest",
+            label: {
+              zh: [issue.title],
+              en: [issue.title]
+            }
+          }))
+        };
+        
+        console.log('🔍 [调试] 获取到的issues:', issues);
+        console.log('🔍 [调试] 第一个issue:', issues[0]);
+        
+        setIssues(mockCollection.items || []);
+        setPublicationTitle(publication.title);
       } catch (err) {
         setError(err instanceof Error ? err.message : '加载失败');
       } finally {
@@ -81,11 +108,14 @@ export const IssueListPage: React.FC = () => {
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
           {issues.map((issue) => {
-            const issueId = NewspaperService.extractIssueId(issue.id);
+            console.log('🔍 [调试] 处理issue:', issue);
+            console.log('🔍 [调试] issue.manifest:', issue.manifest);
+            const issueId = NewspaperService.extractIssueId(issue.manifest);
+            console.log('🔍 [调试] 提取的issueId:', issueId);
             return (
               <Link 
                 key={issue.id} 
-                to={`/newspapers/${publicationId}/issues/${issueId}/viewer`}
+                to={`/newspaper/${publicationId}/issues/${issueId}/viewer`}
                 className="block"
               >
                 <IssueCard 
@@ -101,3 +131,5 @@ export const IssueListPage: React.FC = () => {
     </div>
   );
 };
+
+export default IssueListPage;
