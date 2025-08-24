@@ -148,15 +148,34 @@ export const NewspapersModule: React.FC<NewspapersModuleProps> = ({
     const publicationId = NewspaperService.extractPublicationId(selectedPublication.collection);
     const issueId = NewspaperService.extractIssueId(selectedIssue.manifest);
     
+    // 处理期数选择
+    const handleViewerIssueSelect = (issue: IssueItem) => {
+      setSelectedIssue(issue);
+      const newIssueId = NewspaperService.extractIssueId(issue.manifest);
+      if (onIssueSelect) {
+        onIssueSelect(newIssueId);
+      }
+    };
+
+    // 处理期数预览
+    const handleViewerIssuePreview = (issue: IssueItem) => {
+      setSelectedIssue(issue);
+      const newIssueId = NewspaperService.extractIssueId(issue.manifest);
+      if (onIssueSelect) {
+        onIssueSelect(newIssueId);
+      }
+    };
+    
     return (
       <div className="h-screen">
-        <button
-          onClick={handleBackToCatalog}
-          className="fixed top-4 left-4 z-50 bg-white text-blue-500 px-4 py-2 rounded-lg shadow-lg hover:bg-gray-50"
-        >
-          ← 返回期刊目录
-        </button>
-        <ViewerPage publicationId={publicationId} issueId={issueId} />
+        <ViewerPage 
+          publicationId={publicationId} 
+          issueId={issueId}
+          publicationTitle={selectedPublication.title}
+          allIssues={issues}
+          onIssueSelect={handleViewerIssueSelect}
+          onIssuePreview={handleViewerIssuePreview}
+        />
       </div>
     );
   }
