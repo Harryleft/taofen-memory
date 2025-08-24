@@ -28,7 +28,7 @@ export interface IssueItem {
 
 export class NewspaperService {
   static async getPublications(): Promise<PublicationItem[]> {
-    const collectionUrl = this.buildCollectionUrl('collection');
+    const collectionUrl = this.buildProxyUrl('https://www.ai4dh.cn/iiif/3/manifests/collection.json');
     
     try {
       const response = await fetchWithProxy(collectionUrl);
@@ -96,8 +96,8 @@ export class NewspaperService {
 
   static async getManifest(manifestId: string): Promise<IIIFManifest> {
     try {
-      // 使用简化的URL构建
-      const manifestUrl = this.buildManifestUrl(manifestId);
+      // 直接构建完整的manifest URL
+      const manifestUrl = this.buildProxyUrl(`https://www.ai4dh.cn/iiif/3/manifests/${manifestId}/manifest.json`);
       
       const response = await fetchWithProxy(manifestUrl);
       if (!response.ok) {
@@ -125,7 +125,7 @@ export class NewspaperService {
   // 简化的getIssues方法 - 基于publicationId获取期数
   static async getIssues(publicationId: string): Promise<IssueItem[]> {
     try {
-      const collectionUrl = this.buildCollectionUrl(`${publicationId}/collection`);
+      const collectionUrl = this.buildProxyUrl(`https://www.ai4dh.cn/iiif/3/manifests/${publicationId}/collection.json`);
       return await this.getIssuesForPublication(collectionUrl);
     } catch (error) {
       console.error('Failed to get issues:', error);
@@ -133,17 +133,17 @@ export class NewspaperService {
     }
   }
 
-  // Linus式简化的URL构建方法
-  private static buildManifestUrl(path: string): string {
-    const baseUrl = 'https://www.ai4dh.cn/iiif/3';
-    const url = `${baseUrl}/manifests/${path}/manifest.json`;
-    return this.getProxyUrl(url);
-  }
-
-  private static buildCollectionUrl(path: string): string {
-    const baseUrl = 'https://www.ai4dh.cn/iiif/3';
-    const url = `${baseUrl}/manifests/${path}/collection.json`;
-    return this.getProxyUrl(url);
+  // Linus式简化的代理URL构建 - 直接使用完整URL
+  private static buildProxyUrl(url: string): string {
+    if (!url) return '';
+    
+    // 开发环境使用代理
+    if (import.meta.env.DEV && url.startsWith('https://')) {
+      return `/proxy?url=${encodeURIComponent(url)}`;
+    }
+    
+    // 生产环境直接返回原URL
+    return url;
   }
 
   // 简化的搜索功能
@@ -184,14 +184,6 @@ export class NewspaperService {
 
   // Linus式简化的代理URL获取 - 消除特殊情况
   static getProxyUrl(url: string): string {
-    if (!url) return '';
-    
-    // 开发环境使用代理
-    if (import.meta.env.DEV && url.startsWith('https://')) {
-      return `/proxy?url=${encodeURIComponent(url)}`;
-    }
-    
-    // 生产环境直接返回原URL
-    return url;
+    return this.buildProxyUrl(url);
   }
 }
