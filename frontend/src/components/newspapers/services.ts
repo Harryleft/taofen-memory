@@ -47,8 +47,13 @@ export class NewspaperService {
       const col = await response.json();
       
       const publications = (col.items || []).map((it: any, i: number) => {
+        // 调试信息：检查item.id的实际内容
+        console.log(`🔍 [调试] item ${i}:`, it.id);
+        
         // 从完整的collection URL中提取刊物ID
         const collectionId = it.id.match(/([^/]+)\/collection\.json$/)?.[1] || it.id;
+        
+        console.log(`🔍 [调试] 提取的collectionId:`, collectionId);
         
         return {
           i, 
