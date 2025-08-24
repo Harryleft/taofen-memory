@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { NewspaperService, PublicationItem, IssueItem } from './services';
+import { IIIFUrlBuilder } from './iiifUrlBuilder';
 import AppHeader from '@/components/layout/header/AppHeader.tsx';
 
 interface NewspapersIntegratedLayoutProps {
@@ -85,39 +86,30 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
     }
   }, [onPublicationSelect]);
 
-  // 加载查看器 - 修复URL构建逻辑
+  // 加载查看器 - 使用新的URL构建工具
   const loadViewer = useCallback(async (issue: IssueItem, publicationId: string) => {
     try {
       console.log('Debug: Loading viewer for issue:', issue);
       console.log('Debug: publicationId =', publicationId);
       console.log('Debug: issue.manifest =', issue.manifest);
       
-      let fullManifestUrl;
-      
-      // 检查issue.manifest的类型
-      if (issue.manifest.includes('collection.json')) {
-        // 如果是collection.json，需要提取真正的manifest ID
+      // 使用统一的URL构建工具
+      let manifestUrl;
+      try {
+        // 首先尝试直接使用issue.manifest作为完整URL
+        const components = IIIFUrlBuilder.parse(issue.manifest);
+        manifestUrl = IIIFUrlBuilder.build(components, { proxy: true });
+      } catch (error) {
+        // 如果解析失败，构建新的URL
         const issueId = NewspaperService.extractIssueId(issue.manifest);
-        console.log('Debug: Extracted issueId from collection.json =', issueId);
-        fullManifestUrl = `https://www.ai4dh.cn/iiif/3/manifests/${publicationId}/${issueId}/manifest.json`;
-      } else if (issue.manifest.startsWith('http')) {
-        // 如果已经是完整的manifest URL，直接使用
-        console.log('Debug: Using full manifest URL');
-        fullManifestUrl = issue.manifest;
-      } else {
-        // 如果是manifest ID，构建完整URL
-        console.log('Debug: Building manifest URL from ID');
-        fullManifestUrl = `https://www.ai4dh.cn/iiif/3/manifests/${publicationId}/${issue.manifest}/manifest.json`;
+        manifestUrl = IIIFUrlBuilder.buildManifest(`${publicationId}/${issueId}`, { proxy: true });
       }
       
-      console.log('Debug: Final manifest URL =', fullManifestUrl);
-      
-      const proxyManifestUrl = NewspaperService.getProxyUrl(fullManifestUrl);
-      console.log('Debug: Proxy manifest URL =', proxyManifestUrl);
-      setManifestUrl(proxyManifestUrl);
+      console.log('Debug: Final manifest URL =', manifestUrl);
+      setManifestUrl(manifestUrl);
       
       // 验证manifest是否可访问
-      const response = await fetch(proxyManifestUrl);
+      const response = await fetch(manifestUrl);
       if (!response.ok) {
         throw new Error(`Manifest加载失败: ${response.status} ${response.statusText}`);
       }
@@ -144,8 +136,8 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
       await loadViewer(issue, publicationId);
       
       if (onIssueSelect) {
-        const issueId = NewspaperService.extractIssueId(issue.manifest);
-        onIssueSelect(issueId);
+        // Linus式设计：直接使用manifest URL作为ID，避免复杂的提取逻辑
+        onIssueSelect(issue.manifest);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : '切换失败');
