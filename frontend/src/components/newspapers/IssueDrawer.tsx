@@ -6,7 +6,6 @@ interface IssueDrawerProps {
   issues: IssueItem[];
   selectedIssue: IssueItem | null;
   onIssueSelect: (issue: IssueItem) => void;
-  onIssuePreview: (issue: IssueItem) => void;
   isOpen?: boolean;
   loading?: boolean;
 }
@@ -16,7 +15,6 @@ export const IssueDrawer: React.FC<IssueDrawerProps> = ({
   issues,
   selectedIssue,
   onIssueSelect,
-  onIssuePreview,
   isOpen = true,
   loading = false
 }) => {
@@ -57,20 +55,11 @@ export const IssueDrawer: React.FC<IssueDrawerProps> = ({
                   <button 
                     onClick={(e) => {
                       e.stopPropagation();
-                      onIssuePreview(issue);
+                      onIssueSelect(issue);
                     }}
                     className="text-blue-600 hover:text-blue-800 text-sm px-2 py-1 rounded hover:bg-blue-50"
                   >
-                    预览
-                  </button>
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onIssueSelect(issue);
-                    }}
-                    className="text-green-600 hover:text-green-800 text-sm px-2 py-1 rounded hover:bg-green-50"
-                  >
-                    在UV打开
+                    查看
                   </button>
                 </div>
               </div>

@@ -8,7 +8,6 @@ interface ViewerPageProps {
   publicationTitle?: string;
   allIssues?: IssueItem[];
   onIssueSelect?: (issue: IssueItem) => void;
-  onIssuePreview?: (issue: IssueItem) => void;
 }
 
 export const ViewerPage: React.FC<ViewerPageProps> = ({ 
@@ -16,15 +15,16 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({
   issueId, 
   publicationTitle = '',
   allIssues = [],
-  onIssueSelect,
-  onIssuePreview 
+  onIssueSelect
 }) => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [manifestUrl, setManifestUrl] = useState<string>('');
   const [selectedIssue, setSelectedIssue] = useState<IssueItem | null>(null);
   const [issues, setIssues] = useState<IssueItem[]>(allIssues);
   const [issuesLoading, setIssuesLoading] = useState(false);
+  const [currentPublicationId, setCurrentPublicationId] = useState<string>(publicationId);
+  const [currentIssueId, setCurrentIssueId] = useState<string>(issueId);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
@@ -68,8 +68,11 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({
       }
     };
 
-    loadManifest();
-  }, [publicationId, issueId]);
+    // 只在第一次加载时执行
+    if (!manifestUrl) {
+      loadManifest();
+    }
+  }, [publicationId, issueId, manifestUrl]);
 
   // 设置当前选择的期数
   useEffect(() => {
@@ -154,17 +157,53 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({
     }
   };
 
-  // 处理期数选择
-  const handleIssueSelect = (issue: IssueItem) => {
-    if (onIssueSelect) {
-      onIssueSelect(issue);
-    }
-  };
-
-  // 处理期数预览
-  const handleIssuePreview = (issue: IssueItem) => {
-    if (onIssuePreview) {
-      onIssuePreview(issue);
+  // 处理期数选择 - 实时加载UV浏览器
+  const handleIssueSelect = async (issue: IssueItem) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // 提取新的期数ID
+      const newIssueId = NewspaperService.extractIssueId(issue.manifest);
+      
+      // 构建完整的manifest URL
+      let fullManifestUrl;
+      if (issue.manifest.startsWith('http')) {
+        fullManifestUrl = issue.manifest;
+      } else {
+        fullManifestUrl = `https://www.ai4dh.cn/iiif/3/manifests/${currentPublicationId}/${newIssueId}/manifest.json`;
+      }
+      
+      // 设置用于UV查看器的manifest URL（使用代理）
+      const proxyManifestUrl = NewspaperService.getProxyUrl(fullManifestUrl);
+      
+      console.log('🔍 [调试] 切换期数 - 完整manifest URL:', fullManifestUrl);
+      console.log('🔍 [调试] 切换期数 - 代理manifest URL:', proxyManifestUrl);
+      
+      // 验证manifest是否可访问
+      const response = await fetch(proxyManifestUrl);
+      if (!response.ok) {
+        throw new Error(`Manifest加载失败: ${response.status} ${response.statusText}`);
+      }
+      
+      const manifest = await response.json();
+      console.log('✅ [调试] 新期数Manifest加载成功:', manifest);
+      
+      // 更新状态
+      setManifestUrl(proxyManifestUrl);
+      setCurrentIssueId(newIssueId);
+      setSelectedIssue(issue);
+      
+      // 通知父组件
+      if (onIssueSelect) {
+        onIssueSelect(issue);
+      }
+      
+    } catch (err) {
+      console.error('❌ 切换期数失败:', err);
+      setError(err instanceof Error ? err.message : '切换期数失败');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -219,6 +258,14 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({
         
         {/* UV查看器区域 */}
         <div className="flex-1 bg-gray-50 relative">
+          {loading && (
+            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10 m-4 rounded-lg">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+                <p className="text-white text-lg">正在加载期数内容...</p>
+              </div>
+            </div>
+          )}
           <div className="uv-frame-wrap h-full border border-gray-300 rounded-lg overflow-hidden m-4">
             <iframe
               ref={iframeRef}
@@ -238,7 +285,6 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({
         issues={issues}
         selectedIssue={selectedIssue}
         onIssueSelect={handleIssueSelect}
-        onIssuePreview={handleIssuePreview}
         loading={issuesLoading}
       />
     </div>

@@ -157,15 +157,6 @@ export const NewspapersModule: React.FC<NewspapersModuleProps> = ({
       }
     };
 
-    // 处理期数预览
-    const handleViewerIssuePreview = (issue: IssueItem) => {
-      setSelectedIssue(issue);
-      const newIssueId = NewspaperService.extractIssueId(issue.manifest);
-      if (onIssueSelect) {
-        onIssueSelect(newIssueId);
-      }
-    };
-    
     return (
       <div className="h-screen">
         <ViewerPage 
@@ -174,7 +165,6 @@ export const NewspapersModule: React.FC<NewspapersModuleProps> = ({
           publicationTitle={selectedPublication.title}
           allIssues={issues}
           onIssueSelect={handleViewerIssueSelect}
-          onIssuePreview={handleViewerIssuePreview}
         />
       </div>
     );
