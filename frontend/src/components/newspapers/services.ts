@@ -1,4 +1,4 @@
-import { IIIFCollection, IIIFManifest } from './iiifTypes';
+import { IIIFManifest } from './iiifTypes';
 
 // 在开发环境中使用相对路径，通过Vite代理访问
 // 在生产环境中使用完整URL
@@ -46,7 +46,7 @@ export class NewspaperService {
       }
       const col = await response.json();
       
-      const publications = (col.items || []).map((it: any, i: number) => {
+      const publications = (col.items || []).map((it: IIIFCollectionItem, i: number) => {
         // 调试信息：检查item.id的实际内容
         console.log(`🔍 [调试] item ${i}:`, it.id);
         
@@ -97,7 +97,7 @@ export class NewspaperService {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const col = await response.json();
-      return (col.items || []).map((it: any, i: number) => ({
+      return (col.items || []).map((it: IIIFCollectionItem, i: number) => ({
         i, 
         id: it.id,
         manifest: it.id,
