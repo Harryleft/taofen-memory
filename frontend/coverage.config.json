@@ -1,0 +1,64 @@
+# 数字报刊模块测试覆盖率配置
+
+# 覆盖率目标
+coverageThresholds:
+  global:
+    statements: 80
+    branches: 75
+    functions: 80
+    lines: 80
+  newspapers:
+    statements: 90
+    branches: 85
+    functions: 90
+    lines: 90
+
+# 忽略的文件和模式
+ignorePatterns:
+  - "**/*.d.ts"
+  - "**/*.test.ts"
+  - "**/*.spec.ts"
+  - "**/types/**"
+  - "**/constants/**"
+  - "**/main.tsx"
+  - "**/vite-env.d.ts"
+
+# 重点测试的模块
+priorityModules:
+  - "src/components/newspapers/services.ts"
+  - "src/components/newspapers/NewspapersIntegratedLayout.tsx"
+  - "src/components/newspapers/NewspapersMobileLayout.tsx"
+  - "src/components/newspapers/utils/errorHandler.ts"
+  - "src/components/newspapers/utils/iiifUrlBuilder.ts"
+
+# 关键测试场景
+criticalTestScenarios:
+  - "数据加载和错误处理"
+  - "移动端响应式布局"
+  - "IIIF查看器集成"
+  - "键盘导航和可访问性"
+  - "性能和内存管理"
+
+# 测试数据要求
+testDataRequirements:
+  mockData: true
+  realData: false
+  edgeCases: true
+  errorCases: true
+  performanceData: true
+
+# 集成测试要求
+integrationTests:
+  componentIntegration: true
+  dataFlow: true
+  userFlow: true
+  stateManagement: true
+  errorPropagation: true
+
+# E2E测试要求
+e2eTests:
+  criticalPaths: true
+  userJourneys: true
+  crossBrowser: true
+  mobileResponsive: true
+  accessibility: true
