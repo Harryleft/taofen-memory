@@ -8,6 +8,7 @@ interface IssueDrawerProps {
   onIssueSelect: (issue: IssueItem) => void;
   onIssuePreview: (issue: IssueItem) => void;
   isOpen?: boolean;
+  loading?: boolean;
 }
 
 export const IssueDrawer: React.FC<IssueDrawerProps> = ({
@@ -16,7 +17,8 @@ export const IssueDrawer: React.FC<IssueDrawerProps> = ({
   selectedIssue,
   onIssueSelect,
   onIssuePreview,
-  isOpen = true
+  isOpen = true,
+  loading = false
 }) => {
   if (!isOpen) return null;
 
@@ -31,7 +33,12 @@ export const IssueDrawer: React.FC<IssueDrawerProps> = ({
       {/* 期数列表 */}
       <div className="flex-1 overflow-y-auto p-4">
         <div className="space-y-2">
-          {issues.length === 0 ? (
+          {loading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 mx-auto mb-2"></div>
+              <p className="text-gray-600">加载期数列表...</p>
+            </div>
+          ) : issues.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               暂无期数数据
             </div>
