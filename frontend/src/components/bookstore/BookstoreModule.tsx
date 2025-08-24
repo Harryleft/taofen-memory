@@ -16,16 +16,63 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { BookItem } from '@/types/bookTypes';
 import { downloadCSV } from '@/utils/bookUtils';
-import { NewspaperService, PublicationItem } from '@/components/newspapers/services';
-import { NewspaperCard } from '@/components/newspapers/NewspaperCard';
-import { IssueCard } from '@/components/newspapers/IssueCard';
+import { NewspaperService, PublicationItem, IssueItem } from '@/components/newspapers/services';
 import { IIIFCollectionItem } from '@/components/newspapers/iiifTypes';
-import { ViewerPage } from '@/components/newspapers/ViewerPage';
 
 import BookFiltersPanel from './BookFiltersPanel.tsx';
 import BookGrid from './BookGridContainer.tsx';
 import BookDetailModal from './BookDetailModal.tsx';
 import { BookstoreCoverCard } from '@/components/common/CoverCard.tsx';
+
+// 简单的报刊卡片组件
+const NewspaperCard: React.FC<{ publication: IIIFCollectionItem; onClick: () => void }> = ({ publication, onClick }) => (
+  <div 
+    className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer p-4"
+    onClick={onClick}
+  >
+    <div className="aspect-[3/4] bg-gray-200 rounded mb-3 flex items-center justify-center">
+      <span className="text-4xl">📰</span>
+    </div>
+    <h3 className="font-medium text-gray-900 text-sm mb-1 line-clamp-2">
+      {publication.label?.zh?.[0] || publication.label?.en?.[0] || '未知刊物'}
+    </h3>
+  </div>
+);
+
+// 简单的期数卡片组件
+const IssueCard: React.FC<{ issue: IIIFCollectionItem; onClick: () => void }> = ({ issue, onClick }) => (
+  <div 
+    className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer p-4"
+    onClick={onClick}
+  >
+    <div className="aspect-[3/4] bg-gray-200 rounded mb-3 flex items-center justify-center">
+      <span className="text-4xl">📄</span>
+    </div>
+    <h3 className="font-medium text-gray-900 text-sm mb-1 line-clamp-2">
+      {issue.label?.zh?.[0] || issue.label?.en?.[0] || '未知期数'}
+    </h3>
+  </div>
+);
+
+// 简单的查看器组件
+const ViewerPage: React.FC<{ publicationId: string; issueId: string }> = ({ publicationId, issueId }) => {
+  const manifestUrl = `https://www.ai4dh.cn/iiif/3/manifests/${publicationId}/${issueId}/manifest.json`;
+  const proxyUrl = import.meta.env.DEV && manifestUrl.startsWith('https://') 
+    ? `/proxy?url=${encodeURIComponent(manifestUrl)}`
+    : manifestUrl;
+
+  return (
+    <div className="h-full">
+      <iframe
+        src={`/uv_simple.html?v=${Date.now()}#?iiifManifestId=${encodeURIComponent(proxyUrl)}&embedded=true`}
+        className="w-full h-full border-0"
+        title="报刊查看器"
+        allowFullScreen
+        sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation"
+      />
+    </div>
+  );
+};
 
 import { useBookData } from '@/hooks/useBookData';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';

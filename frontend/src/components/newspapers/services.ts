@@ -1,20 +1,15 @@
 import { IIIFManifest } from './iiifTypes';
 
-// 在开发环境中使用相对路径，通过Vite代理访问
-// 在生产环境中使用完整URL
+// 基础URL配置
 const BASE_URL = import.meta.env.DEV ? '/iiif' : 'https://www.ai4dh.cn/iiif';
 
-// 代理函数用于处理CORS
+// 简化的代理函数 - 消除特殊情况
 async function fetchWithProxy(url: string): Promise<Response> {
-  // 如果是本地开发环境且是外部URL，使用代理
-  if (import.meta.env.DEV && url.startsWith('https://')) {
-    const proxyUrl = `/proxy?url=${encodeURIComponent(url)}`;
-    console.log('使用代理:', proxyUrl);
-    return fetch(proxyUrl);
-  }
+  const finalUrl = import.meta.env.DEV && url.startsWith('https://') 
+    ? `/proxy?url=${encodeURIComponent(url)}`
+    : url;
   
-  // 直接获取
-  return fetch(url);
+  return fetch(finalUrl);
 }
 
 export interface PublicationItem {
@@ -36,7 +31,6 @@ export interface IssueItem {
 
 export class NewspaperService {
   static async getPublications(): Promise<PublicationItem[]> {
-    // 加载顶级刊物集合
     const url = 'https://www.ai4dh.cn/iiif/3/manifests/collection.json';
     
     try {
@@ -44,16 +38,12 @@ export class NewspaperService {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+      
       const col = await response.json();
       
+      // 简化数据处理 - 消除复杂的调试信息
       const publications = (col.items || []).map((it: IIIFCollectionItem, i: number) => {
-        // 调试信息：检查item.id的实际内容
-        console.log(`🔍 [调试] item ${i}:`, it.id);
-        
-        // 从完整的collection URL中提取刊物ID
         const collectionId = it.id.match(/([^/]+)\/collection\.json$/)?.[1] || it.id;
-        
-        console.log(`🔍 [调试] 提取的collectionId:`, collectionId);
         
         return {
           i, 
@@ -61,17 +51,16 @@ export class NewspaperService {
           collection: it.id,
           title: (it.label?.zh?.[0]) || (it.label?.['zh-CN']?.[0]) || (it.label?.en?.[0]) || '未知刊物',
           name: (it.label?.zh?.[0]) || (it.label?.['zh-CN']?.[0]) || (it.label?.en?.[0]) || '未知刊物',
-          issueCount: 0, // 将在后续加载时填充
-          lastUpdated: null // 将在后续加载时填充
+          issueCount: 0,
+          lastUpdated: null
         };
       });
       
-      // 异步获取每个刊物的期数信息
+      // 异步获取期数信息
       await Promise.all(publications.map(async (pub, index) => {
         try {
           const issues = await this.getIssuesForPublication(pub.collection);
           publications[index].issueCount = issues.length;
-          // 从第一个期数中获取日期信息
           if (issues.length > 0) {
             publications[index].lastUpdated = issues[0].title || issues[0].summary;
           }
@@ -88,14 +77,12 @@ export class NewspaperService {
   }
   
   static async getIssuesForPublication(collectionUrl: string): Promise<IssueItem[]> {
-    // 直接使用传入的完整URL，不进行任何路径拼接
-    const url = collectionUrl;
-    
     try {
-      const response = await fetchWithProxy(url);
+      const response = await fetchWithProxy(collectionUrl);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+      
       const col = await response.json();
       return (col.items || []).map((it: IIIFCollectionItem, i: number) => ({
         i, 
@@ -112,28 +99,19 @@ export class NewspaperService {
 
   static async getManifest(manifestId: string): Promise<IIIFManifest> {
     try {
-      let manifestUrl;
-      
-      if (manifestId.startsWith('http')) {
-        // 如果manifestId是完整URL，直接使用
-        manifestUrl = manifestId;
-        console.log('🔍 [调试] 使用完整manifest URL:', manifestUrl);
-      } else {
-        // 否则构建完整URL
-        manifestUrl = `${BASE_URL}/3/manifests/${encodeURIComponent(manifestId)}/manifest.json`;
-        console.log('🔍 [调试] 构建manifest URL:', manifestUrl);
-      }
+      // 简化URL构建逻辑
+      const manifestUrl = manifestId.startsWith('http') 
+        ? manifestId 
+        : `${BASE_URL}/3/manifests/${encodeURIComponent(manifestId)}/manifest.json`;
       
       const response = await fetchWithProxy(manifestUrl);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      const manifest = await response.json();
-      console.log('✅ [调试] Manifest加载成功:', manifest);
-      return manifest;
+      return await response.json();
     } catch (error) {
-      console.error('❌ Failed to fetch manifest:', error);
+      console.error('Failed to fetch manifest:', error);
       throw error;
     }
   }
@@ -144,17 +122,23 @@ export class NewspaperService {
   }
 
   static extractIssueId(manifestUrl: string): string {
-    // 如果是完整的URL，提取最后的ID部分
-    if (manifestUrl.startsWith('http')) {
-      const match = manifestUrl.match(/([^/]+)\/manifest\.json$/);
-      return match ? match[1] : '';
-    }
-    // 如果是相对路径，直接提取
+    // 简化ID提取逻辑
     const match = manifestUrl.match(/([^/]+)\/manifest\.json$/);
     return match ? match[1] : '';
   }
 
-  // 搜索功能
+  // 简化的getIssues方法 - 基于publicationId获取期数
+  static async getIssues(publicationId: string): Promise<IssueItem[]> {
+    try {
+      const collectionUrl = `https://www.ai4dh.cn/iiif/3/manifests/${publicationId}/collection.json`;
+      return await this.getIssuesForPublication(collectionUrl);
+    } catch (error) {
+      console.error('Failed to get issues:', error);
+      return [];
+    }
+  }
+
+  // 简化的搜索功能
   static filterPublications(
     publications: PublicationItem[], 
     searchTerm: string, 
@@ -179,7 +163,6 @@ export class NewspaperService {
         case 'count':
           return b.issueCount - a.issueCount;
         case 'date':
-          // 按最后更新时间排序（如果有）
           if (!a.lastUpdated) return 1;
           if (!b.lastUpdated) return -1;
           return a.lastUpdated.localeCompare(b.lastUpdated, 'zh-CN');
@@ -191,11 +174,10 @@ export class NewspaperService {
     return filtered;
   }
 
-  // 获取代理URL
+  // 简化的代理URL获取
   static getProxyUrl(url: string): string {
-    if (import.meta.env.DEV && url.startsWith('https://')) {
-      return `/proxy?url=${encodeURIComponent(url)}`;
-    }
-    return url;
+    return import.meta.env.DEV && url.startsWith('https://') 
+      ? `/proxy?url=${encodeURIComponent(url)}`
+      : url;
   }
 }
