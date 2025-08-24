@@ -16,13 +16,16 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { BookItem } from '@/types/bookTypes';
 import { downloadCSV } from '@/utils/bookUtils';
-
+import { TabSwitcher } from '@/components/common/TabSwitcher';
+import { NewspaperService, PublicationItem } from '@/components/newspapers/services';
+import { NewspaperCard } from '@/components/newspapers/NewspaperCard';
+import { IssueCard } from '@/components/newspapers/IssueCard';
+import { IIIFCollectionItem } from '@/components/newspapers/iiifTypes';
 
 import BookFiltersPanel from './BookFiltersPanel.tsx';
 import BookGrid from './BookGridContainer.tsx';
 import BookDetailModal from './BookDetailModal.tsx';
 import { BookstoreCoverCard } from '@/components/common/CoverCard.tsx';
-
 
 import { useBookData } from '@/hooks/useBookData';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
@@ -45,10 +48,24 @@ interface BookstoreTimelineModuleProps {
  * @returns {JSX.Element} - 渲染出的书店页面。
  */
 export default function BookstoreTimelineModule({ className = '' }: BookstoreTimelineModuleProps) {
+  // 标签页状态管理
+  const [activeTab, setActiveTab] = useState<'books' | 'newspapers'>('books');
+  
   // 筛选状态管理
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedYear, setSelectedYear] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  
+  // 报刊数据状态
+  const [publications, setPublications] = useState<PublicationItem[]>([]);
+  const [newspapersLoading, setNewspapersLoading] = useState(true);
+  const [newspapersError, setNewspapersError] = useState<string | null>(null);
+  
+  // 期数列表状态
+  const [selectedPublication, setSelectedPublication] = useState<PublicationItem | null>(null);
+  const [issues, setIssues] = useState<IIIFCollectionItem[]>([]);
+  const [issuesLoading, setIssuesLoading] = useState(false);
+  const [issuesError, setIssuesError] = useState<string | null>(null);
   
   // 构建筛选条件对象
   const filters = useMemo(() => ({ searchTerm, category: selectedCategory, year: selectedYear }), [searchTerm, selectedCategory, selectedYear]);
@@ -93,6 +110,60 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
 
   // 【修复】使用 useRef 追踪上一次的 isInitialLoading 状态，用于精确判断重置加载何时完成
   const prevIsInitialLoading = useRef(isInitialLoading);
+
+  // 报刊数据加载
+  useEffect(() => {
+    const loadNewspapers = async () => {
+      try {
+        setNewspapersLoading(true);
+        setNewspapersError(null);
+        const data = await NewspaperService.getPublications();
+        setPublications(data);
+      } catch (err) {
+        setNewspapersError(err instanceof Error ? err.message : '加载报刊失败');
+      } finally {
+        setNewspapersLoading(false);
+      }
+    };
+
+    loadNewspapers();
+  }, []);
+
+  // 加载期数列表
+  const loadIssues = async (publication: PublicationItem) => {
+    try {
+      setIssuesLoading(true);
+      setIssuesError(null);
+      setSelectedPublication(publication);
+      
+      const collectionUrl = `https://www.ai4dh.cn/iiif/3/manifests/${publication.id}/collection.json`;
+      const issuesData = await NewspaperService.getIssuesForPublication(collectionUrl);
+      
+      // 转换为 IIIFCollectionItem 格式
+      const issuesCollection: IIIFCollectionItem[] = issuesData.map(issue => ({
+        id: issue.id,
+        manifest: issue.manifest,
+        type: "Manifest",
+        label: {
+          zh: [issue.title],
+          en: [issue.title]
+        }
+      }));
+      
+      setIssues(issuesCollection);
+    } catch (err) {
+      setIssuesError(err instanceof Error ? err.message : '加载期数失败');
+    } finally {
+      setIssuesLoading(false);
+    }
+  };
+
+  // 返回报刊列表
+  const handleBackToPublications = () => {
+    setSelectedPublication(null);
+    setIssues([]);
+    setIssuesError(null);
+  };
 
   // 防抖处理：筛选条件变化时重新加载数据
   useEffect(() => {
@@ -167,62 +238,205 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
     );
   }
 
+  // 书籍标签内容
+  const booksContent = (
+    <>
+      {/* 书店封面卡 */}
+      <BookstoreCoverCard 
+        totalBooks={allData.length} 
+        featuredCategories={uniqueCategories.length} 
+      />
+      
+      {/* 筛选控件 */}
+      <BookFiltersPanel
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+        uniqueCategories={uniqueCategories}
+        selectedYear={selectedYear}
+        setSelectedYear={setSelectedYear}
+        uniqueYears={uniqueYears}
+        onDownload={() => downloadCSV(allData)}
+      />
+
+      {/* 书籍网格 - 瀑布流布局 */}
+      <BookGrid
+        columnArrays={columnArrays}
+        visibleItems={itemsToDisplay}
+        onOpenLightbox={handleOpenLightbox}
+      />
+
+      {/* 加载更多 */}
+      {hasMore && (
+        <>
+          <div ref={loadMoreRef} className={`w-full h-${LOAD_MORE_INDICATOR_HEIGHT}`} />
+          {isLoading && (
+            <div className="flex items-center justify-center w-full py-4">
+               <div className="flex items-center text-gray-500">
+                 <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-500 rounded-full animate-spin"></div>
+                 <span className="ml-3 font-song">正在加载更多...</span>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* 空状态提示 */}
+      {displayedData.length === 0 && !isLoading && (
+        <div className="text-center py-12">
+          <div className="text-6xl mb-4">📚</div>
+          <h3 className="text-xl font-bold text-charcoal mb-2" style={{fontFamily: "'KaiTi', 'STKaiti', '华文楷体', serif"}}>未找到相关书籍</h3>
+          <p className="text-charcoal/60" style={{fontFamily: "'SimSun', '宋体', 'NSimSun', serif"}}>请尝试调整搜索条件</p>
+        </div>
+      )}
+    </>
+  );
+
+  // 报刊标签内容
+  const newspapersContent = (
+    <>
+      {selectedPublication ? (
+        <>
+          {/* 期数列表头部 */}
+          <div className="mb-8">
+            <button 
+              onClick={handleBackToPublications}
+              className="text-blue-500 hover:text-blue-600 mb-4 inline-block"
+            >
+              ← 返回刊物列表
+            </button>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">{selectedPublication.title}</h1>
+            <p className="text-gray-600">选择期数进行浏览</p>
+          </div>
+
+          {/* 期数列表 */}
+          {issuesLoading ? (
+            <div className="flex flex-col items-center justify-center p-12 text-center">
+              <div className="w-12 h-12 border-4 border-gray-200 border-t-gray-500 rounded-full animate-spin"></div>
+              <span className="mt-4 text-lg text-gray-600 font-song">正在加载期数数据...</span>
+            </div>
+          ) : issuesError ? (
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4">📄</div>
+              <h3 className="text-xl font-bold text-charcoal mb-2">加载失败</h3>
+              <p className="text-charcoal/60 mb-4">{issuesError}</p>
+              <button 
+                onClick={() => loadIssues(selectedPublication)}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              >
+                重试
+              </button>
+            </div>
+          ) : issues.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4">📄</div>
+              <h3 className="text-xl font-bold text-charcoal mb-2">暂无期数数据</h3>
+              <p className="text-charcoal/60">请稍后再试</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+              {issues.map((issue) => (
+                <div key={issue.id} className="block">
+                  <IssueCard 
+                    issue={issue} 
+                    onClick={() => {
+                      // 这里可以添加打开查看器的逻辑
+                      console.log('点击期数:', issue.label.zh?.[0]);
+                    }} 
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      ) : (
+        <>
+          {/* 报刊封面卡 */}
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg p-8 mb-8">
+            <h1 className="text-3xl font-bold mb-2">数字报刊</h1>
+            <p className="text-blue-100">浏览历史报刊资料</p>
+            <div className="mt-4 text-2xl font-bold">
+              共 {publications.length} 种刊物
+            </div>
+          </div>
+
+          {/* 报刊网格 */}
+          {newspapersLoading ? (
+            <div className="flex flex-col items-center justify-center p-12 text-center">
+              <div className="w-12 h-12 border-4 border-gray-200 border-t-gray-500 rounded-full animate-spin"></div>
+              <span className="mt-4 text-lg text-gray-600 font-song">正在加载报刊数据...</span>
+            </div>
+          ) : newspapersError ? (
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4">📰</div>
+              <h3 className="text-xl font-bold text-charcoal mb-2">加载失败</h3>
+              <p className="text-charcoal/60 mb-4">{newspapersError}</p>
+              <button 
+                onClick={() => window.location.reload()}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              >
+                重试
+              </button>
+            </div>
+          ) : publications.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4">📰</div>
+              <h3 className="text-xl font-bold text-charcoal mb-2">暂无报刊数据</h3>
+              <p className="text-charcoal/60">请稍后再试</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+              {publications.map((publication) => {
+                // 将 PublicationItem 转换为 IIIFCollectionItem 格式
+                const iiifPublication: IIIFCollectionItem = {
+                  id: publication.id,
+                  type: "Collection",
+                  label: {
+                    zh: [publication.title],
+                    en: [publication.title]
+                  }
+                };
+                
+                return (
+                  <div key={publication.id} className="block">
+                    <NewspaperCard 
+                      publication={iiifPublication} 
+                      onClick={() => loadIssues(publication)} 
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </>
+      )}
+    </>
+  );
+
+  // 标签页配置
+  const tabs = [
+    {
+      id: 'books',
+      label: '书籍',
+      content: booksContent
+    },
+    {
+      id: 'newspapers',
+      label: '报刊',
+      content: newspapersContent
+    }
+  ];
+
   return (
     <section className={`relative py-20 ${className}`}>
       <div className="max-w-7xl mx-auto px-6">
-        {/* 书店封面卡 */}
-        <BookstoreCoverCard 
-          totalBooks={allData.length} 
-          featuredCategories={uniqueCategories.length} 
+        {/* 标签切换器 */}
+        <TabSwitcher
+          tabs={tabs}
+          activeTab={activeTab}
+          onTabChange={(tabId) => setActiveTab(tabId as 'books' | 'newspapers')}
         />
-        
-        {/* 筛选控件 */}
-        <BookFiltersPanel
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          selectedCategory={selectedCategory}
-          setSelectedCategory={setSelectedCategory}
-          uniqueCategories={uniqueCategories}
-          selectedYear={selectedYear}
-          setSelectedYear={setSelectedYear}
-          uniqueYears={uniqueYears}
-          onDownload={() => downloadCSV(allData)}
-        />
-
-        {/* 书籍网格 - 瀑布流布局 */}
-        {/* 【修复】将 visibleItems 替换为我们新计算的 itemsToDisplay */}
-        <BookGrid
-          columnArrays={columnArrays}
-          visibleItems={itemsToDisplay}
-          onOpenLightbox={handleOpenLightbox}
-        />
-
-        {/* 【修复】只有在 hasMore 为 true (无限滚动模式下) 才显示加载触发器和加载动画 */}
-        {hasMore && (
-          <>
-            {/* 无限滚动触发器 */}
-            <div ref={loadMoreRef} className={`w-full h-${LOAD_MORE_INDICATOR_HEIGHT}`} />
-
-            {/* 加载更多指示器 */}
-            {isLoading && (
-              <div className="flex items-center justify-center w-full py-4">
-                 <div className="flex items-center text-gray-500">
-                   <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-500 rounded-full animate-spin"></div>
-                   <span className="ml-3 font-song">正在加载更多...</span>
-                </div>
-              </div>
-            )}
-          </>
-        )}
-
-        {/* 空状态提示 */}
-        {displayedData.length === 0 && !isLoading && (
-          <div className="text-center py-12">
-            <div className="text-6xl mb-4">📚</div>
-            <h3 className="text-xl font-bold text-charcoal mb-2" style={{fontFamily: "'KaiTi', 'STKaiti', '华文楷体', serif"}}>未找到相关书籍</h3>
-            <p className="text-charcoal/60" style={{fontFamily: "'SimSun', '宋体', 'NSimSun', serif"}}>请尝试调整搜索条件</p>
-          </div>
-        )}
       </div>
 
       {/* 书籍详情灯箱 */}
