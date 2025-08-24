@@ -13,7 +13,19 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:performance": "node ../scripts/performance-test.js"
+    "test:performance": "node ../scripts/performance-test.js",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "test:performance:e2e": "playwright test --grep='性能测试'",
+    "test:component": "playwright test --component",
+    "test:report": "node scripts/generate-test-report.js",
+    "test:security": "npm audit",
+    "test:newspapers": "bash scripts/test-newspapers.sh",
+    "test:visual": "playwright test --config=playwright.config.ts --grep='视觉测试'",
+    "test:accessibility": "playwright test --config=playwright.config.ts --grep='无障碍测试'",
+    "test:mobile": "playwright test --config=playwright.config.ts --grep='移动端'",
+    "test:desktop": "playwright test --config=playwright.config.ts --grep='桌面端'"
   },
   "dependencies": {
     "@types/d3": "^7.4.3",
