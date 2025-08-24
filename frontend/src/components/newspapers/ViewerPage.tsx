@@ -20,14 +20,14 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({ publicationId, issueId }
         setLoading(true);
         setError(null);
         
-        // 构建manifest URL
-        const combinedId = `${publicationId}/${issueId}`;
+        // 直接使用issueId作为manifest ID，因为issueId已经包含了完整的路径
         const manifestUrl = NewspaperService.getProxyUrl(
-          `https://www.ai4dh.cn/iiif/3/manifests/${combinedId}/manifest.json`
+          `https://www.ai4dh.cn/iiif/3/manifests/${issueId}/manifest.json`
         );
         setManifestUrl(manifestUrl);
         
-        const manifest = await NewspaperService.getManifest(combinedId);
+        // 使用issueId而不是组合ID来避免双重路径
+        const manifest = await NewspaperService.getManifest(issueId);
         console.log('Manifest loaded:', manifest);
       } catch (err) {
         setError(err instanceof Error ? err.message : '加载失败');
