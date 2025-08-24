@@ -117,20 +117,28 @@ export class NewspaperService {
   }
 
   static extractPublicationId(collectionUrl: string): string {
+    console.log('Debug: extractPublicationId called with:', collectionUrl);
     const match = collectionUrl.match(/([^/]+)\/collection\.json$/);
-    return match ? match[1] : '';
+    const result = match ? match[1] : '';
+    console.log('Debug: extractPublicationId result:', result);
+    return result;
   }
 
   static extractIssueId(manifestUrl: string): string {
+    console.log('Debug: extractIssueId called with:', manifestUrl);
     // 修复ID提取逻辑，处理各种URL格式
     if (manifestUrl.includes('/manifest.json')) {
       const match = manifestUrl.match(/([^/]+)\/manifest\.json$/);
-      return match ? match[1] : '';
+      const result = match ? match[1] : '';
+      console.log('Debug: extractIssueId (manifest.json) result:', result);
+      return result;
     }
     
     // 如果是完整的manifest URL，提取最后一部分作为ID
     const parts = manifestUrl.split('/');
-    return parts[parts.length - 1] || '';
+    const result = parts[parts.length - 1] || '';
+    console.log('Debug: extractIssueId (fallback) result:', result);
+    return result;
   }
 
   // 简化的getIssues方法 - 基于publicationId获取期数

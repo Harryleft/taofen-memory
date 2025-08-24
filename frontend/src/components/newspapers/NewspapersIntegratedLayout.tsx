@@ -65,8 +65,9 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
       
       setSelectedPublication(publication);
       
-      // 加载该刊物的期数列表
-      const publicationId = NewspaperService.extractPublicationId(publication.id);
+      // 加载该刊物的期数列表 - publication.id已经是正确的ID，无需再次提取
+      const publicationId = publication.id;
+      console.log('Debug: publication.id =', publicationId); // 调试日志
       const issuesData = await NewspaperService.getIssues(publicationId);
       setIssues(issuesData);
       
@@ -87,7 +88,9 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
   // 加载查看器 - 修复URL构建逻辑
   const loadViewer = useCallback(async (issue: IssueItem, publicationId: string) => {
     try {
-      console.log('Loading viewer for issue:', issue); // 调试信息
+      console.log('Debug: Loading viewer for issue:', issue);
+      console.log('Debug: publicationId =', publicationId);
+      console.log('Debug: issue.manifest =', issue.manifest);
       
       let fullManifestUrl;
       
@@ -95,18 +98,22 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
       if (issue.manifest.includes('collection.json')) {
         // 如果是collection.json，需要提取真正的manifest ID
         const issueId = NewspaperService.extractIssueId(issue.manifest);
+        console.log('Debug: Extracted issueId from collection.json =', issueId);
         fullManifestUrl = `https://www.ai4dh.cn/iiif/3/manifests/${publicationId}/${issueId}/manifest.json`;
       } else if (issue.manifest.startsWith('http')) {
         // 如果已经是完整的manifest URL，直接使用
+        console.log('Debug: Using full manifest URL');
         fullManifestUrl = issue.manifest;
       } else {
         // 如果是manifest ID，构建完整URL
+        console.log('Debug: Building manifest URL from ID');
         fullManifestUrl = `https://www.ai4dh.cn/iiif/3/manifests/${publicationId}/${issue.manifest}/manifest.json`;
       }
       
-      console.log('Final manifest URL:', fullManifestUrl); // 调试信息
+      console.log('Debug: Final manifest URL =', fullManifestUrl);
       
       const proxyManifestUrl = NewspaperService.getProxyUrl(fullManifestUrl);
+      console.log('Debug: Proxy manifest URL =', proxyManifestUrl);
       setManifestUrl(proxyManifestUrl);
       
       // 验证manifest是否可访问
@@ -114,8 +121,9 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
       if (!response.ok) {
         throw new Error(`Manifest加载失败: ${response.status} ${response.statusText}`);
       }
+      console.log('Debug: Manifest validation successful');
     } catch (err) {
-      console.error('Viewer load error:', err); // 调试信息
+      console.error('Debug: Viewer load error:', err);
       setError(err instanceof Error ? err.message : '查看器加载失败');
     }
   }, []);
@@ -130,8 +138,10 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
       
       setSelectedIssue(issue);
       
-      // 直接加载查看器
-      await loadViewer(issue, NewspaperService.extractPublicationId(selectedPublication.id));
+      // 直接加载查看器 - selectedPublication.id已经是正确的ID
+      const publicationId = selectedPublication.id;
+      console.log('Debug: publicationId =', publicationId); // 调试日志
+      await loadViewer(issue, publicationId);
       
       if (onIssueSelect) {
         const issueId = NewspaperService.extractIssueId(issue.manifest);
