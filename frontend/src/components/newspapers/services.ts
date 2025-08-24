@@ -185,14 +185,21 @@ export class NewspaperService {
     // 确保URL格式正确
     if (!url) return '';
     
-    // 如果URL已经包含manifest.json，直接使用
+    // 如果URL已经包含manifest.json，直接代理
     if (url.includes('manifest.json')) {
       return import.meta.env.DEV && url.startsWith('https://') 
         ? `/proxy?url=${encodeURIComponent(url)}`
         : url;
     }
     
-    // 否则构建正确的manifest URL
+    // 如果URL是collection.json，也直接代理，不要添加manifest.json
+    if (url.includes('collection.json')) {
+      return import.meta.env.DEV && url.startsWith('https://') 
+        ? `/proxy?url=${encodeURIComponent(url)}`
+        : url;
+    }
+    
+    // 只有在明确是manifest ID的情况下才添加manifest.json
     const manifestUrl = url.endsWith('/manifest.json') ? url : `${url}/manifest.json`;
     return import.meta.env.DEV && manifestUrl.startsWith('https://') 
       ? `/proxy?url=${encodeURIComponent(manifestUrl)}`
