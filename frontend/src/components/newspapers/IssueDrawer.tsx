@@ -44,24 +44,14 @@ export const IssueDrawer: React.FC<IssueDrawerProps> = ({
             issues.map((issue) => (
               <div 
                 key={issue.manifest}
-                className={`flex items-center justify-between p-3 rounded-lg border transition-colors ${
+                className={`p-3 rounded-lg border transition-colors cursor-pointer ${
                   selectedIssue?.manifest === issue.manifest
                     ? 'bg-blue-50 border-blue-300'
                     : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
                 }`}
+                onClick={() => onIssueSelect(issue)}
               >
                 <span className="font-medium text-gray-800">{issue.title}</span>
-                <div className="flex gap-2">
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onIssueSelect(issue);
-                    }}
-                    className="text-blue-600 hover:text-blue-800 text-sm px-2 py-1 rounded hover:bg-blue-50"
-                  >
-                    查看
-                  </button>
-                </div>
               </div>
             ))
           )}
