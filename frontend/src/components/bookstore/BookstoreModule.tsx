@@ -135,8 +135,8 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
       setIssuesError(null);
       setSelectedPublication(publication);
       
-      const collectionUrl = `https://www.ai4dh.cn/iiif/3/manifests/${publication.id}/collection.json`;
-      const issuesData = await NewspaperService.getIssuesForPublication(collectionUrl);
+      // 直接使用 publication.collection，它已经是完整的collection URL
+      const issuesData = await NewspaperService.getIssuesForPublication(publication.collection);
       
       // 转换为 IIIFCollectionItem 格式
       const issuesCollection: IIIFCollectionItem[] = issuesData.map(issue => ({

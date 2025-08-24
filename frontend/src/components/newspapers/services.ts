@@ -46,15 +46,20 @@ export class NewspaperService {
       }
       const col = await response.json();
       
-      const publications = (col.items || []).map((it: any, i: number) => ({
-        i, 
-        id: it.id,
-        collection: it.id,
-        title: (it.label?.zh?.[0]) || (it.label?.['zh-CN']?.[0]) || (it.label?.en?.[0]) || '未知刊物',
-        name: (it.label?.zh?.[0]) || (it.label?.['zh-CN']?.[0]) || (it.label?.en?.[0]) || '未知刊物',
-        issueCount: 0, // 将在后续加载时填充
-        lastUpdated: null // 将在后续加载时填充
-      }));
+      const publications = (col.items || []).map((it: any, i: number) => {
+        // 从完整的collection URL中提取刊物ID
+        const collectionId = it.id.match(/([^/]+)\/collection\.json$/)?.[1] || it.id;
+        
+        return {
+          i, 
+          id: collectionId,
+          collection: it.id,
+          title: (it.label?.zh?.[0]) || (it.label?.['zh-CN']?.[0]) || (it.label?.en?.[0]) || '未知刊物',
+          name: (it.label?.zh?.[0]) || (it.label?.['zh-CN']?.[0]) || (it.label?.en?.[0]) || '未知刊物',
+          issueCount: 0, // 将在后续加载时填充
+          lastUpdated: null // 将在后续加载时填充
+        };
+      });
       
       // 异步获取每个刊物的期数信息
       await Promise.all(publications.map(async (pub, index) => {
@@ -78,12 +83,8 @@ export class NewspaperService {
   }
   
   static async getIssuesForPublication(collectionUrl: string): Promise<IssueItem[]> {
-    let url = collectionUrl;
-    
-    // 如果是相对路径，添加基础URL
-    if (!url.startsWith('http')) {
-      url = `${BASE_URL}/${url.replace(/^\//, '')}`;
-    }
+    // 直接使用传入的完整URL，不进行任何路径拼接
+    const url = collectionUrl;
     
     try {
       const response = await fetchWithProxy(url);
