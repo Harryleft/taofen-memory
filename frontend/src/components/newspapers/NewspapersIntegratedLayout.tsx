@@ -87,19 +87,24 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
   // 加载查看器 - 修复URL构建逻辑
   const loadViewer = useCallback(async (issue: IssueItem, publicationId: string) => {
     try {
-      const issueId = NewspaperService.extractIssueId(issue.manifest);
+      console.log('Loading viewer for issue:', issue); // 调试信息
       
-      // 修复URL构建逻辑，避免重复manifest.json
       let fullManifestUrl;
-      if (issue.manifest.startsWith('http')) {
-        // 如果已经是完整URL，直接使用
+      
+      // 检查issue.manifest的类型
+      if (issue.manifest.includes('collection.json')) {
+        // 如果是collection.json，需要提取真正的manifest ID
+        const issueId = NewspaperService.extractIssueId(issue.manifest);
+        fullManifestUrl = `https://www.ai4dh.cn/iiif/3/manifests/${publicationId}/${issueId}/manifest.json`;
+      } else if (issue.manifest.startsWith('http')) {
+        // 如果已经是完整的manifest URL，直接使用
         fullManifestUrl = issue.manifest;
       } else {
-        // 构建完整URL，确保不重复manifest.json
-        fullManifestUrl = `https://www.ai4dh.cn/iiif/3/manifests/${publicationId}/${issueId}/manifest.json`;
+        // 如果是manifest ID，构建完整URL
+        fullManifestUrl = `https://www.ai4dh.cn/iiif/3/manifests/${publicationId}/${issue.manifest}/manifest.json`;
       }
       
-      console.log('Loading manifest:', fullManifestUrl); // 调试信息
+      console.log('Final manifest URL:', fullManifestUrl); // 调试信息
       
       const proxyManifestUrl = NewspaperService.getProxyUrl(fullManifestUrl);
       setManifestUrl(proxyManifestUrl);
