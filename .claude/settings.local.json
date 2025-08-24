@@ -98,7 +98,13 @@
       "Read(/C:\\Users\\afkxw/**)",
       "Bash(npm info:*)",
       "mcp__sequential-thinking__sequentialthinking",
-      "mcp__frontend-tech-lead__project_info"
+      "mcp__frontend-tech-lead__project_info",
+      "WebFetch(domain:www.ai4dh.cn)",
+      "WebFetch(domain:www.ai4dh.cn)",
+      "WebFetch(domain:www.ai4dh.cn)",
+      "mcp__playwright__playwright_get",
+      "mcp__playwright__playwright_navigate",
+      "Bash(npx playwright install:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",
