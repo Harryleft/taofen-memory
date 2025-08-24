@@ -112,15 +112,28 @@ export class NewspaperService {
 
   static async getManifest(manifestId: string): Promise<IIIFManifest> {
     try {
-      // 对manifestId进行URL编码，确保特殊字符正确处理
-      const encodedManifestId = encodeURIComponent(manifestId);
-      const response = await fetch(`${BASE_URL}/3/manifests/${encodedManifestId}/manifest.json`);
+      let manifestUrl;
+      
+      if (manifestId.startsWith('http')) {
+        // 如果manifestId是完整URL，直接使用
+        manifestUrl = manifestId;
+        console.log('🔍 [调试] 使用完整manifest URL:', manifestUrl);
+      } else {
+        // 否则构建完整URL
+        manifestUrl = `${BASE_URL}/3/manifests/${encodeURIComponent(manifestId)}/manifest.json`;
+        console.log('🔍 [调试] 构建manifest URL:', manifestUrl);
+      }
+      
+      const response = await fetchWithProxy(manifestUrl);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      return await response.json();
+      
+      const manifest = await response.json();
+      console.log('✅ [调试] Manifest加载成功:', manifest);
+      return manifest;
     } catch (error) {
-      console.error('Failed to fetch manifest:', error);
+      console.error('❌ Failed to fetch manifest:', error);
       throw error;
     }
   }

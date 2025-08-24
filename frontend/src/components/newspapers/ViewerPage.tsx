@@ -20,23 +20,33 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({ publicationId, issueId }
         setLoading(true);
         setError(null);
         
-        // 如果issueId是完整URL，直接使用；否则构建完整URL
-        let manifestUrl;
+        // 构建完整的manifest URL
+        let fullManifestUrl;
         if (issueId.startsWith('http')) {
-          manifestUrl = NewspaperService.getProxyUrl(issueId);
+          // 如果issueId是完整URL，直接使用
+          fullManifestUrl = issueId;
         } else {
-          manifestUrl = NewspaperService.getProxyUrl(
-            `https://www.ai4dh.cn/iiif/3/manifests/${issueId}/manifest.json`
-          );
+          // 否则构建完整URL：https://www.ai4dh.cn/iiif/3/manifests/{publicationId}/{issueId}/manifest.json
+          fullManifestUrl = `https://www.ai4dh.cn/iiif/3/manifests/${publicationId}/${issueId}/manifest.json`;
         }
-        setManifestUrl(manifestUrl);
         
-        // 使用正确的manifest ID来获取数据
-        const manifestId = issueId.startsWith('http') ? 
-          NewspaperService.extractIssueId(issueId) : issueId;
-        const manifest = await NewspaperService.getManifest(manifestId);
-        console.log('Manifest loaded:', manifest);
+        // 设置用于UV查看器的manifest URL（使用代理）
+        const proxyManifestUrl = NewspaperService.getProxyUrl(fullManifestUrl);
+        setManifestUrl(proxyManifestUrl);
+        
+        console.log('🔍 [调试] 完整manifest URL:', fullManifestUrl);
+        console.log('🔍 [调试] 代理manifest URL:', proxyManifestUrl);
+        
+        // 验证manifest是否可访问
+        const response = await fetch(proxyManifestUrl);
+        if (!response.ok) {
+          throw new Error(`Manifest加载失败: ${response.status} ${response.statusText}`);
+        }
+        
+        const manifest = await response.json();
+        console.log('✅ Manifest加载成功:', manifest);
       } catch (err) {
+        console.error('❌ Manifest加载失败:', err);
         setError(err instanceof Error ? err.message : '加载失败');
       } finally {
         setLoading(false);
