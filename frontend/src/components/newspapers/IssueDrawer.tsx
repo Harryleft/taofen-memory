@@ -23,7 +23,7 @@ export const IssueDrawer: React.FC<IssueDrawerProps> = ({
   return (
     <div className="w-[30%] h-full bg-white border-l border-gray-300 flex flex-col">
       {/* 抽屉标题 */}
-      <div className="bg-blue-600 text-white p-4">
+      <div className="bg-[var(--drawer-header-bg)] text-[var(--drawer-header-text)] p-4">
         <h2 className="text-lg font-semibold">刊物：{publicationTitle}</h2>
         <p className="text-sm opacity-90">期数清单（按时间倒序）</p>
       </div>

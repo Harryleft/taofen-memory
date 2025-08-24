@@ -19,6 +19,8 @@ const buttonVariants = cva(
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
+        gold: "bg-[var(--button-gold-base)] text-white hover:bg-[var(--button-gold-hover)] active:bg-[var(--button-gold-active)] disabled:bg-[var(--button-gold-disabled)] disabled:text-[var(--button-gold-text-disabled)] shadow-[0_2px_4px_var(--button-gold-shadow)] hover:shadow-[0_4px_8px_var(--button-gold-shadow-hover)] hover:translate-y-[-1px] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] active:translate-y-0 disabled:shadow-none disabled:translate-y-0",
+        newspapers: "bg-[var(--newspapers-button-bg)] text-[var(--newspapers-button-text)] hover:bg-[var(--newspapers-button-hover)] active:bg-[var(--newspapers-button-active)] disabled:bg-[var(--newspapers-button-disabled)] disabled:text-[var(--newspapers-button-text-disabled)] shadow-[0_2px_4px_var(--button-gold-shadow)] hover:shadow-[0_4px_8px_var(--button-gold-shadow-hover)] hover:translate-y-[-1px] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] active:translate-y-0 disabled:shadow-none disabled:translate-y-0",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
