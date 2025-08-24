@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NewspaperService, PublicationItem, IssueItem } from './services';
 import { ViewerPage } from './ViewerPage';
+import { NewspapersIntegratedModule } from './NewspapersIntegratedModule';
 
 interface NewspapersModuleProps {
   onPublicationSelect?: (publicationId: string, publicationTitle: string) => void;
@@ -21,6 +22,7 @@ export const NewspapersModule: React.FC<NewspapersModuleProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<'name' | 'date' | 'count'>('name');
   const [currentView, setCurrentView] = useState<'catalog' | 'viewer'>('catalog');
+  const [useIntegratedLayout, setUseIntegratedLayout] = useState(true);
 
   // 防抖函数
   const debounceRef = useRef<NodeJS.Timeout>();
@@ -170,9 +172,85 @@ export const NewspapersModule: React.FC<NewspapersModuleProps> = ({
     );
   }
 
-  // 目录视图
+  // 布局切换
+  if (useIntegratedLayout) {
+    return (
+      <div className="space-y-4">
+        {/* 布局切换器 */}
+        <div className="flex items-center justify-between px-4 py-2 bg-white rounded-lg border">
+          <div className="flex items-center gap-4">
+            <span className="text-sm font-medium text-gray-700">布局模式：</span>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setUseIntegratedLayout(true)}
+                className={`px-3 py-1 rounded text-sm font-medium ${
+                  useIntegratedLayout
+                    ? 'bg-[var(--newspapers-button-bg)] text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                一体化布局
+              </button>
+              <button
+                onClick={() => setUseIntegratedLayout(false)}
+                className={`px-3 py-1 rounded text-sm font-medium ${
+                  !useIntegratedLayout
+                    ? 'bg-[var(--newspapers-button-bg)] text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                传统布局
+              </button>
+            </div>
+          </div>
+          <div className="text-xs text-gray-500">
+            💡 一体化布局提供更好的用户体验
+          </div>
+        </div>
+        
+        {/* 一体化布局组件 */}
+        <NewspapersIntegratedModule
+          onPublicationSelect={onPublicationSelect}
+          onIssueSelect={onIssueSelect}
+        />
+      </div>
+    );
+  }
+
+  // 传统布局（目录视图）
   return (
     <div className="space-y-6">
+      {/* 布局切换器 */}
+      <div className="flex items-center justify-between px-4 py-2 bg-white rounded-lg border">
+        <div className="flex items-center gap-4">
+          <span className="text-sm font-medium text-gray-700">布局模式：</span>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setUseIntegratedLayout(true)}
+              className={`px-3 py-1 rounded text-sm font-medium ${
+                useIntegratedLayout
+                  ? 'bg-[var(--newspapers-button-bg)] text-white'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              一体化布局
+            </button>
+            <button
+              onClick={() => setUseIntegratedLayout(false)}
+              className={`px-3 py-1 rounded text-sm font-medium ${
+                !useIntegratedLayout
+                  ? 'bg-[var(--newspapers-button-bg)] text-white'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              传统布局
+            </button>
+          </div>
+        </div>
+        <div className="text-xs text-gray-500">
+          💡 建议使用一体化布局以获得更好的体验
+        </div>
+      </div>
       {/* 搜索和过滤 */}
       <div className="search-container flex gap-4 items-center p-4 bg-gray-50 rounded-lg border">
         <div className="search-box flex-1 relative">
