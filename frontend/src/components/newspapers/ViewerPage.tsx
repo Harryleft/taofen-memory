@@ -20,14 +20,21 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({ publicationId, issueId }
         setLoading(true);
         setError(null);
         
-        // 直接使用issueId作为manifest ID，因为issueId已经包含了完整的路径
-        const manifestUrl = NewspaperService.getProxyUrl(
-          `https://www.ai4dh.cn/iiif/3/manifests/${issueId}/manifest.json`
-        );
+        // 如果issueId是完整URL，直接使用；否则构建完整URL
+        let manifestUrl;
+        if (issueId.startsWith('http')) {
+          manifestUrl = NewspaperService.getProxyUrl(issueId);
+        } else {
+          manifestUrl = NewspaperService.getProxyUrl(
+            `https://www.ai4dh.cn/iiif/3/manifests/${issueId}/manifest.json`
+          );
+        }
         setManifestUrl(manifestUrl);
         
-        // 使用issueId而不是组合ID来避免双重路径
-        const manifest = await NewspaperService.getManifest(issueId);
+        // 使用正确的manifest ID来获取数据
+        const manifestId = issueId.startsWith('http') ? 
+          NewspaperService.extractIssueId(issueId) : issueId;
+        const manifest = await NewspaperService.getManifest(manifestId);
         console.log('Manifest loaded:', manifest);
       } catch (err) {
         setError(err instanceof Error ? err.message : '加载失败');
