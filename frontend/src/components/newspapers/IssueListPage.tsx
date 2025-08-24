@@ -93,7 +93,7 @@ export const IssueListPage: React.FC = () => {
         <div className="mb-8">
           <Link 
             to="/newspapers" 
-            className="text-blue-500 hover:text-blue-600 mb-4 inline-block"
+            className="text-[var(--newspapers-button-bg)] hover:text-[var(--newspapers-button-hover)] mb-4 inline-block"
           >
             ← 返回刊物列表
           </Link>

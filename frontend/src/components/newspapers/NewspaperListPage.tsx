@@ -90,7 +90,7 @@ export const NewspaperListPage: React.FC = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">数字报刊</h1>
           <p className="text-gray-600">浏览历史报刊资料</p>
-          <div className="mt-2 p-2 bg-blue-100 rounded text-sm">
+          <div className="mt-2 p-2 bg-[rgba(196,155,97,0.1)] rounded text-sm">
             🔍 调试信息: 共找到 {publications.length} 个刊物
           </div>
         </div>

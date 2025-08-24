@@ -251,14 +251,14 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({
         {/* 顶部工具栏 */}
         <div className="bg-gray-100 border-b border-gray-300 p-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <button className="text-blue-600 hover:text-blue-800 font-medium">
+            <button className="text-[var(--newspapers-button-bg)] hover:text-[var(--newspapers-button-hover)] font-medium">
               ← 返回书籍
             </button>
           </div>
           <div className="flex items-center gap-4">
             <button 
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="text-gray-600 hover:text-gray-800 font-medium"
+              className="text-[var(--newspapers-button-bg)] hover:text-[var(--newspapers-button-hover)] font-medium"
             >
               {sidebarCollapsed ? '展开侧栏' : '收起侧栏'}
             </button>

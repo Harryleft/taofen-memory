@@ -254,7 +254,7 @@ export const NewspapersModule: React.FC<NewspapersModuleProps> = ({
                 <div
                   key={issue.manifest}
                   className={`catalog-item bg-white border border-gray-200 rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow ${
-                    selectedIssue?.manifest === issue.manifest ? 'border-blue-500 bg-blue-50' : ''
+                    selectedIssue?.manifest === issue.manifest ? 'border-[var(--newspapers-button-bg)] bg-[rgba(196,155,97,0.1)]' : ''
                   }`}
                   onClick={() => handleIssueClick(issue)}
                 >
