@@ -46,7 +46,7 @@ export const IssueDrawer: React.FC<IssueDrawerProps> = ({
                 key={issue.manifest}
                 className={`p-3 rounded-lg border transition-colors cursor-pointer ${
                   selectedIssue?.manifest === issue.manifest
-                    ? 'bg-blue-50 border-blue-300'
+                    ? 'bg-[rgba(196,155,97,0.1)] border-[var(--newspapers-button-bg)]'
                     : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
                 }`}
                 onClick={() => onIssueSelect(issue)}
