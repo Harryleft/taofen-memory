@@ -585,3 +585,251 @@
 .newspapers-scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background: var(--newspapers-text-secondary);
 }
+
+/* ================================================
+   一体化布局新增样式
+   ================================================ */
+
+/* 主内容区域 - 一体化布局 */
+.newspapers-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background: var(--newspapers-bg-primary);
+}
+
+/* 欢迎界面 */
+.newspapers-welcome {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+}
+
+.newspapers-welcome__content {
+  max-width: 400px;
+}
+
+.newspapers-welcome__icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.8;
+}
+
+.newspapers-welcome__title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--newspapers-text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.newspapers-welcome__message {
+  color: var(--newspapers-text-secondary);
+  margin: 0 0 1.5rem 0;
+  line-height: 1.5;
+}
+
+/* 期数和查看器一体化布局 */
+.newspapers-issue-viewer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* 期数选择器 */
+.newspapers-issue-selector {
+  height: 200px;
+  border-bottom: 1px solid var(--newspapers-border-color);
+  background: var(--newspapers-bg-secondary);
+  display: flex;
+  flex-direction: column;
+}
+
+.newspapers-issue-selector__header {
+  padding: 1rem;
+  border-bottom: 1px solid var(--newspapers-border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.newspapers-issue-selector__title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--newspapers-text-primary);
+  margin: 0;
+}
+
+.newspapers-issue-selector__count {
+  font-size: 0.875rem;
+  color: var(--newspapers-text-secondary);
+  background: var(--newspapers-hover-bg);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+/* 期数列表 */
+.newspapers-issue-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-content: flex-start;
+}
+
+.newspapers-issue-list__empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--newspapers-text-secondary);
+  text-align: center;
+}
+
+.newspapers-issue-list__empty-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.6;
+}
+
+/* 期数项目 */
+.newspapers-issue-item {
+  background: var(--newspapers-bg-primary);
+  border: 1px solid var(--newspapers-border-color);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: all var(--newspapers-transition-fast);
+  min-width: 150px;
+  max-width: 200px;
+  flex: 0 0 auto;
+}
+
+.newspapers-issue-item:hover {
+  background: var(--newspapers-hover-bg);
+  border-color: var(--newspapers-focus-ring);
+  transform: translateY(-1px);
+}
+
+.newspapers-issue-item--selected {
+  background: var(--newspapers-selected-bg);
+  border-color: var(--newspapers-focus-ring);
+  box-shadow: 0 2px 8px rgba(196, 155, 97, 0.2);
+}
+
+.newspapers-issue-item__title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--newspapers-text-primary);
+  margin: 0 0 0.25rem 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.newspapers-issue-item__summary {
+  font-size: 0.75rem;
+  color: var(--newspapers-text-secondary);
+  margin: 0 0 0.5rem 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.newspapers-issue-item__action {
+  display: flex;
+  justify-content: center;
+}
+
+.newspapers-issue-item__button {
+  background: var(--newspapers-hover-bg);
+  border: 1px solid var(--newspapers-border-color);
+  color: var(--newspapers-text-primary);
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all var(--newspapers-transition-fast);
+}
+
+.newspapers-issue-item__button:hover {
+  background: var(--newspapers-selected-bg);
+  border-color: var(--newspapers-focus-ring);
+}
+
+/* 查看器容器 */
+.newspapers-viewer-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 查看器占位符 */
+.newspapers-viewer-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--newspapers-bg-primary);
+}
+
+.newspapers-viewer-placeholder__content {
+  text-align: center;
+  max-width: 300px;
+}
+
+.newspapers-viewer-placeholder__icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.6;
+}
+
+.newspapers-viewer-placeholder__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--newspapers-text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.newspapers-viewer-placeholder__message {
+  color: var(--newspapers-text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* 刊物元信息 */
+.newspapers-publication__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--newspapers-text-secondary);
+}
+
+.newspapers-publication__count {
+  background: var(--newspapers-hover-bg);
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-weight: 500;
+}
+
+.newspapers-publication__updated {
+  font-style: italic;
+  opacity: 0.8;
+}

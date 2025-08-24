@@ -122,9 +122,15 @@ export class NewspaperService {
   }
 
   static extractIssueId(manifestUrl: string): string {
-    // 简化ID提取逻辑
-    const match = manifestUrl.match(/([^/]+)\/manifest\.json$/);
-    return match ? match[1] : '';
+    // 修复ID提取逻辑，处理各种URL格式
+    if (manifestUrl.includes('/manifest.json')) {
+      const match = manifestUrl.match(/([^/]+)\/manifest\.json$/);
+      return match ? match[1] : '';
+    }
+    
+    // 如果是完整的manifest URL，提取最后一部分作为ID
+    const parts = manifestUrl.split('/');
+    return parts[parts.length - 1] || '';
   }
 
   // 简化的getIssues方法 - 基于publicationId获取期数
@@ -174,10 +180,22 @@ export class NewspaperService {
     return filtered;
   }
 
-  // 简化的代理URL获取
+  // 修复的代理URL获取
   static getProxyUrl(url: string): string {
-    return import.meta.env.DEV && url.startsWith('https://') 
-      ? `/proxy?url=${encodeURIComponent(url)}`
-      : url;
+    // 确保URL格式正确
+    if (!url) return '';
+    
+    // 如果URL已经包含manifest.json，直接使用
+    if (url.includes('manifest.json')) {
+      return import.meta.env.DEV && url.startsWith('https://') 
+        ? `/proxy?url=${encodeURIComponent(url)}`
+        : url;
+    }
+    
+    // 否则构建正确的manifest URL
+    const manifestUrl = url.endsWith('/manifest.json') ? url : `${url}/manifest.json`;
+    return import.meta.env.DEV && manifestUrl.startsWith('https://') 
+      ? `/proxy?url=${encodeURIComponent(manifestUrl)}`
+      : manifestUrl;
   }
 }

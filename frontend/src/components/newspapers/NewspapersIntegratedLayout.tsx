@@ -57,7 +57,7 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
     loadPublications();
   }, []);
 
-  // 选择刊物并加载期数 - 消除多层选择
+  // 选择刊物并加载期数 - 一体化交互
   const handlePublicationSelect = useCallback(async (publication: PublicationItem) => {
     try {
       setLoading(true);
@@ -70,19 +70,9 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
       const issuesData = await NewspaperService.getIssues(publicationId);
       setIssues(issuesData);
       
-      // 自动选择第一个期数
-      if (issuesData.length > 0) {
-        const firstIssue = issuesData[0];
-        setSelectedIssue(firstIssue);
-        
-        // 直接加载查看器
-        await loadViewer(firstIssue, publicationId);
-        
-        if (onIssueSelect) {
-          const issueId = NewspaperService.extractIssueId(firstIssue.manifest);
-          onIssueSelect(issueId);
-        }
-      }
+      // 在一体化布局中，不自动选择期数，让用户在右侧选择
+      setSelectedIssue(null);
+      setManifestUrl('');
       
       if (onPublicationSelect) {
         onPublicationSelect(publicationId, publication.title);
@@ -92,17 +82,24 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
     } finally {
       setLoading(false);
     }
-  }, [onPublicationSelect, onIssueSelect]);
+  }, [onPublicationSelect]);
 
-  // 加载查看器 - 简化逻辑
+  // 加载查看器 - 修复URL构建逻辑
   const loadViewer = useCallback(async (issue: IssueItem, publicationId: string) => {
     try {
       const issueId = NewspaperService.extractIssueId(issue.manifest);
       
-      // 直接构建manifest URL，消除特殊情况
-      const fullManifestUrl = issue.manifest.startsWith('http') 
-        ? issue.manifest 
-        : `https://www.ai4dh.cn/iiif/3/manifests/${publicationId}/${issueId}/manifest.json`;
+      // 修复URL构建逻辑，避免重复manifest.json
+      let fullManifestUrl;
+      if (issue.manifest.startsWith('http')) {
+        // 如果已经是完整URL，直接使用
+        fullManifestUrl = issue.manifest;
+      } else {
+        // 构建完整URL，确保不重复manifest.json
+        fullManifestUrl = `https://www.ai4dh.cn/iiif/3/manifests/${publicationId}/${issueId}/manifest.json`;
+      }
+      
+      console.log('Loading manifest:', fullManifestUrl); // 调试信息
       
       const proxyManifestUrl = NewspaperService.getProxyUrl(fullManifestUrl);
       setManifestUrl(proxyManifestUrl);
@@ -113,6 +110,7 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
         throw new Error(`Manifest加载失败: ${response.status} ${response.statusText}`);
       }
     } catch (err) {
+      console.error('Viewer load error:', err); // 调试信息
       setError(err instanceof Error ? err.message : '查看器加载失败');
     }
   }, []);
@@ -211,7 +209,7 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
       <AppHeader moduleId="newspapers" />
       
       <div className="flex flex-1 overflow-hidden">
-        {/* 左侧刊物选择 - 简化为单一列表 */}
+        {/* 左侧刊物选择 - 一体化布局 */}
         <div className={`newspapers-sidebar ${sidebarOpen ? 'newspapers-sidebar--open' : ''}`}>
           <div className="newspapers-sidebar__header">
             <h2 className="newspapers-sidebar__title">报刊列表</h2>
@@ -242,6 +240,16 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
                   <p className="newspapers-publication__summary">
                     {publication.summary || '暂无描述'}
                   </p>
+                  <div className="newspapers-publication__meta">
+                    <span className="newspapers-publication__count">
+                      {publication.issueCount} 期
+                    </span>
+                    {publication.lastUpdated && (
+                      <span className="newspapers-publication__updated">
+                        最新: {publication.lastUpdated}
+                      </span>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -333,14 +341,15 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
             </div>
           </div>
           
-          {/* 查看器区域 */}
-          <div className="newspapers-viewer">
+          {/* 右侧内容区域 - 一体化布局 */}
+          <div className="newspapers-content">
             {!selectedPublication ? (
-              <div className="newspapers-empty">
-                <div className="newspapers-empty__content">
-                  <div className="newspapers-empty__icon">📰</div>
-                  <h2 className="newspapers-empty__title">欢迎使用数字报刊</h2>
-                  <p className="newspapers-empty__message">
+              // 未选择刊物时的欢迎界面
+              <div className="newspapers-welcome">
+                <div className="newspapers-welcome__content">
+                  <div className="newspapers-welcome__icon">📰</div>
+                  <h2 className="newspapers-welcome__title">欢迎使用数字报刊</h2>
+                  <p className="newspapers-welcome__message">
                     请从左侧选择一个刊物开始浏览
                   </p>
                   {isMobile && (
@@ -354,24 +363,87 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
                 </div>
               </div>
             ) : (
-              <>
-                {loading && (
-                  <div className="newspapers-loading">
-                    <div className="newspapers-loading__content">
-                      <div className="newspapers-loading__spinner"></div>
-                      <p className="newspapers-loading__text">加载中...</p>
-                    </div>
+              // 选择刊物后的期数选择和查看器区域
+              <div className="newspapers-issue-viewer">
+                {/* 期数选择区域 */}
+                <div className="newspapers-issue-selector">
+                  <div className="newspapers-issue-selector__header">
+                    <h3 className="newspapers-issue-selector__title">
+                      {selectedPublication.title}
+                    </h3>
+                    <span className="newspapers-issue-selector__count">
+                      共 {issues.length} 期
+                    </span>
                   </div>
-                )}
+                  
+                  <div className="newspapers-issue-list">
+                    {issues.length === 0 ? (
+                      <div className="newspapers-issue-list__empty">
+                        <div className="newspapers-issue-list__empty-icon">📄</div>
+                        <p>暂无期数</p>
+                      </div>
+                    ) : (
+                      issues.map((issue) => (
+                        <div
+                          key={issue.manifest}
+                          className={`newspapers-issue-item ${
+                            selectedIssue?.manifest === issue.manifest
+                              ? 'newspapers-issue-item--selected'
+                              : ''
+                          }`}
+                          onClick={() => handleIssueSelect(issue)}
+                        >
+                          <div className="newspapers-issue-item__title">
+                            {issue.title}
+                          </div>
+                          <div className="newspapers-issue-item__summary">
+                            {issue.summary}
+                          </div>
+                          <div className="newspapers-issue-item__action">
+                            <button className="newspapers-issue-item__button">
+                              查看本期
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
                 
-                <iframe
-                  ref={iframeRef}
-                  className="newspapers-viewer__iframe"
-                  title="报刊查看器"
-                  allowFullScreen
-                  sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation"
-                />
-              </>
+                {/* 查看器区域 */}
+                <div className="newspapers-viewer-container">
+                  {loading && (
+                    <div className="newspapers-loading">
+                      <div className="newspapers-loading__content">
+                        <div className="newspapers-loading__spinner"></div>
+                        <p className="newspapers-loading__text">加载中...</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {!selectedIssue ? (
+                    <div className="newspapers-viewer-placeholder">
+                      <div className="newspapers-viewer-placeholder__content">
+                        <div className="newspapers-viewer-placeholder__icon">📖</div>
+                        <h3 className="newspapers-viewer-placeholder__title">
+                          选择期数开始阅读
+                        </h3>
+                        <p className="newspapers-viewer-placeholder__message">
+                          请从上方选择一个期数开始阅读
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <iframe
+                      ref={iframeRef}
+                      className="newspapers-viewer__iframe"
+                      title="报刊查看器"
+                      allowFullScreen
+                      sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation allow-modals"
+                    />
+                  )}
+                </div>
+              </div>
             )}
           </div>
         </div>
