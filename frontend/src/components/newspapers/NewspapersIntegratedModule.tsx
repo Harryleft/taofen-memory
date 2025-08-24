@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
+import { useNewspapers } from './NewspapersContext';
 import { NewspaperService, PublicationItem, IssueItem } from './services';
-import { NewspaperCard } from './NewspaperCard';
+import { OptimizedViewer } from './OptimizedViewer';
+import { OptimizedIssueSelector } from './OptimizedIssueSelector';
 import AppHeader from '@/components/layout/header/AppHeader.tsx';
 
 interface NewspapersIntegratedModuleProps {
@@ -12,68 +14,46 @@ export const NewspapersIntegratedModule: React.FC<NewspapersIntegratedModuleProp
   onPublicationSelect,
   onIssueSelect
 }) => {
-  // 状态管理 - 简化为核心状态
-  const [publications, setPublications] = useState<PublicationItem[]>([]);
-  const [selectedPublication, setSelectedPublication] = useState<PublicationItem | null>(null);
-  const [selectedIssue, setSelectedIssue] = useState<IssueItem | null>(null);
-  const [issues, setIssues] = useState<IssueItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-
-  // 加载刊物列表
-  useEffect(() => {
-    const loadPublications = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const publicationsData = await NewspaperService.getPublications();
-        setPublications(publicationsData);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : '加载失败');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadPublications();
-  }, []);
+  const { state, actions } = useNewspapers();
+  
+  const {
+    publications,
+    selectedPublication,
+    selectedIssue,
+    issues,
+    loading,
+    error,
+    sidebarCollapsed
+  } = state;
 
   // 选择刊物并加载期数
   const handlePublicationSelect = useCallback(async (publication: PublicationItem) => {
     try {
-      setSelectedPublication(publication);
-      
-      // 加载该刊物的期数列表
-      const publicationId = NewspaperService.extractPublicationId(publication.id);
-      const issuesData = await NewspaperService.getIssues(publicationId);
-      setIssues(issuesData);
-      
-      // 如果有期数，自动选择第一个
-      if (issuesData.length > 0) {
-        setSelectedIssue(issuesData[0]);
-        if (onIssueSelect) {
-          const issueId = NewspaperService.extractIssueId(issuesData[0].manifest);
-          onIssueSelect(issueId);
-        }
-      }
+      actions.selectPublication(publication);
+      await actions.loadIssues(publication);
       
       if (onPublicationSelect) {
+        const publicationId = NewspaperService.extractPublicationId(publication.id);
         onPublicationSelect(publicationId, publication.title);
       }
     } catch (err) {
       console.error('加载期数失败:', err);
     }
-  }, [onPublicationSelect, onIssueSelect]);
+  }, [actions, onPublicationSelect]);
 
-  // 选择期数 - 直接切换，无需额外确认
+  // 选择期数
   const handleIssueSelect = useCallback((issue: IssueItem) => {
-    setSelectedIssue(issue);
-    if (onIssueSelect) {
+    actions.selectIssue(issue);
+    
+    if (onIssueSelect && selectedPublication) {
       const issueId = NewspaperService.extractIssueId(issue.manifest);
       onIssueSelect(issueId);
+      
+      // 加载manifest
+      const publicationId = NewspaperService.extractPublicationId(selectedPublication.id);
+      actions.loadManifest(publicationId, issueId);
     }
-  }, [onIssueSelect]);
+  }, [actions, selectedPublication, onIssueSelect]);
 
   // 键盘快捷键支持
   useEffect(() => {
@@ -81,7 +61,7 @@ export const NewspapersIntegratedModule: React.FC<NewspapersIntegratedModuleProp
       // 空格键切换侧边栏
       if (e.code === 'Space' && !e.target.matches('input, textarea, select')) {
         e.preventDefault();
-        setSidebarCollapsed(!sidebarCollapsed);
+        actions.toggleSidebar();
       }
       
       // 左右箭头切换期数
@@ -97,7 +77,7 @@ export const NewspapersIntegratedModule: React.FC<NewspapersIntegratedModuleProp
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [issues, selectedIssue, handleIssueSelect, sidebarCollapsed]);
+  }, [issues, selectedIssue, handleIssueSelect, actions]);
 
   // 错误状态处理
   if (error) {
@@ -106,7 +86,7 @@ export const NewspapersIntegratedModule: React.FC<NewspapersIntegratedModuleProp
         <div className="text-center">
           <p className="text-red-600 mb-4">加载失败: {error}</p>
           <button 
-            onClick={() => window.location.reload()}
+            onClick={() => actions.loadPublications()}
             className="btn-newspapers px-4 py-2 rounded"
           >
             重试
@@ -180,7 +160,7 @@ export const NewspapersIntegratedModule: React.FC<NewspapersIntegratedModuleProp
             </div>
             <div className="flex items-center gap-4">
               <button
-                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                onClick={() => actions.toggleSidebar()}
                 className="text-[var(--newspapers-button-bg)] hover:text-[var(--newspapers-button-hover)] font-medium"
               >
                 {sidebarCollapsed ? '展开侧栏' : '收起侧栏'}
@@ -198,7 +178,7 @@ export const NewspapersIntegratedModule: React.FC<NewspapersIntegratedModuleProp
                   <p className="text-gray-600 mb-4">请从左侧选择一个刊物开始浏览</p>
                   {!sidebarCollapsed && (
                     <button
-                      onClick={() => setSidebarCollapsed(true)}
+                      onClick={() => actions.toggleSidebar()}
                       className="btn-newspapers px-4 py-2 rounded"
                     >
                       收起侧栏
@@ -209,94 +189,11 @@ export const NewspapersIntegratedModule: React.FC<NewspapersIntegratedModuleProp
             ) : (
               <div className="h-full flex flex-col">
                 {/* 期数选择器 */}
-                <div className="bg-white border-b border-gray-200 p-4">
-                  <div className="flex items-center gap-4">
-                    <label className="text-sm font-medium text-gray-700">选择期数：</label>
-                    <select
-                      value={selectedIssue?.manifest || ''}
-                      onChange={(e) => {
-                        const issue = issues.find(i => i.manifest === e.target.value);
-                        if (issue) handleIssueSelect(issue);
-                      }}
-                      className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--newspapers-button-bg)]"
-                      disabled={issues.length === 0}
-                    >
-                      {issues.length === 0 ? (
-                        <option value="">暂无期数</option>
-                      ) : (
-                        issues.map((issue) => (
-                          <option key={issue.manifest} value={issue.manifest}>
-                            {issue.title}
-                          </option>
-                        ))
-                      )}
-                    </select>
-                    
-                    {/* 期数导航按钮 */}
-                    {issues.length > 1 && selectedIssue && (
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => {
-                            const currentIndex = issues.findIndex(issue => issue.manifest === selectedIssue.manifest);
-                            if (currentIndex > 0) {
-                              handleIssueSelect(issues[currentIndex - 1]);
-                            }
-                          }}
-                          disabled={issues.findIndex(issue => issue.manifest === selectedIssue.manifest) === 0}
-                          className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50"
-                        >
-                          上一期
-                        </button>
-                        <button
-                          onClick={() => {
-                            const currentIndex = issues.findIndex(issue => issue.manifest === selectedIssue.manifest);
-                            if (currentIndex < issues.length - 1) {
-                              handleIssueSelect(issues[currentIndex + 1]);
-                            }
-                          }}
-                          disabled={issues.findIndex(issue => issue.manifest === selectedIssue.manifest) === issues.length - 1}
-                          className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50"
-                        >
-                          下一期
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                <OptimizedIssueSelector />
                 
                 {/* 查看器区域 */}
                 <div className="flex-1">
-                  {selectedIssue ? (
-                    <div className="h-full">
-                      {/* 这里可以嵌入实际的查看器组件 */}
-                      <div className="h-full flex items-center justify-center">
-                        <div className="text-center">
-                          <div className="text-6xl mb-4">📄</div>
-                          <h3 className="text-xl font-semibold text-gray-700 mb-2">
-                            {selectedIssue.title}
-                          </h3>
-                          <p className="text-gray-600 mb-4">
-                            刊物：{selectedPublication?.title}
-                          </p>
-                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md mx-auto">
-                            <p className="text-sm text-blue-800">
-                              <strong>查看器预览</strong><br />
-                              这里将显示报刊的实际内容<br />
-                              当前选择了：{selectedIssue.title}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center h-full">
-                      <div className="text-center">
-                        <div className="text-6xl mb-4">📋</div>
-                        <h3 className="text-xl font-semibold text-gray-700 mb-2">选择期数</h3>
-                        <p className="text-gray-600">请从上方下拉菜单中选择一个期数</p>
-                      </div>
-                    </div>
-                  )}
+                  <OptimizedViewer />
                 </div>
               </div>
             )}

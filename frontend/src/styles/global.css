@@ -5,6 +5,9 @@
 /* AI解读功能样式引入 */
 @import url('./ai-interpretation.css');
 
+/* 数字报刊模块样式引入 */
+@import url('./newspapers.css');
+
 /* 全局根变量定义 */
 :root {
   /* === 基础色彩系统 === */
