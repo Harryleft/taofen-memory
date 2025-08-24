@@ -1,8 +1,4 @@
 import { IIIFManifest } from './iiifTypes';
-import { IIIFUrlBuilder } from './iiifUrlBuilder';
-
-// 基础URL配置
-const BASE_URL = import.meta.env.DEV ? '/iiif' : 'https://www.ai4dh.cn/iiif';
 
 // 简化的代理函数 - 消除特殊情况
 async function fetchWithProxy(url: string): Promise<Response> {
@@ -32,7 +28,7 @@ export interface IssueItem {
 
 export class NewspaperService {
   static async getPublications(): Promise<PublicationItem[]> {
-    const collectionUrl = IIIFUrlBuilder.buildCollection('collection.json', { proxy: true });
+    const collectionUrl = this.buildCollectionUrl('collection.json');
     
     try {
       const response = await fetchWithProxy(collectionUrl);
@@ -100,8 +96,8 @@ export class NewspaperService {
 
   static async getManifest(manifestId: string): Promise<IIIFManifest> {
     try {
-      // 使用统一的URL构建工具
-      const manifestUrl = IIIFUrlBuilder.buildManifest(manifestId, { proxy: true });
+      // 使用简化的URL构建
+      const manifestUrl = this.buildManifestUrl(manifestId);
       
       const response = await fetchWithProxy(manifestUrl);
       if (!response.ok) {
@@ -115,49 +111,39 @@ export class NewspaperService {
     }
   }
 
+  // Linus式简化的ID提取 - 消除特殊情况
   static extractPublicationId(collectionUrl: string): string {
-    try {
-      return IIIFUrlBuilder.extractCollectionId(collectionUrl);
-    } catch (error) {
-      // 回退到原来的逻辑作为后备
-      console.log('Debug: extractPublicationId fallback with:', collectionUrl);
-      const match = collectionUrl.match(/([^/]+)\/collection\.json$/);
-      const result = match ? match[1] : '';
-      console.log('Debug: extractPublicationId fallback result:', result);
-      return result;
-    }
+    const match = collectionUrl.match(/([^/]+)\/collection\.json$/);
+    return match ? match[1] : '';
   }
 
   static extractIssueId(manifestUrl: string): string {
-    try {
-      return IIIFUrlBuilder.extractManifestId(manifestUrl);
-    } catch (error) {
-      // 回退到原来的逻辑作为后备
-      console.log('Debug: extractIssueId fallback with:', manifestUrl);
-      if (manifestUrl.includes('/manifest.json')) {
-        const match = manifestUrl.match(/([^/]+)\/manifest\.json$/);
-        const result = match ? match[1] : '';
-        console.log('Debug: extractIssueId (manifest.json) fallback result:', result);
-        return result;
-      }
-      
-      // 如果是完整的manifest URL，提取最后一部分作为ID
-      const parts = manifestUrl.split('/');
-      const result = parts[parts.length - 1] || '';
-      console.log('Debug: extractIssueId (fallback) result:', result);
-      return result;
-    }
+    const match = manifestUrl.match(/([^/]+)\/manifest\.json$/);
+    return match ? match[1] : '';
   }
 
   // 简化的getIssues方法 - 基于publicationId获取期数
   static async getIssues(publicationId: string): Promise<IssueItem[]> {
     try {
-      const collectionUrl = IIIFUrlBuilder.buildCollection(`${publicationId}/collection.json`, { proxy: true });
+      const collectionUrl = this.buildCollectionUrl(`${publicationId}/collection.json`);
       return await this.getIssuesForPublication(collectionUrl);
     } catch (error) {
       console.error('Failed to get issues:', error);
       return [];
     }
+  }
+
+  // Linus式简化的URL构建方法
+  private static buildManifestUrl(path: string): string {
+    const baseUrl = 'https://www.ai4dh.cn/iiif/3';
+    const url = `${baseUrl}/manifests/${path}/manifest.json`;
+    return this.getProxyUrl(url);
+  }
+
+  private static buildCollectionUrl(path: string): string {
+    const baseUrl = 'https://www.ai4dh.cn/iiif/3';
+    const url = `${baseUrl}/manifests/${path}/collection.json`;
+    return this.getProxyUrl(url);
   }
 
   // 简化的搜索功能
@@ -196,16 +182,16 @@ export class NewspaperService {
     return filtered;
   }
 
-  // 统一的代理URL获取 - 使用新的URL构建工具
+  // Linus式简化的代理URL获取 - 消除特殊情况
   static getProxyUrl(url: string): string {
-    try {
-      // 首先尝试解析URL
-      const components = IIIFUrlBuilder.parse(url);
-      return IIIFUrlBuilder.build(components, { proxy: true });
-    } catch (error) {
-      // 如果解析失败，尝试修复URL
-      const fixedUrl = IIIFUrlBuilder.fix(url);
-      return IIIFUrlBuilder.build(IIIFUrlBuilder.parse(fixedUrl), { proxy: true });
+    if (!url) return '';
+    
+    // 开发环境使用代理
+    if (import.meta.env.DEV && url.startsWith('https://')) {
+      return `/proxy?url=${encodeURIComponent(url)}`;
     }
+    
+    // 生产环境直接返回原URL
+    return url;
   }
 }

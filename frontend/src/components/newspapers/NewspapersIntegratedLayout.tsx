@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { NewspaperService, PublicationItem, IssueItem } from './services';
-import { IIIFUrlBuilder } from './utils';
 import AppHeader from '@/components/layout/header/AppHeader.tsx';
 
 interface NewspapersIntegratedLayoutProps {
@@ -86,84 +85,26 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
     }
   }, [onPublicationSelect]);
 
-  // 加载查看器 - 使用新的URL构建工具
-  const loadViewer = useCallback(async (issue: IssueItem, publicationId: string) => {
+  // 加载查看器 - Linus式简化设计
+  const loadViewer = useCallback(async (issue: IssueItem, _publicationId: string) => {
     try {
       console.log('🔍 [DEBUG] 开始加载查看器:');
       console.log('🔍 [DEBUG] Issue:', issue);
-      console.log('🔍 [DEBUG] publicationId:', publicationId);
       console.log('🔍 [DEBUG] issue.manifest:', issue.manifest);
-      console.log('🔍 [DEBUG] issue.manifest 类型:', typeof issue.manifest);
       
-      // 使用统一的URL构建工具
-      let manifestUrl;
+      // Linus式设计：直接使用issue.manifest，它已经是完整的manifest URL
+      const fullManifestUrl = issue.manifest;
+      console.log('🔍 [DEBUG] 完整manifest URL:', fullManifestUrl);
       
-      if (issue.manifest.includes('collection.json')) {
-        console.log('🔍 [DEBUG] 检测到collection.json，需要提取真正的manifest ID');
-        const issueId = NewspaperService.extractIssueId(issue.manifest);
-        console.log('🔍 [DEBUG] 提取的issueId:', issueId);
-        
-        if (!issueId) {
-          console.error('🔍 [DEBUG] issueId为空，无法构建manifest URL');
-          throw new Error('无法解析期数ID');
-        }
-        
-        // 直接构建manifest URL，不经过collection
-        manifestUrl = IIIFUrlBuilder.buildManifest(`${publicationId}/${issueId}`, { proxy: true });
-      } else {
-        console.log('🔍 [DEBUG] 尝试直接使用issue.manifest');
-        
-        try {
-          // 首先尝试直接使用issue.manifest作为完整URL
-          const components = IIIFUrlBuilder.parse(issue.manifest);
-          console.log('🔍 [DEBUG] 解析的URL组件:', components);
-          
-          if (components.type === 'manifests' && components.resourcePath.includes('collection.json')) {
-            console.log('🔍 [DEBUG] 检测到collection.json，需要转换为manifest');
-            // 如果是collection.json，提取ID并构建manifest URL
-            const collectionId = NewspaperService.extractPublicationId(components.resourcePath);
-            if (collectionId && collectionId !== publicationId) {
-              console.log('🔍 [DEBUG] 使用collectionId作为issueId:', collectionId);
-              manifestUrl = IIIFUrlBuilder.buildManifest(`${publicationId}/${collectionId}`, { proxy: true });
-            } else {
-              console.log('🔍 [DEBUG] 无法从collection.json提取有效的issueId');
-              throw new Error('无法从collection.json提取期数ID');
-            }
-          } else {
-            manifestUrl = IIIFUrlBuilder.build(components, { proxy: true });
-          }
-        } catch (error) {
-          console.log('🔍 [DEBUG] 解析失败，尝试构建新的URL:', error);
-          // 如果解析失败，构建新的URL
-          const issueId = NewspaperService.extractIssueId(issue.manifest);
-          console.log('🔍 [DEBUG] 使用extractIssueId结果:', issueId);
-          
-          if (!issueId) {
-            console.error('🔍 [DEBUG] issueId为空，无法构建manifest URL');
-            throw new Error('无法解析期数 ID');
-          }
-          
-          manifestUrl = IIIFUrlBuilder.buildManifest(`${publicationId}/${issueId}`, { proxy: true });
-        }
-      }
+      // 使用简化的代理处理
+      const proxyManifestUrl = NewspaperService.getProxyUrl(fullManifestUrl);
+      console.log('🔍 [DEBUG] 代理manifest URL:', proxyManifestUrl);
       
-      console.log('🔍 [DEBUG] 最终manifest URL:', manifestUrl);
-      
-      // 验证URL格式
-      if (!IIIFUrlBuilder.validate(manifestUrl)) {
-        console.error('🔍 [DEBUG] 构建的URL格式无效:', manifestUrl);
-        throw new Error('构建的manifest URL格式无效');
-      }
-      
-      // 修复URL中的常见问题
-      const fixedUrl = IIIFUrlBuilder.fix(manifestUrl);
-      console.log('🔍 [DEBUG] 修复后的URL:', fixedUrl);
-      
-      setManifestUrl(fixedUrl);
+      setManifestUrl(proxyManifestUrl);
       
       // 验证manifest是否可访问
       console.log('🔍 [DEBUG] 开始验证manifest可访问性...');
-      const response = await fetch(fixedUrl);
+      const response = await fetch(proxyManifestUrl);
       console.log('🔍 [DEBUG] HTTP响应状态:', response.status);
       
       if (!response.ok) {
