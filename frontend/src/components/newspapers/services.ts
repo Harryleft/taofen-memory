@@ -99,6 +99,7 @@ export class NewspaperService {
       const col = await response.json();
       return (col.items || []).map((it: any, i: number) => ({
         i, 
+        id: it.id,
         manifest: it.id,
         title: (it.label?.['zh-CN']?.[0]) || (it.label?.zh?.[0]) || (it.label?.en?.[0]) || '未知期刊',
         summary: (it.summary?.['zh-CN']?.[0]) || (it.summary?.zh?.[0]) || (it.summary?.en?.[0]) || ''

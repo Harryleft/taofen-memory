@@ -100,6 +100,24 @@ export const headerConfigs: Record<string, HeaderConfig> = {
     backgroundColor: 'white',
   },
 
+  // 数字报刊 - 其他页面使用白色背景
+  newspapers: {
+    moduleId: 'newspapers',
+    title: '数字报刊',
+    subtitle: 'Digital Newspapers',
+    description: '浏览和查阅韬奋先生相关的历史报刊资料，包括《生活》周刊等重要出版物。',
+    accentColor: 'purple',
+    layout: 'hero',
+    navigation: NAVIGATION_ITEMS,
+    logo: {
+      showText: true,
+      showIcon: true,
+    },
+    showNavigation: true,
+    showMobileMenu: true,
+    backgroundColor: 'white',
+  },
+
   // 默认或未知模块 - 其他页面使用白色背景
   default: {
     moduleId: 'default',

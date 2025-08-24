@@ -5,7 +5,7 @@ import { TimelineEvent } from "@/types/personTypes.ts";
 
 interface TimelineNavigationProps {
   events: TimelineEvent[];
-  activeEventId: string;
+  activeEventId: number; // 修改这里的类型
 }
 
 export function TimelineNavigation({

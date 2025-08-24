@@ -20,6 +20,7 @@ import { NewspaperService, PublicationItem } from '@/components/newspapers/servi
 import { NewspaperCard } from '@/components/newspapers/NewspaperCard';
 import { IssueCard } from '@/components/newspapers/IssueCard';
 import { IIIFCollectionItem } from '@/components/newspapers/iiifTypes';
+import { ViewerPage } from '@/components/newspapers/ViewerPage';
 
 import BookFiltersPanel from './BookFiltersPanel.tsx';
 import BookGrid from './BookGridContainer.tsx';
@@ -65,6 +66,10 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
   const [issues, setIssues] = useState<IIIFCollectionItem[]>([]);
   const [issuesLoading, setIssuesLoading] = useState(false);
   const [issuesError, setIssuesError] = useState<string | null>(null);
+  
+  // 查看器状态
+  const [selectedIssue, setSelectedIssue] = useState<IIIFCollectionItem | null>(null);
+  const [currentView, setCurrentView] = useState<'catalog' | 'viewer'>('catalog');
   
   // 构建筛选条件对象
   const filters = useMemo(() => ({ searchTerm, category: selectedCategory, year: selectedYear }), [searchTerm, selectedCategory, selectedYear]);
@@ -174,6 +179,18 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
     setIssuesError(null);
   };
 
+  // 处理期数点击
+  const handleIssueClick = (issue: IIIFCollectionItem) => {
+    setSelectedIssue(issue);
+    setCurrentView('viewer');
+  };
+
+  // 返回期数列表
+  const handleBackToIssues = () => {
+    setCurrentView('catalog');
+    setSelectedIssue(null);
+  };
+
   // 防抖处理：筛选条件变化时重新加载数据
   useEffect(() => {
     // isInitialLoading 会在 resetAndReload 开始时变为 true，这里用它来防止在加载期间再次触发
@@ -231,6 +248,24 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
   const itemsToDisplay = !hasMore 
     ? new Set(displayedData.map(item => item.id)) 
     : visibleItems;
+
+  // 查看器视图
+  if (currentView === 'viewer' && selectedPublication && selectedIssue) {
+    const publicationId = selectedPublication.id;
+    const issueId = selectedIssue.id;
+    
+    return (
+      <div className="h-screen">
+        <button
+          onClick={handleBackToIssues}
+          className="fixed top-4 left-4 z-50 bg-white text-blue-500 px-4 py-2 rounded-lg shadow-lg hover:bg-gray-50"
+        >
+          ← 返回期刊目录
+        </button>
+        <ViewerPage publicationId={publicationId} issueId={issueId} />
+      </div>
+    );
+  }
 
   // 初始加载状态渲染
   if (isInitialLoading && displayedData.length === 0) {
@@ -363,10 +398,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
                 <div key={issue.id} className="block">
                   <IssueCard 
                     issue={issue} 
-                    onClick={() => {
-                      // 这里可以添加打开查看器的逻辑
-                      console.log('点击期数:', issue.label.zh?.[0]);
-                    }} 
+                    onClick={() => handleIssueClick(issue)} 
                   />
                 </div>
               ))}
