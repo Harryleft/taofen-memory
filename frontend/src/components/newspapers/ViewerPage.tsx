@@ -1,15 +1,28 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { NewspaperService } from './services';
+import { NewspaperService, IssueItem } from './services';
+import { IssueDrawer } from './IssueDrawer';
 
 interface ViewerPageProps {
   publicationId: string;
   issueId: string;
+  publicationTitle?: string;
+  allIssues?: IssueItem[];
+  onIssueSelect?: (issue: IssueItem) => void;
+  onIssuePreview?: (issue: IssueItem) => void;
 }
 
-export const ViewerPage: React.FC<ViewerPageProps> = ({ publicationId, issueId }) => {
+export const ViewerPage: React.FC<ViewerPageProps> = ({ 
+  publicationId, 
+  issueId, 
+  publicationTitle = '',
+  allIssues = [],
+  onIssueSelect,
+  onIssuePreview 
+}) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [manifestUrl, setManifestUrl] = useState<string>('');
+  const [selectedIssue, setSelectedIssue] = useState<IssueItem | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
@@ -56,6 +69,16 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({ publicationId, issueId }
     loadManifest();
   }, [publicationId, issueId]);
 
+  // 设置当前选择的期数
+  useEffect(() => {
+    if (allIssues.length > 0 && issueId) {
+      const currentIssue = allIssues.find(issue => 
+        NewspaperService.extractIssueId(issue.manifest) === issueId
+      );
+      setSelectedIssue(currentIssue || null);
+    }
+  }, [allIssues, issueId]);
+
   useEffect(() => {
     if (!manifestUrl || loading) return;
 
@@ -90,6 +113,20 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({ publicationId, issueId }
       const timestamp = Date.now();
       const iframeSrc = `/uv_simple.html?v=${timestamp}#?iiifManifestId=${encodeURIComponent(manifestUrl)}&embedded=true`;
       iframeRef.current.src = iframeSrc;
+    }
+  };
+
+  // 处理期数选择
+  const handleIssueSelect = (issue: IssueItem) => {
+    if (onIssueSelect) {
+      onIssueSelect(issue);
+    }
+  };
+
+  // 处理期数预览
+  const handleIssuePreview = (issue: IssueItem) => {
+    if (onIssuePreview) {
+      onIssuePreview(issue);
     }
   };
 
@@ -130,17 +167,50 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({ publicationId, issueId }
   }
 
   return (
-    <div className="h-screen bg-white">
-      <div className="uv-frame-wrap h-full border border-gray-300 rounded-lg overflow-hidden">
-        <iframe
-          ref={iframeRef}
-          id="uv-frame"
-          title="Universal Viewer"
-          allowFullScreen
-          className="w-full h-full border-0"
-          sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation"
-        />
+    <div className="h-screen bg-white flex">
+      {/* 左侧主视图区域 - 70%宽度 */}
+      <div className="w-[70%] h-full flex flex-col border-r border-gray-300">
+        {/* 顶部工具栏 */}
+        <div className="bg-gray-100 border-b border-gray-300 p-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button className="text-blue-600 hover:text-blue-800 font-medium">
+              ← 返回书籍
+            </button>
+            <span className="text-gray-600">|</span>
+            <button className="text-gray-600 hover:text-gray-800">上一页</button>
+            <button className="text-gray-600 hover:text-gray-800">下一页</button>
+          </div>
+          <div className="flex items-center gap-2">
+            <button className="text-gray-600 hover:text-gray-800">缩放-</button>
+            <button className="text-gray-600 hover:text-gray-800">缩放+</button>
+            <button className="text-gray-600 hover:text-gray-800">全屏</button>
+            <button className="text-gray-600 hover:text-gray-800">目录</button>
+          </div>
+        </div>
+        
+        {/* UV查看器区域 */}
+        <div className="flex-1 bg-gray-50 relative">
+          <div className="uv-frame-wrap h-full border border-gray-300 rounded-lg overflow-hidden m-4">
+            <iframe
+              ref={iframeRef}
+              id="uv-frame"
+              title="Universal Viewer"
+              allowFullScreen
+              className="w-full h-full border-0"
+              sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation"
+            />
+          </div>
+        </div>
       </div>
+      
+      {/* 右侧抽屉组件 */}
+      <IssueDrawer
+        publicationTitle={publicationTitle}
+        issues={allIssues}
+        selectedIssue={selectedIssue}
+        onIssueSelect={handleIssueSelect}
+        onIssuePreview={handleIssuePreview}
+      />
     </div>
   );
 };
