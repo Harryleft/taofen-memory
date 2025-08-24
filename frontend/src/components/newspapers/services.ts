@@ -1,4 +1,5 @@
 import { IIIFManifest } from './iiifTypes';
+import { IIIFUrlBuilder } from './iiifUrlBuilder';
 
 // 基础URL配置
 const BASE_URL = import.meta.env.DEV ? '/iiif' : 'https://www.ai4dh.cn/iiif';
@@ -31,10 +32,10 @@ export interface IssueItem {
 
 export class NewspaperService {
   static async getPublications(): Promise<PublicationItem[]> {
-    const url = 'https://www.ai4dh.cn/iiif/3/manifests/collection.json';
+    const collectionUrl = IIIFUrlBuilder.buildCollection('collection.json', { proxy: true });
     
     try {
-      const response = await fetchWithProxy(url);
+      const response = await fetchWithProxy(collectionUrl);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -99,10 +100,8 @@ export class NewspaperService {
 
   static async getManifest(manifestId: string): Promise<IIIFManifest> {
     try {
-      // 简化URL构建逻辑
-      const manifestUrl = manifestId.startsWith('http') 
-        ? manifestId 
-        : `${BASE_URL}/3/manifests/${encodeURIComponent(manifestId)}/manifest.json`;
+      // 使用统一的URL构建工具
+      const manifestUrl = IIIFUrlBuilder.buildManifest(manifestId, { proxy: true });
       
       const response = await fetchWithProxy(manifestUrl);
       if (!response.ok) {
@@ -117,34 +116,43 @@ export class NewspaperService {
   }
 
   static extractPublicationId(collectionUrl: string): string {
-    console.log('Debug: extractPublicationId called with:', collectionUrl);
-    const match = collectionUrl.match(/([^/]+)\/collection\.json$/);
-    const result = match ? match[1] : '';
-    console.log('Debug: extractPublicationId result:', result);
-    return result;
+    try {
+      return IIIFUrlBuilder.extractCollectionId(collectionUrl);
+    } catch (error) {
+      // 回退到原来的逻辑作为后备
+      console.log('Debug: extractPublicationId fallback with:', collectionUrl);
+      const match = collectionUrl.match(/([^/]+)\/collection\.json$/);
+      const result = match ? match[1] : '';
+      console.log('Debug: extractPublicationId fallback result:', result);
+      return result;
+    }
   }
 
   static extractIssueId(manifestUrl: string): string {
-    console.log('Debug: extractIssueId called with:', manifestUrl);
-    // 修复ID提取逻辑，处理各种URL格式
-    if (manifestUrl.includes('/manifest.json')) {
-      const match = manifestUrl.match(/([^/]+)\/manifest\.json$/);
-      const result = match ? match[1] : '';
-      console.log('Debug: extractIssueId (manifest.json) result:', result);
+    try {
+      return IIIFUrlBuilder.extractManifestId(manifestUrl);
+    } catch (error) {
+      // 回退到原来的逻辑作为后备
+      console.log('Debug: extractIssueId fallback with:', manifestUrl);
+      if (manifestUrl.includes('/manifest.json')) {
+        const match = manifestUrl.match(/([^/]+)\/manifest\.json$/);
+        const result = match ? match[1] : '';
+        console.log('Debug: extractIssueId (manifest.json) fallback result:', result);
+        return result;
+      }
+      
+      // 如果是完整的manifest URL，提取最后一部分作为ID
+      const parts = manifestUrl.split('/');
+      const result = parts[parts.length - 1] || '';
+      console.log('Debug: extractIssueId (fallback) result:', result);
       return result;
     }
-    
-    // 如果是完整的manifest URL，提取最后一部分作为ID
-    const parts = manifestUrl.split('/');
-    const result = parts[parts.length - 1] || '';
-    console.log('Debug: extractIssueId (fallback) result:', result);
-    return result;
   }
 
   // 简化的getIssues方法 - 基于publicationId获取期数
   static async getIssues(publicationId: string): Promise<IssueItem[]> {
     try {
-      const collectionUrl = `https://www.ai4dh.cn/iiif/3/manifests/${publicationId}/collection.json`;
+      const collectionUrl = IIIFUrlBuilder.buildCollection(`${publicationId}/collection.json`, { proxy: true });
       return await this.getIssuesForPublication(collectionUrl);
     } catch (error) {
       console.error('Failed to get issues:', error);
@@ -188,29 +196,16 @@ export class NewspaperService {
     return filtered;
   }
 
-  // 修复的代理URL获取
+  // 统一的代理URL获取 - 使用新的URL构建工具
   static getProxyUrl(url: string): string {
-    // 确保URL格式正确
-    if (!url) return '';
-    
-    // 如果URL已经包含manifest.json，直接代理
-    if (url.includes('manifest.json')) {
-      return import.meta.env.DEV && url.startsWith('https://') 
-        ? `/proxy?url=${encodeURIComponent(url)}`
-        : url;
+    try {
+      // 首先尝试解析URL
+      const components = IIIFUrlBuilder.parse(url);
+      return IIIFUrlBuilder.build(components, { proxy: true });
+    } catch (error) {
+      // 如果解析失败，尝试修复URL
+      const fixedUrl = IIIFUrlBuilder.fix(url);
+      return IIIFUrlBuilder.build(IIIFUrlBuilder.parse(fixedUrl), { proxy: true });
     }
-    
-    // 如果URL是collection.json，也直接代理，不要添加manifest.json
-    if (url.includes('collection.json')) {
-      return import.meta.env.DEV && url.startsWith('https://') 
-        ? `/proxy?url=${encodeURIComponent(url)}`
-        : url;
-    }
-    
-    // 只有在明确是manifest ID的情况下才添加manifest.json
-    const manifestUrl = url.endsWith('/manifest.json') ? url : `${url}/manifest.json`;
-    return import.meta.env.DEV && manifestUrl.startsWith('https://') 
-      ? `/proxy?url=${encodeURIComponent(manifestUrl)}`
-      : manifestUrl;
   }
 }
