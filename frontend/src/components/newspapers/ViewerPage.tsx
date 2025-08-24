@@ -23,6 +23,8 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [manifestUrl, setManifestUrl] = useState<string>('');
   const [selectedIssue, setSelectedIssue] = useState<IssueItem | null>(null);
+  const [issues, setIssues] = useState<IssueItem[]>(allIssues);
+  const [issuesLoading, setIssuesLoading] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
@@ -76,8 +78,44 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({
         NewspaperService.extractIssueId(issue.manifest) === issueId
       );
       setSelectedIssue(currentIssue || null);
+      setIssues(allIssues);
     }
   }, [allIssues, issueId]);
+
+  // 如果没有期数数据，主动获取
+  useEffect(() => {
+    const loadIssuesIfNeeded = async () => {
+      if (issues.length === 0 && publicationId && !issuesLoading) {
+        setIssuesLoading(true);
+        try {
+          console.log('🔍 [调试] 主动获取期数数据，publicationId:', publicationId);
+          
+          // 构建collection URL
+          const collectionUrl = `https://www.ai4dh.cn/iiif/3/manifests/${publicationId}/collection.json`;
+          console.log('🔍 [调试] 构建的collection URL:', collectionUrl);
+          
+          const issueList = await NewspaperService.getIssuesForPublication(collectionUrl);
+          console.log('🔍 [调试] 获取到的期数列表:', issueList);
+          
+          setIssues(issueList);
+          
+          // 设置当前选择的期数
+          if (issueId) {
+            const currentIssue = issueList.find(issue => 
+              NewspaperService.extractIssueId(issue.manifest) === issueId
+            );
+            setSelectedIssue(currentIssue || null);
+          }
+        } catch (err) {
+          console.error('❌ 获取期数列表失败:', err);
+        } finally {
+          setIssuesLoading(false);
+        }
+      }
+    };
+
+    loadIssuesIfNeeded();
+  }, [publicationId, issueId, issues.length, issuesLoading]);
 
   useEffect(() => {
     if (!manifestUrl || loading) return;
@@ -176,15 +214,6 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({
             <button className="text-blue-600 hover:text-blue-800 font-medium">
               ← 返回书籍
             </button>
-            <span className="text-gray-600">|</span>
-            <button className="text-gray-600 hover:text-gray-800">上一页</button>
-            <button className="text-gray-600 hover:text-gray-800">下一页</button>
-          </div>
-          <div className="flex items-center gap-2">
-            <button className="text-gray-600 hover:text-gray-800">缩放-</button>
-            <button className="text-gray-600 hover:text-gray-800">缩放+</button>
-            <button className="text-gray-600 hover:text-gray-800">全屏</button>
-            <button className="text-gray-600 hover:text-gray-800">目录</button>
           </div>
         </div>
         
@@ -206,10 +235,11 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({
       {/* 右侧抽屉组件 */}
       <IssueDrawer
         publicationTitle={publicationTitle}
-        issues={allIssues}
+        issues={issues}
         selectedIssue={selectedIssue}
         onIssueSelect={handleIssueSelect}
         onIssuePreview={handleIssuePreview}
+        loading={issuesLoading}
       />
     </div>
   );
