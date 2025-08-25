@@ -58,8 +58,9 @@ export const NewspapersLayout: React.FC<NewspapersLayoutProps> = ({
             <button
               onClick={onRootSelect}
               className="newspapers-sidebar__back"
+              aria-label="返回刊物列表"
             >
-              ← 返回刊物列表
+              ←
             </button>
             <h2 className="newspapers-sidebar__title">
               {selectedPublication.title}
