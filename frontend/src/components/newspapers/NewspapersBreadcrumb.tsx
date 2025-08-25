@@ -19,7 +19,6 @@ interface NewspapersBreadcrumbProps {
 }
 
 export const NewspapersBreadcrumb: React.FC<NewspapersBreadcrumbProps> = ({
-  publications,
   selectedPublication,
   selectedIssue,
   onPublicationSelect,
