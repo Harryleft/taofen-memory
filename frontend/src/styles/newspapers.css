@@ -33,6 +33,10 @@
   --newspapers-selected-bg: rgba(196, 155, 97, 0.12);
   --newspapers-focus-ring: rgba(196, 155, 97, 0.3);
   
+  /* 按钮颜色 */
+  --newspapers-button-bg: #c49b61;
+  --newspapers-button-hover: #b08a55;
+  
   /* 动画 - 快速且不引人注意 */
   --newspapers-transition-fast: 0.15s ease;
   --newspapers-transition-normal: 0.25s ease;
@@ -428,33 +432,231 @@
 }
 
 /* ================================================
+   移动端抽屉样式
+   ================================================ */
+
+/* 移动端抽屉遮罩 */
+.newspapers-drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: var(--newspapers-z-sidebar);
+  animation: newspapers-fade-in var(--newspapers-transition-normal);
+}
+
+@keyframes newspapers-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* 移动端底部抽屉 */
+.newspapers-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 70vh;
+  max-height: 600px;
+  background: var(--newspapers-bg-secondary);
+  border-radius: 1rem 1rem 0 0;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  z-index: var(--newspapers-z-sidebar) + 1;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(100%);
+  transition: transform var(--newspapers-transition-normal) cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.newspapers-drawer--open {
+  transform: translateY(0);
+}
+
+/* 抽屉头部 */
+.newspapers-drawer__header {
+  padding: 1rem;
+  border-bottom: 1px solid var(--newspapers-border-color);
+  background: var(--newspapers-bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  border-radius: 1rem 1rem 0 0;
+}
+
+/* 抽屉手柄 */
+.newspapers-drawer__handle {
+  position: absolute;
+  top: 0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 4px;
+  background: var(--newspapers-border-color);
+  border-radius: 2px;
+  cursor: grab;
+}
+
+.newspapers-drawer__handle:active {
+  cursor: grabbing;
+}
+
+/* 抽屉标题 */
+.newspapers-drawer__title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--newspapers-text-primary);
+  margin: 0;
+  flex: 1;
+  text-align: center;
+  padding: 0 2rem;
+}
+
+/* 抽屉关闭按钮 */
+.newspapers-drawer__close {
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--newspapers-text-secondary);
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--newspapers-transition-fast);
+  z-index: 1;
+}
+
+.newspapers-drawer__close:hover {
+  background: var(--newspapers-hover-bg);
+  color: var(--newspapers-text-primary);
+}
+
+/* 抽屉内容 */
+.newspapers-drawer__content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 抽屉中的刊物列表 - 优化移动端显示 */
+.newspapers-drawer .newspapers-publication-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.newspapers-drawer .newspapers-publication-item {
+  padding: 1rem;
+  border: 1px solid var(--newspapers-border-color);
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all var(--newspapers-transition-fast);
+  background: var(--newspapers-bg-primary);
+}
+
+.newspapers-drawer .newspapers-publication-item:hover {
+  background: var(--newspapers-hover-bg);
+  border-color: var(--newspapers-button-bg);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.newspapers-drawer .newspapers-publication-item--selected {
+  background: var(--newspapers-selected-bg);
+  border-color: var(--newspapers-button-bg);
+  box-shadow: 0 0 0 2px var(--newspapers-focus-ring);
+}
+
+/* 抽屉中的期数列表 - 网格布局 */
+.newspapers-drawer .newspapers-issue-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.75rem;
+  padding: 0.5rem;
+}
+
+.newspapers-drawer .newspapers-issue-item {
+  background: var(--newspapers-bg-primary);
+  border: 1px solid var(--newspapers-border-color);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all var(--newspapers-transition-fast);
+  text-align: center;
+}
+
+.newspapers-drawer .newspapers-issue-item:hover {
+  background: var(--newspapers-hover-bg);
+  border-color: var(--newspapers-focus-ring);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.newspapers-drawer .newspapers-issue-item--selected {
+  background: var(--newspapers-selected-bg);
+  border-color: var(--newspapers-focus-ring);
+  box-shadow: 0 2px 8px rgba(196, 155, 97, 0.2);
+}
+
+.newspapers-drawer .newspapers-issue-item__title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--newspapers-text-primary);
+  margin: 0 0 0.5rem 0;
+  line-height: 1.3;
+}
+
+.newspapers-drawer .newspapers-issue-item__summary {
+  font-size: 0.75rem;
+  color: var(--newspapers-text-secondary);
+  margin: 0 0 0.75rem 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.newspapers-drawer .newspapers-issue-item__button {
+  background: var(--newspapers-button-bg);
+  border: none;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--newspapers-transition-fast);
+  width: 100%;
+}
+
+.newspapers-drawer .newspapers-issue-item__button:hover {
+  background: var(--newspapers-button-hover);
+  transform: translateY(-1px);
+}
+
+/* ================================================
    响应式设计 - 移动端优先
    ================================================ */
 
-/* 移动端 - 垂直堆叠 */
+/* 移动端 - 隐藏桌面端侧边栏，使用抽屉 */
 @media (max-width: 768px) {
   .newspapers-integrated-container {
     height: 100vh;
   }
   
+  /* 隐藏桌面端侧边栏 */
   .newspapers-sidebar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    max-width: var(--newspapers-sidebar-width);
-    transform: translateX(-100%);
-    transition: transform var(--newspapers-transition-normal);
-    z-index: var(--newspapers-z-sidebar);
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .newspapers-sidebar--open {
-    transform: translateX(0);
-  }
-  
-  .newspapers-sidebar--collapsed {
     display: none;
   }
   
