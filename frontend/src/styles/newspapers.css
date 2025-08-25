@@ -8,6 +8,7 @@
    2. 简化数据流 - 减少状态管理
    3. 移动端优先 - 响应式设计
    4. 清晰意图 - 直观的交互模式
+   5. 性能优化 - 减少重排重绘
 */
 
 /* ================================================
@@ -1219,5 +1220,106 @@
   
   .newspapers-breadcrumb:not(.newspapers-breadcrumb--mobile) {
     display: block;
+  }
+}
+
+/* ================================================
+   性能优化样式
+   ================================================ */
+
+/* 硬件加速优化 */
+.newspapers-drawer,
+.newspapers-issue-item,
+.newspapers-publication-item {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* 滚动优化 */
+.newspapers-issue-list,
+.newspapers-drawer__content,
+.newspapers-sidebar__content {
+  will-change: scroll-position;
+  contain: layout style paint;
+}
+
+/* 动画优化 */
+.newspapers-drawer--open {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* 图片懒加载优化 */
+.newspapers-issue-item img {
+  content-visibility: auto;
+  contain-intrinsic-size: 200px 150px;
+}
+
+/* 文本截断优化 */
+.newspapers-issue-item__title,
+.newspapers-issue-item__summary,
+.newspapers-breadcrumb__mobile-text {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  contain: content;
+}
+
+/* 列表渲染优化 */
+.newspapers-issue-list {
+  contain: layout style;
+  content-visibility: auto;
+  contain-intrinsic-size: 500px;
+}
+
+/* 移动端触摸优化 */
+.newspapers-drawer {
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 性能优化：减少重排 */
+.newspapers-issue-item,
+.newspapers-publication-item {
+  contain: layout style;
+}
+
+/* 高频更新元素优化 */
+.newspapers-loading__spinner {
+  will-change: transform;
+}
+
+/* 内存优化：大列表虚拟化 */
+.newspapers-issue-list {
+  contain: strict;
+  content-visibility: auto;
+  contain-intrinsic-size: 100vh;
+}
+
+/* 网络优化：图片压缩 */
+.newspapers-issue-item img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* 可访问性优化 */
+.newspapers-issue-item[role="button"]:focus,
+.newspapers-publication-item[role="button"]:focus {
+  outline: 2px solid var(--newspapers-focus-ring);
+  outline-offset: 2px;
+}
+
+/* 打印优化 */
+@media print {
+  .newspapers-drawer,
+  .newspapers-sidebar,
+  .newspapers-toolbar {
+    display: none !important;
+  }
+  
+  .newspapers-viewer__iframe {
+    width: 100% !important;
+    height: 100% !important;
   }
 }
