@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { NewspaperService, PublicationItem, IssueItem } from './services';
+import { NewspaperService, PublicationItem, IssueItem, PaginationParams } from './services';
+import { InfiniteScrollIssueList } from './InfiniteScrollIssueList';
+import { NewspapersBreadcrumb } from './NewspapersBreadcrumb';
 import AppHeader from '@/components/layout/header/AppHeader.tsx';
 
 interface NewspapersIntegratedLayoutProps {
@@ -22,15 +24,34 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
   const [manifestUrl, setManifestUrl] = useState<string>('');
   const [isMobile, setIsMobile] = useState(false);
   
+  // 无限滚动相关状态
+  const [issuesPage, setIssuesPage] = useState(0);
+  const [issuesHasMore, setIssuesHasMore] = useState(true);
+  const [issuesLoadingMore, setIssuesLoadingMore] = useState(false);
+  const [issuesError, setIssuesError] = useState<string | null>(null);
+  const [issuesRetryCount, setIssuesRetryCount] = useState(0);
+  const [allIssuesLoaded, setAllIssuesLoaded] = useState(false);
+  
+  // 期数缓存
+  const issuesCacheRef = useRef<Map<number, IssueItem[]>>(new Map());
+  const selectedPublicationRef = useRef<string | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerMode, setDrawerMode] = useState<'publications' | 'issues'>('publications');
+  const [touchStartY, setTouchStartY] = useState(0);
+  const [touchCurrentY, setTouchCurrentY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
 
-  // 检测移动端和响应式处理
+  // 移动端检测和抽屉状态管理
   useEffect(() => {
     const checkMobile = () => {
       const mobile = window.innerWidth <= 768;
       setIsMobile(mobile);
       if (mobile) {
         setSidebarOpen(false);
+        setDrawerOpen(false);
       }
     };
 
@@ -38,6 +59,28 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // 移动端返回键处理
+  useEffect(() => {
+    if (!isMobile) return;
+    
+    const handlePopState = (e: PopStateEvent) => {
+      if (drawerOpen) {
+        e.preventDefault();
+        setDrawerOpen(false);
+        window.history.pushState(null, '', window.location.pathname);
+      }
+    };
+
+    if (drawerOpen) {
+      window.history.pushState(null, '', window.location.pathname);
+      window.addEventListener('popstate', handlePopState);
+    }
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [isMobile, drawerOpen]);
 
   // 加载刊物列表 - 简化为单一数据源
   useEffect(() => {
@@ -57,7 +100,7 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
     loadPublications();
   }, []);
 
-  // 选择刊物并加载期数 - 一体化交互
+  // 选择刊物 - 移动端打开期数抽屉
   const handlePublicationSelect = useCallback(async (publication: PublicationItem) => {
     try {
       setLoading(true);
@@ -65,13 +108,18 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
       
       setSelectedPublication(publication);
       
-      // 加载该刊物的期数列表 - publication.id已经是正确的ID，无需再次提取
+      // 加载该刊物的期数列表
       const publicationId = publication.id;
-      console.log('Debug: publication.id =', publicationId); // 调试日志
+      console.log('Debug: publication.id =', publicationId);
       const issuesData = await NewspaperService.getIssues(publicationId);
       setIssues(issuesData);
       
-      // 在一体化布局中，不自动选择期数，让用户在右侧选择
+      // 移动端自动打开期数抽屉
+      if (isMobile) {
+        setDrawerMode('issues');
+        setDrawerOpen(true);
+      }
+      
       setSelectedIssue(null);
       setManifestUrl('');
       
@@ -83,7 +131,7 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
     } finally {
       setLoading(false);
     }
-  }, [onPublicationSelect]);
+  }, [isMobile, onPublicationSelect]);
 
   // 加载查看器 - Linus式简化设计
   const loadViewer = useCallback(async (issue: IssueItem, _publicationId: string) => {
@@ -119,7 +167,7 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
     }
   }, []);
 
-  // 选择期数 - 直接切换，无需额外确认
+  // 选择期数 - 移动端自动关闭抽屉
   const handleIssueSelect = useCallback(async (issue: IssueItem) => {
     if (!selectedPublication) return;
     
@@ -129,13 +177,16 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
       
       setSelectedIssue(issue);
       
-      // 直接加载查看器 - selectedPublication.id已经是正确的ID
+      // 移动端自动关闭抽屉
+      if (isMobile) {
+        setDrawerOpen(false);
+      }
+      
       const publicationId = selectedPublication.id;
       console.log('🔍 [DEBUG] 使用的publicationId:', publicationId);
       await loadViewer(issue, publicationId);
       
       if (onIssueSelect) {
-        // Linus式设计：直接使用manifest URL作为ID，避免复杂的提取逻辑
         onIssueSelect(issue.manifest);
       }
     } catch (err) {
@@ -143,7 +194,7 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
     } finally {
       setLoading(false);
     }
-  }, [selectedPublication, onIssueSelect, loadViewer]);
+  }, [selectedPublication, isMobile, onIssueSelect, loadViewer]);
 
   // 加载查看器iframe
   useEffect(() => {
@@ -156,6 +207,129 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
       iframeRef.current.src = iframeSrc;
     }
   }, [manifestUrl, loading]);
+
+  // 触摸手势处理
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (!isMobile) return;
+    setTouchStartY(e.touches[0].clientY);
+    setTouchCurrentY(e.touches[0].clientY);
+    setIsDragging(true);
+  }, [isMobile]);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isMobile || !isDragging) return;
+    
+    const currentY = e.touches[0].clientY;
+    setTouchCurrentY(currentY);
+    
+    const deltaY = currentY - touchStartY;
+    const drawer = drawerRef.current;
+    
+    if (drawer) {
+      if (drawerOpen && deltaY > 0) {
+        // 向下滑动关闭抽屉
+        const progress = Math.min(deltaY / 200, 1);
+        drawer.style.transform = `translateY(${progress * 100}%)`;
+      } else if (!drawerOpen && deltaY < -50) {
+        // 向上滑动打开抽屉
+        setDrawerOpen(true);
+      }
+    }
+  }, [isMobile, isDragging, touchStartY, drawerOpen]);
+
+  const handleTouchEnd = useCallback(() => {
+    if (!isMobile || !isDragging) return;
+    
+    const deltaY = touchCurrentY - touchStartY;
+    const drawer = drawerRef.current;
+    
+    if (drawer) {
+      if (drawerOpen && deltaY > 100) {
+        // 滑动距离足够，关闭抽屉
+        setDrawerOpen(false);
+      }
+      
+      // 重置位置
+      drawer.style.transform = '';
+    }
+    
+    setIsDragging(false);
+    setTouchStartY(0);
+    setTouchCurrentY(0);
+  }, [isMobile, isDragging, touchStartY, touchCurrentY, drawerOpen]);
+
+  // 面包屑导航处理函数
+  const handleBreadcrumbRootSelect = useCallback(() => {
+    setSelectedPublication(null);
+    setSelectedIssue(null);
+    setIssues([]);
+    setManifestUrl('');
+    setDrawerOpen(false);
+  }, []);
+
+  // 面包屑导航选择刊物
+  const handleBreadcrumbPublicationSelect = useCallback(async (publication: PublicationItem) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      setSelectedPublication(publication);
+      
+      // 加载该刊物的期数列表
+      const publicationId = publication.id;
+      const issuesData = await NewspaperService.getIssues(publicationId);
+      setIssues(issuesData);
+      
+      // 清除期数选择
+      setSelectedIssue(null);
+      setManifestUrl('');
+      setDrawerOpen(false);
+      
+      if (onPublicationSelect) {
+        onPublicationSelect(publicationId, publication.title);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '加载失败');
+    } finally {
+      setLoading(false);
+    }
+  }, [onPublicationSelect]);
+
+  // 面包屑导航选择期数
+  const handleBreadcrumbIssueSelect = useCallback(async (issue: IssueItem) => {
+    if (!selectedPublication) return;
+    
+    try {
+      setLoading(true);
+      setError(null);
+      
+      setSelectedIssue(issue);
+      
+      // 加载查看器
+      const publicationId = selectedPublication.id;
+      await loadViewer(issue, publicationId);
+      setDrawerOpen(false);
+      
+      if (onIssueSelect) {
+        onIssueSelect(issue.manifest);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '切换失败');
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedPublication, onIssueSelect, loadViewer]);
+
+  // 打开刊物抽屉
+  const openPublicationsDrawer = useCallback(() => {
+    setDrawerMode('publications');
+    setDrawerOpen(true);
+  }, []);
+
+  // 关闭抽屉
+  const closeDrawer = useCallback(() => {
+    setDrawerOpen(false);
+  }, []);
 
   // 键盘快捷键 - 保持现有功能
   useEffect(() => {
@@ -213,6 +387,17 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
   return (
     <div className="newspapers-integrated-container">
       <AppHeader moduleId="newspapers" />
+      
+      {/* 面包屑导航 */}
+      <NewspapersBreadcrumb
+        publications={publications}
+        selectedPublication={selectedPublication}
+        selectedIssue={selectedIssue}
+        onPublicationSelect={handleBreadcrumbPublicationSelect}
+        onIssueSelect={handleBreadcrumbIssueSelect}
+        onRootSelect={handleBreadcrumbRootSelect}
+        isMobile={isMobile}
+      />
       
       <div className="flex flex-1 overflow-hidden">
         {/* 左侧刊物选择 - 一体化布局 */}

@@ -833,3 +833,131 @@
   font-style: italic;
   opacity: 0.8;
 }
+
+/* ================================================
+   面包屑导航
+   ================================================ */
+
+.newspapers-breadcrumb {
+  background: var(--newspapers-bg-secondary);
+  border-bottom: 1px solid var(--newspapers-border-color);
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+}
+
+.newspapers-breadcrumb__list {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 0.5rem;
+}
+
+.newspapers-breadcrumb__item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.newspapers-breadcrumb__link {
+  background: none;
+  border: none;
+  color: var(--newspapers-text-primary);
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: inherit;
+  font-family: inherit;
+  text-decoration: none;
+  transition: all var(--newspapers-transition-fast);
+}
+
+.newspapers-breadcrumb__link:hover {
+  background: var(--newspapers-hover-bg);
+  color: var(--newspapers-button-bg);
+}
+
+.newspapers-breadcrumb__link:focus {
+  outline: none;
+  background: var(--newspapers-hover-bg);
+  box-shadow: 0 0 0 2px var(--newspapers-focus-ring);
+}
+
+.newspapers-breadcrumb__text {
+  color: var(--newspapers-text-primary);
+  padding: 0.25rem 0.5rem;
+}
+
+.newspapers-breadcrumb__text--current {
+  color: var(--newspapers-button-bg);
+  font-weight: 500;
+}
+
+.newspapers-breadcrumb__separator {
+  color: var(--newspapers-text-secondary);
+  user-select: none;
+}
+
+/* 移动端面包屑样式 */
+.newspapers-breadcrumb--mobile {
+  padding: 0.5rem 1rem;
+}
+
+.newspapers-breadcrumb__mobile-current {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.newspapers-breadcrumb__mobile-back {
+  background: none;
+  border: none;
+  color: var(--newspapers-text-primary);
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 1.125rem;
+  font-weight: bold;
+  transition: all var(--newspapers-transition-fast);
+}
+
+.newspapers-breadcrumb__mobile-back:hover {
+  background: var(--newspapers-hover-bg);
+  color: var(--newspapers-button-bg);
+}
+
+.newspapers-breadcrumb__mobile-back:focus {
+  outline: none;
+  background: var(--newspapers-hover-bg);
+  box-shadow: 0 0 0 2px var(--newspapers-focus-ring);
+}
+
+.newspapers-breadcrumb__mobile-text {
+  color: var(--newspapers-text-primary);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .newspapers-breadcrumb:not(.newspapers-breadcrumb--mobile) {
+    display: none;
+  }
+  
+  .newspapers-breadcrumb--mobile {
+    display: block;
+  }
+}
+
+@media (min-width: 769px) {
+  .newspapers-breadcrumb--mobile {
+    display: none;
+  }
+  
+  .newspapers-breadcrumb:not(.newspapers-breadcrumb--mobile) {
+    display: block;
+  }
+}

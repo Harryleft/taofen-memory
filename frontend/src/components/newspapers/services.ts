@@ -26,6 +26,21 @@ export interface IssueItem {
   summary: string;
 }
 
+// 分页加载参数接口
+export interface PaginationParams {
+  page: number;
+  limit: number;
+}
+
+// 分页响应接口
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+  hasMore: boolean;
+}
+
 export class NewspaperService {
   static async getPublications(): Promise<PublicationItem[]> {
     const collectionUrl = this.buildProxyUrl('https://www.ai4dh.cn/iiif/3/manifests/collection.json');
@@ -130,6 +145,52 @@ export class NewspaperService {
     } catch (error) {
       console.error('Failed to get issues:', error);
       return [];
+    }
+  }
+
+  // 分页获取期数
+  static async getIssuesPaginated(
+    publicationId: string, 
+    pagination: PaginationParams
+  ): Promise<PaginatedResponse<IssueItem>> {
+    try {
+      const collectionUrl = this.buildProxyUrl(`https://www.ai4dh.cn/iiif/3/manifests/${publicationId}/collection.json`);
+      const response = await fetchWithProxy(collectionUrl);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const col = await response.json();
+      const allIssues = (col.items || []).map((it: IIIFCollectionItem, i: number) => ({
+        i, 
+        id: it.id,
+        manifest: it.id,
+        title: (it.label?.['zh-CN']?.[0]) || (it.label?.zh?.[0]) || (it.label?.en?.[0]) || '未知期刊',
+        summary: (it.summary?.['zh-CN']?.[0]) || (it.summary?.zh?.[0]) || (it.summary?.en?.[0]) || ''
+      }));
+
+      // 计算分页
+      const startIndex = pagination.page * pagination.limit;
+      const endIndex = startIndex + pagination.limit;
+      const paginatedIssues = allIssues.slice(startIndex, endIndex);
+      
+      return {
+        data: paginatedIssues,
+        total: allIssues.length,
+        page: pagination.page,
+        limit: pagination.limit,
+        hasMore: endIndex < allIssues.length
+      };
+    } catch (error) {
+      console.error('Failed to get paginated issues:', error);
+      return {
+        data: [],
+        total: 0,
+        page: pagination.page,
+        limit: pagination.limit,
+        hasMore: false
+      };
     }
   }
 
