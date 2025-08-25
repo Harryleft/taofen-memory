@@ -50,7 +50,55 @@
 }
 
 /* ================================================
-   一体化布局容器
+   新的Grid布局系统 - 渐进式重构
+   ================================================ */
+
+/* 主要布局容器 - Grid布局 */
+.newspapers-layout {
+  display: grid;
+  grid-template-areas:
+    "header header"
+    "sidebar main";
+  grid-template-columns: var(--newspapers-sidebar-width) 1fr;
+  grid-template-rows: auto 1fr;
+  height: 100vh;
+  background: var(--newspapers-bg-primary);
+  overflow: hidden;
+  contain: layout style paint;
+}
+
+/* 布局区域定义 */
+.newspapers-layout__header {
+  grid-area: header;
+  background: var(--newspapers-bg-secondary);
+  border-bottom: 1px solid var(--newspapers-border-color);
+  display: flex;
+  flex-direction: column;
+  z-index: var(--newspapers-z-header);
+}
+
+.newspapers-layout__sidebar {
+  grid-area: sidebar;
+  background: var(--newspapers-bg-secondary);
+  border-right: 1px solid var(--newspapers-border-color);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: var(--newspapers-z-sidebar);
+  contain: strict;
+}
+
+.newspapers-layout__main {
+  grid-area: main;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--newspapers-bg-primary);
+  contain: layout style;
+}
+
+/* ================================================
+   兼容性布局容器 - 保持现有功能
    ================================================ */
 
 .newspapers-integrated-container {
@@ -650,6 +698,33 @@
    响应式设计 - 移动端优先
    ================================================ */
 
+/* ================================================
+   Grid布局的响应式设计
+   ================================================ */
+
+/* 移动端 - Grid布局自动隐藏侧边栏 */
+@media (max-width: 768px) {
+  .newspapers-layout {
+    grid-template-areas:
+      "header"
+      "main";
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+  
+  .newspapers-layout__sidebar {
+    display: none;
+  }
+  
+  .newspapers-layout__main {
+    border-top: 1px solid var(--newspapers-border-color);
+  }
+}
+
+/* ================================================
+   兼容性布局的响应式设计 - 保持现有功能
+   ================================================ */
+
 /* 移动端 - 隐藏桌面端侧边栏，使用抽屉 */
 @media (max-width: 768px) {
   .newspapers-integrated-container {
@@ -716,14 +791,139 @@
 }
 
 /* ================================================
+   动态侧边栏样式
+   ================================================ */
+
+/* 返回按钮样式 */
+.newspapers-sidebar__back {
+  background: none;
+  border: none;
+  color: var(--newspapers-button-bg);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  transition: all var(--newspapers-transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-right: 0.5rem;
+}
+
+.newspapers-sidebar__back:hover {
+  background: var(--newspapers-hover-bg);
+}
+
+.newspapers-sidebar__back:focus {
+  outline: none;
+  background: var(--newspapers-hover-bg);
+  box-shadow: 0 0 0 2px var(--newspapers-focus-ring);
+}
+
+/* 侧边栏期数列表样式 */
+.newspapers-layout__sidebar .newspapers-issue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.newspapers-layout__sidebar .newspapers-issue-item {
+  padding: 0.75rem;
+  border: 1px solid var(--newspapers-border-color);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all var(--newspapers-transition-fast);
+  background: var(--newspapers-bg-primary);
+}
+
+.newspapers-layout__sidebar .newspapers-issue-item:hover {
+  background: var(--newspapers-hover-bg);
+  border-color: var(--newspapers-focus-ring);
+  transform: translateY(-1px);
+}
+
+.newspapers-layout__sidebar .newspapers-issue-item--selected {
+  background: var(--newspapers-selected-bg);
+  border-color: var(--newspapers-focus-ring);
+  box-shadow: 0 2px 8px rgba(196, 155, 97, 0.2);
+}
+
+.newspapers-layout__sidebar .newspapers-issue-item__title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--newspapers-text-primary);
+  margin: 0 0 0.25rem 0;
+  line-height: 1.3;
+}
+
+.newspapers-layout__sidebar .newspapers-issue-item__summary {
+  font-size: 0.75rem;
+  color: var(--newspapers-text-secondary);
+  margin: 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 侧边栏头部调整 */
+.newspapers-layout__sidebar .newspapers-sidebar__header {
+  padding: 1rem;
+  border-bottom: 1px solid var(--newspapers-border-color);
+  background: var(--newspapers-bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--newspapers-header-height);
+}
+
+.newspapers-layout__sidebar .newspapers-sidebar__header .newspapers-sidebar__title {
+  flex: 1;
+  text-align: center;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.newspapers-layout__sidebar .newspapers-sidebar__header .newspapers-sidebar__back {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .newspapers-layout__sidebar .newspapers-issue-list {
+    padding: 0.75rem;
+  }
+  
+  .newspapers-layout__sidebar .newspapers-issue-item {
+    padding: 1rem;
+  }
+  
+  .newspapers-layout__sidebar .newspapers-sidebar__header .newspapers-sidebar__title {
+    font-size: 1rem;
+    padding: 0 2rem;
+  }
+}
+
+/* ================================================
    辅助功能
    ================================================ */
 
 /* 键盘导航 */
 .newspapers-publication-item:focus-visible,
+.newspapers-issue-item:focus-visible,
 .newspapers-issue-selector__select:focus-visible,
 .newspapers-issue-nav__button:focus-visible,
-.newspapers-sidebar-toggle:focus-visible {
+.newspapers-sidebar-toggle:focus-visible,
+.newspapers-sidebar__back:focus-visible {
   outline: 2px solid var(--newspapers-focus-ring);
   outline-offset: 2px;
 }

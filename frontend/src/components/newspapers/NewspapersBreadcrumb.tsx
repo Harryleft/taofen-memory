@@ -158,3 +158,5 @@ export const NewspapersBreadcrumb: React.FC<NewspapersBreadcrumbProps> = ({
     </nav>
   );
 };
+
+export default NewspapersBreadcrumb;

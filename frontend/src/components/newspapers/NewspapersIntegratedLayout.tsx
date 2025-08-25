@@ -3,6 +3,7 @@ import { NewspaperService, PublicationItem, IssueItem, PaginationParams } from '
 import { InfiniteScrollIssueList } from './InfiniteScrollIssueList';
 import { NewspapersBreadcrumb } from './NewspapersBreadcrumb';
 import AppHeader from '@/components/layout/header/AppHeader.tsx';
+import NewspapersLayout from './NewspapersLayout.tsx';
 
 interface NewspapersIntegratedLayoutProps {
   onPublicationSelect?: (publicationId: string, publicationTitle: string) => void;
@@ -37,6 +38,9 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
   const selectedPublicationRef = useRef<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<'publications' | 'issues'>('publications');
+  
+  // 渐进式重构开关 - 使用新的Grid布局
+  const [useNewLayout, setUseNewLayout] = useState(true);
   const [touchStartY, setTouchStartY] = useState(0);
   const [touchCurrentY, setTouchCurrentY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -455,6 +459,153 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
     );
   }
 
+  // 新布局的内容渲染函数
+  const renderNewLayoutContent = () => {
+    if (loading && publications.length === 0) {
+      return (
+        <div className="newspapers-loading">
+          <div className="newspapers-loading__content">
+            <div className="newspapers-loading__spinner"></div>
+            <p className="newspapers-loading__text">加载报刊数据...</p>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <>
+        {/* 工具栏 */}
+        <div className="newspapers-toolbar">
+          <div className="newspapers-toolbar__left">
+            {isMobile && (
+              <button
+                onClick={() => setDrawerOpen(true)}
+                className="newspapers-sidebar-toggle"
+                aria-label="打开抽屉"
+              >
+                ☰
+              </button>
+            )}
+            
+            {selectedPublication && (
+              <div className="newspapers-issue-selector">
+                <label className="newspapers-issue-selector__label">
+                  期数：
+                </label>
+                <select
+                  value={selectedIssue?.manifest || ''}
+                  onChange={(e) => {
+                    const issue = issues.find(i => i.manifest === e.target.value);
+                    if (issue) handleIssueSelect(issue);
+                  }}
+                  className="newspapers-issue-selector__select"
+                  disabled={issues.length === 0}
+                >
+                  {issues.length === 0 ? (
+                    <option value="">暂无期数</option>
+                  ) : (
+                    issues.map((issue) => (
+                      <option key={issue.manifest} value={issue.manifest}>
+                        {issue.title}
+                      </option>
+                    ))
+                  )}
+                </select>
+              </div>
+            )}
+          </div>
+          
+          <div className="newspapers-toolbar__right">
+            {issues.length > 1 && selectedIssue && !isMobile && (
+              <div className="newspapers-issue-nav">
+                <button
+                  onClick={() => {
+                    const currentIndex = issues.findIndex(issue => issue.manifest === selectedIssue.manifest);
+                    if (currentIndex > 0) {
+                      handleIssueSelect(issues[currentIndex - 1]);
+                    }
+                  }}
+                  disabled={issues.findIndex(issue => issue.manifest === selectedIssue.manifest) === 0}
+                  className="newspapers-issue-nav__button"
+                >
+                  上一期
+                </button>
+                <button
+                  onClick={() => {
+                    const currentIndex = issues.findIndex(issue => issue.manifest === selectedIssue.manifest);
+                    if (currentIndex < issues.length - 1) {
+                      handleIssueSelect(issues[currentIndex + 1]);
+                    }
+                  }}
+                  disabled={issues.findIndex(issue => issue.manifest === selectedIssue.manifest) === issues.length - 1}
+                  className="newspapers-issue-nav__button"
+                >
+                  下一期
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {/* 主要内容区域 */}
+        {!selectedPublication ? (
+          // 未选择刊物时的欢迎界面
+          <div className="newspapers-welcome">
+            <div className="newspapers-welcome__content">
+              <div className="newspapers-welcome__icon">📰</div>
+              <h2 className="newspapers-welcome__title">欢迎使用数字报刊</h2>
+              <p className="newspapers-welcome__message">
+                请从左侧选择一个刊物开始浏览
+              </p>
+              {isMobile && (
+                <button
+                  onClick={() => setDrawerOpen(true)}
+                  className="btn-newspapers"
+                >
+                  选择刊物
+                </button>
+              )}
+            </div>
+          </div>
+        ) : (
+          // 选择刊物后的查看器区域
+          <div className="newspapers-viewer-container">
+            {loading && (
+              <div className="newspapers-loading">
+                <div className="newspapers-loading__content">
+                  <div className="newspapers-loading__spinner"></div>
+                  <p className="newspapers-loading__text">加载中...</p>
+                </div>
+              </div>
+            )}
+            
+            {!selectedIssue ? (
+              <div className="newspapers-viewer-placeholder">
+                <div className="newspapers-viewer-placeholder__content">
+                  <div className="newspapers-viewer-placeholder__icon">📖</div>
+                  <h3 className="newspapers-viewer-placeholder__title">
+                    选择期数开始阅读
+                  </h3>
+                  <p className="newspapers-viewer-placeholder__message">
+                    请从左侧选择一个期数开始阅读
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <iframe
+                ref={iframeRef}
+                className="newspapers-viewer__iframe"
+                title="报刊查看器"
+                allowFullScreen
+                sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation allow-modals"
+              />
+            )}
+          </div>
+        )}
+      </>
+    );
+  };
+
   // 加载状态处理
   if (loading && publications.length === 0) {
     return (
@@ -467,6 +618,27 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
     );
   }
 
+  // 渐进式重构：根据开关选择布局方式
+  if (useNewLayout) {
+    return (
+      <NewspapersLayout
+        publications={publications}
+        selectedPublication={selectedPublication}
+        selectedIssue={selectedIssue}
+        onPublicationSelect={handleBreadcrumbPublicationSelect}
+        onIssueSelect={handleBreadcrumbIssueSelect}
+        onRootSelect={handleBreadcrumbRootSelect}
+        isMobile={isMobile}
+        issues={issues}
+        loading={loading}
+      >
+        {/* 新布局的主内容区域 */}
+        {renderNewLayoutContent()}
+      </NewspapersLayout>
+    );
+  }
+
+  // 原有的布局结构（保持兼容性）
   return (
     <div className="newspapers-integrated-container">
       <AppHeader moduleId="newspapers" />
