@@ -16,7 +16,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { BookItem } from '@/types/bookTypes';
 import { downloadCSV } from '@/utils/bookUtils';
-import { NewspaperService, PublicationItem, IssueItem } from '@/components/newspapers/services';
+import { NewspaperService, PublicationItem } from '@/components/newspapers/services';
 import { IIIFCollectionItem } from '@/components/newspapers/iiifTypes';
 
 import BookFiltersPanel from './BookFiltersPanel.tsx';

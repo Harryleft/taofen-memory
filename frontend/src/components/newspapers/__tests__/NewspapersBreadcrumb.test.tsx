@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { NewspapersBreadcrumb } from '../NewspapersBreadcrumb';
 import { PublicationItem, IssueItem } from '../services';
 

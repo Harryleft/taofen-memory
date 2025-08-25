@@ -1,13 +1,28 @@
 import React, { useState, useEffect } from 'react';
 
+interface DebugInfo {
+  userAgent: string;
+  url: string;
+  timestamp: string;
+  uvLoaded: boolean;
+  uvAdapterLoaded: boolean;
+  proxyAvailable: boolean;
+}
+
+interface NetworkRequest {
+  type: string;
+  url: string;
+  timestamp: string;
+}
+
 interface IIIFDebugToolsProps {
   isVisible: boolean;
   onClose: () => void;
 }
 
 export const IIIFDebugTools: React.FC<IIIFDebugToolsProps> = ({ isVisible, onClose }) => {
-  const [debugInfo, setDebugInfo] = useState<any>(null);
-  const [networkRequests, setNetworkRequests] = useState<any[]>([]);
+  const [debugInfo, setDebugInfo] = useState<DebugInfo | null>(null);
+  const [networkRequests, setNetworkRequests] = useState<NetworkRequest[]>([]);
   const [manifestData, setManifestData] = useState<any>(null);
 
   useEffect(() => {
@@ -18,7 +33,7 @@ export const IIIFDebugTools: React.FC<IIIFDebugToolsProps> = ({ isVisible, onClo
 
   const refreshDebugInfo = () => {
     // 获取调试信息
-    const info = {
+    const info: DebugInfo = {
       userAgent: navigator.userAgent,
       url: window.location.href,
       timestamp: new Date().toISOString(),
@@ -101,14 +116,15 @@ export const IIIFDebugTools: React.FC<IIIFDebugToolsProps> = ({ isVisible, onClo
       console.log(`\\n🔍 测试URL ${index + 1}:`, url);
       
       // 测试缩略图转换
-      const thumbnailConverted = (window as any).convertToIIIFUrl ? 
-        (window as any).convertToIIIFUrl(url, true, '1024,') : url;
+      const convertToIIIFUrl = (window as any).convertToIIIFUrl as ((url: string, force: boolean, size: string) => string) | undefined;
+      const thumbnailConverted = convertToIIIFUrl ? 
+        convertToIIIFUrl(url, true, '1024,') : url;
       console.log(`  缩略图转换: ${thumbnailConverted}`);
       console.log(`  包含1024尺寸: ${thumbnailConverted.includes('1024,')}`);
       
       // 测试主图像转换
-      const mainConverted = (window as any).convertToIIIFUrl ? 
-        (window as any).convertToIIIFUrl(url, true, 'max') : url;
+      const mainConverted = convertToIIIFUrl ? 
+        convertToIIIFUrl(url, true, 'max') : url;
       console.log(`  主图像转换: ${mainConverted}`);
       console.log(`  包含max尺寸: ${mainConverted.includes('max')}`);
     });

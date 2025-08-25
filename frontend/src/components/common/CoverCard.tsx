@@ -229,7 +229,7 @@ export function TimelineCoverCard({ totalEvents }: TimelineCoverCardProps) {
 // 便捷的书店卡片组件
 export interface BookstoreCoverCardProps {
   totalBooks: number;
-  featuredCategories: number;
+  featuredCategories?: number;
 }
 
 const BOOKSTORE_DATA = {
@@ -240,7 +240,7 @@ const BOOKSTORE_DATA = {
   categoriesLabel: "精选分类"
 } as const;
 
-export function BookstoreCoverCard({ totalBooks, featuredCategories }: BookstoreCoverCardProps) {
+export function BookstoreCoverCard({ totalBooks }: BookstoreCoverCardProps) {
   const bookstoreStats = [
     { value: `${totalBooks}份`, label: BOOKSTORE_DATA.booksLabel },
     // { value: `${featuredCategories}个`, label: BOOKSTORE_DATA.categoriesLabel }

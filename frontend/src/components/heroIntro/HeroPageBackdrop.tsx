@@ -80,10 +80,6 @@ const CONFIG = {
   DEBUG: false,
 } as const;
 
-// 网络质量检测配置
-const NETWORK_CONDITIONS = {
-  SLOW_TYPES: ['slow-2g', '2g'] as const,
-} as const;
 
 // 列节奏模板
 const RHYTHM_PATTERN = [-0.06, 0.0, 0.05, -0.03, 0.02] as const;
@@ -191,31 +187,6 @@ class LayoutCalculator {
 // =============== 懒加载工具 ===============
 // LazyLoadingManager 类已被移除，其功能已集成到 IntersectionObserverManager 中
 
-// =============== 网络检测工具 ===============
-class NetworkDetector {
-  // 检测网络连接信息
-  static getConnectionInfo(): {
-    saveData: boolean;
-    effectiveType: string;
-    isSlowNetwork: boolean;
-  } {
-    const nav = typeof navigator !== 'undefined' ? (navigator as Navigator & { connection?: NetworkInformation }) : null;
-    const connection = Boolean(nav) && nav.connection ? nav.connection : null;
-    const saveData = Boolean(connection) && connection.saveData === true;
-    const effectiveType = Boolean(connection) && typeof connection.effectiveType === 'string' 
-      ? connection.effectiveType 
-      : '';
-    const isSlowNetwork = NETWORK_CONDITIONS.SLOW_TYPES.includes(effectiveType as typeof NETWORK_CONDITIONS.SLOW_TYPES[number]);
-    
-    return { saveData, effectiveType, isSlowNetwork };
-  }
-
-  // 判断是否应该延迟加载
-  static shouldDeferLoading(): boolean {
-    const { saveData, isSlowNetwork } = this.getConnectionInfo();
-    return !saveData && !isSlowNetwork;
-  }
-}
 
 // =============== 图片处理类 ===============
 class ImageProcessor {

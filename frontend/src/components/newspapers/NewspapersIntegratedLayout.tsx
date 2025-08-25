@@ -4,6 +4,8 @@ import { InfiniteScrollIssueList } from './InfiniteScrollIssueList';
 import { NewspapersBreadcrumb } from './NewspapersBreadcrumb';
 import AppHeader from '@/components/layout/header/AppHeader.tsx';
 import NewspapersLayout from './NewspapersLayout.tsx';
+import { NewspapersHeroCard } from './NewspapersHeroCard.tsx';
+import { headerConfigs } from '@/constants/header.configs.tsx';
 
 interface NewspapersIntegratedLayoutProps {
   onPublicationSelect?: (publicationId: string, publicationTitle: string) => void;
@@ -40,7 +42,7 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
   const [drawerMode, setDrawerMode] = useState<'publications' | 'issues'>('publications');
   
   // 渐进式重构开关 - 使用新的Grid布局
-  const [useNewLayout, setUseNewLayout] = useState(true);
+  const useNewLayout = true;
   const [touchStartY, setTouchStartY] = useState(0);
   const [touchCurrentY, setTouchCurrentY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -221,7 +223,7 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
   }, [loadMoreIssues]);
 
   // 加载查看器 - Linus式简化设计
-  const loadViewer = useCallback(async (issue: IssueItem, _publicationId: string) => {
+  const loadViewer = useCallback(async (issue: IssueItem) => {
     try {
       console.log('🔍 [DEBUG] 开始加载查看器:');
       console.log('🔍 [DEBUG] Issue:', issue);
@@ -271,7 +273,7 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
       
       const publicationId = selectedPublication.id;
       console.log('🔍 [DEBUG] 使用的publicationId:', publicationId);
-      await loadViewer(issue, publicationId);
+      await loadViewer(issue);
       
       if (onIssueSelect) {
         onIssueSelect(issue.manifest);
@@ -393,8 +395,7 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
       setSelectedIssue(issue);
       
       // 加载查看器
-      const publicationId = selectedPublication.id;
-      await loadViewer(issue, publicationId);
+      await loadViewer(issue);
       setDrawerOpen(false);
       
       if (onIssueSelect) {
@@ -549,24 +550,12 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
         
         {/* 主要内容区域 */}
         {!selectedPublication ? (
-          // 未选择刊物时的欢迎界面
-          <div className="newspapers-welcome">
-            <div className="newspapers-welcome__content">
-              <div className="newspapers-welcome__icon">📰</div>
-              <h2 className="newspapers-welcome__title">欢迎使用数字报刊</h2>
-              <p className="newspapers-welcome__message">
-                请从左侧选择一个刊物开始浏览
-              </p>
-              {isMobile && (
-                <button
-                  onClick={() => setDrawerOpen(true)}
-                  className="btn-newspapers"
-                >
-                  选择刊物
-                </button>
-              )}
-            </div>
-          </div>
+          // 未选择刊物时的Hero卡片
+          <NewspapersHeroCard 
+            config={headerConfigs.newspapers}
+            onMobileDrawerOpen={() => setDrawerOpen(true)}
+            isMobile={isMobile}
+          />
         ) : (
           // 选择刊物后的查看器区域
           <div className="newspapers-viewer-container">

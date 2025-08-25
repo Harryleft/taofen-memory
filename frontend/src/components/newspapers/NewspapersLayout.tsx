@@ -1,15 +1,16 @@
 import React from 'react';
 import AppHeader from '@/components/layout/header/AppHeader.tsx';
 import NewspapersBreadcrumb from './NewspapersBreadcrumb.tsx';
-import { IssueItem } from './services';
+import { IssueItem, PublicationItem } from './services';
+import { PublicationCard } from './PublicationCard.tsx';
 
 interface NewspapersLayoutProps {
   children: React.ReactNode;
-  publications: any[];
-  selectedPublication: any;
-  selectedIssue: any;
-  onPublicationSelect: (publication: any) => void;
-  onIssueSelect: (issue: any) => void;
+  publications: PublicationItem[];
+  selectedPublication: PublicationItem | null;
+  selectedIssue: IssueItem | null;
+  onPublicationSelect: (publication: PublicationItem) => void;
+  onIssueSelect: (issue: IssueItem) => void;
   onRootSelect: () => void;
   isMobile: boolean;
   sidebarContent?: React.ReactNode;
@@ -98,40 +99,20 @@ export const NewspapersLayout: React.FC<NewspapersLayoutProps> = ({
         </div>
       );
     } else {
-      // 显示刊物列表
+      // 显示刊物列表 - 使用卡片网格布局
       return (
         <div className="newspapers-sidebar__content">
           <div className="newspapers-sidebar__header">
             <h2 className="newspapers-sidebar__title">报刊列表</h2>
           </div>
-          <div className="newspapers-publication-list">
+          <div className="newspapers-publication-grid">
             {publications.map((publication) => (
-              <div
+              <PublicationCard
                 key={publication.id}
-                className={`newspapers-publication-item ${
-                  selectedPublication?.id === publication.id
-                    ? 'newspapers-publication-item--selected'
-                    : ''
-                  }`}
-                onClick={() => onPublicationSelect(publication)}
-              >
-                <h3 className="newspapers-publication__title">
-                  {publication.title}
-                </h3>
-                <p className="newspapers-publication__summary">
-                  {publication.summary || '暂无描述'}
-                </p>
-                <div className="newspapers-publication__meta">
-                  <span className="newspapers-publication__count">
-                    {publication.issueCount} 期
-                  </span>
-                  {publication.lastUpdated && (
-                    <span className="newspapers-publication__updated">
-                      最新: {publication.lastUpdated}
-                    </span>
-                  )}
-                </div>
-              </div>
+                publication={publication}
+                isSelected={selectedPublication?.id === publication.id}
+                onClick={onPublicationSelect}
+              />
             ))}
           </div>
         </div>
