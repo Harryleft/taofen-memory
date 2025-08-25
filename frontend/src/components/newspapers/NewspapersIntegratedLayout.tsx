@@ -107,12 +107,32 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
       setError(null);
       
       setSelectedPublication(publication);
+      selectedPublicationRef.current = publication.id;
       
-      // 加载该刊物的期数列表
+      // 重置无限滚动状态
+      setIssuesPage(0);
+      setIssuesHasMore(true);
+      setIssuesLoadingMore(false);
+      setIssuesError(null);
+      setIssuesRetryCount(0);
+      setAllIssuesLoaded(false);
+      issuesCacheRef.current.clear();
+      
+      // 加载第一期期数
       const publicationId = publication.id;
       console.log('Debug: publication.id =', publicationId);
-      const issuesData = await NewspaperService.getIssues(publicationId);
-      setIssues(issuesData);
+      
+      const paginationParams: PaginationParams = {
+        page: 0,
+        limit: 20
+      };
+      
+      const response = await NewspaperService.getIssuesPaginated(publicationId, paginationParams);
+      setIssues(response.data);
+      setIssuesHasMore(response.hasMore);
+      
+      // 缓存第一期数据
+      issuesCacheRef.current.set(0, response.data);
       
       // 移动端自动打开期数抽屉
       if (isMobile) {
@@ -132,6 +152,69 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
       setLoading(false);
     }
   }, [isMobile, onPublicationSelect]);
+
+  // 加载更多期数
+  const loadMoreIssues = useCallback(async () => {
+    if (!selectedPublicationRef.current || issuesLoadingMore || !issuesHasMore || allIssuesLoaded) {
+      return;
+    }
+
+    try {
+      setIssuesLoadingMore(true);
+      setIssuesError(null);
+
+      const nextPage = issuesPage + 1;
+      
+      // 检查缓存
+      if (issuesCacheRef.current.has(nextPage)) {
+        const cachedIssues = issuesCacheRef.current.get(nextPage)!;
+        setIssues(prev => [...prev, ...cachedIssues]);
+        setIssuesPage(nextPage);
+        setIssuesLoadingMore(false);
+        return;
+      }
+
+      const paginationParams: PaginationParams = {
+        page: nextPage,
+        limit: 20
+      };
+
+      const response = await NewspaperService.getIssuesPaginated(
+        selectedPublicationRef.current, 
+        paginationParams
+      );
+
+      if (response.data.length > 0) {
+        setIssues(prev => [...prev, ...response.data]);
+        setIssuesPage(nextPage);
+        setIssuesHasMore(response.hasMore);
+        
+        // 缓存新数据
+        issuesCacheRef.current.set(nextPage, response.data);
+
+        // 如果没有更多数据了
+        if (!response.hasMore) {
+          setAllIssuesLoaded(true);
+        }
+      } else {
+        setAllIssuesLoaded(true);
+        setIssuesHasMore(false);
+      }
+    } catch (err) {
+      console.error('加载更多期数失败:', err);
+      setIssuesError(err instanceof Error ? err.message : '加载失败');
+      setIssuesRetryCount(prev => prev + 1);
+    } finally {
+      setIssuesLoadingMore(false);
+    }
+  }, [issuesPage, issuesLoadingMore, issuesHasMore, allIssuesLoaded]);
+
+  // 重试加载
+  const retryLoadMore = useCallback(() => {
+    setIssuesRetryCount(0);
+    setIssuesError(null);
+    loadMoreIssues();
+  }, [loadMoreIssues]);
 
   // 加载查看器 - Linus式简化设计
   const loadViewer = useCallback(async (issue: IssueItem, _publicationId: string) => {
@@ -388,6 +471,91 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
     <div className="newspapers-integrated-container">
       <AppHeader moduleId="newspapers" />
       
+      {/* 移动端抽屉 */}
+      {isMobile && (
+        <>
+          {/* 抽屉遮罩 */}
+          {drawerOpen && (
+            <div 
+              className="newspapers-drawer-overlay"
+              onClick={closeDrawer}
+            />
+          )}
+          
+          {/* 底部抽屉 */}
+          <div 
+            ref={drawerRef}
+            className={`newspapers-drawer ${drawerOpen ? 'newspapers-drawer--open' : ''}`}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
+            <div className="newspapers-drawer__header">
+              <div className="newspapers-drawer__handle" />
+              <h3 className="newspapers-drawer__title">
+                {drawerMode === 'publications' ? '选择刊物' : selectedPublication?.title || '选择期数'}
+              </h3>
+              <button
+                onClick={closeDrawer}
+                className="newspapers-drawer__close"
+                aria-label="关闭抽屉"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="newspapers-drawer__content newspapers-scrollbar-thin">
+              {drawerMode === 'publications' ? (
+                // 刊物列表
+                <div className="newspapers-publication-list">
+                  {publications.map((publication) => (
+                    <div
+                      key={publication.id}
+                      className={`newspapers-publication-item ${
+                        selectedPublication?.id === publication.id
+                          ? 'newspapers-publication-item--selected'
+                          : ''
+                      }`}
+                      onClick={() => handlePublicationSelect(publication)}
+                    >
+                      <h3 className="newspapers-publication__title">
+                        {publication.title}
+                      </h3>
+                      <p className="newspapers-publication__summary">
+                        {publication.summary || '暂无描述'}
+                      </p>
+                      <div className="newspapers-publication__meta">
+                        <span className="newspapers-publication__count">
+                          {publication.issueCount} 期
+                        </span>
+                        {publication.lastUpdated && (
+                          <span className="newspapers-publication__updated">
+                            最新: {publication.lastUpdated}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                // 期数列表 - 无限滚动
+                <InfiniteScrollIssueList
+                  issues={issues}
+                  selectedIssue={selectedIssue}
+                  loading={issuesLoadingMore}
+                  hasMore={issuesHasMore}
+                  onLoadMore={loadMoreIssues}
+                  onIssueSelect={handleIssueSelect}
+                  error={issuesError}
+                  retryCount={issuesRetryCount}
+                  onRetry={retryLoadMore}
+                />
+              )}
+            </div>
+          </div>
+        </>
+      )}
+      
       {/* 面包屑导航 */}
       <NewspapersBreadcrumb
         publications={publications}
@@ -400,8 +568,9 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
       />
       
       <div className="flex flex-1 overflow-hidden">
-        {/* 左侧刊物选择 - 一体化布局 */}
-        <div className={`newspapers-sidebar ${sidebarOpen ? 'newspapers-sidebar--open' : ''}`}>
+        {/* 桌面端侧边栏 */}
+        {!isMobile && (
+          <div className={`newspapers-sidebar ${sidebarOpen ? 'newspapers-sidebar--open' : ''}`}>
           <div className="newspapers-sidebar__header">
             <h2 className="newspapers-sidebar__title">报刊列表</h2>
             <button
@@ -445,7 +614,8 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
               ))}
             </div>
           </div>
-        </div>
+          </div>
+        )}
         
         {/* 右侧主内容区域 */}
         <div className="newspapers-main">
@@ -454,9 +624,9 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
             <div className="newspapers-toolbar__left">
               {isMobile && (
                 <button
-                  onClick={() => setSidebarOpen(true)}
+                  onClick={openPublicationsDrawer}
                   className="newspapers-sidebar-toggle"
-                  aria-label="打开侧边栏"
+                  aria-label="打开刊物选择"
                 >
                   ☰
                 </button>
@@ -545,7 +715,7 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
                   </p>
                   {isMobile && (
                     <button
-                      onClick={() => setSidebarOpen(true)}
+                      onClick={openPublicationsDrawer}
                       className="btn-newspapers"
                     >
                       选择刊物
@@ -556,50 +726,31 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
             ) : (
               // 选择刊物后的期数选择和查看器区域
               <div className="newspapers-issue-viewer">
-                {/* 期数选择区域 */}
-                <div className="newspapers-issue-selector">
-                  <div className="newspapers-issue-selector__header">
-                    <h3 className="newspapers-issue-selector__title">
-                      {selectedPublication.title}
-                    </h3>
-                    <span className="newspapers-issue-selector__count">
-                      共 {issues.length} 期
-                    </span>
+                {/* 移动端隐藏期数选择区域 */}
+                {isMobile ? null : (
+                  <div className="newspapers-issue-selector">
+                    <div className="newspapers-issue-selector__header">
+                      <h3 className="newspapers-issue-selector__title">
+                        {selectedPublication.title}
+                      </h3>
+                      <span className="newspapers-issue-selector__count">
+                        共 {issues.length} 期
+                      </span>
+                    </div>
+                    
+                    <InfiniteScrollIssueList
+                      issues={issues}
+                      selectedIssue={selectedIssue}
+                      loading={issuesLoadingMore}
+                      hasMore={issuesHasMore}
+                      onLoadMore={loadMoreIssues}
+                      onIssueSelect={handleIssueSelect}
+                      error={issuesError}
+                      retryCount={issuesRetryCount}
+                      onRetry={retryLoadMore}
+                    />
                   </div>
-                  
-                  <div className="newspapers-issue-list">
-                    {issues.length === 0 ? (
-                      <div className="newspapers-issue-list__empty">
-                        <div className="newspapers-issue-list__empty-icon">📄</div>
-                        <p>暂无期数</p>
-                      </div>
-                    ) : (
-                      issues.map((issue) => (
-                        <div
-                          key={issue.manifest}
-                          className={`newspapers-issue-item ${
-                            selectedIssue?.manifest === issue.manifest
-                              ? 'newspapers-issue-item--selected'
-                              : ''
-                          }`}
-                          onClick={() => handleIssueSelect(issue)}
-                        >
-                          <div className="newspapers-issue-item__title">
-                            {issue.title}
-                          </div>
-                          <div className="newspapers-issue-item__summary">
-                            {issue.summary}
-                          </div>
-                          <div className="newspapers-issue-item__action">
-                            <button className="newspapers-issue-item__button">
-                              查看本期
-                            </button>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
+                )}
                 
                 {/* 查看器区域 */}
                 <div className="newspapers-viewer-container">
