@@ -917,21 +917,6 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
   const layoutActions = useMemo(() => createLayoutActions(layoutDispatch), [layoutDispatch]);
   const dataActions = useMemo(() => createDataActions(dataDispatch), [dataDispatch]);
   
-  // 合并状态和操作以保持向后兼容性
-  const state = useMemo(() => ({
-    ...layoutState,
-    ...dataState,
-    // 添加触摸手势状态
-    touchStartY,
-    touchCurrentY,
-    isDragging,
-  }), [layoutState, dataState, touchStartY, touchCurrentY, isDragging]);
-  
-  const actions = useMemo(() => ({
-    ...layoutActions,
-    ...dataActions
-  }), [layoutActions, dataActions]);
-  
   // 引用
   const issuesCacheRef = useRef<Map<number, IssueItem[]>>(new Map());
   const selectedPublicationRef = useRef<string | null>(null);
@@ -947,11 +932,26 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
     handleTouchMove,
     handleTouchEnd,
   } = useTouchDrawer({
-    isMobile: state.isMobile,
-    drawerOpen: state.drawerOpen,
+    isMobile: layoutState.isMobile,
+    drawerOpen: layoutState.drawerOpen,
     onDrawerOpen: layoutActions.setDrawerOpen,
     drawerRef,
   });
+  
+  // 合并状态和操作以保持向后兼容性
+  const state = useMemo(() => ({
+    ...layoutState,
+    ...dataState,
+    // 添加触摸手势状态
+    touchStartY,
+    touchCurrentY,
+    isDragging,
+  }), [layoutState, dataState, touchStartY, touchCurrentY, isDragging]);
+  
+  const actions = useMemo(() => ({
+    ...layoutActions,
+    ...dataActions
+  }), [layoutActions, dataActions]);
   
   // ====================
   // 副作用和事件监听
