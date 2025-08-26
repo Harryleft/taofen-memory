@@ -13,6 +13,7 @@
 /* 3. 组件样式 - 按依赖关系和字母顺序 */
 @import 'bookstore.css';          /* 独立组件 */
 @import 'cover.css';             /* Cover卡片组件 */
+@import 'image-peek.css';        /* 图片预览组件 */
 @import 'newspapers.css';        /* 报纸组件 */
 @import 'relationships.css';     /* 独立组件 */
 @import 'timeline.css';          /* 独立组件 */

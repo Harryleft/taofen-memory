@@ -1,0 +1,305 @@
+/* ================================================
+   图片前20%显示组件 - 基于项目设计系统
+   ================================================ */
+
+/* === 图片预览容器基础样式 === */
+.image-peek-container {
+  @apply relative overflow-hidden rounded-lg shadow-md;
+  width: 100%;
+  height: auto;
+  background: var(--global-bg-primary);
+  transition: all var(--global-animation-normal) var(--global-ease-out);
+  
+  /* 性能优化 */
+  transform: translateZ(0);
+  will-change: clip-path;
+  backface-visibility: hidden;
+}
+
+/* === 基于clip-path的20%显示实现 === */
+.image-peek-clip {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  
+  /* 只显示顶部20%区域 */
+  clip-path: inset(0 0 80% 0);
+  
+  /* 平滑过渡动画 */
+  transition: clip-path var(--global-animation-normal) var(--global-ease-out);
+  
+  /* 防止图片变形 */
+  transform-origin: center top;
+}
+
+/* === 悬停展开效果 === */
+.image-peek-container:hover .image-peek-clip {
+  /* 展开显示完整图片 */
+  clip-path: inset(0 0 0 0);
+}
+
+/* === 渐变遮罩提示效果 === */
+.image-peek-container::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(250, 247, 242, 0.3) 50%,
+    rgba(250, 247, 242, 0.8) 100%
+  );
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity var(--global-animation-normal) var(--global-ease-out);
+}
+
+.image-peek-container:hover::after {
+  opacity: 0;
+}
+
+/* === 方案二：基于overflow的实现 === */
+.image-peek-overflow {
+  position: relative;
+  width: 100%;
+  height: 120px; /* 固定高度，根据图片比例调整 */
+  overflow: hidden;
+  border-radius: var(--global-radius-lg);
+  box-shadow: var(--global-shadow-card);
+  transition: all var(--global-animation-normal) var(--global-ease-out);
+}
+
+.image-peek-overflow img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  transform: translateY(0);
+  transition: transform var(--global-animation-normal) var(--global-ease-out);
+}
+
+.image-peek-overflow:hover {
+  height: auto;
+  max-height: 600px;
+  box-shadow: var(--global-shadow-hover);
+}
+
+.image-peek-overflow:hover img {
+  transform: translateY(0);
+}
+
+/* === 方案三：基于transform的缩放实现 === */
+.image-peek-scale {
+  position: relative;
+  width: 100%;
+  height: 150px;
+  overflow: hidden;
+  border-radius: var(--global-radius-lg);
+  box-shadow: var(--global-shadow-card);
+}
+
+.image-peek-scale img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 500px; /* 5倍高度，只显示顶部20% */
+  object-fit: cover;
+  transform: scale(1);
+  transform-origin: center top;
+  transition: transform var(--global-animation-normal) var(--global-ease-out);
+}
+
+.image-peek-scale:hover {
+  height: auto;
+  max-height: 600px;
+  box-shadow: var(--global-shadow-hover);
+}
+
+.image-peek-scale:hover img {
+  transform: scale(1);
+}
+
+/* === 响应式设计 === */
+@media (max-width: 768px) {
+  .image-peek-container {
+    border-radius: var(--global-radius-md);
+  }
+  
+  .image-peek-overflow {
+    height: 100px;
+    border-radius: var(--global-radius-md);
+  }
+  
+  .image-peek-scale {
+    height: 120px;
+    border-radius: var(--global-radius-md);
+  }
+  
+  .image-peek-scale img {
+    height: 600px;
+  }
+}
+
+@media (max-width: 480px) {
+  .image-peek-overflow {
+    height: 80px;
+  }
+  
+  .image-peek-scale {
+    height: 100px;
+  }
+  
+  .image-peek-scale img {
+    height: 500px;
+  }
+}
+
+/* === 移动端触摸优化 === */
+@media (hover: none) and (pointer: coarse) {
+  .image-peek-container,
+  .image-peek-overflow,
+  .image-peek-scale {
+    /* 移动端默认展开，避免hover失效 */
+    height: auto !important;
+    max-height: none !important;
+  }
+  
+  .image-peek-clip {
+    clip-path: inset(0 0 0 0) !important;
+  }
+  
+  .image-peek-container::after {
+    opacity: 0 !important;
+  }
+  
+  .image-peek-overflow img {
+    transform: translateY(0) !important;
+  }
+}
+
+/* === 加载状态优化 === */
+.image-peek-loading {
+  position: relative;
+  width: 100%;
+  height: 150px;
+  background: linear-gradient(90deg, 
+    var(--global-bg-secondary) 0%, 
+    var(--global-bg-tertiary) 50%, 
+    var(--global-bg-secondary) 100%);
+  background-size: 200% 100%;
+  animation: loading-shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--global-radius-lg);
+}
+
+@keyframes loading-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* === 错误状态 === */
+.image-peek-error {
+  position: relative;
+  width: 100%;
+  height: 150px;
+  background: var(--global-bg-secondary);
+  border: 2px dashed var(--global-border-medium);
+  border-radius: var(--global-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--global-text-tertiary);
+  font-size: var(--global-font-size-sm);
+}
+
+/* === 无障碍支持 === */
+.image-peek-container:focus-within {
+  outline: 2px solid var(--global-accent-secondary);
+  outline-offset: 2px;
+}
+
+.image-peek-container[aria-expanded="true"] .image-peek-clip {
+  clip-path: inset(0 0 0 0);
+}
+
+.image-peek-container[aria-expanded="true"]::after {
+  opacity: 0;
+}
+
+/* === 性能优化类 === */
+.image-peek-performance {
+  /* 硬件加速 */
+  transform: translateZ(0);
+  will-change: clip-path, transform;
+  backface-visibility: hidden;
+  
+  /* 减少重绘 */
+  contain: layout style paint;
+}
+
+/* === 自定义动画变体 === */
+.image-peek-animate-slow {
+  transition-duration: var(--global-animation-slow);
+}
+
+.image-peek-animate-fast {
+  transition-duration: var(--global-animation-fast);
+}
+
+/* === 主题适配 === */
+.image-peek-glow {
+  box-shadow: 
+    var(--global-shadow-card),
+    0 0 20px rgba(196, 155, 97, 0.1);
+}
+
+.image-peek-glow:hover {
+  box-shadow: 
+    var(--global-shadow-hover),
+    0 0 30px rgba(196, 155, 97, 0.2);
+}
+
+/* === 组合使用示例类 === */
+.image-peek-card {
+  @apply image-peek-container image-peek-performance;
+  height: 180px;
+  cursor: pointer;
+}
+
+.image-peek-card:hover {
+  transform: translateY(-2px);
+}
+
+/* === Tailwind工具类集成 === */
+@layer utilities {
+  .image-peek {
+    @apply image-peek-container;
+  }
+  
+  .image-peek-sm {
+    height: 120px;
+  }
+  
+  .image-peek-md {
+    height: 180px;
+  }
+  
+  .image-peek-lg {
+    height: 240px;
+  }
+  
+  .image-peek-auto {
+    height: auto;
+    max-height: 300px;
+  }
+}
