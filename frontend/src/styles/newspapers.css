@@ -2779,7 +2779,7 @@ div#uv > div.loaded > div.uv-iiif-extension-host .options {
    垂直报刊卡片样式 - 界面1专用
    ================================================ */
 
-/* 垂直卡片基础样式 - 按照UI原型设计 */
+/* 垂直卡片基础样式 - 按照UI原型设计，优化比例 */
 .vertical-newspaper-card {
   width: 280px;
   background: #ffffff;
@@ -2793,6 +2793,9 @@ div#uv > div.loaded > div.uv-iiif-extension-host .options {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   box-sizing: border-box;
   margin: 0 auto 1rem;
+  /* 优化卡片高度，确保内容合理分布 */
+  min-height: 420px;
+  max-height: 480px;
 }
 
 .vertical-newspaper-card:hover {
@@ -2812,9 +2815,9 @@ div#uv > div.loaded > div.uv-iiif-extension-host .options {
   outline-offset: 2px;
 }
 
-/* 封面图片区域 */
+/* 封面图片区域 - 优化比例和显示 */
 .vertical-newspaper-card__image {
-  height: 160px;
+  height: 180px;
   background: #f8fafc;
   display: flex;
   align-items: center;
@@ -2822,13 +2825,24 @@ div#uv > div.loaded > div.uv-iiif-extension-host .options {
   border-bottom: 3px solid #cbd5e1;
   overflow: hidden;
   position: relative;
+  /* 报刊封面最佳显示比例 */
+  aspect-ratio: 3/4;
 }
 
 .vertical-newspaper-card__image-img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain; /* 改为contain避免裁剪 */
   display: block;
+  transition: transform 0.3s ease;
+  /* 确保图片在容器内完整显示 */
+  object-position: center;
+  background: #f8fafc;
+}
+
+/* 悬停时轻微放大效果 */
+.vertical-newspaper-card:hover .vertical-newspaper-card__image-img {
+  transform: scale(1.05);
 }
 
 .vertical-newspaper-card__image-placeholder {
@@ -2838,37 +2852,51 @@ div#uv > div.loaded > div.uv-iiif-extension-host .options {
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  /* 保持与图片相同的比例 */
+  aspect-ratio: 3/4;
 }
 
 .vertical-newspaper-card__image-icon {
-  font-size: 3rem;
-  opacity: 0.6;
+  font-size: 3.5rem;
+  opacity: 0.7;
   color: #64748b;
+  transition: all 0.3s ease;
 }
 
-/* 卡片内容区域 */
+/* 悬停时图标也响应 */
+.vertical-newspaper-card:hover .vertical-newspaper-card__image-icon {
+  transform: scale(1.1);
+  opacity: 0.9;
+}
+
+/* 卡片内容区域 - 优化空间分配 */
 .vertical-newspaper-card__content {
-  padding: 1.25rem;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
   flex: 1;
   text-align: center;
+  /* 确保内容区域合理利用空间 */
+  min-height: 0;
 }
 
-/* 报刊标题 */
+/* 报刊标题 - 优化显示 */
 .vertical-newspaper-card__title {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   font-weight: 600;
   color: #1e293b;
   margin: 0;
   text-align: center;
-  line-height: 1.4;
+  line-height: 1.3;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+  /* 确保标题不会占用过多空间 */
+  max-height: 2.6em;
+  min-height: 2.6em;
 }
 
 /* 元信息区域 */
@@ -2896,39 +2924,51 @@ div#uv > div.loaded > div.uv-iiif-extension-host .options {
   font-weight: 500;
 }
 
-/* 简介描述 */
+/* 简介描述 - 优化显示和空间 */
 .vertical-newspaper-card__description {
-  font-size: 0.813rem;
+  font-size: 0.75rem;
   color: #64748b;
-  line-height: 1.5;
+  line-height: 1.4;
   margin: 0;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: center;
+  /* 限制描述区域高度，为其他内容留出空间 */
+  max-height: 2.8em;
+  min-height: 2.8em;
+  /* 确保描述文本在移动端也能良好显示 */
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
-/* 操作按钮区域 */
+/* 操作按钮区域 - 优化空间和视觉 */
 .vertical-newspaper-card__action {
-  margin-top: 0.5rem;
-  padding-top: 0.75rem;
-  border-top: 3px solid #cbd5e1;
+  margin-top: auto;
+  padding-top: 0.5rem;
+  border-top: 2px solid #cbd5e1;
+  /* 确保按钮始终在底部 */
+  align-self: stretch;
 }
 
 .vertical-newspaper-card__button {
   background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
   color: white;
   border: none;
-  border-radius: 0.5rem;
-  padding: 0.625rem 1.25rem;
-  font-size: 0.875rem;
+  border-radius: 0.375rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.813rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   width: 100%;
-  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 2px 6px rgba(139, 92, 246, 0.2);
+  /* 确保按钮文本不会换行 */
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .vertical-newspaper-card__button:hover {
@@ -3367,7 +3407,7 @@ div#uv > div.loaded > div.uv-iiif-extension-host .options {
    响应式设计
    ================================================ */
 
-/* 移动端适配 */
+/* 移动端适配 - 优化显示效果 */
 @media (max-width: 768px) {
   .newspapers-vertical-list {
     max-width: 280px;
@@ -3377,15 +3417,36 @@ div#uv > div.loaded > div.uv-iiif-extension-host .options {
   
   .vertical-newspaper-card {
     width: 260px;
-    min-height: 100px;
+    min-height: 380px;
+    max-height: 440px;
+  }
+  
+  .vertical-newspaper-card__image {
+    height: 160px;
   }
   
   .vertical-newspaper-card__content {
-    padding: 1rem;
+    padding: 0.875rem;
+    gap: 0.375rem;
   }
   
   .vertical-newspaper-card__title {
     font-size: 1rem;
+    line-height: 1.2;
+    max-height: 2.4em;
+    min-height: 2.4em;
+  }
+  
+  .vertical-newspaper-card__description {
+    font-size: 0.713rem;
+    line-height: 1.3;
+    max-height: 2.6em;
+    min-height: 2.6em;
     -webkit-line-clamp: 2;
+  }
+  
+  .vertical-newspaper-card__button {
+    font-size: 0.75rem;
+    padding: 0.438rem 0.875rem;
   }
 }
