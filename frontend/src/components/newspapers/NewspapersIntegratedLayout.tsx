@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useRef, useReducer, useMemo } from 'react';
+import React, { useEffect, useCallback, useRef, useReducer, useMemo, memo } from 'react';
 import { NewspaperService, PublicationItem, IssueItem, PaginationParams } from './services';
 import { InfiniteScrollIssueList } from './InfiniteScrollIssueList';
 import { NewspapersBreadcrumb } from './NewspapersBreadcrumb';
@@ -203,6 +203,622 @@ const newspapersReducer = (state: NewspapersState, action: NewspapersAction): Ne
       return state;
   }
 };
+
+// ====================
+// 提取的子组件
+// ====================
+
+/**
+ * 错误状态组件
+ */
+const ErrorComponent = memo(() => (
+  <div className="newspapers-error">
+    <div className="newspapers-error__content">
+      <div className="newspapers-error__icon">❌</div>
+      <h3 className="newspapers-error__title">加载失败</h3>
+      <p className="newspapers-error__message">请刷新页面重试</p>
+      <div className="newspapers-error__actions">
+        <button
+          onClick={() => window.location.reload()}
+          className="btn-newspapers"
+        >
+          重新加载
+        </button>
+      </div>
+    </div>
+  </div>
+));
+
+/**
+ * 加载状态组件
+ */
+const LoadingComponent = memo(({ message = "加载报刊数据..." }: { message?: string }) => (
+  <div className="newspapers-loading">
+    <div className="newspapers-loading__content">
+      <div className="newspapers-loading__spinner"></div>
+      <p className="newspapers-loading__text">{message}</p>
+    </div>
+  </div>
+));
+
+/**
+ * 刊物列表组件
+ */
+const PublicationList = memo(({ 
+  publications, 
+  selectedPublication, 
+  onPublicationSelect 
+}: {
+  publications: PublicationItem[];
+  selectedPublication: PublicationItem | null;
+  onPublicationSelect: (publication: PublicationItem) => void;
+}) => (
+  <div className="newspapers-publication-list">
+    {publications.map((publication) => (
+      <div
+        key={publication.id}
+        className={`newspapers-publication-item ${
+          selectedPublication?.id === publication.id
+            ? 'newspapers-publication-item--selected'
+            : ''
+        }`}
+        onClick={() => onPublicationSelect(publication)}
+      >
+        <h3 className="newspapers-publication__title">
+          {publication.title}
+        </h3>
+        <p className="newspapers-publication__summary">
+          {publication.summary || '暂无描述'}
+        </p>
+        <div className="newspapers-publication__meta">
+          <span className="newspapers-publication__count">
+            {publication.issueCount} 期
+          </span>
+          {publication.lastUpdated && (
+            <span className="newspapers-publication__updated">
+              最新: {publication.lastUpdated}
+            </span>
+          )}
+        </div>
+      </div>
+    ))}
+  </div>
+));
+
+/**
+ * 移动端抽屉组件
+ */
+const MobileDrawer = memo(({ 
+  isOpen, 
+  mode, 
+  selectedPublication, 
+  publications, 
+  issues, 
+  selectedIssue, 
+  loading, 
+  hasMore, 
+  error, 
+  retryCount, 
+  onClose, 
+  onTouchStart, 
+  onTouchMove, 
+  onTouchEnd, 
+  onPublicationSelect, 
+  onIssueSelect, 
+  onLoadMore, 
+  onRetry 
+}: {
+  isOpen: boolean;
+  mode: 'publications' | 'issues';
+  selectedPublication: PublicationItem | null;
+  publications: PublicationItem[];
+  issues: IssueItem[];
+  selectedIssue: IssueItem | null;
+  loading: boolean;
+  hasMore: boolean;
+  error: string | null;
+  retryCount: number;
+  onClose: () => void;
+  onTouchStart: (e: React.TouchEvent) => void;
+  onTouchMove: (e: React.TouchEvent) => void;
+  onTouchEnd: () => void;
+  onPublicationSelect: (publication: PublicationItem) => void;
+  onIssueSelect: (issue: IssueItem) => void;
+  onLoadMore: () => void;
+  onRetry: () => void;
+}) => {
+  return (
+    <>
+      {/* 抽屉遮罩 */}
+      {isOpen && (
+        <div 
+          className="newspapers-drawer-overlay"
+          onClick={onClose}
+        />
+      )}
+      
+      {/* 底部抽屉 */}
+      <div 
+        className={`newspapers-drawer ${isOpen ? 'newspapers-drawer--open' : ''}`}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
+        <div className="newspapers-drawer__header">
+          <div className="newspapers-drawer__handle" />
+          <h3 className="newspapers-drawer__title">
+            {mode === 'publications' ? '选择刊物' : selectedPublication?.title || '选择期数'}
+          </h3>
+          <button
+            onClick={onClose}
+            className="newspapers-drawer__close"
+            aria-label="关闭抽屉"
+          >
+            ✕
+          </button>
+        </div>
+        
+        <div className="newspapers-drawer__content newspapers-scrollbar-thin">
+          {mode === 'publications' ? (
+            <PublicationList 
+              publications={publications}
+              selectedPublication={selectedPublication}
+              onPublicationSelect={onPublicationSelect}
+            />
+          ) : (
+            <InfiniteScrollIssueList
+              issues={issues}
+              selectedIssue={selectedIssue}
+              loading={loading}
+              hasMore={hasMore}
+              onLoadMore={onLoadMore}
+              onIssueSelect={onIssueSelect}
+              error={error}
+              retryCount={retryCount}
+              onRetry={onRetry}
+            />
+          )}
+        </div>
+      </div>
+    </>
+  );
+});
+
+/**
+ * 桌面端侧边栏组件
+ */
+const DesktopSidebar = memo(({ 
+  isOpen, 
+  publications, 
+  selectedPublication, 
+  onPublicationSelect, 
+  onClose 
+}: {
+  isOpen: boolean;
+  publications: PublicationItem[];
+  selectedPublication: PublicationItem | null;
+  onPublicationSelect: (publication: PublicationItem) => void;
+  onClose: () => void;
+}) => (
+  <div className={`newspapers-sidebar ${isOpen ? 'newspapers-sidebar--open' : ''}`}>
+    <div className="newspapers-sidebar__header">
+      <h2 className="newspapers-sidebar__title">报刊列表</h2>
+      <button
+        onClick={onClose}
+        className="newspapers-sidebar-toggle"
+        aria-label="关闭侧边栏"
+      >
+        ✕
+      </button>
+    </div>
+    
+    <div className="newspapers-sidebar__content newspapers-scrollbar-thin">
+      <PublicationList 
+        publications={publications}
+        selectedPublication={selectedPublication}
+        onPublicationSelect={onPublicationSelect}
+      />
+    </div>
+  </div>
+));
+
+/**
+ * 欢迎界面组件
+ */
+const WelcomeScreen = memo(({ onOpenPublications }: { onOpenPublications: () => void }) => (
+  <div className="newspapers-welcome">
+    <div className="newspapers-welcome__content">
+      <div className="newspapers-welcome__icon">📰</div>
+      <h2 className="newspapers-welcome__title">欢迎使用数字报刊</h2>
+      <p className="newspapers-welcome__message">
+        请从左侧选择一个刊物开始浏览
+      </p>
+      <button
+        onClick={onOpenPublications}
+        className="btn-newspapers"
+      >
+        选择刊物
+      </button>
+    </div>
+  </div>
+));
+
+/**
+ * 新布局工具栏组件
+ */
+const NewLayoutToolbar = memo(({ 
+  isMobile, 
+  selectedPublication, 
+  selectedIssue, 
+  issues, 
+  onToggleDrawer, 
+  onIssueSelect 
+}: {
+  isMobile: boolean;
+  selectedPublication: PublicationItem | null;
+  selectedIssue: IssueItem | null;
+  issues: IssueItem[];
+  onToggleDrawer: () => void;
+  onIssueSelect: (issue: IssueItem) => void;
+}) => (
+  <div className="newspapers-toolbar">
+    <div className="newspapers-toolbar__left">
+      {isMobile && (
+        <button
+          onClick={onToggleDrawer}
+          className="newspapers-sidebar-toggle"
+          aria-label="打开抽屉"
+        >
+          ☰
+        </button>
+      )}
+      
+      {selectedPublication && (
+        <div className="newspapers-issue-selector">
+          <label className="newspapers-issue-selector__label">
+            期数：
+          </label>
+          <select
+            value={selectedIssue?.manifest || ''}
+            onChange={(e) => {
+              const issue = issues.find(i => i.manifest === e.target.value);
+              if (issue) onIssueSelect(issue);
+            }}
+            className="newspapers-issue-selector__select"
+            disabled={issues.length === 0}
+          >
+            {issues.length === 0 ? (
+              <option value="">暂无期数</option>
+            ) : (
+              issues.map((issue) => (
+                <option key={issue.manifest} value={issue.manifest}>
+                  {issue.title}
+                </option>
+              ))
+            )}
+          </select>
+        </div>
+      )}
+    </div>
+    
+    <div className="newspapers-toolbar__right">
+      {issues.length > 1 && selectedIssue && !isMobile && (
+        <div className="newspapers-issue-nav">
+          <button
+            onClick={() => {
+              const currentIndex = issues.findIndex(issue => issue.manifest === selectedIssue?.manifest);
+              if (currentIndex > 0) {
+                onIssueSelect(issues[currentIndex - 1]);
+              }
+            }}
+            disabled={issues.findIndex(issue => issue.manifest === selectedIssue?.manifest) === 0}
+            className="newspapers-issue-nav__button"
+          >
+            上一期
+          </button>
+          <button
+            onClick={() => {
+              const currentIndex = issues.findIndex(issue => issue.manifest === selectedIssue?.manifest);
+              if (currentIndex < issues.length - 1) {
+                onIssueSelect(issues[currentIndex + 1]);
+              }
+            }}
+            disabled={issues.findIndex(issue => issue.manifest === selectedIssue?.manifest) === issues.length - 1}
+            className="newspapers-issue-nav__button"
+          >
+            下一期
+          </button>
+        </div>
+      )}
+    </div>
+  </div>
+));
+
+/**
+ * 新布局查看器容器组件
+ */
+const NewLayoutViewerContainer = memo(({ 
+  loading, 
+  selectedIssue, 
+  iframeRef 
+}: {
+  loading: boolean;
+  selectedIssue: IssueItem | null;
+  iframeRef: React.RefObject<HTMLIFrameElement>;
+}) => (
+  <div className="newspapers-viewer-container">
+    {loading && <LoadingComponent message="加载中..." />}
+    
+    {!selectedIssue ? (
+      <EmptyState
+        icon={
+          <div className="newspapers-viewer-placeholder__icon">📖</div>
+        }
+        title="选择期数开始阅读"
+        message="请从左侧选择一个期数开始阅读"
+        className="newspapers-viewer-placeholder"
+      />
+    ) : (
+      <iframe
+        ref={iframeRef}
+        className="newspapers-viewer__iframe"
+        title="报刊查看器"
+        allowFullScreen
+        sandbox={IFRAME_SANDBOX}
+      />
+    )}
+  </div>
+));
+
+/**
+ * 原布局工具栏组件
+ */
+const LegacyToolbar = memo(({ 
+  isMobile, 
+  selectedPublication, 
+  selectedIssue, 
+  issues, 
+  onOpenPublicationsDrawer, 
+  onIssueSelect, 
+  onToggleSidebar, 
+  sidebarOpen 
+}: {
+  isMobile: boolean;
+  selectedPublication: PublicationItem | null;
+  selectedIssue: IssueItem | null;
+  issues: IssueItem[];
+  onOpenPublicationsDrawer: () => void;
+  onIssueSelect: (issue: IssueItem) => void;
+  onToggleSidebar: () => void;
+  sidebarOpen: boolean;
+}) => (
+  <div className="newspapers-toolbar">
+    <div className="newspapers-toolbar__left">
+      {isMobile && (
+        <button
+          onClick={onOpenPublicationsDrawer}
+          className="newspapers-sidebar-toggle"
+          aria-label="打开刊物选择"
+        >
+          ☰
+        </button>
+      )}
+      
+      {selectedPublication && (
+        <div className="newspapers-issue-selector">
+          <label className="newspapers-issue-selector__label">
+            期数：
+          </label>
+          <select
+            value={selectedIssue?.manifest || ''}
+            onChange={(e) => {
+              const issue = issues.find(i => i.manifest === e.target.value);
+              if (issue) onIssueSelect(issue);
+            }}
+            className="newspapers-issue-selector__select"
+            disabled={issues.length === 0}
+          >
+            {issues.length === 0 ? (
+              <option value="">暂无期数</option>
+            ) : (
+              issues.map((issue) => (
+                <option key={issue.manifest} value={issue.manifest}>
+                  {issue.title}
+                </option>
+              ))
+            )}
+          </select>
+        </div>
+      )}
+    </div>
+    
+    <div className="newspapers-toolbar__right">
+      {issues.length > 1 && selectedIssue && !isMobile && (
+        <div className="newspapers-issue-nav">
+          <button
+            onClick={() => {
+              const currentIndex = issues.findIndex(issue => issue.manifest === selectedIssue?.manifest);
+              if (currentIndex > 0) {
+                onIssueSelect(issues[currentIndex - 1]);
+              }
+            }}
+            disabled={issues.findIndex(issue => issue.manifest === selectedIssue?.manifest) === 0}
+            className="newspapers-issue-nav__button"
+          >
+            上一期
+          </button>
+          <button
+            onClick={() => {
+              const currentIndex = issues.findIndex(issue => issue.manifest === selectedIssue?.manifest);
+              if (currentIndex < issues.length - 1) {
+                onIssueSelect(issues[currentIndex + 1]);
+              }
+            }}
+            disabled={issues.findIndex(issue => issue.manifest === selectedIssue?.manifest) === issues.length - 1}
+            className="newspapers-issue-nav__button"
+          >
+            下一期
+          </button>
+        </div>
+      )}
+      
+      {!isMobile && (
+        <button
+          onClick={onToggleSidebar}
+          className="newspapers-sidebar-toggle"
+          aria-label={sidebarOpen ? "关闭侧边栏" : "打开侧边栏"}
+        >
+          {sidebarOpen ? '◀' : '▶'}
+        </button>
+      )}
+    </div>
+  </div>
+));
+
+/**
+ * 期数查看器组件
+ */
+const IssueViewer = memo(({ 
+  isMobile, 
+  selectedPublication, 
+  issues, 
+  selectedIssue, 
+  loading, 
+  issuesLoadingMore, 
+  issuesHasMore, 
+  issuesError, 
+  issuesRetryCount, 
+  iframeRef, 
+  onIssueSelect, 
+  onLoadMore, 
+  onRetry 
+}: {
+  isMobile: boolean;
+  selectedPublication: PublicationItem | null;
+  issues: IssueItem[];
+  selectedIssue: IssueItem | null;
+  loading: boolean;
+  issuesLoadingMore: boolean;
+  issuesHasMore: boolean;
+  issuesError: string | null;
+  issuesRetryCount: number;
+  iframeRef: React.RefObject<HTMLIFrameElement>;
+  onIssueSelect: (issue: IssueItem) => void;
+  onLoadMore: () => void;
+  onRetry: () => void;
+}) => (
+  <div className="newspapers-issue-viewer">
+    {/* 移动端隐藏期数选择区域 */}
+    {isMobile ? null : (
+      <div className="newspapers-issue-selector">
+        <div className="newspapers-issue-selector__header">
+          <h3 className="newspapers-issue-selector__title">
+            {selectedPublication?.title}
+          </h3>
+          <span className="newspapers-issue-selector__count">
+            共 {issues.length} 期
+          </span>
+        </div>
+        
+        <InfiniteScrollIssueList
+          issues={issues}
+          selectedIssue={selectedIssue}
+          loading={issuesLoadingMore}
+          hasMore={issuesHasMore}
+          onLoadMore={onLoadMore}
+          onIssueSelect={onIssueSelect}
+          error={issuesError}
+          retryCount={issuesRetryCount}
+          onRetry={onRetry}
+        />
+      </div>
+    )}
+    
+    {/* 查看器区域 */}
+    <div className="newspapers-viewer-container">
+      {loading && <LoadingComponent message="加载中..." />}
+      
+      {!selectedIssue ? (
+        <div className="newspapers-viewer-placeholder">
+          <div className="newspapers-viewer-placeholder__content">
+            <div className="newspapers-viewer-placeholder__icon">📖</div>
+            <h3 className="newspapers-viewer-placeholder__title">
+              选择期数开始阅读
+            </h3>
+            <p className="newspapers-viewer-placeholder__message">
+              请从上方选择一个期数开始阅读
+            </p>
+          </div>
+        </div>
+      ) : (
+        <iframe
+          ref={iframeRef}
+          className="newspapers-viewer__iframe"
+          title="报刊查看器"
+          allowFullScreen
+          sandbox={IFRAME_SANDBOX}
+        />
+      )}
+    </div>
+  </div>
+));
+
+/**
+ * 主内容区域组件
+ */
+const MainContent = memo(({ 
+  selectedPublication, 
+  isMobile, 
+  selectedPublicationData, 
+  issues, 
+  selectedIssue, 
+  loading, 
+  issuesLoadingMore, 
+  issuesHasMore, 
+  issuesError, 
+  issuesRetryCount, 
+  iframeRef, 
+  onIssueSelect, 
+  onLoadMore, 
+  onRetry 
+}: {
+  selectedPublication: PublicationItem | null;
+  isMobile: boolean;
+  selectedPublicationData: PublicationItem | null;
+  issues: IssueItem[];
+  selectedIssue: IssueItem | null;
+  loading: boolean;
+  issuesLoadingMore: boolean;
+  issuesHasMore: boolean;
+  issuesError: string | null;
+  issuesRetryCount: number;
+  iframeRef: React.RefObject<HTMLIFrameElement>;
+  onIssueSelect: (issue: IssueItem) => void;
+  onLoadMore: () => void;
+  onRetry: () => void;
+}) => (
+  <div className="newspapers-content">
+    {!selectedPublication ? (
+      <WelcomeScreen onOpenPublications={() => {}} />
+    ) : (
+      <IssueViewer
+        isMobile={isMobile}
+        selectedPublication={selectedPublicationData}
+        issues={issues}
+        selectedIssue={selectedIssue}
+        loading={loading}
+        issuesLoadingMore={issuesLoadingMore}
+        issuesHasMore={issuesHasMore}
+        issuesError={issuesError}
+        issuesRetryCount={issuesRetryCount}
+        iframeRef={iframeRef}
+        onIssueSelect={onIssueSelect}
+        onLoadMore={onLoadMore}
+        onRetry={onRetry}
+      />
+    )}
+  </div>
+));
 
 // ====================
 // 工具函数
@@ -748,475 +1364,6 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
   }, [actions]);
 
   // ====================
-  // 子组件函数
-  // ====================
-  
-  /**
-   * 错误状态组件
-   */
-  const ErrorComponent = () => (
-    <div className="newspapers-error">
-      <div className="newspapers-error__content">
-        <div className="newspapers-error__icon">❌</div>
-        <h3 className="newspapers-error__title">加载失败</h3>
-        <p className="newspapers-error__message">{state.error}</p>
-        <div className="newspapers-error__actions">
-          <button
-            onClick={() => window.location.reload()}
-            className="btn-newspapers"
-          >
-            重新加载
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-
-  /**
-   * 加载状态组件
-   */
-  const LoadingComponent = ({ message = "加载报刊数据..." }: { message?: string }) => (
-    <div className="newspapers-loading">
-      <div className="newspapers-loading__content">
-        <div className="newspapers-loading__spinner"></div>
-        <p className="newspapers-loading__text">{message}</p>
-      </div>
-    </div>
-  );
-
-  /**
-   * 新布局工具栏组件
-   */
-  const NewLayoutToolbar = () => (
-    <div className="newspapers-toolbar">
-      <div className="newspapers-toolbar__left">
-        {state.isMobile && (
-          <button
-            onClick={() => actions.setDrawerOpen(true)}
-            className="newspapers-sidebar-toggle"
-            aria-label="打开抽屉"
-          >
-            ☰
-          </button>
-        )}
-        
-        {state.selectedPublication && (
-          <div className="newspapers-issue-selector">
-            <label className="newspapers-issue-selector__label">
-              期数：
-            </label>
-            <select
-              value={state.selectedIssue?.manifest || ''}
-              onChange={(e) => {
-                const issue = state.issues.find(i => i.manifest === e.target.value);
-                if (issue) handleIssueSelect(issue);
-              }}
-              className="newspapers-issue-selector__select"
-              disabled={state.issues.length === 0}
-            >
-              {state.issues.length === 0 ? (
-                <option value="">暂无期数</option>
-              ) : (
-                state.issues.map((issue) => (
-                  <option key={issue.manifest} value={issue.manifest}>
-                    {issue.title}
-                  </option>
-                ))
-              )}
-            </select>
-          </div>
-        )}
-      </div>
-      
-      <div className="newspapers-toolbar__right">
-        {state.issues.length > 1 && state.selectedIssue && !state.isMobile && (
-          <div className="newspapers-issue-nav">
-            <button
-              onClick={() => {
-                const currentIndex = state.issues.findIndex(issue => issue.manifest === state.selectedIssue?.manifest);
-                if (currentIndex > 0) {
-                  handleIssueSelect(state.issues[currentIndex - 1]);
-                }
-              }}
-              disabled={state.issues.findIndex(issue => issue.manifest === state.selectedIssue?.manifest) === 0}
-              className="newspapers-issue-nav__button"
-            >
-              上一期
-            </button>
-            <button
-              onClick={() => {
-                const currentIndex = state.issues.findIndex(issue => issue.manifest === state.selectedIssue?.manifest);
-                if (currentIndex < state.issues.length - 1) {
-                  handleIssueSelect(state.issues[currentIndex + 1]);
-                }
-              }}
-              disabled={state.issues.findIndex(issue => issue.manifest === state.selectedIssue?.manifest) === state.issues.length - 1}
-              className="newspapers-issue-nav__button"
-            >
-              下一期
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-
-  /**
-   * 新布局查看器容器组件
-   */
-  const NewLayoutViewerContainer = () => (
-    <div className="newspapers-viewer-container">
-      {state.loading && <LoadingComponent message="加载中..." />}
-      
-      {!state.selectedIssue ? (
-        <EmptyState
-          icon={
-            <div className="newspapers-viewer-placeholder__icon">📖</div>
-          }
-          title="选择期数开始阅读"
-          message="请从左侧选择一个期数开始阅读"
-          className="newspapers-viewer-placeholder"
-        />
-      ) : (
-        <iframe
-          ref={iframeRef}
-          className="newspapers-viewer__iframe"
-          title="报刊查看器"
-          allowFullScreen
-          sandbox={IFRAME_SANDBOX}
-        />
-      )}
-    </div>
-  );
-
-  /**
-   * 新布局内容渲染函数
-   */
-  const renderNewLayoutContent = () => {
-    if (state.loading && state.publications.length === 0) {
-      return <LoadingComponent />;
-    }
-
-    return (
-      <>
-        <NewLayoutToolbar />
-        
-        {/* 主要内容区域 */}
-        {state.selectedPublication ? (
-          <NewLayoutViewerContainer />
-        ) : (
-          <NewspapersGuideArea />
-        )}
-      </>
-    );
-  };
-
-  /**
-   * 刊物列表组件
-   */
-  const PublicationList = () => (
-    <div className="newspapers-publication-list">
-      {state.publications.map((publication) => (
-        <div
-          key={publication.id}
-          className={`newspapers-publication-item ${
-            state.selectedPublication?.id === publication.id
-              ? 'newspapers-publication-item--selected'
-              : ''
-          }`}
-          onClick={() => handlePublicationSelect(publication)}
-        >
-          <h3 className="newspapers-publication__title">
-            {publication.title}
-          </h3>
-          <p className="newspapers-publication__summary">
-            {publication.summary || '暂无描述'}
-          </p>
-          <div className="newspapers-publication__meta">
-            <span className="newspapers-publication__count">
-              {publication.issueCount} 期
-            </span>
-            {publication.lastUpdated && (
-              <span className="newspapers-publication__updated">
-                最新: {publication.lastUpdated}
-              </span>
-            )}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-
-  /**
-   * 移动端抽屉组件
-   */
-  const MobileDrawer = () => {
-    if (!state.isMobile) return null;
-    
-    return (
-      <>
-        {/* 抽屉遮罩 */}
-        {state.drawerOpen && (
-          <div 
-            className="newspapers-drawer-overlay"
-            onClick={closeDrawer}
-          />
-        )}
-        
-        {/* 底部抽屉 */}
-        <div 
-          ref={drawerRef}
-          className={`newspapers-drawer ${state.drawerOpen ? 'newspapers-drawer--open' : ''}`}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
-          <div className="newspapers-drawer__header">
-            <div className="newspapers-drawer__handle" />
-            <h3 className="newspapers-drawer__title">
-              {state.drawerMode === 'publications' ? '选择刊物' : state.selectedPublication?.title || '选择期数'}
-            </h3>
-            <button
-              onClick={closeDrawer}
-              className="newspapers-drawer__close"
-              aria-label="关闭抽屉"
-            >
-              ✕
-            </button>
-          </div>
-          
-          <div className="newspapers-drawer__content newspapers-scrollbar-thin">
-            {state.drawerMode === 'publications' ? (
-              <PublicationList />
-            ) : (
-              <InfiniteScrollIssueList
-                issues={state.issues}
-                selectedIssue={state.selectedIssue}
-                loading={state.issuesLoadingMore}
-                hasMore={state.issuesHasMore}
-                onLoadMore={loadMoreIssues}
-                onIssueSelect={handleIssueSelect}
-                error={state.issuesError}
-                retryCount={state.issuesRetryCount}
-                onRetry={retryLoadMore}
-              />
-            )}
-          </div>
-        </div>
-      </>
-    );
-  };
-
-  /**
-   * 桌面端侧边栏组件
-   */
-  const DesktopSidebar = () => {
-    if (state.isMobile) return null;
-    
-    return (
-      <div className={`newspapers-sidebar ${state.sidebarOpen ? 'newspapers-sidebar--open' : ''}`}>
-        <div className="newspapers-sidebar__header">
-          <h2 className="newspapers-sidebar__title">报刊列表</h2>
-          <button
-            onClick={() => actions.setSidebarOpen(false)}
-            className="newspapers-sidebar-toggle"
-            aria-label="关闭侧边栏"
-          >
-            ✕
-          </button>
-        </div>
-        
-        <div className="newspapers-sidebar__content newspapers-scrollbar-thin">
-          <PublicationList />
-        </div>
-      </div>
-    );
-  };
-
-  /**
-   * 原布局工具栏组件
-   */
-  const LegacyToolbar = () => (
-    <div className="newspapers-toolbar">
-      <div className="newspapers-toolbar__left">
-        {state.isMobile && (
-          <button
-            onClick={openPublicationsDrawer}
-            className="newspapers-sidebar-toggle"
-            aria-label="打开刊物选择"
-          >
-            ☰
-          </button>
-        )}
-        
-        {state.selectedPublication && (
-          <div className="newspapers-issue-selector">
-            <label className="newspapers-issue-selector__label">
-              期数：
-            </label>
-            <select
-              value={state.selectedIssue?.manifest || ''}
-              onChange={(e) => {
-                const issue = state.issues.find(i => i.manifest === e.target.value);
-                if (issue) handleIssueSelect(issue);
-              }}
-              className="newspapers-issue-selector__select"
-              disabled={state.issues.length === 0}
-            >
-              {state.issues.length === 0 ? (
-                <option value="">暂无期数</option>
-              ) : (
-                state.issues.map((issue) => (
-                  <option key={issue.manifest} value={issue.manifest}>
-                    {issue.title}
-                  </option>
-                ))
-              )}
-            </select>
-          </div>
-        )}
-      </div>
-      
-      <div className="newspapers-toolbar__right">
-        {state.issues.length > 1 && state.selectedIssue && !state.isMobile && (
-          <div className="newspapers-issue-nav">
-            <button
-              onClick={() => {
-                const currentIndex = state.issues.findIndex(issue => issue.manifest === state.selectedIssue?.manifest);
-                if (currentIndex > 0) {
-                  handleIssueSelect(state.issues[currentIndex - 1]);
-                }
-              }}
-              disabled={state.issues.findIndex(issue => issue.manifest === state.selectedIssue?.manifest) === 0}
-              className="newspapers-issue-nav__button"
-            >
-              上一期
-            </button>
-            <button
-              onClick={() => {
-                const currentIndex = state.issues.findIndex(issue => issue.manifest === state.selectedIssue?.manifest);
-                if (currentIndex < state.issues.length - 1) {
-                  handleIssueSelect(state.issues[currentIndex + 1]);
-                }
-              }}
-              disabled={state.issues.findIndex(issue => issue.manifest === state.selectedIssue?.manifest) === state.issues.length - 1}
-              className="newspapers-issue-nav__button"
-            >
-              下一期
-            </button>
-          </div>
-        )}
-        
-        {!state.isMobile && (
-          <button
-            onClick={() => actions.setSidebarOpen(!state.sidebarOpen)}
-            className="newspapers-sidebar-toggle"
-            aria-label={state.sidebarOpen ? "关闭侧边栏" : "打开侧边栏"}
-          >
-            {state.sidebarOpen ? '◀' : '▶'}
-          </button>
-        )}
-      </div>
-    </div>
-  );
-
-  /**
-   * 欢迎界面组件
-   */
-  const WelcomeScreen = () => (
-    <div className="newspapers-welcome">
-      <div className="newspapers-welcome__content">
-        <div className="newspapers-welcome__icon">📰</div>
-        <h2 className="newspapers-welcome__title">欢迎使用数字报刊</h2>
-        <p className="newspapers-welcome__message">
-          请从左侧选择一个刊物开始浏览
-        </p>
-        {state.isMobile && (
-          <button
-            onClick={openPublicationsDrawer}
-            className="btn-newspapers"
-          >
-            选择刊物
-          </button>
-        )}
-      </div>
-    </div>
-  );
-
-  /**
-   * 期数查看器组件
-   */
-  const IssueViewer = () => (
-    <div className="newspapers-issue-viewer">
-      {/* 移动端隐藏期数选择区域 */}
-      {state.isMobile ? null : (
-        <div className="newspapers-issue-selector">
-          <div className="newspapers-issue-selector__header">
-            <h3 className="newspapers-issue-selector__title">
-              {state.selectedPublication?.title}
-            </h3>
-            <span className="newspapers-issue-selector__count">
-              共 {state.issues.length} 期
-            </span>
-          </div>
-          
-          <InfiniteScrollIssueList
-            issues={state.issues}
-            selectedIssue={state.selectedIssue}
-            loading={state.issuesLoadingMore}
-            hasMore={state.issuesHasMore}
-            onLoadMore={loadMoreIssues}
-            onIssueSelect={handleIssueSelect}
-            error={state.issuesError}
-            retryCount={state.issuesRetryCount}
-            onRetry={retryLoadMore}
-          />
-        </div>
-      )}
-      
-      {/* 查看器区域 */}
-      <div className="newspapers-viewer-container">
-        {state.loading && <LoadingComponent message="加载中..." />}
-        
-        {!state.selectedIssue ? (
-          <div className="newspapers-viewer-placeholder">
-            <div className="newspapers-viewer-placeholder__content">
-              <div className="newspapers-viewer-placeholder__icon">📖</div>
-              <h3 className="newspapers-viewer-placeholder__title">
-                选择期数开始阅读
-              </h3>
-              <p className="newspapers-viewer-placeholder__message">
-                请从上方选择一个期数开始阅读
-              </p>
-            </div>
-          </div>
-        ) : (
-          <iframe
-            ref={iframeRef}
-            className="newspapers-viewer__iframe"
-            title="报刊查看器"
-            allowFullScreen
-            sandbox={IFRAME_SANDBOX}
-          />
-        )}
-      </div>
-    </div>
-  );
-
-  /**
-   * 主内容区域组件
-   */
-  const MainContent = () => (
-    <div className="newspapers-content">
-      {!state.selectedPublication ? (
-        <WelcomeScreen />
-      ) : (
-        <IssueViewer />
-      )}
-    </div>
-  );
-
-  // ====================
   // 渲染逻辑
   // ====================
   
@@ -1248,7 +1395,31 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
         loading={state.loading}
       >
         {/* 新布局的主内容区域 */}
-        {renderNewLayoutContent()}
+        {state.loading && state.publications.length === 0 ? (
+          <LoadingComponent />
+        ) : (
+          <>
+            <NewLayoutToolbar
+              isMobile={state.isMobile}
+              selectedPublication={state.selectedPublication}
+              selectedIssue={state.selectedIssue}
+              issues={state.issues}
+              onToggleDrawer={() => actions.setDrawerOpen(true)}
+              onIssueSelect={handleIssueSelect}
+            />
+            
+            {/* 主要内容区域 */}
+            {state.selectedPublication ? (
+              <NewLayoutViewerContainer
+                loading={state.loading}
+                selectedIssue={state.selectedIssue}
+                iframeRef={iframeRef}
+              />
+            ) : (
+              <NewspapersGuideArea />
+            )}
+          </>
+        )}
       </NewspapersLayout>
     );
   }
@@ -1259,7 +1430,26 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
       <AppHeader moduleId="newspapers" />
       
       {/* 移动端抽屉 */}
-      <MobileDrawer />
+      <MobileDrawer
+        isOpen={state.drawerOpen}
+        mode={state.drawerMode}
+        selectedPublication={state.selectedPublication}
+        publications={state.publications}
+        issues={state.issues}
+        selectedIssue={state.selectedIssue}
+        loading={state.issuesLoadingMore}
+        hasMore={state.issuesHasMore}
+        error={state.issuesError}
+        retryCount={state.issuesRetryCount}
+        onClose={closeDrawer}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onPublicationSelect={handlePublicationSelect}
+        onIssueSelect={handleIssueSelect}
+        onLoadMore={loadMoreIssues}
+        onRetry={retryLoadMore}
+      />
       
       {/* 面包屑导航 */}
       <NewspapersBreadcrumb
@@ -1274,15 +1464,45 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
       
       <div className="flex flex-1 overflow-hidden">
         {/* 桌面端侧边栏 */}
-        <DesktopSidebar />
+        <DesktopSidebar
+          isOpen={state.sidebarOpen}
+          publications={state.publications}
+          selectedPublication={state.selectedPublication}
+          onPublicationSelect={handlePublicationSelect}
+          onClose={() => actions.setSidebarOpen(false)}
+        />
         
         {/* 右侧主内容区域 */}
         <div className="newspapers-main">
           {/* 顶部工具栏 - 简化为核心控制 */}
-          <LegacyToolbar />
+          <LegacyToolbar
+            isMobile={state.isMobile}
+            selectedPublication={state.selectedPublication}
+            selectedIssue={state.selectedIssue}
+            issues={state.issues}
+            onOpenPublicationsDrawer={openPublicationsDrawer}
+            onIssueSelect={handleIssueSelect}
+            onToggleSidebar={() => actions.setSidebarOpen(!state.sidebarOpen)}
+            sidebarOpen={state.sidebarOpen}
+          />
           
           {/* 右侧内容区域 - 一体化布局 */}
-          <MainContent />
+          <MainContent
+            selectedPublication={state.selectedPublication}
+            isMobile={state.isMobile}
+            selectedPublicationData={state.selectedPublication}
+            issues={state.issues}
+            selectedIssue={state.selectedIssue}
+            loading={state.loading}
+            issuesLoadingMore={state.issuesLoadingMore}
+            issuesHasMore={state.issuesHasMore}
+            issuesError={state.issuesError}
+            issuesRetryCount={state.issuesRetryCount}
+            iframeRef={iframeRef}
+            onIssueSelect={handleIssueSelect}
+            onLoadMore={loadMoreIssues}
+            onRetry={retryLoadMore}
+          />
         </div>
       </div>
     </div>
