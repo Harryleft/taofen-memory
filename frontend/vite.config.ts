@@ -19,7 +19,18 @@ export default defineConfig({
       '/iiif': {
         target: 'https://www.ai4dh.cn',
         changeOrigin: true,
-        secure: true
+        secure: true,
+        configure: (proxy, _options) => {
+          proxy.on('proxyReq', (proxyReq, req, _res) => {
+            console.log(`[代理] /iiif 请求: ${req.method} ${req.url}`);
+          });
+          proxy.on('proxyRes', (proxyRes, req, _res) => {
+            console.log(`[代理] /iiif 响应: ${req.url} - ${proxyRes.statusCode}`);
+          });
+          proxy.on('error', (err, _req, _res) => {
+            console.error(`[代理] /iiif 错误:`, err);
+          });
+        }
       },
       // 将 /proxy 请求代理到对应的URL
       '/proxy': {
@@ -30,7 +41,19 @@ export default defineConfig({
           // 从 /proxy?url=https://www.ai4dh.cn/iiif/... 中提取实际URL
           const urlParams = new URLSearchParams(path.split('?')[1]);
           const actualUrl = urlParams.get('url');
+          console.log(`[代理] /proxy 重写: ${path} -> ${actualUrl}`);
           return actualUrl || path;
+        },
+        configure: (proxy, _options) => {
+          proxy.on('proxyReq', (proxyReq, req, _res) => {
+            console.log(`[代理] /proxy 请求: ${req.method} ${req.url}`);
+          });
+          proxy.on('proxyRes', (proxyRes, req, _res) => {
+            console.log(`[代理] /proxy 响应: ${req.url} - ${proxyRes.statusCode}`);
+          });
+          proxy.on('error', (err, _req, _res) => {
+            console.error(`[代理] /proxy 错误:`, err);
+          });
         }
       }
     }
