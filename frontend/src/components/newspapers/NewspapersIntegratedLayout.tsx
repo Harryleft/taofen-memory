@@ -144,10 +144,13 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
       if (response.data.length > 0) {
         const firstIssue = response.data[0];
         setSelectedIssue(firstIssue);
-        setManifestUrl(firstIssue.manifest);
+        
+        // 使用代理URL构建方式，避免CORS问题
+        const proxyManifestUrl = NewspaperService.getProxyUrl(firstIssue.manifest);
+        setManifestUrl(proxyManifestUrl);
         
         if (onIssueSelect) {
-          onIssueSelect(firstIssue.manifest, firstIssue.title);
+          onIssueSelect(proxyManifestUrl, firstIssue.title);
         }
       } else {
         // 如果没有期数，清除选择

@@ -60,6 +60,14 @@
       window.fetch = function(url, options) {
         console.log('拦截fetch请求:', url);
         
+        // 如果是外部manifest请求，自动转换为代理请求
+        if (url.includes('manifest.json') && url.startsWith('https://www.ai4dh.cn')) {
+          console.log('检测到外部manifest请求，转换为代理请求...');
+          const proxyUrl = `/proxy?url=${encodeURIComponent(url)}`;
+          console.log('转换后的代理URL:', proxyUrl);
+          return originalFetch(proxyUrl, options);
+        }
+        
         // 如果是manifest请求，尝试重写
         if (url.includes('manifest.json')) {
           console.log('检测到manifest请求，开始处理...');
