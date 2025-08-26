@@ -50,29 +50,13 @@ interface NewspapersIntegratedLayoutProps {
 }
 
 /**
- * 组件状态类型
+ * 布局状态类型（UI相关）
  */
-interface NewspapersState {
-  // 基础状态
-  publications: PublicationItem[];
-  selectedPublication: PublicationItem | null;
-  selectedIssue: IssueItem | null;
-  issues: IssueItem[];
-  loading: boolean;
-  error: string | null;
-  
-  // 布局状态
+interface LayoutState {
+  // 布局控制
   sidebarOpen: boolean;
   isMobile: boolean;
   manifestUrl: string;
-  
-  // 无限滚动状态
-  issuesPage: number;
-  issuesHasMore: boolean;
-  issuesLoadingMore: boolean;
-  issuesError: string | null;
-  issuesRetryCount: number;
-  allIssuesLoaded: boolean;
   
   // 移动端抽屉状态
   drawerOpen: boolean;
@@ -85,55 +69,72 @@ interface NewspapersState {
 }
 
 /**
- * 状态操作类型
+ * 数据状态类型（数据相关）
  */
-type NewspapersAction = 
+interface DataState {
+  // 基础数据
+  publications: PublicationItem[];
+  selectedPublication: PublicationItem | null;
+  selectedIssue: IssueItem | null;
+  issues: IssueItem[];
+  
+  // 加载状态
+  loading: boolean;
+  error: string | null;
+  
+  // 无限滚动状态
+  issuesPage: number;
+  issuesHasMore: boolean;
+  issuesLoadingMore: boolean;
+  issuesError: string | null;
+  issuesRetryCount: number;
+  allIssuesLoaded: boolean;
+}
+
+/**
+ * 布局状态操作类型
+ */
+type LayoutAction = 
+  | { type: 'SET_SIDEBAR_OPEN'; payload: boolean }
+  | { type: 'SET_MOBILE'; payload: boolean }
+  | { type: 'SET_MANIFEST_URL'; payload: string }
+  | { type: 'SET_DRAWER_OPEN'; payload: boolean }
+  | { type: 'SET_DRAWER_MODE'; payload: 'publications' | 'issues' }
+  | { type: 'SET_TOUCH_START_Y'; payload: number }
+  | { type: 'SET_TOUCH_CURRENT_Y'; payload: number }
+  | { type: 'SET_IS_DRAGGING'; payload: boolean }
+  | { type: 'RESET_LAYOUT_STATE' };
+
+/**
+ * 数据状态操作类型
+ */
+type DataAction = 
   | { type: 'SET_PUBLICATIONS'; payload: PublicationItem[] }
   | { type: 'SET_SELECTED_PUBLICATION'; payload: PublicationItem | null }
   | { type: 'SET_SELECTED_ISSUE'; payload: IssueItem | null }
   | { type: 'SET_ISSUES'; payload: IssueItem[] }
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string | null }
-  | { type: 'SET_SIDEBAR_OPEN'; payload: boolean }
-  | { type: 'SET_MOBILE'; payload: boolean }
-  | { type: 'SET_MANIFEST_URL'; payload: string }
   | { type: 'SET_ISSUES_PAGE'; payload: number }
   | { type: 'SET_ISSUES_HAS_MORE'; payload: boolean }
   | { type: 'SET_ISSUES_LOADING_MORE'; payload: boolean }
   | { type: 'SET_ISSUES_ERROR'; payload: string | null }
   | { type: 'SET_ISSUES_RETRY_COUNT'; payload: number }
   | { type: 'SET_ALL_ISSUES_LOADED'; payload: boolean }
-  | { type: 'SET_DRAWER_OPEN'; payload: boolean }
-  | { type: 'SET_DRAWER_MODE'; payload: 'publications' | 'issues' }
-  | { type: 'SET_TOUCH_START_Y'; payload: number }
-  | { type: 'SET_TOUCH_CURRENT_Y'; payload: number }
-  | { type: 'SET_IS_DRAGGING'; payload: boolean }
   | { type: 'RESET_ISSUES_STATE' }
-  | { type: 'RESET_STATE' };
+  | { type: 'RESET_DATA_STATE' };
 
 // ====================
 // 状态管理器
 // ====================
 
 /**
- * 初始状态
+ * 布局状态初始值
  */
-const initialState: NewspapersState = {
-  publications: [],
-  selectedPublication: null,
-  selectedIssue: null,
-  issues: [],
-  loading: false,
-  error: null,
+const initialLayoutState: LayoutState = {
   sidebarOpen: true,
   isMobile: false,
   manifestUrl: '',
-  issuesPage: 0,
-  issuesHasMore: true,
-  issuesLoadingMore: false,
-  issuesError: null,
-  issuesRetryCount: 0,
-  allIssuesLoaded: false,
   drawerOpen: false,
   drawerMode: 'publications',
   touchStartY: 0,
@@ -142,9 +143,55 @@ const initialState: NewspapersState = {
 };
 
 /**
- * 状态管理器 - 使用 useReducer 统一管理状态
+ * 数据状态初始值
  */
-const newspapersReducer = (state: NewspapersState, action: NewspapersAction): NewspapersState => {
+const initialDataState: DataState = {
+  publications: [],
+  selectedPublication: null,
+  selectedIssue: null,
+  issues: [],
+  loading: false,
+  error: null,
+  issuesPage: 0,
+  issuesHasMore: true,
+  issuesLoadingMore: false,
+  issuesError: null,
+  issuesRetryCount: 0,
+  allIssuesLoaded: false,
+};
+
+/**
+ * 布局状态管理器
+ */
+const layoutReducer = (state: LayoutState, action: LayoutAction): LayoutState => {
+  switch (action.type) {
+    case 'SET_SIDEBAR_OPEN':
+      return { ...state, sidebarOpen: action.payload };
+    case 'SET_MOBILE':
+      return { ...state, isMobile: action.payload };
+    case 'SET_MANIFEST_URL':
+      return { ...state, manifestUrl: action.payload };
+    case 'SET_DRAWER_OPEN':
+      return { ...state, drawerOpen: action.payload };
+    case 'SET_DRAWER_MODE':
+      return { ...state, drawerMode: action.payload };
+    case 'SET_TOUCH_START_Y':
+      return { ...state, touchStartY: action.payload };
+    case 'SET_TOUCH_CURRENT_Y':
+      return { ...state, touchCurrentY: action.payload };
+    case 'SET_IS_DRAGGING':
+      return { ...state, isDragging: action.payload };
+    case 'RESET_LAYOUT_STATE':
+      return { ...initialLayoutState };
+    default:
+      return state;
+  }
+};
+
+/**
+ * 数据状态管理器
+ */
+const dataReducer = (state: DataState, action: DataAction): DataState => {
   switch (action.type) {
     case 'SET_PUBLICATIONS':
       return { ...state, publications: action.payload };
@@ -158,12 +205,6 @@ const newspapersReducer = (state: NewspapersState, action: NewspapersAction): Ne
       return { ...state, loading: action.payload };
     case 'SET_ERROR':
       return { ...state, error: action.payload };
-    case 'SET_SIDEBAR_OPEN':
-      return { ...state, sidebarOpen: action.payload };
-    case 'SET_MOBILE':
-      return { ...state, isMobile: action.payload };
-    case 'SET_MANIFEST_URL':
-      return { ...state, manifestUrl: action.payload };
     case 'SET_ISSUES_PAGE':
       return { ...state, issuesPage: action.payload };
     case 'SET_ISSUES_HAS_MORE':
@@ -176,16 +217,6 @@ const newspapersReducer = (state: NewspapersState, action: NewspapersAction): Ne
       return { ...state, issuesRetryCount: action.payload };
     case 'SET_ALL_ISSUES_LOADED':
       return { ...state, allIssuesLoaded: action.payload };
-    case 'SET_DRAWER_OPEN':
-      return { ...state, drawerOpen: action.payload };
-    case 'SET_DRAWER_MODE':
-      return { ...state, drawerMode: action.payload };
-    case 'SET_TOUCH_START_Y':
-      return { ...state, touchStartY: action.payload };
-    case 'SET_TOUCH_CURRENT_Y':
-      return { ...state, touchCurrentY: action.payload };
-    case 'SET_IS_DRAGGING':
-      return { ...state, isDragging: action.payload };
     case 'RESET_ISSUES_STATE':
       return {
         ...state,
@@ -197,8 +228,8 @@ const newspapersReducer = (state: NewspapersState, action: NewspapersAction): Ne
         allIssuesLoaded: false,
         issues: [],
       };
-    case 'RESET_STATE':
-      return { ...initialState };
+    case 'RESET_DATA_STATE':
+      return { ...initialDataState };
     default:
       return state;
   }
@@ -827,7 +858,34 @@ const MainContent = memo(({
 /**
  * 创建状态操作函数
  */
-const createActions = (dispatch: React.Dispatch<NewspapersAction>) => ({
+/**
+ * 创建布局状态操作函数
+ */
+const createLayoutActions = (dispatch: React.Dispatch<LayoutAction>) => ({
+  setSidebarOpen: (open: boolean) => 
+    dispatch({ type: 'SET_SIDEBAR_OPEN', payload: open }),
+  setMobile: (mobile: boolean) => 
+    dispatch({ type: 'SET_MOBILE', payload: mobile }),
+  setManifestUrl: (url: string) => 
+    dispatch({ type: 'SET_MANIFEST_URL', payload: url }),
+  setDrawerOpen: (open: boolean) => 
+    dispatch({ type: 'SET_DRAWER_OPEN', payload: open }),
+  setDrawerMode: (mode: 'publications' | 'issues') => 
+    dispatch({ type: 'SET_DRAWER_MODE', payload: mode }),
+  setTouchStartY: (y: number) => 
+    dispatch({ type: 'SET_TOUCH_START_Y', payload: y }),
+  setTouchCurrentY: (y: number) => 
+    dispatch({ type: 'SET_TOUCH_CURRENT_Y', payload: y }),
+  setIsDragging: (dragging: boolean) => 
+    dispatch({ type: 'SET_IS_DRAGGING', payload: dragging }),
+  resetLayoutState: () => 
+    dispatch({ type: 'RESET_LAYOUT_STATE' }),
+});
+
+/**
+ * 创建数据状态操作函数
+ */
+const createDataActions = (dispatch: React.Dispatch<DataAction>) => ({
   setPublications: (publications: PublicationItem[]) => 
     dispatch({ type: 'SET_PUBLICATIONS', payload: publications }),
   setSelectedPublication: (publication: PublicationItem | null) => 
@@ -840,12 +898,6 @@ const createActions = (dispatch: React.Dispatch<NewspapersAction>) => ({
     dispatch({ type: 'SET_LOADING', payload: loading }),
   setError: (error: string | null) => 
     dispatch({ type: 'SET_ERROR', payload: error }),
-  setSidebarOpen: (open: boolean) => 
-    dispatch({ type: 'SET_SIDEBAR_OPEN', payload: open }),
-  setMobile: (mobile: boolean) => 
-    dispatch({ type: 'SET_MOBILE', payload: mobile }),
-  setManifestUrl: (url: string) => 
-    dispatch({ type: 'SET_MANIFEST_URL', payload: url }),
   setIssuesPage: (page: number) => 
     dispatch({ type: 'SET_ISSUES_PAGE', payload: page }),
   setIssuesHasMore: (hasMore: boolean) => 
@@ -858,20 +910,10 @@ const createActions = (dispatch: React.Dispatch<NewspapersAction>) => ({
     dispatch({ type: 'SET_ISSUES_RETRY_COUNT', payload: count }),
   setAllIssuesLoaded: (loaded: boolean) => 
     dispatch({ type: 'SET_ALL_ISSUES_LOADED', payload: loaded }),
-  setDrawerOpen: (open: boolean) => 
-    dispatch({ type: 'SET_DRAWER_OPEN', payload: open }),
-  setDrawerMode: (mode: 'publications' | 'issues') => 
-    dispatch({ type: 'SET_DRAWER_MODE', payload: mode }),
-  setTouchStartY: (y: number) => 
-    dispatch({ type: 'SET_TOUCH_START_Y', payload: y }),
-  setTouchCurrentY: (y: number) => 
-    dispatch({ type: 'SET_TOUCH_CURRENT_Y', payload: y }),
-  setIsDragging: (dragging: boolean) => 
-    dispatch({ type: 'SET_IS_DRAGGING', payload: dragging }),
   resetIssuesState: () => 
     dispatch({ type: 'RESET_ISSUES_STATE' }),
-  resetState: () => 
-    dispatch({ type: 'RESET_STATE' }),
+  resetDataState: () => 
+    dispatch({ type: 'RESET_DATA_STATE' }),
 });
 
 /**
@@ -899,8 +941,22 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
   // 状态管理
   // ====================
   
-  const [state, dispatch] = useReducer(newspapersReducer, initialState);
-  const actions = useMemo(() => createActions(dispatch), [dispatch]);
+  const [layoutState, layoutDispatch] = useReducer(layoutReducer, initialLayoutState);
+  const [dataState, dataDispatch] = useReducer(dataReducer, initialDataState);
+  
+  const layoutActions = useMemo(() => createLayoutActions(layoutDispatch), [layoutDispatch]);
+  const dataActions = useMemo(() => createDataActions(dataDispatch), [dataDispatch]);
+  
+  // 合并状态和操作以保持向后兼容性
+  const state = useMemo(() => ({
+    ...layoutState,
+    ...dataState
+  }), [layoutState, dataState]);
+  
+  const actions = useMemo(() => ({
+    ...layoutActions,
+    ...dataActions
+  }), [layoutActions, dataActions]);
   
   // 引用
   const issuesCacheRef = useRef<Map<number, IssueItem[]>>(new Map());
