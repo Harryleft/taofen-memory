@@ -71,23 +71,38 @@ export const NewspapersLayout: React.FC<NewspapersLayoutProps> = ({
         }
         const localData = await localResponse.json();
         
-        // 更精确的匹配算法：只保留在远程数据中存在的报刊
+        // 更智能的匹配算法：只保留在远程数据中存在的报刊
         const matchedNewspapers = localData.filter(localNewspaper => {
           const normalizedLocalTitle = localNewspaper.title
-            .replace(/[《》]/g, '') // 移除书名号
-            .replace(/\s+/g, '')     // 移除空格
+            .replace(/[《》\s]/g, '') // 移除书名号和空格
+            .replace(/周刊|日报|刊|报/g, '') // 移除常见的报刊类型后缀
             .toLowerCase();
           
           return publications.some(remotePub => {
             const normalizedRemoteTitle = remotePub.title
-              .replace(/[《》]/g, '') // 移除书名号
-              .replace(/\s+/g, '')     // 移除空格
+              .replace(/[《》\s]/g, '') // 移除书名号和空格
+              .replace(/周刊|日报|刊|报/g, '') // 移除常见的报刊类型后缀
               .toLowerCase();
             
-            // 精确匹配或包含匹配
-            return normalizedRemoteTitle === normalizedLocalTitle ||
-                   normalizedRemoteTitle.includes(normalizedLocalTitle) ||
-                   normalizedLocalTitle.includes(normalizedRemoteTitle);
+            // 精确匹配
+            if (normalizedRemoteTitle === normalizedLocalTitle) {
+              return true;
+            }
+            
+            // 包含匹配（检查核心关键词）
+            const localKeywords = normalizedLocalTitle.split(/[\u4e00-\u9fa5]+/).filter(k => k.length > 1);
+            const remoteKeywords = normalizedRemoteTitle.split(/[\u4e00-\u9fa5]+/).filter(k => k.length > 1);
+            
+            // 检查是否有足够的关键词匹配
+            const matchingKeywords = localKeywords.filter(keyword => 
+              remoteKeywords.some(remoteKeyword => 
+                remoteKeyword.includes(keyword) || keyword.includes(remoteKeyword)
+              )
+            );
+            
+            // 如果有至少2个关键词匹配，或者标题长度较短时有1个匹配
+            return matchingKeywords.length >= 2 || 
+                   (normalizedLocalTitle.length < 8 && matchingKeywords.length >= 1);
           });
         });
         
@@ -103,6 +118,49 @@ export const NewspapersLayout: React.FC<NewspapersLayoutProps> = ({
         console.log('📰 [DEBUG] 未匹配的报刊:', unmatchedNewspapers.map(n => n.title));
         console.log('📰 [DEBUG] 远程报刊标题:', publications.map(p => p.title));
         
+        // 输出详细的匹配过程信息
+        console.log('📰 [DEBUG] ===== 详细匹配过程 =====');
+        localData.forEach(localNewspaper => {
+          const normalizedLocalTitle = localNewspaper.title
+            .replace(/[《》\s]/g, '')
+            .replace(/周刊|日报|刊|报/g, '')
+            .toLowerCase();
+          
+          const isMatched = publications.some(remotePub => {
+            const normalizedRemoteTitle = remotePub.title
+              .replace(/[《》\s]/g, '')
+              .replace(/周刊|日报|刊|报/g, '')
+              .toLowerCase();
+            
+            if (normalizedRemoteTitle === normalizedLocalTitle) {
+              console.log(`📰 [DEBUG] 精确匹配: "${localNewspaper.title}" <-> "${remotePub.title}"`);
+              return true;
+            }
+            
+            const localKeywords = normalizedLocalTitle.split(/[\u4e00-\u9fa5]+/).filter(k => k.length > 1);
+            const remoteKeywords = normalizedRemoteTitle.split(/[\u4e00-\u9fa5]+/).filter(k => k.length > 1);
+            
+            const matchingKeywords = localKeywords.filter(keyword => 
+              remoteKeywords.some(remoteKeyword => 
+                remoteKeyword.includes(keyword) || keyword.includes(remoteKeyword)
+              )
+            );
+            
+            const shouldMatch = matchingKeywords.length >= 2 || 
+                              (normalizedLocalTitle.length < 8 && matchingKeywords.length >= 1);
+            
+            if (shouldMatch) {
+              console.log(`📰 [DEBUG] 关键词匹配: "${localNewspaper.title}" <-> "${remotePub.title}" (匹配关键词: ${matchingKeywords.join(', ')})`);
+            }
+            
+            return shouldMatch;
+          });
+          
+          if (!isMatched) {
+            console.log(`📰 [DEBUG] 未匹配: "${localNewspaper.title}" (标准化后: "${normalizedLocalTitle}")`);
+          }
+        });
+        
         setLocalNewspapers(matchedNewspapers);
       } catch (error) {
         console.error('加载本地报纸数据失败:', error);
@@ -112,7 +170,7 @@ export const NewspapersLayout: React.FC<NewspapersLayoutProps> = ({
     };
 
     loadAndMatchNewspapers();
-  }, [publications]);
+  }, [publications]); // 保持依赖项不变，这是正确的
   // 动态渲染侧边栏内容
   const renderSidebarContent = () => {
     if (sidebarContent) {
@@ -195,27 +253,30 @@ export const NewspapersLayout: React.FC<NewspapersLayoutProps> = ({
                 </p>
               </div>
             ) : (
-              localNewspapers.map((newspaper, index) => (
-                <VerticalNewspaperCard
-                  key={index}
-                  publication={{
-                    ...publications.find(p => p.title === newspaper.title) || {
-                      id: newspaper.title,
-                      title: newspaper.title,
-                      name: newspaper.title,
-                      issueCount: newspaper.total_issues,
-                      collection: '',
-                      lastUpdated: null
-                    },
-                    // 添加本地数据字段
-                    founding_date: newspaper.founding_date,
-                    description: newspaper.description,
-                    image: newspaper.image
-                  }}
-                  isSelected={selectedPublication?.title === newspaper.title}
-                  onClick={onPublicationSelect}
-                />
-              ))
+              localNewspapers.map((newspaper, index) => {
+                const matchedRemotePub = publications.find(p => p.title === newspaper.title);
+                return (
+                  <VerticalNewspaperCard
+                    key={index}
+                    publication={{
+                      ...matchedRemotePub || {
+                        id: newspaper.title,
+                        title: newspaper.title,
+                        name: newspaper.title,
+                        issueCount: newspaper.total_issues,
+                        collection: '',
+                        lastUpdated: null
+                      },
+                      // 添加本地数据字段
+                      founding_date: newspaper.founding_date,
+                      description: newspaper.description,
+                      image: newspaper.image
+                    }}
+                    isSelected={selectedPublication?.title === newspaper.title}
+                    onClick={onPublicationSelect}
+                  />
+                );
+              })
             )}
           </div>
         </>
