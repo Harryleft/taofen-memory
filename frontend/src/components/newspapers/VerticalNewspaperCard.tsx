@@ -59,7 +59,10 @@ export const VerticalNewspaperCard: React.FC<VerticalNewspaperCardProps> = ({
             className="vertical-newspaper-card__image-img"
             onError={(e) => {
               e.currentTarget.style.display = 'none';
-              e.currentTarget.nextElementSibling?.style.display = 'flex';
+              const placeholder = e.currentTarget.nextElementSibling;
+              if (placeholder) {
+                placeholder.style.display = 'flex';
+              }
             }}
           />
         ) : null}
