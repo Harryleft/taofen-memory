@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { PublicationItem } from './services';
 
 // 扩展的 PublicationItem 接口，包含本地数据字段
@@ -29,10 +29,30 @@ export const VerticalNewspaperCard: React.FC<VerticalNewspaperCardProps> = ({
   onClick,
   className = ''
 }) => {
-  const handleClick = () => {
+  const [isImageExpanded, setIsImageExpanded] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isImageLoading, setIsImageLoading] = useState(true);
+  const [hasImageError, setHasImageError] = useState(false);
+
+  // 检测是否为移动设备
+  React.useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const handleCardClick = () => {
     if (onClick) {
       onClick(publication);
     }
+  };
+
+  const handleImageClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsImageExpanded(!isImageExpanded);
   };
 
   return (
@@ -50,21 +70,38 @@ export const VerticalNewspaperCard: React.FC<VerticalNewspaperCardProps> = ({
         }
       }}
     >
-      {/* 封面图片 */}
+      {/* 封面图片 - 前20%显示 */}
       <div className="vertical-newspaper-card__image">
         {publication.image ? (
-          <img 
-            src={`/${publication.image}`}
-            alt={publication.title}
-            className="vertical-newspaper-card__image-img"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-              const placeholder = e.currentTarget.nextElementSibling;
-              if (placeholder) {
-                placeholder.style.display = 'flex';
-              }
-            }}
-          />
+          <div 
+            className={`vertical-newspaper-card__image-peek ${isImageExpanded || isMobile ? 'expanded' : ''}`}
+            onClick={handleImageClick}
+          >
+            <img 
+              src={`/${publication.image}`}
+              alt={publication.title}
+              className="vertical-newspaper-card__image-img"
+              onLoad={() => setIsImageLoading(false)}
+              onError={(e) => {
+                setIsImageLoading(false);
+                setHasImageError(true);
+                const container = e.currentTarget.closest('.vertical-newspaper-card__image-peek');
+                const placeholder = container?.nextElementSibling;
+                if (container && placeholder) {
+                  container.style.display = 'none';
+                  placeholder.style.display = 'flex';
+                }
+              }}
+            />
+            {isImageLoading && (
+              <div className="vertical-newspaper-card__image-loading"></div>
+            )}
+            <div className={`vertical-newspaper-card__image-overlay ${isImageExpanded || isMobile || isImageLoading ? 'hidden' : ''}`}>
+              <span className="vertical-newspaper-card__image-hint">
+                {isMobile ? '点击查看完整图片' : '点击查看完整图片'}
+              </span>
+            </div>
+          </div>
         ) : null}
         <div className="vertical-newspaper-card__image-placeholder" style={{display: publication.image ? 'none' : 'flex'}}>
           <span className="vertical-newspaper-card__image-icon">📰</span>
