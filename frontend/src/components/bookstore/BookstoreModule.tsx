@@ -56,15 +56,12 @@ const IssueCard: React.FC<{ issue: IIIFCollectionItem; onClick: () => void }> = 
 
 // 简单的查看器组件
 const ViewerPage: React.FC<{ publicationId: string; issueId: string }> = ({ publicationId, issueId }) => {
-  const manifestUrl = `https://www.ai4dh.cn/iiif/3/manifests/${publicationId}/${issueId}/manifest.json`;
-  const proxyUrl = import.meta.env.DEV && manifestUrl.startsWith('https://') 
-    ? `/proxy?url=${encodeURIComponent(manifestUrl)}`
-    : manifestUrl;
+  const manifestUrl = NewspaperService.getProxyUrl(`https://www.ai4dh.cn/iiif/3/manifests/${publicationId}/${issueId}/manifest.json`);
 
   return (
     <div className="h-full">
       <iframe
-        src={`/uv_simple.html?v=${Date.now()}#?iiifManifestId=${encodeURIComponent(proxyUrl)}&embedded=true`}
+        src={`/uv_simple.html?v=${Date.now()}#?iiifManifestId=${encodeURIComponent(manifestUrl)}&embedded=true`}
         className="w-full h-full border-0"
         title="报刊查看器"
         allowFullScreen
