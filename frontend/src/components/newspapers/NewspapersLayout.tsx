@@ -3,7 +3,6 @@ import AppHeader from '@/components/layout/header/AppHeader.tsx';
 import NewspapersBreadcrumb from './NewspapersBreadcrumb.tsx';
 import { IssueItem, PublicationItem } from './services';
 import { VerticalNewspaperCard } from './VerticalNewspaperCard.tsx';
-import { NewspapersGuideArea } from './NewspapersGuideArea.tsx';
 
 interface NewspapersLayoutProps {
   children: React.ReactNode;
