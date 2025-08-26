@@ -6,7 +6,7 @@ import AppHeader from '@/components/layout/header/AppHeader.tsx';
 import NewspapersLayout from './NewspapersLayout.tsx';
 import { EmptyState } from './EmptyState';
 import { NewspapersGuideArea } from './NewspapersGuideArea';
-import { useTouchDrawer } from './hooks/useTouchDrawer';
+import { useTouchDrawer } from '../../hooks/useTouchDrawer.ts';
 
 // ====================
 // 常量配置
