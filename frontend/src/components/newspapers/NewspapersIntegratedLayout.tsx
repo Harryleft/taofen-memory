@@ -5,7 +5,6 @@ import { NewspapersBreadcrumb } from './NewspapersBreadcrumb';
 import AppHeader from '@/components/layout/header/AppHeader.tsx';
 import NewspapersLayout from './NewspapersLayout.tsx';
 import { EmptyState } from './EmptyState';
-import { GuideTip } from './GuideTip';
 import { NewspapersGuideArea } from './NewspapersGuideArea';
 
 interface NewspapersIntegratedLayoutProps {
@@ -141,14 +140,26 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
       // 缓存第一期数据
       issuesCacheRef.current.set(0, response.data);
       
+      // 自动选择第一期（如果有的话）
+      if (response.data.length > 0) {
+        const firstIssue = response.data[0];
+        setSelectedIssue(firstIssue);
+        setManifestUrl(firstIssue.manifest);
+        
+        if (onIssueSelect) {
+          onIssueSelect(firstIssue.manifest, firstIssue.title);
+        }
+      } else {
+        // 如果没有期数，清除选择
+        setSelectedIssue(null);
+        setManifestUrl('');
+      }
+      
       // 移动端自动打开期数抽屉
       if (isMobile) {
         setDrawerMode('issues');
         setDrawerOpen(true);
       }
-      
-      setSelectedIssue(null);
-      setManifestUrl('');
       
       if (onPublicationSelect) {
         onPublicationSelect(publicationId, publication.title);
@@ -158,7 +169,7 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
     } finally {
       setLoading(false);
     }
-  }, [isMobile, onPublicationSelect]);
+  }, [isMobile, onPublicationSelect, onIssueSelect]);
 
   // 加载更多期数
   const loadMoreIssues = useCallback(async () => {
