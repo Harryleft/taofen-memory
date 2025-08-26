@@ -550,10 +550,7 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
         </div>
         
         {/* 主要内容区域 */}
-        {!selectedPublication ? (
-          // 未选择刊物时的引导界面
-          <NewspapersGuideArea />
-        ) : (
+        {selectedPublication ? (
           // 选择刊物后的查看器区域
           <div className="newspapers-viewer-container">
             {loading && (
@@ -583,6 +580,11 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
                 sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation allow-modals"
               />
             )}
+          </div>
+        ) : (
+          // 未选择刊物时的空白状态
+          <div className="newspapers-empty-state">
+            {/* 右侧引导区域由 NewspapersLayout 始终显示 */}
           </div>
         )}
       </>
