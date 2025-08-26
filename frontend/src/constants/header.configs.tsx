@@ -5,8 +5,7 @@ const NAVIGATION_ITEMS: NavigationItem[] = [
   { label: '岁月行履', to: '/timeline' },
   { label: '时光书影', to: '/bookstore-timeline' },
   { label: '笔下风骨', to: '/handwriting' },
-  { label: '同行群像', to: '/relationships' },
-  { label: '数字报刊', to: '/newspapers' }
+  { label: '同行群像', to: '/relationships' }
 ];
 
 // 定义所有模块的 Header 配置 - 统一使用首页样式
