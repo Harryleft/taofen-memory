@@ -6,6 +6,7 @@ import AppHeader from '@/components/layout/header/AppHeader.tsx';
 import NewspapersLayout from './NewspapersLayout.tsx';
 import { EmptyState } from './EmptyState';
 import { GuideTip } from './GuideTip';
+import { NewspapersGuideArea } from './NewspapersGuideArea';
 
 interface NewspapersIntegratedLayoutProps {
   onPublicationSelect?: (publicationId: string, publicationTitle: string) => void;
