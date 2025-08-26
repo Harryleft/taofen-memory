@@ -55,22 +55,28 @@ export const NewspapersLayout: React.FC<NewspapersLayoutProps> = ({
     if (selectedPublication) {
       // 显示期数列表 (界面2)
       return (
-        <div className="newspapers-sidebar__content">
-          <div className="newspapers-sidebar__header">
+        <>
+          {/* 返回按钮和刊物标题 */}
+          <div className="newspapers-issue-list__header">
             <button
               onClick={onRootSelect}
-              className="newspapers-sidebar__back"
+              className="newspapers-issue-list__back"
               aria-label="返回刊物列表"
             >
-              ←
+              ← 返回
             </button>
-            <h2 className="newspapers-sidebar__title">
+            <h2 className="newspapers-issue-list__title">
               {selectedPublication.title}
             </h2>
           </div>
+          
+          {/* 期数列表 */}
           <div className="newspapers-issue-list">
             {loading ? (
-              <div className="newspapers-loading__spinner"></div>
+              <div className="newspapers-issue-list__loading">
+                <div className="newspapers-loading__spinner"></div>
+                <p>加载期数...</p>
+              </div>
             ) : issues.length === 0 ? (
               <div className="newspapers-issue-list__empty">
                 <div className="newspapers-issue-list__empty-icon">📄</div>
@@ -89,6 +95,9 @@ export const NewspapersLayout: React.FC<NewspapersLayoutProps> = ({
                 >
                   <div className="newspapers-issue-item__title">
                     {issue.title}
+                    {selectedIssue?.manifest === issue.manifest && (
+                      <span className="newspapers-issue-item__current">●</span>
+                    )}
                   </div>
                   <div className="newspapers-issue-item__summary">
                     {issue.summary}
@@ -97,7 +106,7 @@ export const NewspapersLayout: React.FC<NewspapersLayoutProps> = ({
               ))
             )}
           </div>
-        </div>
+        </>
       );
     } else {
       // 显示刊物列表 - 简化的单列布局

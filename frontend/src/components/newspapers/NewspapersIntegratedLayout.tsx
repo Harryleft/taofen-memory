@@ -608,8 +608,8 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
         publications={publications}
         selectedPublication={selectedPublication}
         selectedIssue={selectedIssue}
-        onPublicationSelect={handleBreadcrumbPublicationSelect}
-        onIssueSelect={handleBreadcrumbIssueSelect}
+        onPublicationSelect={handlePublicationSelect}
+        onIssueSelect={handleIssueSelect}
         onRootSelect={handleBreadcrumbRootSelect}
         isMobile={isMobile}
         issues={issues}
