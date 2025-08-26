@@ -2,6 +2,8 @@
  * IIIF URL构建工具类
  * 统一处理所有IIIF相关的URL构建逻辑
  */
+import { debug } from '../../utils/debugLogger.ts';
+
 export class IIIFUrlBuilder {
   private static readonly BASE_URL = 'https://www.ai4dh.cn/iiif/3';
   private static readonly PROXY_BASE = '/proxy';
@@ -10,14 +12,14 @@ export class IIIFUrlBuilder {
    * 解析IIIF URL组件
    */
   static parse(url: string): IIIFUrlComponents {
-    console.log('🔍 [IIIF] 解析URL:', url);
+    debug.log('iiif', '解析URL:', url);
     
     // 如果是完整的HTTP URL
     if (url.startsWith('http')) {
       const urlObj = new URL(url);
       const pathParts = urlObj.pathname.split('/').filter(Boolean);
       
-      console.log('🔍 [IIIF] 路径部分:', pathParts);
+      debug.log('iiif', '路径部分:', pathParts);
       
       // 检查是否是ai4dh.cn的URL
       if (urlObj.hostname === 'www.ai4dh.cn') {
@@ -27,7 +29,7 @@ export class IIIFUrlBuilder {
           const type = pathParts[iiifIndex + 2];
           const resourcePath = pathParts.slice(iiifIndex + 3).join('/');
           
-          console.log('🔍 [IIIF] 解析结果:', { version, type, resourcePath });
+          debug.log('iiif', '解析结果:', { version, type, resourcePath });
           
           return {
             baseUrl: urlObj.origin,
@@ -68,8 +70,8 @@ export class IIIFUrlBuilder {
   static build(components: IIIFUrlComponents, options: IIIFUrlOptions = {}): string {
     const { proxy = false, format = 'manifest' } = options;
     
-    console.log('🔍 [IIIF] 构建URL组件:', components);
-    console.log('🔍 [IIIF] 构建选项:', options);
+    debug.log('iiif', '构建URL组件:', components);
+    debug.log('iiif', '构建选项:', options);
     
     let url: string;
     

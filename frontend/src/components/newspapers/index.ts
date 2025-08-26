@@ -26,7 +26,7 @@ export type {
   IIIFImage,
   IIIFResource,
   IIIFService
-} from '../../utils/iiifTypes.ts';
+} from '../iiif/iiifTypes.ts';
 
 export type { PublicationItem, IssueItem } from './services';
 

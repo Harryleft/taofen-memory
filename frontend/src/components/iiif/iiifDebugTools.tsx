@@ -29,7 +29,7 @@ interface IIIFDebugToolsProps {
   onClose: () => void;
 }
 
-export const IIIFDebugTools: React.FC<IIIFDebugToolsProps> = ({ isVisible, onClose }) => {
+export const IiifDebugTools: React.FC<IIIFDebugToolsProps> = ({ isVisible, onClose }) => {
   const [debugInfo, setDebugInfo] = useState<DebugInfo | null>(null);
   const [networkRequests, setNetworkRequests] = useState<NetworkRequest[]>([]);
   const [manifestData, setManifestData] = useState<unknown>(null);
