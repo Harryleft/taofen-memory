@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, Download, Calendar, ChevronDown, Newspaper } from 'lucide-react';
 
 /**
@@ -40,6 +41,7 @@ interface BookstoreFiltersProps {
  * - 包含一个文本输入框用于按关键词搜索。
  * - 提供一个自定义的下拉菜单用于按年份筛选。
  * - 包含一个按钮，用于触发数据导出功能。
+ * - 包含一个按钮，用于跳转到数字报刊页面。
  * - 筛选状态由父组件通过 props 传入和控制。
  */
 const BookFiltersPanel: React.FC<BookstoreFiltersProps> = ({
@@ -54,6 +56,7 @@ const BookFiltersPanel: React.FC<BookstoreFiltersProps> = ({
 }) => {
   const [yearDropdownOpen, setYearDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   // 处理点击外部关闭下拉菜单
   useEffect(() => {
@@ -154,7 +157,7 @@ const BookFiltersPanel: React.FC<BookstoreFiltersProps> = ({
       </div>
 
       <button
-        onClick={() => onTabChange?.('newspapers')}
+        onClick={() => navigate('/newspaper')}
         className={`bookstore-download-button ${activeTab === 'newspapers' ? 'bg-blue-100 text-blue-700 border-blue-300' : ''}`}
         title="查看数字报刊"
       >
