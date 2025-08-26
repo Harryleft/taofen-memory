@@ -1,10 +1,17 @@
 import React from 'react';
 import { PublicationItem } from './services';
 
+// 扩展的 PublicationItem 接口，包含本地数据字段
+interface ExtendedPublicationItem extends PublicationItem {
+  founding_date?: string;
+  description?: string;
+  image?: string;
+}
+
 interface VerticalNewspaperCardProps {
-  publication: PublicationItem;
+  publication: ExtendedPublicationItem;
   isSelected?: boolean;
-  onClick?: (publication: PublicationItem) => void;
+  onClick?: (publication: ExtendedPublicationItem) => void;
   className?: string;
 }
 
@@ -58,7 +65,7 @@ export const VerticalNewspaperCard: React.FC<VerticalNewspaperCardProps> = ({
         
         <div className="vertical-newspaper-card__meta">
           <span className="vertical-newspaper-card__founding-date">
-            创刊：{publication.title.includes('全民抗战') ? '1938年7月7日' : '1938年'}
+            创刊：{publication.founding_date || '1938年'}
           </span>
           <span className="vertical-newspaper-card__issue-count">
             共{publication.issueCount || 0}期
@@ -66,10 +73,7 @@ export const VerticalNewspaperCard: React.FC<VerticalNewspaperCardProps> = ({
         </div>
         
         <div className="vertical-newspaper-card__description">
-          {publication.title.includes('全民抗战') ? 
-            '1938年在汉口创刊，主编邹韬奋、柳湜，是当时国民党统治区影响最广的刊物。' :
-            '历史报刊文献，珍贵的历史资料。'
-          }
+          {publication.description || '历史报刊文献，珍贵的历史资料。'}
         </div>
         
         <div className="vertical-newspaper-card__action">

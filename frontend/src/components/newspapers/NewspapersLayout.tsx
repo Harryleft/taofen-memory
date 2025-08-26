@@ -1,8 +1,17 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import AppHeader from '@/components/layout/header/AppHeader.tsx';
 import NewspapersBreadcrumb from './NewspapersBreadcrumb.tsx';
 import { IssueItem, PublicationItem } from './services';
 import { VerticalNewspaperCard } from './VerticalNewspaperCard.tsx';
+
+// 本地报纸数据接口
+interface LocalNewspaperData {
+  title: string;
+  founding_date: string;
+  total_issues: number;
+  description: string;
+  image: string;
+}
 
 interface NewspapersLayoutProps {
   children: React.ReactNode;
@@ -45,6 +54,24 @@ export const NewspapersLayout: React.FC<NewspapersLayoutProps> = ({
   issues,
   loading
 }) => {
+  const [localNewspapers, setLocalNewspapers] = useState<LocalNewspaperData[]>([]);
+
+  // 加载本地报纸数据
+  useEffect(() => {
+    const loadLocalNewspapers = async () => {
+      try {
+        const response = await fetch('/data/json/newspapers_info.json');
+        if (response.ok) {
+          const data = await response.json();
+          setLocalNewspapers(data);
+        }
+      } catch (error) {
+        console.error('加载本地报纸数据失败:', error);
+      }
+    };
+
+    loadLocalNewspapers();
+  }, []);
   // 动态渲染侧边栏内容
   const renderSidebarContent = () => {
     if (sidebarContent) {
@@ -108,16 +135,29 @@ export const NewspapersLayout: React.FC<NewspapersLayoutProps> = ({
         </>
       );
     } else {
-      // 显示刊物列表 - 简化的单列布局
+      // 显示刊物列表 - 使用本地数据
       return (
         <>
           <h2 className="newspapers-sidebar__title">报刊列表</h2>
           <div className="newspapers-vertical-list">
-            {publications.map((publication) => (
+            {localNewspapers.map((newspaper, index) => (
               <VerticalNewspaperCard
-                key={publication.id}
-                publication={publication}
-                isSelected={selectedPublication?.id === publication.id}
+                key={index}
+                publication={{
+                  ...publications.find(p => p.title === newspaper.title) || {
+                    id: newspaper.title,
+                    title: newspaper.title,
+                    name: newspaper.title,
+                    issueCount: newspaper.total_issues,
+                    collection: '',
+                    lastUpdated: null
+                  },
+                  // 添加本地数据字段
+                  founding_date: newspaper.founding_date,
+                  description: newspaper.description,
+                  image: newspaper.image
+                }}
+                isSelected={selectedPublication?.title === newspaper.title}
                 onClick={onPublicationSelect}
               />
             ))}
