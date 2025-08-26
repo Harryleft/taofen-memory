@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useRef, useReducer } from 'react';
+import React, { useEffect, useCallback, useRef, useReducer, useMemo } from 'react';
 import { NewspaperService, PublicationItem, IssueItem, PaginationParams } from './services';
 import { InfiniteScrollIssueList } from './InfiniteScrollIssueList';
 import { NewspapersBreadcrumb } from './NewspapersBreadcrumb';
