@@ -501,11 +501,23 @@
   border: 1px solid rgba(139, 92, 246, 0.2);
   border-radius: 0.75rem;
   color: #6b21a8;
+  animation: newspapers-hero-card__pulse 2s ease-in-out infinite;
+}
+
+@keyframes newspapers-hero-card__pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
 }
 
 .newspapers-hero-card__instruction-icon {
   color: #8b5cf6;
   flex-shrink: 0;
+  animation: newspapers-hero-card__arrow-bounce 1.5s ease-in-out infinite;
+}
+
+@keyframes newspapers-hero-card__arrow-bounce {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(4px); }
 }
 
 .newspapers-hero-card__instruction p {
@@ -1672,6 +1684,192 @@
 }
 
 /* ================================================
+   引导提示组件样式
+   ================================================ */
+
+.newspapers-guide-tip {
+  position: relative;
+  display: inline-block;
+}
+
+.newspapers-guide-tip__tooltip {
+  position: absolute;
+  z-index: 1000;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+  animation: newspapers-guide-tip__fade-in 0.3s ease;
+  max-width: 200px;
+}
+
+@keyframes newspapers-guide-tip__fade-in {
+  from { 
+    opacity: 0; 
+    transform: translateY(-10px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+.newspapers-guide-tip__tooltip--top {
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 0.5rem;
+}
+
+.newspapers-guide-tip__tooltip--bottom {
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 0.5rem;
+}
+
+.newspapers-guide-tip__tooltip--left {
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-right: 0.5rem;
+}
+
+.newspapers-guide-tip__tooltip--right {
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 0.5rem;
+}
+
+.newspapers-guide-tip__content {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.newspapers-guide-tip__message {
+  margin: 0;
+  flex: 1;
+  line-height: 1.4;
+}
+
+.newspapers-guide-tip__close {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  opacity: 0.8;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.newspapers-guide-tip__close:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.newspapers-guide-tip__arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+
+.newspapers-guide-tip__tooltip--top .newspapers-guide-tip__arrow {
+  bottom: -0.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 0.25rem 0.25rem 0 0.25rem;
+  border-color: #8b5cf6 transparent transparent transparent;
+}
+
+.newspapers-guide-tip__tooltip--bottom .newspapers-guide-tip__arrow {
+  top: -0.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 0 0.25rem 0.25rem 0.25rem;
+  border-color: transparent transparent #8b5cf6 transparent;
+}
+
+.newspapers-guide-tip__tooltip--left .newspapers-guide-tip__arrow {
+  right: -0.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 0.25rem 0 0.25rem 0.25rem;
+  border-color: transparent transparent transparent #8b5cf6;
+}
+
+.newspapers-guide-tip__tooltip--right .newspapers-guide-tip__arrow {
+  left: -0.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 0.25rem 0.25rem 0.25rem 0;
+  border-color: transparent #8b5cf6 transparent transparent;
+}
+
+/* ================================================
+   空状态组件样式
+   ================================================ */
+
+.newspapers-empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  min-height: 200px;
+}
+
+.newspapers-empty-state__content {
+  max-width: 400px;
+  padding: 2rem;
+  background: rgba(139, 92, 246, 0.05);
+  border-radius: 1rem;
+  border: 1px solid rgba(139, 92, 246, 0.1);
+  transition: all 0.3s ease;
+}
+
+.newspapers-empty-state__content:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.1);
+}
+
+.newspapers-empty-state__icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.6;
+  animation: newspapers-empty-state__float 3s ease-in-out infinite;
+}
+
+@keyframes newspapers-empty-state__float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.newspapers-empty-state__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--newspapers-text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.newspapers-empty-state__message {
+  color: var(--newspapers-text-secondary);
+  margin: 0 0 1.5rem 0;
+  line-height: 1.5;
+}
+
+.newspapers-empty-state__action {
+  margin-top: 1rem;
+}
+
+/* ================================================
    工具类
    ================================================ */
 
@@ -1908,12 +2106,22 @@
 .newspapers-viewer-placeholder__content {
   text-align: center;
   max-width: 300px;
+  padding: 2rem;
+  background: rgba(139, 92, 246, 0.05);
+  border-radius: 1rem;
+  border: 1px solid rgba(139, 92, 246, 0.1);
 }
 
 .newspapers-viewer-placeholder__icon {
   font-size: 3rem;
   margin-bottom: 1rem;
   opacity: 0.6;
+  animation: newspapers-viewer-placeholder__float 3s ease-in-out infinite;
+}
+
+@keyframes newspapers-viewer-placeholder__float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
 
 .newspapers-viewer-placeholder__title {
