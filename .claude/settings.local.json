@@ -104,7 +104,9 @@
       "WebFetch(domain:www.ai4dh.cn)",
       "mcp__playwright__playwright_get",
       "mcp__playwright__playwright_navigate",
-      "Bash(npx playwright install:*)"
+      "Bash(npx playwright install:*)",
+      "WebFetch(domain:stackoverflow.com)",
+      "WebFetch(domain:www.howtogeek.com)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",
