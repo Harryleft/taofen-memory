@@ -373,6 +373,37 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
   }, [state.manifestUrl, state.loading]);
 
   /**
+   * 选择期数
+   */
+  const handleIssueSelect = useCallback(async (issue: IssueItem) => {
+    if (!state.selectedPublication) return;
+    
+    try {
+      actions.setLoading(true);
+      actions.setError(null);
+      
+      actions.setSelectedIssue(issue);
+      
+      // 移动端自动关闭抽屉
+      if (state.isMobile) {
+        actions.setDrawerOpen(false);
+      }
+      
+      const publicationId = state.selectedPublication.id;
+      console.log('🔍 [DEBUG] 使用的publicationId:', publicationId);
+      await loadViewer(issue);
+      
+      if (onIssueSelect) {
+        onIssueSelect(issue.manifest);
+      }
+    } catch (err) {
+      actions.setError(err instanceof Error ? err.message : '切换失败');
+    } finally {
+      actions.setLoading(false);
+    }
+  }, [state.selectedPublication, state.isMobile, onIssueSelect, loadViewer, actions]);
+
+  /**
    * 键盘快捷键支持
    */
   useEffect(() => {
@@ -563,37 +594,6 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
       actions.setError(err instanceof Error ? err.message : '查看器加载失败');
     }
   }, [actions]);
-
-  /**
-   * 选择期数
-   */
-  const handleIssueSelect = useCallback(async (issue: IssueItem) => {
-    if (!state.selectedPublication) return;
-    
-    try {
-      actions.setLoading(true);
-      actions.setError(null);
-      
-      actions.setSelectedIssue(issue);
-      
-      // 移动端自动关闭抽屉
-      if (state.isMobile) {
-        actions.setDrawerOpen(false);
-      }
-      
-      const publicationId = state.selectedPublication.id;
-      console.log('🔍 [DEBUG] 使用的publicationId:', publicationId);
-      await loadViewer(issue);
-      
-      if (onIssueSelect) {
-        onIssueSelect(issue.manifest);
-      }
-    } catch (err) {
-      actions.setError(err instanceof Error ? err.message : '切换失败');
-    } finally {
-      actions.setLoading(false);
-    }
-  }, [state.selectedPublication, state.isMobile, onIssueSelect, loadViewer, actions]);
 
   // ====================
   // 触摸手势处理
