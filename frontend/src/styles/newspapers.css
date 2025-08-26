@@ -646,7 +646,7 @@
    ================================================ */
 :root {
   /* 布局尺寸 - 基于内容需求而非美观 */
-  --newspapers-sidebar-width: 320px;
+  --newspapers-sidebar-width: 380px;
   --newspapers-sidebar-collapsed-width: 48px;
   --newspapers-header-height: 60px;
   --newspapers-issue-selector-height: 60px;
@@ -689,7 +689,7 @@
   grid-template-areas:
     "header header"
     "sidebar main";
-  grid-template-columns: var(--newspapers-sidebar-width) 1fr;
+  grid-template-columns: 380px 1fr;
   grid-template-rows: auto 1fr;
   height: 100vh;
   background: var(--newspapers-bg-primary);
@@ -1417,15 +1417,28 @@
 /* 平板端 - 调整尺寸 */
 @media (min-width: 769px) and (max-width: 1024px) {
   :root {
-    --newspapers-sidebar-width: 280px;
+    --newspapers-sidebar-width: 320px;
     --newspapers-min-content-width: 350px;
+  }
+  
+  .newspapers-layout {
+    grid-template-columns: 320px 1fr;
   }
 }
 
 /* 桌面端 - 确保最小宽度 */
 @media (min-width: 1025px) {
   .newspapers-integrated-container {
-    min-width: calc(var(--newspapers-sidebar-width) + var(--newspapers-min-content-width));
+    min-width: calc(380px + var(--newspapers-min-content-width));
+  }
+  
+  /* 优化大屏幕下的内容分布 */
+  .newspapers-layout__sidebar .newspapers-publication-grid {
+    gap: 1.25rem;
+  }
+  
+  .newspapers-layout__sidebar .newspapers-publication-list {
+    gap: 1rem;
   }
 }
 
@@ -1571,6 +1584,8 @@
   flex-direction: column;
   height: 100%;
   overflow: hidden;
+  max-width: 380px;
+  margin: 0 auto;
 }
 
 .newspapers-layout__sidebar .newspapers-issue-list {
@@ -1581,6 +1596,8 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  max-width: 380px;
+  margin: 0 auto;
 }
 
 /* 报刊网格布局 - 卡片式 */
@@ -1593,18 +1610,20 @@
   grid-template-columns: 1fr;
   gap: 1rem;
   align-content: start;
+  max-width: 380px;
+  margin: 0 auto;
 }
 
 /* 响应式网格布局 */
 @media (min-width: 640px) {
   .newspapers-layout__sidebar .newspapers-publication-grid {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   }
 }
 
 @media (min-width: 1024px) {
   .newspapers-layout__sidebar .newspapers-publication-grid {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   }
 }
 
@@ -1617,12 +1636,15 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  max-width: 380px;
+  margin: 0 auto;
 }
 
 /* 移动端适配 */
 @media (max-width: 768px) {
   .newspapers-layout__sidebar .newspapers-issue-list {
     padding: 0.75rem;
+    max-width: 100%;
   }
   
   .newspapers-layout__sidebar .newspapers-issue-item {
@@ -1637,6 +1659,14 @@
   .newspapers-layout__sidebar .newspapers-sidebar__header .newspapers-sidebar__back {
     padding: 0.25rem 0.5rem;
     font-size: 0.8rem;
+  }
+  
+  .newspapers-layout__sidebar .newspapers-sidebar__content {
+    max-width: 100%;
+  }
+  
+  .newspapers-layout__sidebar .newspapers-publication-grid {
+    max-width: 100%;
   }
 }
 
@@ -2407,9 +2437,35 @@
   contain: layout style;
 }
 
+/* 优化侧边栏内容布局 */
+.newspapers-layout__sidebar .newspapers-sidebar__content {
+  contain: strict;
+  overflow: hidden;
+}
+
+/* 优化网格布局的滚动性能 */
+.newspapers-layout__sidebar .newspapers-publication-grid {
+  contain: strict;
+  content-visibility: auto;
+  contain-intrinsic-size: 600px;
+}
+
 /* 高频更新元素优化 */
 .newspapers-loading__spinner {
   will-change: transform;
+}
+
+/* 侧边栏滚动优化 */
+.newspapers-layout__sidebar .newspapers-sidebar__content {
+  scroll-behavior: smooth;
+  scroll-padding-top: 1rem;
+}
+
+/* 网格项目优化 */
+.newspapers-layout__sidebar .newspapers-publication-grid > * {
+  contain: layout style;
+  content-visibility: auto;
+  contain-intrinsic-size: 320px;
 }
 
 /* 内存优化：大列表虚拟化 */
