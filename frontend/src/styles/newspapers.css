@@ -2838,37 +2838,85 @@
 }
 
 /* ================================================
-   引导区域样式
+   统一引导状态样式
    ================================================ */
 
-/* 引导区域内容 */
-.newspapers-guide-content {
-  text-align: center;
+/* 基础状态容器 */
+.newspapers-guide-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 2rem;
-  max-width: 400px;
+  text-align: center;
+  min-height: 200px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.newspapers-guide-content__icon {
-  font-size: 4rem;
+/* 变体：空状态 */
+.newspapers-guide-state--empty {
+  background: rgba(139, 92, 246, 0.05);
+  border-radius: 1rem;
+  border: 1px solid rgba(139, 92, 246, 0.1);
+  transition: all 0.3s ease;
+}
+
+.newspapers-guide-state--empty:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.1);
+}
+
+/* 变体：引导界面 */
+.newspapers-guide-state--guide {
+  background: var(--newspapers-bg-primary);
+  border-radius: 0.5rem;
+  border: 2px dashed var(--newspapers-border-color);
+  min-height: 400px;
+}
+
+/* 变体：欢迎界面 */
+.newspapers-guide-state--welcome {
+  background: var(--newspapers-bg-primary);
+  border-radius: 0.5rem;
+}
+
+/* 内容区域 */
+.newspapers-guide-state__content {
+  max-width: 400px;
+  width: 100%;
+}
+
+/* 图标 */
+.newspapers-guide-state__icon {
+  font-size: 3rem;
   margin-bottom: 1rem;
   opacity: 0.6;
+  animation: newspapers-guide-state__float 3s ease-in-out infinite;
 }
 
-.newspapers-guide-content__title {
+@keyframes newspapers-guide-state__float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* 标题 */
+.newspapers-guide-state__title {
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--newspapers-text-primary);
-  margin: 0 0 1rem 0;
+  margin: 0 0 0.5rem 0;
 }
 
-.newspapers-guide-content__description {
+/* 消息 */
+.newspapers-guide-state__message {
   font-size: 1rem;
   color: var(--newspapers-text-secondary);
   line-height: 1.6;
   margin: 0 0 1.5rem 0;
 }
 
-.newspapers-guide-content__steps {
+/* 步骤说明 */
+.newspapers-guide-state__steps {
   text-align: left;
   background: var(--newspapers-bg-secondary);
   border-radius: 0.5rem;
@@ -2876,18 +2924,18 @@
   margin: 0 0 1.5rem 0;
 }
 
-.newspapers-guide-content__step {
+.newspapers-guide-state__step {
   display: flex;
   align-items: flex-start;
   gap: 0.75rem;
   margin-bottom: 1rem;
 }
 
-.newspapers-guide-content__step:last-child {
+.newspapers-guide-state__step:last-child {
   margin-bottom: 0;
 }
 
-.newspapers-guide-content__step-number {
+.newspapers-guide-state__step-number {
   background: var(--newspapers-accent);
   color: white;
   width: 1.5rem;
@@ -2901,11 +2949,236 @@
   flex-shrink: 0;
 }
 
-.newspapers-guide-content__step-text {
+.newspapers-guide-state__step-text {
   font-size: 0.875rem;
   color: var(--newspapers-text-secondary);
   line-height: 1.5;
   flex: 1;
+}
+
+/* 操作按钮区域 */
+.newspapers-guide-state__action {
+  margin-top: 1rem;
+}
+
+/* ================================================
+   兼容性别名（逐步废弃）
+   ================================================ */
+
+/* ================================================
+   统一引导状态组件样式 - 新架构
+   ================================================ */
+
+/* 基础状态容器 */
+.newspapers-guide-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  border-radius: 0.5rem;
+  border: 2px dashed var(--newspapers-border-color);
+  background: var(--newspapers-bg-primary);
+  min-height: 200px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 变体样式 */
+.newspapers-guide-state--guide {
+  min-height: 400px;
+  border-style: dashed;
+}
+
+.newspapers-guide-state--empty {
+  min-height: 200px;
+  border-style: solid;
+  border-color: var(--newspapers-border-color);
+}
+
+.newspapers-guide-state--welcome {
+  min-height: 300px;
+  border-style: none;
+  background: linear-gradient(135deg, var(--newspapers-bg-primary) 0%, var(--newspapers-bg-secondary) 100%);
+}
+
+/* 内容容器 */
+.newspapers-guide-state__content {
+  max-width: 400px;
+  width: 100%;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+/* 图标样式 */
+.newspapers-guide-state__icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.6;
+  animation: newspapers-guide-state__float 3s ease-in-out infinite;
+}
+
+/* 标题样式 */
+.newspapers-guide-state__title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--newspapers-text-primary);
+  margin: 0 0 1rem 0;
+  line-height: 1.4;
+}
+
+/* 消息样式 */
+.newspapers-guide-state__message {
+  font-size: 1rem;
+  color: var(--newspapers-text-secondary);
+  line-height: 1.6;
+  margin: 0 0 1.5rem 0;
+}
+
+/* 步骤容器 */
+.newspapers-guide-state__steps {
+  text-align: left;
+  background: var(--newspapers-bg-secondary);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin: 0 0 1.5rem 0;
+}
+
+/* 步骤项 */
+.newspapers-guide-state__step {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.newspapers-guide-state__step:last-child {
+  margin-bottom: 0;
+}
+
+/* 步骤编号 */
+.newspapers-guide-state__step-number {
+  background: var(--newspapers-accent);
+  color: white;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* 步骤文本 */
+.newspapers-guide-state__step-text {
+  font-size: 0.875rem;
+  color: var(--newspapers-text-secondary);
+  line-height: 1.5;
+  flex: 1;
+}
+
+/* 操作区域 */
+.newspapers-guide-state__action {
+  margin-top: 1rem;
+}
+
+/* 动画效果 */
+@keyframes newspapers-guide-state__float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+/* ================================================
+   向后兼容样式 - 旧样式名映射到新架构
+   ================================================ */
+
+/* 旧的引导内容样式映射到新的guide状态 */
+.newspapers-guide-content {
+  composes: newspapers-guide-state newspapers-guide-state--guide;
+}
+
+.newspapers-guide-content__icon {
+  composes: newspapers-guide-state__icon;
+}
+
+.newspapers-guide-content__title {
+  composes: newspapers-guide-state__title;
+}
+
+.newspapers-guide-content__description {
+  composes: newspapers-guide-state__message;
+}
+
+.newspapers-guide-content__steps {
+  composes: newspapers-guide-state__steps;
+}
+
+.newspapers-guide-content__step {
+  composes: newspapers-guide-state__step;
+}
+
+.newspapers-guide-content__step-number {
+  composes: newspapers-guide-state__step-number;
+}
+
+.newspapers-guide-content__step-text {
+  composes: newspapers-guide-state__step-text;
+}
+
+/* 旧的空状态样式映射到新的empty状态 */
+.newspapers-empty-state {
+  composes: newspapers-guide-state newspapers-guide-state--empty;
+}
+
+.newspapers-empty-state__content {
+  composes: newspapers-guide-state__content;
+}
+
+.newspapers-empty-state__icon {
+  composes: newspapers-guide-state__icon;
+}
+
+.newspapers-empty-state__title {
+  composes: newspapers-guide-state__title;
+}
+
+.newspapers-empty-state__message {
+  composes: newspapers-guide-state__message;
+}
+
+.newspapers-empty-state__action {
+  composes: newspapers-guide-state__action;
+}
+
+/* 欢迎状态样式映射 */
+.newspapers-welcome {
+  composes: newspapers-guide-state newspapers-guide-state--welcome;
+}
+
+.newspapers-welcome__content {
+  composes: newspapers-guide-state__content;
+}
+
+.newspapers-welcome__icon {
+  composes: newspapers-guide-state__icon;
+}
+
+.newspapers-welcome__title {
+  composes: newspapers-guide-state__title;
+}
+
+.newspapers-welcome__message {
+  composes: newspapers-guide-state__message;
+}
+
+.newspapers-welcome__action {
+  composes: newspapers-guide-state__action;
 }
 
 /* ================================================

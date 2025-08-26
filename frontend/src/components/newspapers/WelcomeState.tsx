@@ -1,7 +1,7 @@
 import React from 'react';
 import { GuideState } from './GuideState';
 
-interface EmptyStateProps {
+interface WelcomeStateProps {
   icon?: React.ReactNode;
   title: string;
   message: string;
@@ -10,15 +10,15 @@ interface EmptyStateProps {
 }
 
 /**
- * 空状态组件 - 统一的空状态显示
+ * 欢迎状态组件 - 统一的欢迎界面显示
  * 
  * 功能：
- * - 显示空状态图标、标题和描述
+ * - 显示欢迎图标、标题和描述
  * - 可选的操作按钮
  * - 统一的样式系统
  */
-export const EmptyState: React.FC<EmptyStateProps> = ({
-  icon = '📄',
+export const WelcomeState: React.FC<WelcomeStateProps> = ({
+  icon = '🎉',
   title,
   message,
   action,
@@ -30,10 +30,10 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       title={title}
       message={message}
       action={action}
-      variant="empty"
+      variant="welcome"
       className={className}
     />
   );
 };
 
-export default EmptyState;
+export default WelcomeState;
