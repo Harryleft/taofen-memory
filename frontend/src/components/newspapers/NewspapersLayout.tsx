@@ -100,29 +100,23 @@ export const NewspapersLayout: React.FC<NewspapersLayoutProps> = ({
         </div>
       );
     } else {
-      // 显示刊物列表 - 使用界面1的垂直布局 (界面1)
+      // 显示刊物列表 - 简化的单列布局
       return (
-        <div className="newspapers-interface1">
-          {/* 左侧：报刊垂直列表 */}
-          <div className="newspapers-interface1__sidebar">
-            <div className="newspapers-sidebar__header">
-              <h2 className="newspapers-sidebar__title">报刊列表</h2>
-            </div>
-            <div className="newspapers-vertical-list">
-              {publications.map((publication) => (
-                <div key={publication.id} className="newspapers-vertical-list__item">
-                  <VerticalNewspaperCard
-                    publication={publication}
-                    isSelected={selectedPublication?.id === publication.id}
-                    onClick={onPublicationSelect}
-                  />
-                </div>
-              ))}
-            </div>
+        <div className="newspapers-sidebar__content">
+          <div className="newspapers-sidebar__header">
+            <h2 className="newspapers-sidebar__title">报刊列表</h2>
           </div>
-          
-          {/* 右侧：引导区域 */}
-          <NewspapersGuideArea />
+          <div className="newspapers-vertical-list">
+            {publications.map((publication) => (
+              <div key={publication.id} className="newspapers-vertical-list__item">
+                <VerticalNewspaperCard
+                  publication={publication}
+                  isSelected={selectedPublication?.id === publication.id}
+                  onClick={onPublicationSelect}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       );
     }
