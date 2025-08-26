@@ -73,25 +73,23 @@ export const NewspapersLayout: React.FC<NewspapersLayoutProps> = ({
         
         // 更智能的匹配算法：只保留在远程数据中存在的报刊
         const matchedNewspapers = localData.filter(localNewspaper => {
-          const normalizedLocalTitle = localNewspaper.title
+          const cleanLocalTitle = localNewspaper.title
             .replace(/[《》\s]/g, '') // 移除书名号和空格
-            .replace(/周刊|日报|刊|报/g, '') // 移除常见的报刊类型后缀
-            .toLowerCase();
+            .trim();
           
           return publications.some(remotePub => {
-            const normalizedRemoteTitle = remotePub.title
+            const cleanRemoteTitle = remotePub.title
               .replace(/[《》\s]/g, '') // 移除书名号和空格
-              .replace(/周刊|日报|刊|报/g, '') // 移除常见的报刊类型后缀
-              .toLowerCase();
+              .trim();
             
-            // 精确匹配
-            if (normalizedRemoteTitle === normalizedLocalTitle) {
+            // 精确匹配（不移除报刊类型后缀，避免过度标准化）
+            if (cleanRemoteTitle === cleanLocalTitle) {
               return true;
             }
             
-            // 包含匹配（检查核心关键词）
-            const localKeywords = normalizedLocalTitle.split(/[\u4e00-\u9fa5]+/).filter(k => k.length > 1);
-            const remoteKeywords = normalizedRemoteTitle.split(/[\u4e00-\u9fa5]+/).filter(k => k.length > 1);
+            // 包含匹配（检查核心关键词）- 仅用于精确匹配失败后的备选方案
+            const localKeywords = cleanLocalTitle.split(/[\u4e00-\u9fa5]+/).filter(k => k.length > 1);
+            const remoteKeywords = cleanRemoteTitle.split(/[\u4e00-\u9fa5]+/).filter(k => k.length > 1);
             
             // 检查是否有足够的关键词匹配
             const matchingKeywords = localKeywords.filter(keyword => 
@@ -100,9 +98,10 @@ export const NewspapersLayout: React.FC<NewspapersLayoutProps> = ({
               )
             );
             
-            // 如果有至少2个关键词匹配，或者标题长度较短时有1个匹配
-            return matchingKeywords.length >= 2 || 
-                   (normalizedLocalTitle.length < 8 && matchingKeywords.length >= 1);
+            // 严格的关键词匹配条件
+            return matchingKeywords.length >= 2 && 
+                   matchingKeywords.length === localKeywords.length && 
+                   matchingKeywords.length === remoteKeywords.length;
           });
         });
         
@@ -121,24 +120,22 @@ export const NewspapersLayout: React.FC<NewspapersLayoutProps> = ({
         // 输出详细的匹配过程信息
         console.log('📰 [DEBUG] ===== 详细匹配过程 =====');
         localData.forEach(localNewspaper => {
-          const normalizedLocalTitle = localNewspaper.title
+          const cleanLocalTitle = localNewspaper.title
             .replace(/[《》\s]/g, '')
-            .replace(/周刊|日报|刊|报/g, '')
-            .toLowerCase();
+            .trim();
           
           const isMatched = publications.some(remotePub => {
-            const normalizedRemoteTitle = remotePub.title
+            const cleanRemoteTitle = remotePub.title
               .replace(/[《》\s]/g, '')
-              .replace(/周刊|日报|刊|报/g, '')
-              .toLowerCase();
+              .trim();
             
-            if (normalizedRemoteTitle === normalizedLocalTitle) {
+            if (cleanRemoteTitle === cleanLocalTitle) {
               console.log(`📰 [DEBUG] 精确匹配: "${localNewspaper.title}" <-> "${remotePub.title}"`);
               return true;
             }
             
-            const localKeywords = normalizedLocalTitle.split(/[\u4e00-\u9fa5]+/).filter(k => k.length > 1);
-            const remoteKeywords = normalizedRemoteTitle.split(/[\u4e00-\u9fa5]+/).filter(k => k.length > 1);
+            const localKeywords = cleanLocalTitle.split(/[\u4e00-\u9fa5]+/).filter(k => k.length > 1);
+            const remoteKeywords = cleanRemoteTitle.split(/[\u4e00-\u9fa5]+/).filter(k => k.length > 1);
             
             const matchingKeywords = localKeywords.filter(keyword => 
               remoteKeywords.some(remoteKeyword => 
@@ -146,8 +143,9 @@ export const NewspapersLayout: React.FC<NewspapersLayoutProps> = ({
               )
             );
             
-            const shouldMatch = matchingKeywords.length >= 2 || 
-                              (normalizedLocalTitle.length < 8 && matchingKeywords.length >= 1);
+            const shouldMatch = matchingKeywords.length >= 2 && 
+                              matchingKeywords.length === localKeywords.length && 
+                              matchingKeywords.length === remoteKeywords.length;
             
             if (shouldMatch) {
               console.log(`📰 [DEBUG] 关键词匹配: "${localNewspaper.title}" <-> "${remotePub.title}" (匹配关键词: ${matchingKeywords.join(', ')})`);
@@ -157,7 +155,7 @@ export const NewspapersLayout: React.FC<NewspapersLayoutProps> = ({
           });
           
           if (!isMatched) {
-            console.log(`📰 [DEBUG] 未匹配: "${localNewspaper.title}" (标准化后: "${normalizedLocalTitle}")`);
+            console.log(`📰 [DEBUG] 未匹配: "${localNewspaper.title}" (清理后: "${cleanLocalTitle}")`);
           }
         });
         
