@@ -26,18 +26,11 @@ export const NewspapersGuideArea: React.FC = () => {
         },
         {
           number: 3,
-          text: "使用查看器工具进行报刊阅读和导航"
-        },
-        {
-          number: 4,
-          text: "随时可以通过返回按钮回到上一级"
-        }
+          text: "使用IIIF浏览器进行报刊阅读"
+        }        
       ]}
       variant="guide"
       className="newspapers-interface1__guide"
-      action={
-        <small>提示：系统支持键盘操作，使用Tab键导航，Enter键确认选择</small>
-      }
     />
   );
 };

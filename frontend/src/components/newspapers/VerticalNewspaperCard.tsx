@@ -43,13 +43,6 @@ export const VerticalNewspaperCard: React.FC<VerticalNewspaperCardProps> = ({
         }
       }}
     >
-      {/* 封面图片区域 */}
-      <div className="vertical-newspaper-card__cover">
-        <div className="vertical-newspaper-card__cover-placeholder">
-          <span className="vertical-newspaper-card__cover-icon">📰</span>
-        </div>
-      </div>
-      
       {/* 卡片内容区域 */}
       <div className="vertical-newspaper-card__content">
         <h3 className="vertical-newspaper-card__title">
@@ -62,17 +55,6 @@ export const VerticalNewspaperCard: React.FC<VerticalNewspaperCardProps> = ({
             {publication.issueCount || 0} 期
           </span>
         </div>
-        
-        {/* 查看本刊按钮 */}
-        <button 
-          className="vertical-newspaper-card__button"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleClick();
-          }}
-        >
-          查看本刊
-        </button>
       </div>
     </div>
   );
