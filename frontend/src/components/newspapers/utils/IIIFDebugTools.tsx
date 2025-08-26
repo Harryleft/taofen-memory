@@ -9,6 +9,15 @@ interface DebugInfo {
   proxyAvailable: boolean;
 }
 
+interface WindowWithDebug extends Window {
+  UV?: {
+    IIIFURLAdapter?: unknown;
+  };
+  networkRequests?: NetworkRequest[];
+  debugManifest?: unknown;
+  convertToIIIFUrl?: (url: string, force: boolean, size: string) => string;
+}
+
 interface NetworkRequest {
   type: string;
   url: string;
@@ -23,7 +32,7 @@ interface IIIFDebugToolsProps {
 export const IIIFDebugTools: React.FC<IIIFDebugToolsProps> = ({ isVisible, onClose }) => {
   const [debugInfo, setDebugInfo] = useState<DebugInfo | null>(null);
   const [networkRequests, setNetworkRequests] = useState<NetworkRequest[]>([]);
-  const [manifestData, setManifestData] = useState<any>(null);
+  const [manifestData, setManifestData] = useState<unknown>(null);
 
   useEffect(() => {
     if (isVisible) {
@@ -37,17 +46,17 @@ export const IIIFDebugTools: React.FC<IIIFDebugToolsProps> = ({ isVisible, onClo
       userAgent: navigator.userAgent,
       url: window.location.href,
       timestamp: new Date().toISOString(),
-      uvLoaded: typeof (window as any).UV !== 'undefined',
-      uvAdapterLoaded: typeof (window as any).UV?.IIIFURLAdapter !== 'undefined',
+      uvLoaded: typeof (window as WindowWithDebug).UV !== 'undefined',
+      uvAdapterLoaded: typeof (window as WindowWithDebug).UV?.IIIFURLAdapter !== 'undefined',
       proxyAvailable: typeof fetch !== 'undefined',
     };
     setDebugInfo(info);
 
     // 获取网络请求历史
-    setNetworkRequests((window as any).networkRequests || []);
+    setNetworkRequests((window as WindowWithDebug).networkRequests || []);
 
     // 获取manifest数据
-    setManifestData((window as any).debugManifest || null);
+    setManifestData((window as WindowWithDebug).debugManifest || null);
   };
 
   const analyzeThumbnailIssue = () => {
@@ -116,7 +125,7 @@ export const IIIFDebugTools: React.FC<IIIFDebugToolsProps> = ({ isVisible, onClo
       console.log(`\\n🔍 测试URL ${index + 1}:`, url);
       
       // 测试缩略图转换
-      const convertToIIIFUrl = (window as any).convertToIIIFUrl as ((url: string, force: boolean, size: string) => string) | undefined;
+      const convertToIIIFUrl = (window as WindowWithDebug).convertToIIIFUrl;
       const thumbnailConverted = convertToIIIFUrl ? 
         convertToIIIFUrl(url, true, '1024,') : url;
       console.log(`  缩略图转换: ${thumbnailConverted}`);
