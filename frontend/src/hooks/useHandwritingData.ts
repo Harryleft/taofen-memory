@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { HandwritingCacheManager, createHandwritingCacheManager } from '@/lib/cache/RedisCacheManager';
+import { HandwritingCacheManager, createHandwritingCacheManager } from '@/lib/cache/HandwritingMemoryCache.ts';
 
 // 真实数据接口定义
 export interface HandwritingItem {

@@ -1,6 +1,6 @@
 import { useMemo, useCallback, useState, useEffect } from 'react';
 import type { TransformedHandwritingItem } from './useHandwritingData';
-import { HandwritingCacheManager, createHandwritingCacheManager } from '@/lib/cache/RedisCacheManager';
+import { HandwritingCacheManager, createHandwritingCacheManager } from '@/lib/cache/HandwritingMemoryCache.ts';
 
 // 搜索过滤Hook
 export const useHandwritingFilters = (
