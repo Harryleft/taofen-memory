@@ -55,23 +55,64 @@ export const NewspapersLayout: React.FC<NewspapersLayoutProps> = ({
   loading
 }) => {
   const [localNewspapers, setLocalNewspapers] = useState<LocalNewspaperData[]>([]);
+  const [matchingLoading, setMatchingLoading] = useState(true);
 
-  // 加载本地报纸数据
+  // 加载本地报纸数据并与远程数据匹配
   useEffect(() => {
-    const loadLocalNewspapers = async () => {
+    const loadAndMatchNewspapers = async () => {
+      setMatchingLoading(true);
+      
       try {
-        const response = await fetch('/data/json/newspapers_info.json');
-        if (response.ok) {
-          const data = await response.json();
-          setLocalNewspapers(data);
+        // 加载本地数据
+        const localResponse = await fetch('/data/json/newspapers_info.json');
+        if (!localResponse.ok) {
+          console.error('无法加载本地报纸数据');
+          return;
         }
+        const localData = await localResponse.json();
+        
+        // 更精确的匹配算法：只保留在远程数据中存在的报刊
+        const matchedNewspapers = localData.filter(localNewspaper => {
+          const normalizedLocalTitle = localNewspaper.title
+            .replace(/[《》]/g, '') // 移除书名号
+            .replace(/\s+/g, '')     // 移除空格
+            .toLowerCase();
+          
+          return publications.some(remotePub => {
+            const normalizedRemoteTitle = remotePub.title
+              .replace(/[《》]/g, '') // 移除书名号
+              .replace(/\s+/g, '')     // 移除空格
+              .toLowerCase();
+            
+            // 精确匹配或包含匹配
+            return normalizedRemoteTitle === normalizedLocalTitle ||
+                   normalizedRemoteTitle.includes(normalizedLocalTitle) ||
+                   normalizedLocalTitle.includes(normalizedRemoteTitle);
+          });
+        });
+        
+        console.log('📰 [DEBUG] 本地数据数量:', localData.length);
+        console.log('📰 [DEBUG] 远程数据数量:', publications.length);
+        console.log('📰 [DEBUG] 匹配数据数量:', matchedNewspapers.length);
+        console.log('📰 [DEBUG] 匹配的报刊:', matchedNewspapers.map(n => n.title));
+        
+        // 输出未匹配的报刊信息
+        const unmatchedNewspapers = localData.filter(localNewspaper => 
+          !matchedNewspapers.some(matched => matched.title === localNewspaper.title)
+        );
+        console.log('📰 [DEBUG] 未匹配的报刊:', unmatchedNewspapers.map(n => n.title));
+        console.log('📰 [DEBUG] 远程报刊标题:', publications.map(p => p.title));
+        
+        setLocalNewspapers(matchedNewspapers);
       } catch (error) {
         console.error('加载本地报纸数据失败:', error);
+      } finally {
+        setMatchingLoading(false);
       }
     };
 
-    loadLocalNewspapers();
-  }, []);
+    loadAndMatchNewspapers();
+  }, [publications]);
   // 动态渲染侧边栏内容
   const renderSidebarContent = () => {
     if (sidebarContent) {
@@ -135,32 +176,47 @@ export const NewspapersLayout: React.FC<NewspapersLayoutProps> = ({
         </>
       );
     } else {
-      // 显示刊物列表 - 使用本地数据
+      // 显示刊物列表 - 使用匹配的本地数据
       return (
         <>
           <h2 className="newspapers-sidebar__title">报刊列表</h2>
           <div className="newspapers-vertical-list">
-            {localNewspapers.map((newspaper, index) => (
-              <VerticalNewspaperCard
-                key={index}
-                publication={{
-                  ...publications.find(p => p.title === newspaper.title) || {
-                    id: newspaper.title,
-                    title: newspaper.title,
-                    name: newspaper.title,
-                    issueCount: newspaper.total_issues,
-                    collection: '',
-                    lastUpdated: null
-                  },
-                  // 添加本地数据字段
-                  founding_date: newspaper.founding_date,
-                  description: newspaper.description,
-                  image: newspaper.image
-                }}
-                isSelected={selectedPublication?.title === newspaper.title}
-                onClick={onPublicationSelect}
-              />
-            ))}
+            {matchingLoading ? (
+              <div className="newspapers-loading-matching">
+                <div className="newspapers-loading__spinner"></div>
+                <p>正在匹配报刊数据...</p>
+              </div>
+            ) : localNewspapers.length === 0 ? (
+              <div className="newspapers-no-matches">
+                <div className="newspapers-no-matches__icon">📭</div>
+                <p>没有找到匹配的报刊数据</p>
+                <p className="newspapers-no-matches__hint">
+                  请检查本地数据与远程数据的匹配情况
+                </p>
+              </div>
+            ) : (
+              localNewspapers.map((newspaper, index) => (
+                <VerticalNewspaperCard
+                  key={index}
+                  publication={{
+                    ...publications.find(p => p.title === newspaper.title) || {
+                      id: newspaper.title,
+                      title: newspaper.title,
+                      name: newspaper.title,
+                      issueCount: newspaper.total_issues,
+                      collection: '',
+                      lastUpdated: null
+                    },
+                    // 添加本地数据字段
+                    founding_date: newspaper.founding_date,
+                    description: newspaper.description,
+                    image: newspaper.image
+                  }}
+                  isSelected={selectedPublication?.title === newspaper.title}
+                  onClick={onPublicationSelect}
+                />
+              ))
+            )}
           </div>
         </>
       );
