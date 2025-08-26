@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef, useReducer } from 'react';
+import React, { useEffect, useCallback, useRef, useReducer } from 'react';
 import { NewspaperService, PublicationItem, IssueItem, PaginationParams } from './services';
 import { InfiniteScrollIssueList } from './InfiniteScrollIssueList';
 import { NewspapersBreadcrumb } from './NewspapersBreadcrumb';
@@ -390,7 +390,7 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [state.issues, state.selectedIssue]);
+  }, [state.issues, state.selectedIssue, handleIssueSelect]);
 
   // ====================
   // 核心业务逻辑

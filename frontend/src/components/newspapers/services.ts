@@ -68,18 +68,27 @@ export class NewspaperService {
         };
       });
       
-      // 异步获取期数信息
-      await Promise.all(publications.map(async (pub, index) => {
-        try {
-          const issues = await this.getIssuesForPublication(pub.collection);
-          publications[index].issueCount = issues.length;
-          if (issues.length > 0) {
-            publications[index].lastUpdated = issues[0].title || issues[0].summary;
+      // 异步获取期数信息 - 使用批处理避免并发请求过多
+      const BATCH_SIZE = 5; // 每批处理5个请求
+      for (let i = 0; i < publications.length; i += BATCH_SIZE) {
+        const batch = publications.slice(i, i + BATCH_SIZE);
+        await Promise.all(batch.map(async (pub, index) => {
+          try {
+            const issues = await this.getIssuesForPublication(pub.collection);
+            publications[i + index].issueCount = issues.length;
+            if (issues.length > 0) {
+              publications[i + index].lastUpdated = issues[0].title || issues[0].summary;
+            }
+          } catch (e) {
+            console.warn(`无法获取刊物 ${pub.title} 的期数信息:`, e);
           }
-        } catch (e) {
-          console.warn(`无法获取刊物 ${pub.title} 的期数信息:`, e);
+        }));
+        
+        // 批次间延迟，避免服务器限流
+        if (i + BATCH_SIZE < publications.length) {
+          await new Promise(resolve => setTimeout(resolve, 100));
         }
-      }));
+      }
       
       return publications;
     } catch (e) { 
