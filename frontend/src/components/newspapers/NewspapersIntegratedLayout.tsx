@@ -551,25 +551,7 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
         {/* 主要内容区域 */}
         {!selectedPublication ? (
           // 未选择刊物时的引导界面
-          <EmptyState
-            icon={
-              <div className="newspapers-welcome__icon">📰</div>
-            }
-            title="欢迎使用数字报刊"
-            message="请从左侧选择一个刊物开始浏览"
-            action={
-              isMobile && (
-                <GuideTip message="向上滑动打开刊物列表" position="bottom">
-                  <button
-                    onClick={() => setDrawerOpen(true)}
-                    className="btn-newspapers"
-                  >
-                    选择刊物
-                  </button>
-                </GuideTip>
-              )
-            }
-          />
+          <NewspapersGuideArea />
         ) : (
           // 选择刊物后的查看器区域
           <div className="newspapers-viewer-container">
