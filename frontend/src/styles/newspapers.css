@@ -2840,7 +2840,8 @@
   background: var(--newspapers-bg-primary);
   border-radius: 0.5rem;
   border: 2px dashed var(--newspapers-border-color);
-  min-height: 400px;
+  min-height: 500px;
+  padding: 2rem;
 }
 
 /* ================================================
