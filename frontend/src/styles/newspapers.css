@@ -2467,17 +2467,17 @@
 }
 
 /* ================================================
-   简洁网格布局样式 - 3列网格
+   简洁网格布局样式 - 2列网格
    ================================================ */
 
 .newspapers-simple-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
   padding: 1.5rem;
   justify-content: center;
   align-items: start;
-  max-width: 900px; /* 3 * 240px + 2 * 1.5rem + padding */
+  max-width: 660px; /* 2 * 240px + 1 * 1.5rem + padding */
   margin: 0 auto;
 }
 
@@ -2493,12 +2493,18 @@
    响应式设计
    ================================================ */
 
-/* 平板端 - 2列布局 */
+/* 平板端 - 1列布局 */
 @media (max-width: 1024px) {
   .newspapers-simple-grid {
-    grid-template-columns: repeat(2, 1fr);
-    max-width: 600px; /* 2 * 240px + 1 * 1.5rem + padding */
+    grid-template-columns: 1fr;
+    max-width: 300px; /* 240px + padding */
     gap: 1rem;
+  }
+  
+  .simple-newspaper-card {
+    width: 100%;
+    max-width: 240px;
+    margin: 0 auto;
   }
 }
 
