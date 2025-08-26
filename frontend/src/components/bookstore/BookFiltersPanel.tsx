@@ -52,7 +52,6 @@ const BookFiltersPanel: React.FC<BookstoreFiltersProps> = ({
   uniqueYears,
   onDownload,
   activeTab = 'books',
-  onTabChange,
 }) => {
   const [yearDropdownOpen, setYearDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
