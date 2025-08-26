@@ -6,6 +6,7 @@ import AppHeader from '@/components/layout/header/AppHeader.tsx';
 import NewspapersLayout from './NewspapersLayout.tsx';
 import { EmptyState } from './EmptyState';
 import { NewspapersGuideArea } from './NewspapersGuideArea';
+import { useTouchDrawer } from './hooks/useTouchDrawer';
 
 // ====================
 // 常量配置
@@ -26,14 +27,6 @@ const PAGINATION = {
   RETRY_DELAY: 100, // 重试延迟(ms)
 } as const;
 
-/**
- * 触摸手势配置
- */
-const TOUCH_GESTURE = {
-  MIN_DRAG_DISTANCE: 50,   // 最小拖动距离
-  CLOSE_THRESHOLD: 100,    // 关闭抽屉阈值
-  TRANSFORM_THRESHOLD: 200, // 变换阈值
-} as const;
 
 /**
  * iframe 沙箱配置
@@ -61,11 +54,6 @@ interface LayoutState {
   // 移动端抽屉状态
   drawerOpen: boolean;
   drawerMode: 'publications' | 'issues';
-  
-  // 触摸手势状态
-  touchStartY: number;
-  touchCurrentY: number;
-  isDragging: boolean;
 }
 
 /**
@@ -100,9 +88,6 @@ type LayoutAction =
   | { type: 'SET_MANIFEST_URL'; payload: string }
   | { type: 'SET_DRAWER_OPEN'; payload: boolean }
   | { type: 'SET_DRAWER_MODE'; payload: 'publications' | 'issues' }
-  | { type: 'SET_TOUCH_START_Y'; payload: number }
-  | { type: 'SET_TOUCH_CURRENT_Y'; payload: number }
-  | { type: 'SET_IS_DRAGGING'; payload: boolean }
   | { type: 'RESET_LAYOUT_STATE' };
 
 /**
@@ -137,9 +122,6 @@ const initialLayoutState: LayoutState = {
   manifestUrl: '',
   drawerOpen: false,
   drawerMode: 'publications',
-  touchStartY: 0,
-  touchCurrentY: 0,
-  isDragging: false,
 };
 
 /**
@@ -175,12 +157,6 @@ const layoutReducer = (state: LayoutState, action: LayoutAction): LayoutState =>
       return { ...state, drawerOpen: action.payload };
     case 'SET_DRAWER_MODE':
       return { ...state, drawerMode: action.payload };
-    case 'SET_TOUCH_START_Y':
-      return { ...state, touchStartY: action.payload };
-    case 'SET_TOUCH_CURRENT_Y':
-      return { ...state, touchCurrentY: action.payload };
-    case 'SET_IS_DRAGGING':
-      return { ...state, isDragging: action.payload };
     case 'RESET_LAYOUT_STATE':
       return { ...initialLayoutState };
     default:
@@ -872,12 +848,6 @@ const createLayoutActions = (dispatch: React.Dispatch<LayoutAction>) => ({
     dispatch({ type: 'SET_DRAWER_OPEN', payload: open }),
   setDrawerMode: (mode: 'publications' | 'issues') => 
     dispatch({ type: 'SET_DRAWER_MODE', payload: mode }),
-  setTouchStartY: (y: number) => 
-    dispatch({ type: 'SET_TOUCH_START_Y', payload: y }),
-  setTouchCurrentY: (y: number) => 
-    dispatch({ type: 'SET_TOUCH_CURRENT_Y', payload: y }),
-  setIsDragging: (dragging: boolean) => 
-    dispatch({ type: 'SET_IS_DRAGGING', payload: dragging }),
   resetLayoutState: () => 
     dispatch({ type: 'RESET_LAYOUT_STATE' }),
 });
@@ -950,8 +920,12 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
   // 合并状态和操作以保持向后兼容性
   const state = useMemo(() => ({
     ...layoutState,
-    ...dataState
-  }), [layoutState, dataState]);
+    ...dataState,
+    // 添加触摸手势状态
+    touchStartY,
+    touchCurrentY,
+    isDragging,
+  }), [layoutState, dataState, touchStartY, touchCurrentY, isDragging]);
   
   const actions = useMemo(() => ({
     ...layoutActions,
@@ -963,6 +937,21 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
   const selectedPublicationRef = useRef<string | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
+  
+  // 触摸手势处理
+  const {
+    touchStartY,
+    touchCurrentY,
+    isDragging,
+    handleTouchStart,
+    handleTouchMove,
+    handleTouchEnd,
+  } = useTouchDrawer({
+    isMobile: state.isMobile,
+    drawerOpen: state.drawerOpen,
+    onDrawerOpen: layoutActions.setDrawerOpen,
+    drawerRef,
+  });
   
   // ====================
   // 副作用和事件监听
@@ -1267,68 +1256,7 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
     loadMoreIssues();
   }, [loadMoreIssues, actions]);
 
-  // ====================
-  // 触摸手势处理
-  // ====================
   
-  /**
-   * 触摸开始
-   */
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    if (!state.isMobile) return;
-    actions.setTouchStartY(e.touches[0].clientY);
-    actions.setTouchCurrentY(e.touches[0].clientY);
-    actions.setIsDragging(true);
-  }, [state.isMobile, actions]);
-
-  /**
-   * 触摸移动
-   */
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!state.isMobile || !state.isDragging) return;
-    
-    const currentY = e.touches[0].clientY;
-    actions.setTouchCurrentY(currentY);
-    
-    const deltaY = currentY - state.touchStartY;
-    const drawer = drawerRef.current;
-    
-    if (drawer) {
-      if (state.drawerOpen && deltaY > 0) {
-        // 向下滑动关闭抽屉
-        const progress = Math.min(deltaY / TOUCH_GESTURE.TRANSFORM_THRESHOLD, 1);
-        drawer.style.transform = `translateY(${progress * 100}%)`;
-      } else if (!state.drawerOpen && deltaY < -TOUCH_GESTURE.MIN_DRAG_DISTANCE) {
-        // 向上滑动打开抽屉
-        actions.setDrawerOpen(true);
-      }
-    }
-  }, [state.isMobile, state.isDragging, state.touchStartY, state.drawerOpen, actions]);
-
-  /**
-   * 触摸结束
-   */
-  const handleTouchEnd = useCallback(() => {
-    if (!state.isMobile || !state.isDragging) return;
-    
-    const deltaY = state.touchCurrentY - state.touchStartY;
-    const drawer = drawerRef.current;
-    
-    if (drawer) {
-      if (state.drawerOpen && deltaY > TOUCH_GESTURE.CLOSE_THRESHOLD) {
-        // 滑动距离足够，关闭抽屉
-        actions.setDrawerOpen(false);
-      }
-      
-      // 重置位置
-      drawer.style.transform = '';
-    }
-    
-    actions.setIsDragging(false);
-    actions.setTouchStartY(0);
-    actions.setTouchCurrentY(0);
-  }, [state.isMobile, state.isDragging, state.touchStartY, state.touchCurrentY, state.drawerOpen, actions]);
-
   // ====================
   // 面包屑导航处理
   // ====================
