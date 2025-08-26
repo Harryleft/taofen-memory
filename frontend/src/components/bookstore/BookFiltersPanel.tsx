@@ -157,7 +157,7 @@ const BookFiltersPanel: React.FC<BookstoreFiltersProps> = ({
       </div>
 
       <button
-        onClick={() => navigate('/newspaper')}
+        onClick={() => navigate('/newspapers')}
         className={`bookstore-download-button ${activeTab === 'newspapers' ? 'bg-blue-100 text-blue-700 border-blue-300' : ''}`}
         title="查看数字报刊"
       >
