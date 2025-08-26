@@ -284,7 +284,7 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
   // ====================
   
   const [state, dispatch] = useReducer(newspapersReducer, initialState);
-  const actions = createActions(dispatch);
+  const actions = useMemo(() => createActions(dispatch), [dispatch]);
   
   // 引用
   const issuesCacheRef = useRef<Map<number, IssueItem[]>>(new Map());
@@ -371,6 +371,42 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
       iframeRef.current.src = iframeSrc;
     }
   }, [state.manifestUrl, state.loading]);
+
+  /**
+   * 加载查看器
+   */
+  const loadViewer = useCallback(async (issue: IssueItem) => {
+    try {
+      console.log('🔍 [DEBUG] 开始加载查看器:');
+      console.log('🔍 [DEBUG] Issue:', issue);
+      console.log('🔍 [DEBUG] issue.manifest:', issue.manifest);
+      
+      // Linus式设计：直接使用issue.manifest，它已经是完整的manifest URL
+      const fullManifestUrl = issue.manifest;
+      console.log('🔍 [DEBUG] 完整manifest URL:', fullManifestUrl);
+      
+      // 使用简化的代理处理
+      const proxyManifestUrl = NewspaperService.getProxyUrl(fullManifestUrl);
+      console.log('🔍 [DEBUG] 代理manifest URL:', proxyManifestUrl);
+      
+      actions.setManifestUrl(proxyManifestUrl);
+      
+      // 验证manifest是否可访问
+      console.log('🔍 [DEBUG] 开始验证manifest可访问性...');
+      const response = await fetch(proxyManifestUrl);
+      console.log('🔍 [DEBUG] HTTP响应状态:', response.status);
+      
+      if (!response.ok) {
+        console.error('🔍 [DEBUG] Manifest加载失败:', response.status, response.statusText);
+        throw new Error(`Manifest加载失败: ${response.status} ${response.statusText}`);
+      }
+      
+      console.log('🔍 [DEBUG] Manifest加载成功!');
+    } catch (err) {
+      console.error('🔍 [DEBUG] Viewer load error:', err);
+      actions.setError(err instanceof Error ? err.message : '查看器加载失败');
+    }
+  }, [actions]);
 
   /**
    * 选择期数
@@ -558,42 +594,6 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
     actions.setIssuesError(null);
     loadMoreIssues();
   }, [loadMoreIssues, actions]);
-
-  /**
-   * 加载查看器
-   */
-  const loadViewer = useCallback(async (issue: IssueItem) => {
-    try {
-      console.log('🔍 [DEBUG] 开始加载查看器:');
-      console.log('🔍 [DEBUG] Issue:', issue);
-      console.log('🔍 [DEBUG] issue.manifest:', issue.manifest);
-      
-      // Linus式设计：直接使用issue.manifest，它已经是完整的manifest URL
-      const fullManifestUrl = issue.manifest;
-      console.log('🔍 [DEBUG] 完整manifest URL:', fullManifestUrl);
-      
-      // 使用简化的代理处理
-      const proxyManifestUrl = NewspaperService.getProxyUrl(fullManifestUrl);
-      console.log('🔍 [DEBUG] 代理manifest URL:', proxyManifestUrl);
-      
-      actions.setManifestUrl(proxyManifestUrl);
-      
-      // 验证manifest是否可访问
-      console.log('🔍 [DEBUG] 开始验证manifest可访问性...');
-      const response = await fetch(proxyManifestUrl);
-      console.log('🔍 [DEBUG] HTTP响应状态:', response.status);
-      
-      if (!response.ok) {
-        console.error('🔍 [DEBUG] Manifest加载失败:', response.status, response.statusText);
-        throw new Error(`Manifest加载失败: ${response.status} ${response.statusText}`);
-      }
-      
-      console.log('🔍 [DEBUG] Manifest加载成功!');
-    } catch (err) {
-      console.error('🔍 [DEBUG] Viewer load error:', err);
-      actions.setError(err instanceof Error ? err.message : '查看器加载失败');
-    }
-  }, [actions]);
 
   // ====================
   // 触摸手势处理
