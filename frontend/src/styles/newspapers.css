@@ -2955,6 +2955,59 @@ div#uv > div.loaded > div.uv-iiif-extension-host .options {
 }
 
 /* ================================================
+   报刊数据匹配状态样式
+   ================================================ */
+
+/* 数据匹配加载状态 */
+.newspapers-loading-matching {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  text-align: center;
+  color: #64748b;
+}
+
+.newspapers-loading-matching p {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  opacity: 0.8;
+}
+
+/* 无匹配数据状态 */
+.newspapers-no-matches {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  text-align: center;
+  color: #64748b;
+  background: #f8fafc;
+  border-radius: 0.75rem;
+  border: 2px dashed #cbd5e1;
+  margin: 1rem 0;
+}
+
+.newspapers-no-matches__icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.6;
+}
+
+.newspapers-no-matches p {
+  margin: 0.5rem 0;
+  font-size: 0.875rem;
+}
+
+.newspapers-no-matches__hint {
+  font-size: 0.75rem !important;
+  opacity: 0.6;
+  font-style: italic;
+}
+
+/* ================================================
    简化的报刊列表布局
    ================================================ */
 
