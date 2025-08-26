@@ -12,6 +12,9 @@ export { NewspapersIntegratedLayout } from './NewspapersIntegratedLayout';
 export { NewspapersLayout } from './NewspapersLayout';
 export { SimpleNewspaperCard } from './SimpleNewspaperCard';
 export { SimpleNewspaperGridDemo } from './SimpleNewspaperGridDemo';
+export { VerticalNewspaperCard } from './VerticalNewspaperCard';
+export { NewspapersGuideArea } from './NewspapersGuideArea';
+export { VerticalLayoutDemo } from './VerticalLayoutDemo';
 
 // ==================== 类型定义 ====================
 export type { 
@@ -55,6 +58,9 @@ export default {
   NewspapersLayout,
   SimpleNewspaperCard,
   SimpleNewspaperGridDemo,
+  VerticalNewspaperCard,
+  NewspapersGuideArea,
+  VerticalLayoutDemo,
   NewspaperService,
   isValidPublicationId,
   isValidIssueId
