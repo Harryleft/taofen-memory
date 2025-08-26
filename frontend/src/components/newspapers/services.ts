@@ -1,4 +1,4 @@
-import { IIIFManifest } from './iiifTypes';
+import { IIIFManifest } from './utils/iiifTypes.ts';
 
 // 简化的代理函数 - 消除特殊情况
 async function fetchWithProxy(url: string): Promise<Response> {

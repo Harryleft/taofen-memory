@@ -10,11 +10,8 @@
 // ==================== 主要组件 ====================
 export { NewspapersIntegratedLayout } from './NewspapersIntegratedLayout';
 export { NewspapersLayout } from './NewspapersLayout';
-export { SimpleNewspaperCard } from './SimpleNewspaperCard';
-export { SimpleNewspaperGridDemo } from './SimpleNewspaperGridDemo';
 export { VerticalNewspaperCard } from './VerticalNewspaperCard';
 export { NewspapersGuideArea } from './NewspapersGuideArea';
-export { VerticalLayoutDemo } from './VerticalLayoutDemo';
 export { GuideState } from './GuideState';
 export { EmptyState } from './EmptyState';
 export { WelcomeState } from './WelcomeState';
@@ -29,7 +26,7 @@ export type {
   IIIFImage,
   IIIFResource,
   IIIFService
-} from './iiifTypes';
+} from './utils/iiifTypes.ts';
 
 export type { PublicationItem, IssueItem } from './services';
 
@@ -40,34 +37,3 @@ export { NewspaperService } from './services';
 export const NEWSPAPERS_MODULE_NAME = '数字报刊模块';
 export const NEWSPAPERS_VERSION = '3.0.0';
 
-// ==================== 工具函数 ====================
-/**
- * 检查是否为有效的刊物ID
- */
-export function isValidPublicationId(id: string): boolean {
-  return typeof id === 'string' && id.length > 0 && id !== 'null' && id !== 'undefined';
-}
-
-/**
- * 检查是否为有效的期数ID
- */
-export function isValidIssueId(id: string): boolean {
-  return typeof id === 'string' && id.length > 0 && id !== 'null' && id !== 'undefined';
-}
-
-// ==================== 默认导出 ====================
-export default {
-  NewspapersIntegratedLayout,
-  NewspapersLayout,
-  SimpleNewspaperCard,
-  SimpleNewspaperGridDemo,
-  VerticalNewspaperCard,
-  NewspapersGuideArea,
-  EmptyState,
-  GuideState,
-  WelcomeState,
-  VerticalLayoutDemo,
-  NewspaperService,
-  isValidPublicationId,
-  isValidIssueId
-};
