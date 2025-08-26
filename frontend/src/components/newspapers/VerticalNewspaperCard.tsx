@@ -52,7 +52,18 @@ export const VerticalNewspaperCard: React.FC<VerticalNewspaperCardProps> = ({
     >
       {/* 封面图片 */}
       <div className="vertical-newspaper-card__image">
-        <div className="vertical-newspaper-card__image-placeholder">
+        {publication.image ? (
+          <img 
+            src={`/${publication.image}`}
+            alt={publication.title}
+            className="vertical-newspaper-card__image-img"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+              e.currentTarget.nextElementSibling?.style.display = 'flex';
+            }}
+          />
+        ) : null}
+        <div className="vertical-newspaper-card__image-placeholder" style={{display: publication.image ? 'none' : 'flex'}}>
           <span className="vertical-newspaper-card__image-icon">📰</span>
         </div>
       </div>
