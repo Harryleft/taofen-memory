@@ -4,8 +4,6 @@ import { InfiniteScrollIssueList } from './InfiniteScrollIssueList';
 import { NewspapersBreadcrumb } from './NewspapersBreadcrumb';
 import AppHeader from '@/components/layout/header/AppHeader.tsx';
 import NewspapersLayout from './NewspapersLayout.tsx';
-import { NewspapersHeroCard } from './NewspapersHeroCard.tsx';
-import { headerConfigs } from '@/constants/header.configs.tsx';
 
 interface NewspapersIntegratedLayoutProps {
   onPublicationSelect?: (publicationId: string, publicationTitle: string) => void;
@@ -550,12 +548,24 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
         
         {/* 主要内容区域 */}
         {!selectedPublication ? (
-          // 未选择刊物时的Hero卡片
-          <NewspapersHeroCard 
-            config={headerConfigs.newspapers}
-            onMobileDrawerOpen={() => setDrawerOpen(true)}
-            isMobile={isMobile}
-          />
+          // 未选择刊物时的引导界面
+          <div className="newspapers-welcome">
+            <div className="newspapers-welcome__content">
+              <div className="newspapers-welcome__icon">📰</div>
+              <h2 className="newspapers-welcome__title">欢迎使用数字报刊</h2>
+              <p className="newspapers-welcome__message">
+                请从左侧选择一个刊物开始浏览
+              </p>
+              {isMobile && (
+                <button
+                  onClick={() => setDrawerOpen(true)}
+                  className="btn-newspapers"
+                >
+                  选择刊物
+                </button>
+              )}
+            </div>
+          </div>
         ) : (
           // 选择刊物后的查看器区域
           <div className="newspapers-viewer-container">
