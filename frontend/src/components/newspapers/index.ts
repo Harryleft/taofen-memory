@@ -9,6 +9,9 @@
 
 // ==================== 主要组件 ====================
 export { NewspapersIntegratedLayout } from './NewspapersIntegratedLayout';
+export { NewspapersLayout } from './NewspapersLayout';
+export { SimpleNewspaperCard } from './SimpleNewspaperCard';
+export { SimpleNewspaperGridDemo } from './SimpleNewspaperGridDemo';
 
 // ==================== 类型定义 ====================
 export type { 
@@ -49,6 +52,9 @@ export function isValidIssueId(id: string): boolean {
 // ==================== 默认导出 ====================
 export default {
   NewspapersIntegratedLayout,
+  NewspapersLayout,
+  SimpleNewspaperCard,
+  SimpleNewspaperGridDemo,
   NewspaperService,
   isValidPublicationId,
   isValidIssueId

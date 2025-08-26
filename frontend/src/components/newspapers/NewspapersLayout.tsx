@@ -2,7 +2,7 @@ import React from 'react';
 import AppHeader from '@/components/layout/header/AppHeader.tsx';
 import NewspapersBreadcrumb from './NewspapersBreadcrumb.tsx';
 import { IssueItem, PublicationItem } from './services';
-import { PublicationCard } from './PublicationCard.tsx';
+import { SimpleNewspaperCard } from './SimpleNewspaperCard.tsx';
 
 interface NewspapersLayoutProps {
   children: React.ReactNode;
@@ -99,15 +99,15 @@ export const NewspapersLayout: React.FC<NewspapersLayoutProps> = ({
         </div>
       );
     } else {
-      // 显示刊物列表 - 使用卡片网格布局
+      // 显示刊物列表 - 使用简洁的3列网格布局
       return (
         <div className="newspapers-sidebar__content">
           <div className="newspapers-sidebar__header">
             <h2 className="newspapers-sidebar__title">报刊列表</h2>
           </div>
-          <div className="newspapers-publication-grid">
+          <div className="newspapers-simple-grid">
             {publications.map((publication) => (
-              <PublicationCard
+              <SimpleNewspaperCard
                 key={publication.id}
                 publication={publication}
                 isSelected={selectedPublication?.id === publication.id}
