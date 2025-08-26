@@ -106,7 +106,11 @@
       "mcp__playwright__playwright_navigate",
       "Bash(npx playwright install:*)",
       "WebFetch(domain:stackoverflow.com)",
-      "WebFetch(domain:www.howtogeek.com)"
+      "WebFetch(domain:www.howtogeek.com)",
+      "mcp__puppeteer__puppeteer_connect_active_tab",
+      "Bash(npx puppeteer browsers install chrome:*)",
+      "Bash(start:*)",
+      "Bash(identify:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",
