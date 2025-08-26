@@ -54,7 +54,7 @@ export const NewspapersHeroCard: React.FC<NewspapersHeroCardProps> = ({
               className="newspapers-hero-card__button"
             >
               <span className="newspapers-hero-card__button-icon">📰</span>
-              <span>浏览报刊</span>
+              <span>选择刊物开始浏览</span>
             </button>
           ) : (
             <div className="newspapers-hero-card__instruction">

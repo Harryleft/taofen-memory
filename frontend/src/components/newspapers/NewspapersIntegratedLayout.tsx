@@ -4,6 +4,8 @@ import { InfiniteScrollIssueList } from './InfiniteScrollIssueList';
 import { NewspapersBreadcrumb } from './NewspapersBreadcrumb';
 import AppHeader from '@/components/layout/header/AppHeader.tsx';
 import NewspapersLayout from './NewspapersLayout.tsx';
+import { EmptyState } from './EmptyState';
+import { GuideTip } from './GuideTip';
 
 interface NewspapersIntegratedLayoutProps {
   onPublicationSelect?: (publicationId: string, publicationTitle: string) => void;
@@ -549,23 +551,25 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
         {/* 主要内容区域 */}
         {!selectedPublication ? (
           // 未选择刊物时的引导界面
-          <div className="newspapers-welcome">
-            <div className="newspapers-welcome__content">
+          <EmptyState
+            icon={
               <div className="newspapers-welcome__icon">📰</div>
-              <h2 className="newspapers-welcome__title">欢迎使用数字报刊</h2>
-              <p className="newspapers-welcome__message">
-                请从左侧选择一个刊物开始浏览
-              </p>
-              {isMobile && (
-                <button
-                  onClick={() => setDrawerOpen(true)}
-                  className="btn-newspapers"
-                >
-                  选择刊物
-                </button>
-              )}
-            </div>
-          </div>
+            }
+            title="欢迎使用数字报刊"
+            message="请从左侧选择一个刊物开始浏览"
+            action={
+              isMobile && (
+                <GuideTip message="向上滑动打开刊物列表" position="bottom">
+                  <button
+                    onClick={() => setDrawerOpen(true)}
+                    className="btn-newspapers"
+                  >
+                    选择刊物
+                  </button>
+                </GuideTip>
+              )
+            }
+          />
         ) : (
           // 选择刊物后的查看器区域
           <div className="newspapers-viewer-container">
@@ -579,17 +583,14 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
             )}
             
             {!selectedIssue ? (
-              <div className="newspapers-viewer-placeholder">
-                <div className="newspapers-viewer-placeholder__content">
+              <EmptyState
+                icon={
                   <div className="newspapers-viewer-placeholder__icon">📖</div>
-                  <h3 className="newspapers-viewer-placeholder__title">
-                    选择期数开始阅读
-                  </h3>
-                  <p className="newspapers-viewer-placeholder__message">
-                    请从左侧选择一个期数开始阅读
-                  </p>
-                </div>
-              </div>
+                }
+                title="选择期数开始阅读"
+                message="请从左侧选择一个期数开始阅读"
+                className="newspapers-viewer-placeholder"
+              />
             ) : (
               <iframe
                 ref={iframeRef}
