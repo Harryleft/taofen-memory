@@ -2376,6 +2376,157 @@
 }
 
 /* ================================================
+   简洁报刊卡片样式 - 新界面1专用
+   ================================================ */
+
+/* 简洁卡片基础样式 */
+.simple-newspaper-card {
+  width: 240px;
+  height: 200px;
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.simple-newspaper-card:hover {
+  border-color: #8b5cf6;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.simple-newspaper-card--selected {
+  border-color: #8b5cf6;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(139, 92, 246, 0.1) 100%);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+
+.simple-newspaper-card:focus-visible {
+  outline: 2px solid #8b5cf6;
+  outline-offset: 2px;
+}
+
+/* 卡片内容区域 */
+.simple-newspaper-card__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.5rem;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* 报刊标题 */
+.simple-newspaper-card__title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+  text-align: center;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 查看本刊按钮 */
+.simple-newspaper-card__button {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  margin-top: 1rem;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+}
+
+.simple-newspaper-card__button:hover {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+.simple-newspaper-card__button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.5);
+}
+
+/* ================================================
+   简洁网格布局样式 - 3列网格
+   ================================================ */
+
+.newspapers-simple-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  padding: 1.5rem;
+  justify-content: center;
+  align-items: start;
+  max-width: 900px; /* 3 * 240px + 2 * 1.5rem + padding */
+  margin: 0 auto;
+}
+
+/* 确保网格容器在侧边栏中正确显示 */
+.newspapers-layout__sidebar .newspapers-simple-grid {
+  width: 100%;
+  padding: 1rem;
+  gap: 1rem;
+  max-width: none;
+}
+
+/* ================================================
+   响应式设计
+   ================================================ */
+
+/* 平板端 - 2列布局 */
+@media (max-width: 1024px) {
+  .newspapers-simple-grid {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 600px; /* 2 * 240px + 1 * 1.5rem + padding */
+    gap: 1rem;
+  }
+}
+
+/* 移动端 - 1列布局 */
+@media (max-width: 768px) {
+  .newspapers-simple-grid {
+    grid-template-columns: 1fr;
+    max-width: 300px; /* 240px + padding */
+    gap: 1rem;
+    padding: 1rem;
+  }
+  
+  .simple-newspaper-card {
+    width: 100%;
+    max-width: 240px;
+    margin: 0 auto;
+  }
+}
+
+/* 大屏幕优化 */
+@media (min-width: 1200px) {
+  .newspapers-simple-grid {
+    gap: 2rem;
+    padding: 2rem;
+  }
+}
+
+/* ================================================
    性能优化样式
    ================================================ */
 
