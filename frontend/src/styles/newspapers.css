@@ -646,7 +646,7 @@
    ================================================ */
 :root {
   /* 布局尺寸 - 基于内容需求而非美观 */
-  --newspapers-sidebar-width: 380px;
+  --newspapers-sidebar-width: 300px;
   --newspapers-sidebar-collapsed-width: 48px;
   --newspapers-header-height: 60px;
   --newspapers-issue-selector-height: 60px;
@@ -667,6 +667,8 @@
   /* 按钮颜色 */
   --newspapers-button-bg: #c49b61;
   --newspapers-button-hover: #b08a55;
+  --newspapers-button-text: white;
+  --newspapers-accent: #c49b61;
   
   /* 动画 - 快速且不引人注意 */
   --newspapers-transition-fast: 0.15s ease;
@@ -689,7 +691,7 @@
   grid-template-areas:
     "header header"
     "sidebar main";
-  grid-template-columns: 380px 1fr;
+  grid-template-columns: 300px 1fr;
   grid-template-rows: auto 1fr;
   height: 100vh;
   background: var(--newspapers-bg-primary);
@@ -1417,12 +1419,12 @@
 /* 平板端 - 调整尺寸 */
 @media (min-width: 769px) and (max-width: 1024px) {
   :root {
-    --newspapers-sidebar-width: 320px;
+    --newspapers-sidebar-width: 280px;
     --newspapers-min-content-width: 350px;
   }
   
   .newspapers-layout {
-    grid-template-columns: 320px 1fr;
+    grid-template-columns: 280px 1fr;
   }
 }
 
@@ -2665,7 +2667,7 @@
 
 /* 垂直卡片基础样式 */
 .vertical-newspaper-card {
-  width: 120px;
+  width: 240px;
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 0.5rem;
@@ -2697,7 +2699,7 @@
 /* 封面图片区域 */
 .vertical-newspaper-card__cover {
   width: 100%;
-  height: 160px;
+  height: 320px;
   background: var(--newspapers-bg-primary);
   display: flex;
   align-items: center;
@@ -2799,7 +2801,8 @@
   gap: 1rem;
   padding: 1rem;
   width: 100%;
-  max-width: 140px; /* 120px card + padding */
+  max-width: 280px; /* 适合300px侧边栏的宽度 */
+  margin: 0 auto;
 }
 
 /* 垂直列表项 */
@@ -2811,38 +2814,8 @@
 }
 
 /* ================================================
-   界面1左右分栏布局
+   简化的报刊列表布局
    ================================================ */
-
-/* 界面1容器 */
-.newspapers-interface1 {
-  display: flex;
-  height: 100%;
-  gap: 1rem;
-  padding: 1rem;
-}
-
-/* 左侧：报刊列表 */
-.newspapers-interface1__sidebar {
-  flex: 0 0 auto;
-  width: 140px;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-/* 右侧：引导区域 */
-.newspapers-interface1__guide {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--newspapers-bg-primary);
-  border-radius: 0.5rem;
-  border: 2px dashed var(--newspapers-border-color);
-  min-height: 500px;
-  padding: 2rem;
-}
 
 /* ================================================
    统一引导状态样式
@@ -3194,50 +3167,15 @@
 
 /* 移动端适配 */
 @media (max-width: 768px) {
-  .newspapers-interface1 {
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .newspapers-interface1__sidebar {
-    width: 100%;
-    flex-direction: row;
-    overflow-x: auto;
-    padding: 0.5rem;
-  }
-  
   .newspapers-vertical-list {
-    flex-direction: row;
-    gap: 0.75rem;
-    padding: 0.5rem;
-    max-width: none;
+    max-width: 240px;
   }
   
-  .newspapers-interface1__guide {
-    min-height: 200px;
+  .vertical-newspaper-card {
+    width: 200px;
   }
   
-  .newspapers-guide-content {
-    padding: 1rem;
-  }
-  
-  .newspapers-guide-content__icon {
-    font-size: 2rem;
-  }
-  
-  .newspapers-guide-content__title {
-    font-size: 1.25rem;
-  }
-  
-  .newspapers-guide-content__description {
-    font-size: 0.875rem;
-  }
-  
-  .newspapers-guide-content__steps {
-    padding: 1rem;
-  }
-  
-  .newspapers-guide-content__step {
-    margin-bottom: 0.75rem;
+  .vertical-newspaper-card__cover {
+    height: 280px;
   }
 }

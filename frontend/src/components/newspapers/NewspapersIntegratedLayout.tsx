@@ -582,10 +582,8 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
             )}
           </div>
         ) : (
-          // 未选择刊物时的空白状态
-          <div className="newspapers-empty-state">
-            {/* 右侧引导区域由 NewspapersLayout 始终显示 */}
-          </div>
+          // 未选择刊物时显示引导区域
+          <NewspapersGuideArea />
         )}
       </>
     );
