@@ -3,7 +3,7 @@ import { HeaderConfig, NavigationItem } from '@/components/layout/header/BaseHea
 // 统一导航菜单配置 - 所有页面使用相同的导航
 const NAVIGATION_ITEMS: NavigationItem[] = [
   { label: '岁月行履', to: '/timeline' },
-  { label: '时光书影', to: '/bookstore-timeline' },
+  { label: '时光书影', to: '/bookstore' },
   { label: '笔下风骨', to: '/handwriting' },
   { label: '同行群像', to: '/relationships' }
 ];

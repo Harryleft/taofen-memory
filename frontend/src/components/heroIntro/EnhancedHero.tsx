@@ -80,7 +80,7 @@ const MODULE_ITEMS: ModuleItem[] = [
     description: '在纸与铅字之间，重访生活书店的生长与担当',
     imageSrc: '/images/hero_page/shsdts.jpg',
     imageAlt: '生活书店',
-    path: '/bookstore-timeline'
+    path: '/bookstore'
   },
   {
     id: 2,
