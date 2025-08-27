@@ -324,6 +324,11 @@
       font-size: 0.875rem;
     }
 
+    /* 移动端增加图标与文字间距 */
+    .bookstore-year-button .lucide-calendar {
+      margin-right: 12px !important;
+    }
+
     .bookstore-newspaper-button {
       @apply py-2.5 px-4;
       min-height: 44px;
@@ -345,6 +350,11 @@
     .bookstore-year-button {
       @apply px-6;
       min-height: 42px;
+    }
+
+    /* 更小屏幕进一步增加图标与文字间距 */
+    .bookstore-year-button .lucide-calendar {
+      margin-right: 16px !important;
     }
 
     .bookstore-newspaper-button {
