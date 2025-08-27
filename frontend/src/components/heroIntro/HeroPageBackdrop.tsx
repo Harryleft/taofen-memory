@@ -2,13 +2,12 @@ import { useEffect, useMemo, useState, useRef, useCallback } from 'react';
 import { fetchHeroImages, type MasonryItem as BaseMasonryItem } from '@/services/heroImageService';
 import PerformanceMonitor, { measureAsyncPerformance } from '@/utils/performanceMonitor';
 import { StateBatcher } from '@/utils/StateBatcher';
-import { IntersectionObserverManager } from '@/utils/IntersectionObserverManager';
 import HeroBackdropErrorBoundary from './HeroBackdropErrorBoundary';
 import Column from './Column';
 
 // =============== 类型定义 ===============
 type MasonryItem = BaseMasonryItem & { 
-  calculatedHeight?: number;
+  calculatedHeight: number;
   // 使用预估宽高比或已测量的宽高比
   currentAspectRatio?: number;
 };
@@ -42,7 +41,7 @@ const CONFIG = {
   
   // 数据处理
   DATA: {
-    REPEAT_TIMES: 1,
+    REPEAT_TIMES: 1, // 保持为1以避免不必要的重复计算
     STABLE_SEED: 'hero-backdrop-v1',
   },
   
@@ -376,7 +375,6 @@ export default function HeroPageBackdrop() {
   const containerRef = useRef<HTMLDivElement>(null);
   const cleanupRef = useRef<(() => void) | null>(null);
   const aspectBatcher = useRef<StateBatcher<Record<number, number>> | null>(null);
-  const observerManager = useRef<IntersectionObserverManager | null>(null);
 
   // 初始化批量更新器
   useEffect(() => {
@@ -384,15 +382,6 @@ export default function HeroPageBackdrop() {
     
     return () => {
       aspectBatcher.current?.clear();
-    };
-  }, []);
-
-  // 初始化Observer管理器
-  useEffect(() => {
-    observerManager.current = new IntersectionObserverManager();
-    
-    return () => {
-      observerManager.current?.disconnect();
     };
   }, []);
 
@@ -420,27 +409,15 @@ export default function HeroPageBackdrop() {
         setIsDataLoaded(true);
         PerformanceMonitor.markEnd('hero-initial-data-load');
         
-        // 3. 数据加载完成后，在空闲时预加载图片
-        if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-          requestIdleCallback(() => {
-            PerformanceMonitor.markStart('hero-image-preload');
-            const cleanup = ImageProcessor.preloadImagesWithCleanup(items, handleAspectMeasured);
-            cleanupRef.current = () => {
-              cleanup();
-              PerformanceMonitor.markEnd('hero-image-preload');
-            };
-          }, { timeout: 2000 });
-        } else {
-          // 降级方案：使用短延迟
-          setTimeout(() => {
-            PerformanceMonitor.markStart('hero-image-preload-fallback');
-            const cleanup = ImageProcessor.preloadImagesWithCleanup(items, handleAspectMeasured);
-            cleanupRef.current = () => {
-              cleanup();
-              PerformanceMonitor.markEnd('hero-image-preload-fallback');
-            };
-          }, 500);
-        }
+        // 3. 数据加载完成后，立即开始预加载关键图片以减少布局跳动
+        setTimeout(() => {
+          PerformanceMonitor.markStart('hero-image-preload');
+          const cleanup = ImageProcessor.preloadImagesWithCleanup(items, handleAspectMeasured);
+          cleanupRef.current = () => {
+            cleanup();
+            PerformanceMonitor.markEnd('hero-image-preload');
+          };
+        }, 100); // 减少延迟时间，让布局更快稳定
       } catch (error) {
         console.error('[HeroBackdrop] Failed to load initial data:', error);
         setIsDataLoaded(true); // 即使出错也标记为已加载，显示错误状态
@@ -458,8 +435,26 @@ export default function HeroPageBackdrop() {
     };
   }, [handleAspectMeasured]);
 
-  // 构建素材池
+  // 响应窗口大小变化 - 更新布局配置
+  useEffect(() => {
+    const handleResize = Utils.debounce(() => {
+      PerformanceMonitor.markStart('hero-resize-layout-calculation');
+      const newConfig = LayoutCalculator.getLayoutConfig();
+      setLayoutConfig(newConfig);
+      PerformanceMonitor.markEnd('hero-resize-layout-calculation');
+    }, CONFIG.PERFORMANCE.DEBOUNCE_DELAY);
+
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  // 构建素材池 - 使用useMemo优化性能
   const weightedPool = useMemo(() => {
+    if (remoteItems.length === 0) return [];
+    
     PerformanceMonitor.markStart('hero-weighted-pool-build');
     const result = ImageProcessor.buildWeightedPool(remoteItems, aspectMap);
     PerformanceMonitor.markEnd('hero-weighted-pool-build');
@@ -467,15 +462,17 @@ export default function HeroPageBackdrop() {
   }, [remoteItems, aspectMap]);
 
   const repeatedItems = useMemo(() => {
+    if (weightedPool.length === 0) return [];
+    
     PerformanceMonitor.markStart('hero-repeated-items-build');
     const result = ImageProcessor.buildRepeatedItems(weightedPool, CONFIG.DATA.REPEAT_TIMES, CONFIG.DATA.STABLE_SEED);
     PerformanceMonitor.markEnd('hero-repeated-items-build');
     return result;
   }, [weightedPool]);
 
-  // 计算列布局
+  // 计算列布局 - 添加防抖和缓存机制
   const columnArrays = useMemo(() => {
-    if (!layoutConfig) return [];
+    if (!layoutConfig || repeatedItems.length === 0) return [];
     
     PerformanceMonitor.markStart('hero-masonry-layout');
     const result = MasonryLayouter.distributeItems(

@@ -26,13 +26,12 @@ const Column = React.memo(({
   return (
     <div className="flex-1 space-y-4">
       {column.map((item, itemIndex) => {
-        const itemWithHeight = item as MasonryItem & { calculatedHeight: number };
         const isVisible = itemIndex < visibleItemsPerColumn;
         
         return (
           <ImageItem
             key={`${item.id}-${columnIndex}-${itemIndex}`}
-            item={itemWithHeight}
+            item={item}
             columnIndex={columnIndex}
             itemIndex={itemIndex}
             isVisible={isVisible}
