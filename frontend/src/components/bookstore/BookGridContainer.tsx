@@ -42,23 +42,9 @@ const BookGridContainer: React.FC<BookGridProps> = ({
     useEffect(() => {
     const visibleSizeChanged = prevVisibleSizeRef.current !== visibleItems.size;
     if (visibleSizeChanged) {
-      logDebug('可见项目集合更新', {
-        visibleCount: visibleItems.size,
-        prevVisibleCount: prevVisibleSizeRef.current,
-        renderCount: renderCountRef.current
-      });
       prevVisibleSizeRef.current = visibleItems.size;
     }
   }, [visibleItems]);
-  
-  //【修改】简化渲染日志
-  if (DEBUG) {
-    console.log(`[BookGrid] 渲染网格`, { 
-      renderCount: renderCountRef.current,
-      columnCount: columnArrays.length,
-      visibleCount: visibleItems.size
-    });
-  }
 
   if (columnArrays.length === 0) {
     return (
