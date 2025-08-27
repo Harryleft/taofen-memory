@@ -8,13 +8,6 @@ import React, { useEffect, useRef } from 'react';
 import { BookItem } from '@/types/bookTypes';
 import BookCard from './BookCardContainer.tsx';
 
-// 调试开关
-const DEBUG = false;
-const logDebug = (message: string, data?: unknown) => {
-  if (DEBUG) {
-    console.log(`[BookGrid] ${message}`, data || '');
-  }
-};
 
 /**
  * @interface BookGridProps
@@ -46,8 +39,7 @@ const BookGridContainer: React.FC<BookGridProps> = ({
   const prevVisibleSizeRef = useRef(visibleItems.size);
   renderCountRef.current += 1;
   
-  //【修改】简化调试日志，移除 isRapidScrolling
-  useEffect(() => {
+    useEffect(() => {
     const visibleSizeChanged = prevVisibleSizeRef.current !== visibleItems.size;
     if (visibleSizeChanged) {
       logDebug('可见项目集合更新', {

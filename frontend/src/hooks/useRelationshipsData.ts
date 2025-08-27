@@ -215,16 +215,6 @@ export function useRelationshipsData() {
     const personData = data.data?.[0]?.data || data.persons || [];
     
     const result = (personData as Array<{ id: number; name: string; desc?: string; category?: string; pic?: string; img?: string; sources?: string[]; link?: string[] }>).map((rawPerson) => {
-      // 调试信息：记录原始数据和验证结果
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[transformLegacyToPersons] 原始数据:', {
-          id: rawPerson.id,
-          originalName: rawPerson.name,
-          originalCategory: rawPerson.category,
-          validatedName: validatePersonName(rawPerson.name),
-          validatedCategory: validatePersonCategory(rawPerson.category)
-        });
-      }
       
       return {
         id: rawPerson.id,

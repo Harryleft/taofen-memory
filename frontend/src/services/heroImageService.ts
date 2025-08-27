@@ -52,23 +52,15 @@ export async function fetchHeroImages(): Promise<MasonryItem[]> {
     return cachedHeroImages;
   }
 
-  const fetchStartTime = performance.now();
   const response = await fetch(HERO_IMAGES_JSON_PATH);
-  const fetchEndTime = performance.now();
   
   if (!response.ok) {
     throw new Error(`加载英雄区图片数据失败: ${response.status}`);
   }
   
-  const parseStartTime = performance.now();
   const data: HeroImageItem[] = await response.json();
-  const parseEndTime = performance.now();
   
-  // 记录API调用性能
-  console.log(`[HeroImageService] API调用耗时: ${fetchEndTime - fetchStartTime}ms`);
-  console.log(`[HeroImageService] JSON解析耗时: ${parseEndTime - parseStartTime}ms`);
-  console.log(`[HeroImageService] 总数据量: ${data.length} 条`);
-
+  
   const processedData = data.map((item) => {
     const { aspectRatio, category } = estimateImageAspect(item.filename);
     

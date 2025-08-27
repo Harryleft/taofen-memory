@@ -105,60 +105,6 @@ export const NewspapersLayout: React.FC<NewspapersLayoutProps> = ({
           });
         });
         
-        console.log('📰 [DEBUG] 本地数据数量:', localData.length);
-        console.log('📰 [DEBUG] 远程数据数量:', publications.length);
-        console.log('📰 [DEBUG] 匹配数据数量:', matchedNewspapers.length);
-        console.log('📰 [DEBUG] 匹配的报刊:', matchedNewspapers.map(n => n.title));
-        
-        // 输出未匹配的报刊信息
-        const unmatchedNewspapers = localData.filter(localNewspaper => 
-          !matchedNewspapers.some(matched => matched.title === localNewspaper.title)
-        );
-        console.log('📰 [DEBUG] 未匹配的报刊:', unmatchedNewspapers.map(n => n.title));
-        console.log('📰 [DEBUG] 远程报刊标题:', publications.map(p => p.title));
-        
-        // 输出详细的匹配过程信息
-        console.log('📰 [DEBUG] ===== 详细匹配过程 =====');
-        localData.forEach(localNewspaper => {
-          const cleanLocalTitle = localNewspaper.title
-            .replace(/[《》\s]/g, '')
-            .trim();
-          
-          const isMatched = publications.some(remotePub => {
-            const cleanRemoteTitle = remotePub.title
-              .replace(/[《》\s]/g, '')
-              .trim();
-            
-            if (cleanRemoteTitle === cleanLocalTitle) {
-              console.log(`📰 [DEBUG] 精确匹配: "${localNewspaper.title}" <-> "${remotePub.title}"`);
-              return true;
-            }
-            
-            const localKeywords = cleanLocalTitle.split(/[\u4e00-\u9fa5]+/).filter(k => k.length > 1);
-            const remoteKeywords = cleanRemoteTitle.split(/[\u4e00-\u9fa5]+/).filter(k => k.length > 1);
-            
-            const matchingKeywords = localKeywords.filter(keyword => 
-              remoteKeywords.some(remoteKeyword => 
-                remoteKeyword.includes(keyword) || keyword.includes(remoteKeyword)
-              )
-            );
-            
-            const shouldMatch = matchingKeywords.length >= 2 && 
-                              matchingKeywords.length === localKeywords.length && 
-                              matchingKeywords.length === remoteKeywords.length;
-            
-            if (shouldMatch) {
-              console.log(`📰 [DEBUG] 关键词匹配: "${localNewspaper.title}" <-> "${remotePub.title}" (匹配关键词: ${matchingKeywords.join(', ')})`);
-            }
-            
-            return shouldMatch;
-          });
-          
-          if (!isMatched) {
-            console.log(`📰 [DEBUG] 未匹配: "${localNewspaper.title}" (清理后: "${cleanLocalTitle}")`);
-          }
-        });
-        
         setLocalNewspapers(matchedNewspapers);
       } catch (error) {
         console.error('加载本地报纸数据失败:', error);

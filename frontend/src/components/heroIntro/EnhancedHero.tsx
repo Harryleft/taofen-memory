@@ -253,7 +253,7 @@ export default function EnhancedHero() {
             >
               邹韬奋
             </h1>
-            <div className="mt-8 flex justify-center">
+            <div className="mt-4 flex justify-center">
               <div className="w-32 h-1 bg-gradient-to-r from-black/80 to-black/60 rounded-full shadow-lg" />
             </div>
           </div>

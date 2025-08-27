@@ -39,7 +39,6 @@ class AIService {
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error('AI解读请求失败:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : '网络请求失败'

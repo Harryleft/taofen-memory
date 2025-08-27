@@ -110,7 +110,8 @@
       "mcp__puppeteer__puppeteer_connect_active_tab",
       "Bash(npx puppeteer browsers install chrome:*)",
       "Bash(start:*)",
-      "Bash(identify:*)"
+      "Bash(identify:*)",
+      "Read(/C:\\Users\\afkxw\\Documents\\WindowsPowerShell/**)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",

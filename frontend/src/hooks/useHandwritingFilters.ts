@@ -138,7 +138,6 @@ export const useHandwritingFilters = (
       // 尝试从缓存获取
       const cached = await cacheManager.get<number[] | string[]>(cacheKey);
       if (cached) {
-        console.log(`✅ Metadata cache hit: ${type}`);
         return cached;
       }
 
@@ -150,11 +149,9 @@ export const useHandwritingFilters = (
         ttl: 60 * 60 * 1000,
         level: 'both',
       });
-      console.log(`❌ Metadata cache miss, cached result: ${type}`);
 
       return result;
-    } catch (error) {
-      console.warn('Metadata cache operation failed, computing directly:', error);
+    } catch {
       return computeMetadata(type, items);
     }
   }, [cacheManager, cacheEnabled, computeMetadata]);

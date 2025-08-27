@@ -167,13 +167,10 @@ export const useHandwritingData = () => {
       // 尝试从缓存获取转换后的数据
       const cachedData = await cacheManager.getTransformedData();
       if (cachedData) {
-        console.log('✅ Cache hit: Loaded transformed data from cache');
         setHandwritingItems(cachedData);
         setLoading(false);
         return;
       }
-
-      console.log('❌ Cache miss: Fetching data from API');
       
       // 从API获取原始数据
       const rawData = await fetchHandwritingData();
@@ -188,9 +185,8 @@ export const useHandwritingData = () => {
       await cacheManager.setTransformedData(transformedData);
       
       setHandwritingItems(transformedData);
-    } catch (err) {
+    } catch {
       // 缓存失败时回退到无缓存模式
-      console.warn('Cache loading failed, falling back to direct API call:', err);
       await loadDataWithoutCache();
     } finally {
       setLoading(false);
@@ -202,7 +198,6 @@ export const useHandwritingData = () => {
     if (cacheManager) {
       // 清理相关缓存
       await cacheManager.clearDataCache();
-      console.log('🗑️ Cache cleared for data refresh');
     }
     await loadData();
   }, [loadData, cacheManager]);
@@ -212,7 +207,6 @@ export const useHandwritingData = () => {
     if (cacheManager) {
       // 清理所有手稿相关缓存
       await cacheManager.clearHandwritingCache();
-      console.log('🔄 Force refresh: All cache cleared');
     }
     await loadData();
   }, [loadData, cacheManager]);
