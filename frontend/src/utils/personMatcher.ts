@@ -1,5 +1,23 @@
 import { Person } from '@/types/Person';
 
+// 新结构的节点类型
+interface NewStructureNode {
+  id: number;
+  name: string;
+  category: string;
+  image_url?: string;
+  description?: string;
+  sources?: string[];
+  links?: string[];
+}
+
+interface NewStructureData {
+  meta?: {
+    centerId?: number;
+  };
+  nodes?: NewStructureNode[];
+}
+
 /**
  * 计算两个字符串之间的Levenshtein距离
  * @param str1 第一个字符串
@@ -74,7 +92,7 @@ export class PersonMatcher {
         let centerId: number = 499;
 
         if (json && typeof json === 'object') {
-          const maybeNew = json as { meta?: { centerId?: number }, nodes?: Array<any> };
+          const maybeNew = json as NewStructureData;
           if (Array.isArray(maybeNew.nodes)) {
             // 新结构不直接适配为 Person，这里仅用于 matcher，简单映射基础字段
             centerId = maybeNew.meta?.centerId ?? 499;

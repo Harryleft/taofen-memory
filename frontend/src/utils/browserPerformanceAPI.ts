@@ -10,6 +10,38 @@ export interface CoreWebVitals {
   tti: number; // Time to Interactive
 }
 
+// 性能条目类型扩展
+interface LayoutShiftEntry extends PerformanceEntry {
+  value: number;
+  hadRecentInput: boolean;
+}
+
+interface FirstInputEntry extends PerformanceEntry {
+  processingStart: number;
+  startTime: number;
+}
+
+interface MemoryInfo {
+  usedJSHeapSize: number;
+  totalJSHeapSize: number;
+  jsHeapSizeLimit: number;
+}
+
+interface NetworkInfo {
+  effectiveType: string;
+  downlink: number;
+  rtt: number;
+  saveData: boolean;
+}
+
+interface ExtendedPerformance extends Performance {
+  memory?: MemoryInfo;
+}
+
+interface ExtendedNavigator extends Navigator {
+  connection?: NetworkInfo;
+}
+
 export interface ResourceTiming {
   name: string;
   startTime: number;
@@ -143,7 +175,7 @@ class BrowserPerformanceAPI {
         let clsValue = 0;
         list.getEntries().forEach((entry) => {
           if (!entry.hadRecentInput) {
-            clsValue += (entry as any).value;
+            clsValue += (entry as LayoutShiftEntry).value;
           }
         });
         this.customMetrics.cls = clsValue;
@@ -159,9 +191,9 @@ class BrowserPerformanceAPI {
     try {
       const observer = new PerformanceObserver((list) => {
         const entries = list.getEntries();
-        const fidEntry = entries[0];
+        const fidEntry = entries[0] as FirstInputEntry;
         if (fidEntry) {
-          this.customMetrics.fid = (fidEntry as any).processingStart - fidEntry.startTime;
+          this.customMetrics.fid = fidEntry.processingStart - fidEntry.startTime;
         }
       });
       observer.observe({ entryTypes: ['first-input'] });
@@ -177,17 +209,18 @@ class BrowserPerformanceAPI {
         const entries = list.getEntries();
         entries.forEach((entry) => {
           if (entry.entryType === 'resource') {
+            const resourceEntry = entry as PerformanceResourceTiming;
             this.resourceTimings.push({
               name: entry.name,
               startTime: entry.startTime,
               duration: entry.duration,
-              transferSize: (entry as PerformanceResourceTiming).transferSize,
-              encodedBodySize: (entry as PerformanceResourceTiming).encodedBodySize,
-              decodedBodySize: (entry as PerformanceResourceTiming).decodedBodySize,
-              initiatorType: (entry as PerformanceResourceTiming).initiatorType,
-              nextHopProtocol: (entry as PerformanceResourceTiming).nextHopProtocol,
-              responseStart: (entry as PerformanceResourceTiming).responseStart,
-              responseEnd: (entry as PerformanceResourceTiming).responseEnd,
+              transferSize: resourceEntry.transferSize,
+              encodedBodySize: resourceEntry.encodedBodySize,
+              decodedBodySize: resourceEntry.decodedBodySize,
+              initiatorType: resourceEntry.initiatorType,
+              nextHopProtocol: resourceEntry.nextHopProtocol,
+              responseStart: resourceEntry.responseStart,
+              responseEnd: resourceEntry.responseEnd,
             });
           }
         });
@@ -245,7 +278,7 @@ class BrowserPerformanceAPI {
   }
 
   private collectMemoryInfo(): void {
-    const perf = performance as any;
+    const perf = performance as ExtendedPerformance;
     if (perf.memory) {
       this.customMetrics.usedJSHeapSize = perf.memory.usedJSHeapSize;
       this.customMetrics.totalJSHeapSize = perf.memory.totalJSHeapSize;
@@ -254,7 +287,7 @@ class BrowserPerformanceAPI {
   }
 
   private collectNetworkInfo(): void {
-    const nav = navigator as any;
+    const nav = navigator as ExtendedNavigator;
     if (nav.connection) {
       this.customMetrics.effectiveType = nav.connection.effectiveType;
       this.customMetrics.downlink = nav.connection.downlink;
@@ -438,8 +471,6 @@ export function measurePageLoadPerformance(): Promise<PerformanceData> {
 }
 
 export function startPerformanceMonitoring(): () => void {
-  const instance = BrowserPerformanceAPI.getInstance();
-  
   // 定期收集性能数据
   const interval = setInterval(() => {
     const data = BrowserPerformanceAPI.getPerformanceData();

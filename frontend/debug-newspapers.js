@@ -44,7 +44,7 @@ async function debugGetPublications() {
           id: collectionId,
           collection: it.id,
           title: (it.label?.zh?.[0]) || (it.label?.['zh-CN']?.[0]) || (it.label?.en?.[0]) || '未知刊物',
-          name: (it.label?.zh?.[0]) || (it.label?.['zh-CN']?.0]) || (it.label?.en?.[0]) || '未知刊物',
+          name: (it.label?.zh?.[0]) || (it.label?.['zh-CN']?.[0]) || (it.label?.en?.[0]) || '未知刊物',
           issueCount: 0,
           lastUpdated: null
         };

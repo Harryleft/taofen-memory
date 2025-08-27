@@ -43,7 +43,7 @@ export class TestDataGenerator {
     };
   }
 
-  static generateNetworkDelayResponse(data: any, delay: number = 1000) {
+  static generateNetworkDelayResponse(data: unknown, delay: number = 1000) {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve({
