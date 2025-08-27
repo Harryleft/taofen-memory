@@ -338,27 +338,27 @@ export default function EnhancedHero() {
       >
         <div className="flex items-center justify-center animate-bounce">
           <svg className="w-8 h-8" fill="none" stroke="var(--global-accent-secondary)" viewBox="0 0 24 24" aria-hidden="true">
-            <!-- 第三层 (最远) -->
+            {/* 第三层 (最远) */}
             <polyline points="6,9 12,15 18,9" 
-                      stroke-width="2.5" 
-                      stroke-linecap="round" 
-                      stroke-linejoin="round"
+                      strokeWidth="2.5" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
                       opacity="0.4"
-                      transform="translate(0, 4)"/>
+                      transform="translate(0, 16)"/>
             
-            <!-- 第二层 (中间) -->
+            {/* 第二层 (中间) */}
             <polyline points="6,9 12,15 18,9" 
-                      stroke-width="2.5" 
-                      stroke-linecap="round" 
-                      stroke-linejoin="round"
+                      strokeWidth="2.5" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
                       opacity="0.7"
-                      transform="translate(0, 2)"/>
+                      transform="translate(0, 8)"/>
             
-            <!-- 第一层 (最近) -->
+            {/* 第一层 (最近) */}
             <polyline points="6,9 12,15 18,9" 
-                      stroke-width="2.5" 
-                      stroke-linecap="round" 
-                      stroke-linejoin="round"
+                      strokeWidth="2.5" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
                       opacity="1.0"/>
           </svg>
         </div>
