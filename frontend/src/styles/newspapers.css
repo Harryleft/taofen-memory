@@ -2792,37 +2792,37 @@ div#uv > div.loaded > div.uv-iiif-extension-host .options {
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   box-sizing: border-box;
-  margin: 0 auto 1rem;
+  margin: 1rem auto 1rem;
   /* 优化卡片高度，确保内容合理分布 */
   min-height: 420px;
   max-height: 480px;
 }
 
 .vertical-newspaper-card:hover {
-  border-color: #8b5cf6;
+  border-color: #d4af37;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .vertical-newspaper-card--selected {
-  border-color: #8b5cf6;
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(139, 92, 246, 0.1) 100%);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+  border-color: #d4af37;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(212, 175, 55, 0.1) 100%);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
 }
 
 .vertical-newspaper-card:focus-visible {
-  outline: 2px solid #8b5cf6;
+  outline: 2px solid #d4af37;
   outline-offset: 2px;
 }
 
 /* 封面图片区域 - 优化比例和显示 */
 .vertical-newspaper-card__image {
-  height: 180px;
+  height: 150px;
   width: 100%; /* 确保容器填满父卡片宽度 */
   background: #f8fafc;
   display: block; /* 改为block布局，避免flexbox对绝对定位元素的影响 */
   border-bottom: 3px solid #cbd5e1;
-  overflow: visible;
+  overflow: hidden;
   position: relative;
   /* 报刊封面最佳显示比例 */
   aspect-ratio: 3/4;
@@ -2847,47 +2847,9 @@ div#uv > div.loaded > div.uv-iiif-extension-host .options {
 .vertical-newspaper-card__image-peek {
   position: relative;
   width: 100%; /* 确保预览容器填满父容器宽度 */
-  height: 160px; /* 调整高度，确保图片可见 */
+  height: 100%; /* 让图片完整显示 */
   overflow: hidden;
-  cursor: pointer;
-  border-radius: 8px;
-  transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* 悬停效果 - 显示更多内容 */
-.vertical-newspaper-card__image-peek:hover {
-  height: 240px; /* 悬停时显示更多内容 */
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
-}
-
-/* 图片覆盖层 */
-.vertical-newspaper-card__image-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 40px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  opacity: 0.8;
-  transition: opacity 0.3s ease;
-}
-
-.vertical-newspaper-card__image-peek:hover .vertical-newspaper-card__image-overlay {
-  opacity: 0;
-}
-
-.vertical-newspaper-card__image-hint {
-  color: white;
-  font-size: 11px;
-  font-weight: 600;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
 }
 
 /* 图片加载状态 */
@@ -2954,7 +2916,7 @@ div#uv > div.loaded > div.uv-iiif-extension-host .options {
   padding: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.75rem;
   flex: 1;
   text-align: center;
   /* 确保内容区域合理利用空间 */
@@ -3034,7 +2996,7 @@ div#uv > div.loaded > div.uv-iiif-extension-host .options {
 }
 
 .vertical-newspaper-card__button {
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
   color: white;
   border: none;
   border-radius: 0.375rem;
@@ -3044,7 +3006,7 @@ div#uv > div.loaded > div.uv-iiif-extension-host .options {
   cursor: pointer;
   transition: all 0.2s ease;
   width: 100%;
-  box-shadow: 0 2px 6px rgba(139, 92, 246, 0.2);
+  box-shadow: 0 2px 6px rgba(212, 175, 55, 0.2);
   /* 确保按钮文本不会换行 */
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -3052,14 +3014,14 @@ div#uv > div.loaded > div.uv-iiif-extension-host .options {
 }
 
 .vertical-newspaper-card__button:hover {
-  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  background: linear-gradient(135deg, #b8941f 0%, #9d7e0a 100%);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
 }
 
 .vertical-newspaper-card__button:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.5);
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.5);
 }
 
 

@@ -126,12 +126,7 @@ export const VerticalNewspaperCard: React.FC<VerticalNewspaperCardProps> = ({
             {isImageLoading && (
               <div className="vertical-newspaper-card__image-loading"></div>
             )}
-            <div className={`vertical-newspaper-card__image-overlay ${isImageLoading ? 'hidden' : ''}`}>
-              <span className="vertical-newspaper-card__image-hint">
-                悬停查看更多
-              </span>
             </div>
-          </div>
         ) : (
           <div className="vertical-newspaper-card__image-placeholder">
             <span className="vertical-newspaper-card__image-icon">📰</span>
@@ -154,9 +149,6 @@ export const VerticalNewspaperCard: React.FC<VerticalNewspaperCardProps> = ({
           <span className="vertical-newspaper-card__founding-date">
             创刊：{publication.founding_date || '1938年'}
           </span>
-          <span className="vertical-newspaper-card__issue-count">
-            共{publication.issueCount || 0}期
-          </span>
         </div>
         
         <div className="vertical-newspaper-card__description">
@@ -171,7 +163,7 @@ export const VerticalNewspaperCard: React.FC<VerticalNewspaperCardProps> = ({
               handleCardClick();
             }}
           >
-            [进入本刊]
+            [查看]
           </button>
         </div>
       </div>
