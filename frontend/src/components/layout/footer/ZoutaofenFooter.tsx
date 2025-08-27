@@ -12,7 +12,7 @@ const COMMON_NAVIGATION_CATEGORIES: NavigationCategory[] = [
   {
     id: 'books-times',
     title: '时光书影',
-    links: [{ label: '时光书影', to: '/bookstore-timeline', external: false }]
+    links: [{ label: '时光书影', to: '/bookstore', external: false }]
   },
   {
     id: 'writing-style',
