@@ -60,6 +60,26 @@
     transition: all 100ms ease-in-out;
   }
 
+  .bookstore-newspaper-button {
+    @apply relative flex items-center px-6 py-3 bg-white border-2 border-accent-gold/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/40 focus:border-accent-gold/60 font-serif text-primary/90 hover:bg-accent-gold/5 hover:border-accent-gold/40 hover:text-primary hover:shadow-warm-sm transition-all duration-300 ease-in-out transform hover:scale-[1.02] active:scale-[0.98] select-none;
+    min-height: 48px;
+    box-shadow: 0 1px 3px rgba(139, 69, 19, 0.08);
+  }
+
+  .bookstore-newspaper-button:hover {
+    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.15);
+  }
+
+  .bookstore-newspaper-button:focus-visible {
+    @apply ring-2 ring-accent-gold/40 ring-offset-2;
+    outline: none;
+  }
+
+  .bookstore-newspaper-button:active {
+    @apply transform scale-[0.98];
+    transition: all 100ms ease-in-out;
+  }
+
   .bookstore-year-dropdown {
     @apply absolute z-20 mt-2 w-full bg-white border-2 border-accent-gold/20 rounded-xl shadow-warm-lg backdrop-blur-sm;
     min-width: 200px;
@@ -296,10 +316,16 @@
     @apply text-primary/60;
   }
 
-  /* 年份按钮响应式优化 */
+  /* 按钮响应式优化 */
   @media (max-width: 640px) {
     .bookstore-year-button {
       @apply py-2.5 px-8;
+      min-height: 44px;
+      font-size: 0.875rem;
+    }
+
+    .bookstore-newspaper-button {
+      @apply py-2.5 px-4;
       min-height: 44px;
       font-size: 0.875rem;
     }
@@ -321,6 +347,12 @@
       min-height: 42px;
     }
 
+    .bookstore-newspaper-button {
+      @apply px-3;
+      min-height: 42px;
+      font-size: 0.8rem;
+    }
+
     .bookstore-year-dropdown {
       max-height: 240px;
     }
@@ -331,6 +363,7 @@
   /* 减少动画模式支持 */
   @media (prefers-reduced-motion: reduce) {
     .bookstore-year-button,
+    .bookstore-newspaper-button,
     .bookstore-year-dropdown,
     .bookstore-year-option {
       transition: none !important;
@@ -396,7 +429,8 @@
 
   /* 触摸设备优化 */
   @media (hover: none) {
-    .bookstore-year-button:active {
+    .bookstore-year-button:active,
+    .bookstore-newspaper-button:active {
       @apply transform scale-95;
     }
 
@@ -408,6 +442,7 @@
   /* 打印样式优化 */
   @media print {
     .bookstore-year-button,
+    .bookstore-newspaper-button,
     .bookstore-year-dropdown {
       @apply hidden;
     }
