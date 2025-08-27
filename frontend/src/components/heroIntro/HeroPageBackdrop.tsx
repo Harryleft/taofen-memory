@@ -175,11 +175,18 @@ class LayoutCalculator {
       columnWidth
     };
   }
+
+  // 保持原有方法向后兼容
+  static preloadImages(
+    items: BaseMasonryItem[],
+    onAspectMeasured: (id: number, aspect: number) => void
+  ): void {
+    ImageProcessor.preloadImagesWithCleanup(items, onAspectMeasured);
+  }
 }
 
 // =============== 懒加载工具 ===============
 // LazyLoadingManager 类已被移除，其功能已集成到 IntersectionObserverManager 中
-
 
 // =============== 图片处理类 ===============
 class ImageProcessor {
@@ -268,14 +275,13 @@ class ImageProcessor {
         
         const handleError = () => {
           if (!abortController.signal.aborted) {
-            Utils.debugLog(CONFIG.DEBUG, `图片加载失败: ${item.src}`);
-          }
           // 清理事件监听器
           img.onload = null;
           img.onerror = null;
           currentlyLoading--;
           // 继续加载下一批
           loadNextBatch();
+          }
         };
         
         img.onload = handleLoad;
@@ -300,14 +306,6 @@ class ImageProcessor {
       imageObjects.length = 0; // 清空数组
     };
   }
-
-  // 保持原有方法向后兼容
-  static preloadImages(
-    items: BaseMasonryItem[],
-    onAspectMeasured: (id: number, aspect: number) => void
-  ): void {
-    this.preloadImagesWithCleanup(items, onAspectMeasured);
-  }
 }
 
 // =============== 瀑布流布局类 ===============
@@ -322,7 +320,6 @@ class MasonryLayouter {
     const arrays: MasonryItem[][] = Array.from({ length: columns }, () => []);
     
     if (columns <= 0 || columnWidth <= 0) {
-      Utils.debugLog(CONFIG.DEBUG, 'Invalid layout parameters', { columns, columnWidth });
       return arrays;
     }
 
@@ -359,12 +356,7 @@ class MasonryLayouter {
       itemCountPerColumn[targetColumnIndex] += 1;
     });
 
-    Utils.debugLog(CONFIG.DEBUG, 'Layout complete', { 
-      columns, 
-      columnWidth, 
-      totalItems: items.length 
-    });
-    
+        
     return arrays;
   }
 }
