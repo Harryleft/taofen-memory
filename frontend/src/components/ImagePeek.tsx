@@ -4,7 +4,6 @@ interface ImagePeekProps {
   src: string;
   alt: string;
   className?: string;
-  variant?: 'clip' | 'overflow' | 'scale';
   height?: 'sm' | 'md' | 'lg' | 'auto';
   showExpandHint?: boolean;
   onLoad?: () => void;
@@ -24,7 +23,6 @@ export const ImagePeek: React.FC<ImagePeekProps> = ({
   src,
   alt,
   className = '',
-  variant = 'clip',
   height = 'md',
   showExpandHint = true,
   onLoad,
