@@ -45,20 +45,30 @@ export const VerticalNewspaperCard: React.FC<VerticalNewspaperCardProps> = ({
       return '/images/books/book_23416_-4998639186942255748.jpg';
     }
     
+    // 清理路径，移除多余的斜杠
+    const cleanPath = imagePath.replace(/^\/+/, '').replace(/\/+/g, '/');
+    
     // 如果已经是完整URL，直接返回
-    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-      console.log('🌐 使用完整URL:', imagePath);
-      return imagePath;
+    if (cleanPath.startsWith('http://') || cleanPath.startsWith('https://')) {
+      console.log('🌐 使用完整URL:', cleanPath);
+      return cleanPath;
+    }
+    
+    // 如果以images/开头，直接添加/前缀
+    if (cleanPath.startsWith('images/')) {
+      const fullPath = `/${cleanPath}`;
+      console.log('📁 使用images路径:', fullPath);
+      return fullPath;
     }
     
     // 如果以/开头，认为是绝对路径
-    if (imagePath.startsWith('/')) {
-      console.log('📁 使用绝对路径:', imagePath);
-      return imagePath;
+    if (cleanPath.startsWith('/')) {
+      console.log('📁 使用绝对路径:', cleanPath);
+      return cleanPath;
     }
     
     // 否则，添加/images/前缀
-    const fullPath = `/images/${imagePath}`;
+    const fullPath = `/images/${cleanPath}`;
     console.log('🔗 拼接路径:', fullPath);
     return fullPath;
   };
