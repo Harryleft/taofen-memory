@@ -230,6 +230,7 @@ export function TimelineCoverCard({ totalEvents }: TimelineCoverCardProps) {
 export interface BookstoreCoverCardProps {
   totalBooks: number;
   featuredCategories?: number;
+  publicationsCount?: number;
 }
 
 const BOOKSTORE_DATA = {
@@ -240,9 +241,12 @@ const BOOKSTORE_DATA = {
   categoriesLabel: "精选分类"
 } as const;
 
-export function BookstoreCoverCard({ totalBooks }: BookstoreCoverCardProps) {
+export function BookstoreCoverCard({ totalBooks, publicationsCount = 6 }: BookstoreCoverCardProps) {
   const bookstoreStats = [
-    { value: `${totalBooks}份`, label: BOOKSTORE_DATA.booksLabel },
+    { 
+      value: `${totalBooks}份`, 
+      label: publicationsCount > 0 ? `${BOOKSTORE_DATA.booksLabel} · ${publicationsCount}份刊物` : BOOKSTORE_DATA.booksLabel 
+    },
     // { value: `${featuredCategories}个`, label: BOOKSTORE_DATA.categoriesLabel }
   ];
 

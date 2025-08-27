@@ -322,7 +322,8 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
       {/* 书店封面卡 */}
       <BookstoreCoverCard 
         totalBooks={allData.length} 
-        featuredCategories={uniqueCategories.length} 
+        featuredCategories={uniqueCategories.length}
+        publicationsCount={publications.length}
       />
       
       {/* 筛选控件 */}
