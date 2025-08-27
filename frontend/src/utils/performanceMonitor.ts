@@ -405,7 +405,8 @@ class PerformanceMonitor {
     
     if (id) {
       const cached = this.isImageCached(entry);
-      this.trackImageEnd(id, true, cached);
+      // 使用静态方法调用，而不是this.trackImageEnd
+      PerformanceMonitor.trackImageEnd(id, true, cached);
     }
   }
 
