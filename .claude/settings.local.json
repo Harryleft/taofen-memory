@@ -112,7 +112,9 @@
       "Bash(start:*)",
       "Bash(identify:*)",
       "Read(/C:\\Users\\afkxw\\Documents\\WindowsPowerShell/**)",
-      "Bash(od:*)"
+      "Bash(od:*)",
+      "Bash(npm ls:*)",
+      "Bash(npm cache clean:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",
