@@ -2934,6 +2934,13 @@ div#uv > div.loaded > div.uv-iiif-extension-host .options {
   transition: all 0.3s ease;
 }
 
+.vertical-newspaper-card__error-text {
+  font-size: 0.75rem;
+  color: #ef4444;
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
 /* 悬停时图标也响应 */
 .vertical-newspaper-card:hover .vertical-newspaper-card__image-icon {
   transform: scale(1.1);
