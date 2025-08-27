@@ -163,7 +163,7 @@ export const VerticalNewspaperCard: React.FC<VerticalNewspaperCardProps> = ({
               handleCardClick();
             }}
           >
-            [查看]
+            查看
           </button>
         </div>
       </div>
