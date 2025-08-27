@@ -12,21 +12,21 @@ import { GuideState } from './GuideState';
 export const NewspapersGuideArea: React.FC = () => {
   return (
     <GuideState
-      icon="📚"
-      title="欢迎使用数字报刊系统"
-      message="选择左侧的报刊开始浏览，系统将显示该报刊的所有期数列表。"
+      icon="📜"
+      title="与韬奋先生对话"
+      message="每一份报刊都是韬奋先生'以笔为剑'的战场，每一篇文章都承载着知识分子的家国情怀。选择左侧报刊，聆听历史的回响，感受思想的力量。"
       steps={[
         {
           number: 1,
-          text: "点击左侧报刊卡片，选择您要浏览的刊物"
+          text: "择一份报刊，走近一个时代"
         },
         {
           number: 2,
-          text: "在期数列表中选择具体的期数进行阅读"
+          text: "选一期内容，感受一段历史"
         },
         {
           number: 3,
-          text: "使用IIIF浏览器进行报刊阅读"
+          text: "用心品读，与先贤对话"
         }        
       ]}
       variant="guide"
