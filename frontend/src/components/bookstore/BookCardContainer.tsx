@@ -22,8 +22,6 @@ interface BookCardProps {
   onOpenLightbox: (item: BookItem) => void;
 }
 
-const DEBUG = false; // 调试开关，生产环境中应保持为 false
-
 /**
  * @component BookCardContainer
  * @description 渲染单个书籍卡片的 React 功能组件。
@@ -40,23 +38,10 @@ const BookCardContainer: React.FC<BookCardProps> = ({
 }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const renderCountRef = useRef(0);
-  
-  //【修改】简化日志，移除 isRapidScrolling
-  const logDebug = React.useCallback((message: string, data?: unknown) => {
-    if (DEBUG) {
-      console.log(`[BookCard-${item.id}] ${message}`, data || '');
-    }
-  }, [item.id]);
 
   useEffect(() => {
-    // 可以在这里保留一些调试逻辑，但移除对 isRapidScrolling 的追踪
-    logDebug('Props变化或渲染', {
-        renderCount: renderCountRef.current,
-        isVisible,
-        timestamp: Date.now()
-    });
     renderCountRef.current += 1;
-  }, [isVisible, logDebug]);
+  }, [isVisible]);
 
 
   const handleImageLoad = () => {

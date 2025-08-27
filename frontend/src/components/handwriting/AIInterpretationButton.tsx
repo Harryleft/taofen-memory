@@ -53,7 +53,6 @@ export const AIInterpretationButton = ({
   useEffect(() => {
     // 如果当前有正在进行的请求，且item ID发生了变化
     if (isLoading && currentItemIdRef.current !== item.id) {
-      console.log('用户翻页，中断正在进行的AI解读请求');
       resetToDefaultState();
     }
     

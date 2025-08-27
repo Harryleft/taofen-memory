@@ -2,8 +2,6 @@
  * IIIF URL构建工具类
  * 统一处理所有IIIF相关的URL构建逻辑
  */
-import { debug } from '../../utils/debugLogger.ts';
-
 export class IIIFUrlBuilder {
   private static readonly BASE_URL = 'https://www.ai4dh.cn/iiif/3';
   private static readonly PROXY_BASE = '/proxy';
@@ -12,7 +10,6 @@ export class IIIFUrlBuilder {
    * 解析IIIF URL组件
    */
   static parse(url: string): IIIFUrlComponents {
-    debug.log('iiif', '解析URL:', url);
     
     // 如果是完整的HTTP URL
     if (url.startsWith('http')) {

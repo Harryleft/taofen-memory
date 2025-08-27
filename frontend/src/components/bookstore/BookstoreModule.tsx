@@ -97,7 +97,7 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
   // 筛选状态管理
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedYear, setSelectedYear] = useState<string>('all');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedCategory] = useState<string>('all');
   
   // 报刊数据状态
   const [publications, setPublications] = useState<PublicationItem[]>([]);
@@ -183,15 +183,8 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
       setIssuesError(null);
       setSelectedPublication(publication);
       
-      // 调试信息：检查publication数据的实际内容
-      console.log('🔍 [调试] publication.id:', publication.id);
-      console.log('🔍 [调试] publication.collection:', publication.collection);
-      console.log('🔍 [调试] publication.title:', publication.title);
-      
       // publication.collection 应该是完整的 collection URL
       const collectionUrl = publication.collection;
-      console.log('🔍 [调试] 使用的collectionUrl:', collectionUrl);
-      
       const issuesData = await NewspaperService.getIssuesForPublication(collectionUrl);
       
       // 转换为 IIIFCollectionItem 格式
@@ -205,10 +198,8 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
         }
       }));
       
-      console.log('🔍 [调试] 加载的期数数量:', issuesCollection.length);
       setIssues(issuesCollection);
     } catch (err) {
-      console.error('🔍 [调试] 加载期数失败:', err);
       setIssuesError(err instanceof Error ? err.message : '加载期数失败');
     } finally {
       setIssuesLoading(false);

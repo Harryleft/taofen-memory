@@ -3,7 +3,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 const INITIAL_VISIBLE_COUNT = 30;
 const OBSERVER_ROOT_MARGIN = '800px 0px';
 
-const DEBUG = true; 
+const DEBUG = false; 
 const logDebug = (message: string, data?: unknown) => {
   if (DEBUG) {
     console.log(`[InfiniteScroll] ${message}`, data || '');

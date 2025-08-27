@@ -76,7 +76,6 @@ const CONFIG = {
     THRESHOLD: 0.01,
   },
   
-  // 调试
   DEBUG: false,
 } as const;
 
@@ -133,13 +132,7 @@ class Utils {
       .map(({ item }) => item);
   }
 
-  // 调试日志
-  static debugLog(enabled: boolean, ...args: unknown[]): void {
-    if (enabled) {
-      console.log('[HeroBackdrop]', ...args);
-    }
-  }
-
+  
   // 安全获取窗口尺寸
   static safeWindowSize(): WindowSize {
     const width = Number.isFinite(window.innerWidth) ? window.innerWidth : 1280;

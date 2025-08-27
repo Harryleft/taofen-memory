@@ -89,14 +89,6 @@ const SafeDisplay: React.FC<SafeDisplayProps> = ({
   validator = isValidDisplayValue,
   render
 }) => {
-  // 开发环境调试
-  if (debug && process.env.NODE_ENV === 'development') {
-    console.log('[SafeDisplay] 输入值:', {
-      value,
-      type: typeof value,
-      isValid: validator(value)
-    });
-  }
   
   // 使用自定义验证函数或默认验证
   const isValid = validator(value);
