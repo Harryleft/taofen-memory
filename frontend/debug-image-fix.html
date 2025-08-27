@@ -78,7 +78,6 @@
         <div class="test-section">
             <h3>🎨 图片显示测试</h3>
             <button class="test-button" onclick="testImageRendering()">测试图片渲染</button>
-            <button class="test-button" onclick="testImageHover()">测试悬停效果</button>
             <div id="image-status"></div>
             <div id="image-test"></div>
         </div>
@@ -136,55 +135,7 @@
             };
         }
         
-        // 测试悬停效果
-        function testImageHover() {
-            const statusDiv = document.getElementById('image-status');
-            const testDiv = document.getElementById('image-test');
-            
-            statusDiv.innerHTML = '<div class="status info">测试悬停效果...</div>';
-            
-            // 创建测试图片容器
-            const testContainer = document.createElement('div');
-            testContainer.className = 'vertical-newspaper-card';
-            testContainer.style.width = '280px';
-            testContainer.innerHTML = `
-                <div class="vertical-newspaper-card__image">
-                    <div class="vertical-newspaper-card__image-peek">
-                        <img 
-                            src="https://via.placeholder.com/280x400"
-                            alt="测试图片"
-                            class="vertical-newspaper-card__image-img"
-                        />
-                    </div>
-                </div>
-            `;
-            
-            testDiv.innerHTML = '';
-            testDiv.appendChild(testContainer);
-            
-            // 模拟悬停效果
-            const peekContainer = testContainer.querySelector('.vertical-newspaper-card__image-peek');
-            
-            // 检查初始高度
-            const initialHeight = peekContainer.offsetHeight;
-            console.log('初始高度:', initialHeight);
-            
-            // 模拟悬停
-            peekContainer.style.height = '240px';
-            
-            // 检查悬停后高度
-            setTimeout(() => {
-                const hoverHeight = peekContainer.offsetHeight;
-                console.log('悬停高度:', hoverHeight);
-                
-                if (hoverHeight > initialHeight) {
-                    statusDiv.innerHTML = '<div class="status success">✅ 悬停效果测试成功</div>';
-                } else {
-                    statusDiv.innerHTML = '<div class="status error">❌ 悬停效果失败</div>';
-                }
-            }, 100);
-        }
-        
+          
         // 测试报刊卡片
         function testNewspaperCards() {
             const statusDiv = document.getElementById('cards-status');
@@ -315,10 +266,14 @@
                                     imageContainer.offsetWidth === 280 && 
                                     peekContainer.offsetWidth === 280;
                 
-                if (isWidthCorrect) {
-                    statusDiv.innerHTML = '<div class="status success">✅ 布局结构测试成功，所有容器宽度正确</div>';
+                // 检查图片是否完整显示（没有悬停限制）
+                const isImageHeightCorrect = imageContainer.offsetHeight === 240 && 
+                                          peekContainer.offsetHeight === 240;
+                
+                if (isWidthCorrect && isImageHeightCorrect) {
+                    statusDiv.innerHTML = '<div class="status success">✅ 布局结构测试成功，图片完整显示</div>';
                 } else {
-                    statusDiv.innerHTML = '<div class="status error">❌ 布局结构测试失败，宽度设置有问题</div>';
+                    statusDiv.innerHTML = '<div class="status error">❌ 布局结构测试失败，尺寸设置有问题</div>';
                 }
                 
                 // 显示详细信息
