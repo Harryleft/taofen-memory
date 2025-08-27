@@ -243,10 +243,8 @@ const BOOKSTORE_DATA = {
 
 export function BookstoreCoverCard({ totalBooks, publicationsCount = 6 }: BookstoreCoverCardProps) {
   const bookstoreStats = [
-    { 
-      value: `${totalBooks}份`, 
-      label: publicationsCount > 0 ? `${BOOKSTORE_DATA.booksLabel} · ${publicationsCount}份刊物` : BOOKSTORE_DATA.booksLabel 
-    },
+    { value: `${totalBooks}份`, label: BOOKSTORE_DATA.booksLabel },
+    ...(publicationsCount > 0 ? [{ value: `${publicationsCount}份`, label: '刊物' }] : [])
     // { value: `${featuredCategories}个`, label: BOOKSTORE_DATA.categoriesLabel }
   ];
 
