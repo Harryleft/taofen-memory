@@ -60,13 +60,13 @@ export const VerticalNewspaperCard: React.FC<VerticalNewspaperCardProps> = ({
       className={`vertical-newspaper-card ${className} ${
         isSelected ? 'vertical-newspaper-card--selected' : ''
       }`}
-      onClick={handleClick}
+      onClick={handleCardClick}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          handleClick();
+          handleCardClick();
         }
       }}
     >
