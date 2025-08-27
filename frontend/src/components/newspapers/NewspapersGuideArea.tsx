@@ -18,16 +18,16 @@ export const NewspapersGuideArea: React.FC = () => {
       steps={[
         {
           number: 1,
-          text: "择一份报刊，走近一个时代"
+          text: "一份报刊，是一个时代的缩影"
         },
         {
           number: 2,
-          text: "选一期内容，感受一段历史"
+          text: "一期文字，是一段历史的注脚"
         },
         {
           number: 3,
-          text: "用心品读，与先贤对话"
-        }        
+          text: "轻触一下，历史就在眼前展开"
+        }
       ]}
       variant="guide"
       className="newspapers-interface1__guide"
