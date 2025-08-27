@@ -2831,44 +2831,31 @@ div#uv > div.loaded > div.uv-iiif-extension-host .options {
 
 .vertical-newspaper-card__image-img {
   width: 100%;
-  height: 500px; /* 5倍高度，用于显示顶部20% */
+  height: auto;
+  min-height: 500px; /* 确保图片足够高 */
   object-fit: cover;
   object-position: top;
   display: block;
-  transform: translateY(-80%); /* 向上移动80%，显示顶部20% */
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: absolute;
+  top: 0;
+  left: 0;
   background: #f8fafc;
-  will-change: transform;
 }
 
 /* 图片预览容器 */
 .vertical-newspaper-card__image-peek {
   position: relative;
-  height: 120px;
+  height: 120px; /* 固定高度，显示顶部120px */
   overflow: hidden;
   cursor: pointer;
   border-radius: 8px;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* 展开状态 - 显示完整图片 */
-.vertical-newspaper-card__image-peek.expanded {
-  height: auto;
-  max-height: 300px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-}
-
-.vertical-newspaper-card__image-peek.expanded .vertical-newspaper-card__image-img {
-  transform: translateY(0);
-}
-
-/* 悬停效果 */
-.vertical-newspaper-card__image-peek:hover .vertical-newspaper-card__image-img {
-  transform: translateY(-60%); /* 悬停时显示更多内容 */
-}
-
+/* 悬停效果 - 显示更多内容 */
 .vertical-newspaper-card__image-peek:hover {
+  height: 200px; /* 悬停时显示更多内容 */
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
 }
 
@@ -2884,29 +2871,21 @@ div#uv > div.loaded > div.uv-iiif-extension-host .options {
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(2px);
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
 }
 
-.vertical-newspaper-card__image-overlay.hidden {
+.vertical-newspaper-card__image-peek:hover .vertical-newspaper-card__image-overlay {
   opacity: 0;
-  pointer-events: none;
 }
 
 .vertical-newspaper-card__image-hint {
   color: white;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  opacity: 0.95;
-  transform: translateY(0);
-  transition: transform 0.3s ease;
-}
-
-.vertical-newspaper-card__image-peek:hover .vertical-newspaper-card__image-hint {
-  transform: translateY(-2px);
 }
 
 /* 图片加载状态 */

@@ -29,30 +29,13 @@ export const VerticalNewspaperCard: React.FC<VerticalNewspaperCardProps> = ({
   onClick,
   className = ''
 }) => {
-  const [isImageExpanded, setIsImageExpanded] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const [isImageLoading, setIsImageLoading] = useState(true);
   const [hasImageError, setHasImageError] = useState(false);
-
-  // 检测是否为移动设备
-  React.useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
   const handleCardClick = () => {
     if (onClick) {
       onClick(publication);
     }
-  };
-
-  const handleImageClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsImageExpanded(!isImageExpanded);
   };
 
   return (
@@ -70,13 +53,10 @@ export const VerticalNewspaperCard: React.FC<VerticalNewspaperCardProps> = ({
         }
       }}
     >
-      {/* 封面图片 - 前20%显示 */}
+      {/* 封面图片 - 顶部20%显示 */}
       <div className="vertical-newspaper-card__image">
         {publication.image ? (
-          <div 
-            className={`vertical-newspaper-card__image-peek ${isImageExpanded || isMobile ? 'expanded' : ''}`}
-            onClick={handleImageClick}
-          >
+          <div className="vertical-newspaper-card__image-peek">
             <img 
               src={`/${publication.image}`}
               alt={publication.title}
@@ -96,9 +76,9 @@ export const VerticalNewspaperCard: React.FC<VerticalNewspaperCardProps> = ({
             {isImageLoading && (
               <div className="vertical-newspaper-card__image-loading"></div>
             )}
-            <div className={`vertical-newspaper-card__image-overlay ${isImageExpanded || isMobile || isImageLoading ? 'hidden' : ''}`}>
+            <div className={`vertical-newspaper-card__image-overlay ${isImageLoading ? 'hidden' : ''}`}>
               <span className="vertical-newspaper-card__image-hint">
-                {isMobile ? '点击查看完整图片' : '点击查看完整图片'}
+                悬停查看更多
               </span>
             </div>
           </div>
