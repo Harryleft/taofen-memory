@@ -38,6 +38,52 @@ export const VerticalNewspaperCard: React.FC<VerticalNewspaperCardProps> = ({
     }
   };
 
+  // 优化的图片URL处理函数
+  const getImageUrl = (imagePath?: string): string => {
+    if (!imagePath) {
+      console.log('🎨 使用默认图片，imagePath为空');
+      return '/images/books/book_23416_-4998639186942255748.jpg';
+    }
+    
+    // 如果已经是完整URL，直接返回
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      console.log('🌐 使用完整URL:', imagePath);
+      return imagePath;
+    }
+    
+    // 如果以/开头，认为是绝对路径
+    if (imagePath.startsWith('/')) {
+      console.log('📁 使用绝对路径:', imagePath);
+      return imagePath;
+    }
+    
+    // 否则，添加/images/前缀
+    const fullPath = `/images/${imagePath}`;
+    console.log('🔗 拼接路径:', fullPath);
+    return fullPath;
+  };
+
+  // 优化的图片加载处理
+  const handleImageLoad = () => {
+    console.log('✅ 图片加载成功:', publication.image);
+    setIsImageLoading(false);
+    setHasImageError(false);
+  };
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    console.error('❌ 图片加载失败:', publication.image, e);
+    setIsImageLoading(false);
+    setHasImageError(true);
+    
+    // 隐藏图片容器，显示占位符
+    const container = e.currentTarget.closest('.vertical-newspaper-card__image-peek');
+    const placeholder = container?.nextElementSibling;
+    if (container && placeholder) {
+      container.style.display = 'none';
+      placeholder.style.display = 'flex';
+    }
+  };
+
   return (
     <div
       className={`vertical-newspaper-card ${className} ${
@@ -55,22 +101,16 @@ export const VerticalNewspaperCard: React.FC<VerticalNewspaperCardProps> = ({
     >
       {/* 封面图片 - 顶部20%显示 */}
       <div className="vertical-newspaper-card__image">
-        {publication.image ? (
+        {publication.image && !hasImageError ? (
           <div className="vertical-newspaper-card__image-peek">
             <img 
-              src={`/${publication.image}`}
+              src={getImageUrl(publication.image)}
               alt={publication.title}
               className="vertical-newspaper-card__image-img"
-              onLoad={() => setIsImageLoading(false)}
-              onError={(e) => {
-                setIsImageLoading(false);
-                setHasImageError(true);
-                const container = e.currentTarget.closest('.vertical-newspaper-card__image-peek');
-                const placeholder = container?.nextElementSibling;
-                if (container && placeholder) {
-                  container.style.display = 'none';
-                  placeholder.style.display = 'flex';
-                }
+              onLoad={handleImageLoad}
+              onError={handleImageError}
+              style={{
+                display: isImageLoading ? 'none' : 'block',
               }}
             />
             {isImageLoading && (
@@ -82,10 +122,16 @@ export const VerticalNewspaperCard: React.FC<VerticalNewspaperCardProps> = ({
               </span>
             </div>
           </div>
-        ) : null}
-        <div className="vertical-newspaper-card__image-placeholder" style={{display: publication.image ? 'none' : 'flex'}}>
-          <span className="vertical-newspaper-card__image-icon">📰</span>
-        </div>
+        ) : (
+          <div className="vertical-newspaper-card__image-placeholder">
+            <span className="vertical-newspaper-card__image-icon">📰</span>
+            {hasImageError && (
+              <span className="vertical-newspaper-card__error-text">
+                图片加载失败
+              </span>
+            )}
+          </div>
+        )}
       </div>
       
       {/* 卡片内容区域 */}
@@ -112,7 +158,7 @@ export const VerticalNewspaperCard: React.FC<VerticalNewspaperCardProps> = ({
             className="vertical-newspaper-card__button"
             onClick={(e) => {
               e.stopPropagation();
-              handleClick();
+              handleCardClick();
             }}
           >
             [进入本刊]
