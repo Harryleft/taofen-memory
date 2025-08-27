@@ -2821,7 +2821,6 @@ div#uv > div.loaded > div.uv-iiif-extension-host .options {
   width: 100%; /* 确保容器填满父卡片宽度 */
   background: #f8fafc;
   display: block; /* 改为block布局，避免flexbox对绝对定位元素的影响 */
-  border-bottom: 3px solid #cbd5e1;
   overflow: hidden;
   position: relative;
   /* 报刊封面最佳显示比例 */
