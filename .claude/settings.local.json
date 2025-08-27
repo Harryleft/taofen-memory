@@ -111,7 +111,8 @@
       "Bash(npx puppeteer browsers install chrome:*)",
       "Bash(start:*)",
       "Bash(identify:*)",
-      "Read(/C:\\Users\\afkxw\\Documents\\WindowsPowerShell/**)"
+      "Read(/C:\\Users\\afkxw\\Documents\\WindowsPowerShell/**)",
+      "Bash(od:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",
