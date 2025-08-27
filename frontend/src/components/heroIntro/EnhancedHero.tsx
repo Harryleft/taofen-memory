@@ -337,8 +337,29 @@ export default function EnhancedHero() {
         className={`group flex flex-col items-center text-gray-600 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-lg transition-colors duration-[${ANIMATION.duration.normal}] p-2`}
       >
         <div className="flex items-center justify-center animate-bounce">
-          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          <svg className="w-8 h-8" fill="none" stroke="var(--global-accent-secondary)" viewBox="0 0 24 24" aria-hidden="true">
+            <!-- 第三层 (最远) -->
+            <polyline points="6,9 12,15 18,9" 
+                      stroke-width="2.5" 
+                      stroke-linecap="round" 
+                      stroke-linejoin="round"
+                      opacity="0.4"
+                      transform="translate(0, 4)"/>
+            
+            <!-- 第二层 (中间) -->
+            <polyline points="6,9 12,15 18,9" 
+                      stroke-width="2.5" 
+                      stroke-linecap="round" 
+                      stroke-linejoin="round"
+                      opacity="0.7"
+                      transform="translate(0, 2)"/>
+            
+            <!-- 第一层 (最近) -->
+            <polyline points="6,9 12,15 18,9" 
+                      stroke-width="2.5" 
+                      stroke-linecap="round" 
+                      stroke-linejoin="round"
+                      opacity="1.0"/>
           </svg>
         </div>
       </button>

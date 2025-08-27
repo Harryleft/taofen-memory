@@ -6,33 +6,25 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Download, Calendar, ChevronDown, Newspaper } from 'lucide-react';
+import { Search, Calendar, ChevronDown, Newspaper } from 'lucide-react';
 
 /**
  * @interface BookFiltersPanelProps
  * @description BookFiltersPanel 组件的 props 定义。
  * @property {string} searchTerm - 当前的搜索关键词。
  * @property {(term: string) => void} setSearchTerm - 更新搜索关键词的回调函数。
- * @property {string} selectedCategory - 当前选中的分类。
- * @property {(category: string) => void} setSelectedCategory - 更新选中分类的回调函数。
- * @property {string[]} uniqueCategories - 所有唯一的分类列表。
  * @property {string} selectedYear - 当前选中的年份。
  * @property {(year: string) => void} setSelectedYear - 更新选中年份的回调函数。
  * @property {number[]} uniqueYears - 所有唯一的年份列表。
- * @property {() => void} onDownload - 点击“导出数据”按钮时触发的回调函数。
+ * @property {'books' | 'newspapers'} activeTab - 当前激活的标签页。
  */
 interface BookstoreFiltersProps {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
-  selectedCategory: string;
-  setSelectedCategory: (category: string) => void;
-  uniqueCategories: string[];
   selectedYear: string;
   setSelectedYear: (year: string) => void;
   uniqueYears: number[];
-  onDownload: () => void;
   activeTab?: 'books' | 'newspapers';
-  onTabChange?: (tabId: 'books' | 'newspapers') => void;
 }
 
 /**
@@ -40,7 +32,6 @@ interface BookstoreFiltersProps {
  * @description 提供用户界面以对书籍列表进行筛选和操作。
  * - 包含一个文本输入框用于按关键词搜索。
  * - 提供一个自定义的下拉菜单用于按年份筛选。
- * - 包含一个按钮，用于触发数据导出功能。
  * - 包含一个按钮，用于跳转到数字报刊页面。
  * - 筛选状态由父组件通过 props 传入和控制。
  */
@@ -50,7 +41,6 @@ const BookFiltersPanel: React.FC<BookstoreFiltersProps> = ({
   selectedYear,
   setSelectedYear,
   uniqueYears,
-  onDownload,
   activeTab = 'books',
 }) => {
   const [yearDropdownOpen, setYearDropdownOpen] = useState(false);
@@ -157,20 +147,11 @@ const BookFiltersPanel: React.FC<BookstoreFiltersProps> = ({
 
       <button
         onClick={() => navigate('/newspapers')}
-        className={`bookstore-download-button ${activeTab === 'newspapers' ? 'bg-blue-100 text-blue-700 border-blue-300' : ''}`}
+        className={`bookstore-newspaper-button ${activeTab === 'newspapers' ? 'bg-blue-100 text-blue-700 border-blue-300' : ''}`}
         title="查看数字报刊"
       >
         <Newspaper size={18} className="mr-2" />
         <span>数字报刊</span>
-      </button>
-
-      <button
-        onClick={onDownload}
-        className="bookstore-download-button"
-        title="下载数据"
-      >
-        <Download size={18} className="mr-2" />
-        <span>导出数据</span>
       </button>
     </div>
   </div>
