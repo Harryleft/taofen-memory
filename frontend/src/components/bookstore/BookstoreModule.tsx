@@ -15,7 +15,6 @@
 
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { BookItem } from '@/types/bookTypes';
-import { downloadCSV } from '@/utils/bookUtils';
 import { NewspaperService, PublicationItem } from '@/components/newspapers/services';
 import { IIIFCollectionItem } from '@/components/iiif/iiifTypes.ts';
 
@@ -339,15 +338,10 @@ export default function BookstoreTimelineModule({ className = '' }: BookstoreTim
       <BookFiltersPanel
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
-        uniqueCategories={uniqueCategories}
         selectedYear={selectedYear}
         setSelectedYear={setSelectedYear}
         uniqueYears={uniqueYears}
-        onDownload={() => downloadCSV(allData)}
         activeTab={activeTab}
-        onTabChange={setActiveTab}
       />
 
       {/* 书籍网格 - 瀑布流布局 */}
