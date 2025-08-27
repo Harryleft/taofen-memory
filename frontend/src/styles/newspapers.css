@@ -2818,12 +2818,11 @@ div#uv > div.loaded > div.uv-iiif-extension-host .options {
 /* 封面图片区域 - 优化比例和显示 */
 .vertical-newspaper-card__image {
   height: 180px;
+  width: 100%; /* 确保容器填满父卡片宽度 */
   background: #f8fafc;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: block; /* 改为block布局，避免flexbox对绝对定位元素的影响 */
   border-bottom: 3px solid #cbd5e1;
-  overflow: hidden;
+  overflow: visible;
   position: relative;
   /* 报刊封面最佳显示比例 */
   aspect-ratio: 3/4;
@@ -2831,8 +2830,7 @@ div#uv > div.loaded > div.uv-iiif-extension-host .options {
 
 .vertical-newspaper-card__image-img {
   width: 100%;
-  height: auto;
-  min-height: 500px; /* 确保图片足够高 */
+  height: 100%;
   object-fit: cover;
   object-position: top;
   display: block;
@@ -2840,12 +2838,16 @@ div#uv > div.loaded > div.uv-iiif-extension-host .options {
   top: 0;
   left: 0;
   background: #f8fafc;
+  /* 确保图片在容器内正确显示 */
+  min-width: 100%;
+  min-height: 100%;
 }
 
 /* 图片预览容器 */
 .vertical-newspaper-card__image-peek {
   position: relative;
-  height: 120px; /* 固定高度，显示顶部120px */
+  width: 100%; /* 确保预览容器填满父容器宽度 */
+  height: 160px; /* 调整高度，确保图片可见 */
   overflow: hidden;
   cursor: pointer;
   border-radius: 8px;
@@ -2855,7 +2857,7 @@ div#uv > div.loaded > div.uv-iiif-extension-host .options {
 
 /* 悬停效果 - 显示更多内容 */
 .vertical-newspaper-card__image-peek:hover {
-  height: 200px; /* 悬停时显示更多内容 */
+  height: 240px; /* 悬停时显示更多内容 */
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
 }
 
