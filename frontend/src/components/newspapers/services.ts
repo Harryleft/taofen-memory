@@ -71,77 +71,125 @@ export class NewspaperService {
   static async getPublications(): Promise<PublicationItem[]> {
     const collectionUrl = this.buildProxyUrl('https://www.ai4dh.cn/iiif/3/manifests/collection.json');
     
-    try {
-      const response = await fetchWithProxy(collectionUrl);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const col = await response.json();
-      
-      // 简化数据处理 - 消除复杂的调试信息
-      const publications = (col.items || []).map((it: IIIFCollectionItem, i: number) => {
-        const collectionId = it.id.match(/([^/]+)\/collection\.json$/)?.[1] || it.id;
-        
-        return {
-          i, 
-          id: collectionId,
-          collection: it.id,
-          title: (it.label?.zh?.[0]) || (it.label?.['zh-CN']?.[0]) || (it.label?.en?.[0]) || '未知刊物',
-          name: (it.label?.zh?.[0]) || (it.label?.['zh-CN']?.[0]) || (it.label?.en?.[0]) || '未知刊物',
-          issueCount: 0,
-          lastUpdated: null
-        };
-      });
-      
-      // 异步获取期数信息 - 使用批处理避免并发请求过多
-      const BATCH_SIZE = 5; // 每批处理5个请求
-      for (let i = 0; i < publications.length; i += BATCH_SIZE) {
-        const batch = publications.slice(i, i + BATCH_SIZE);
-        await Promise.all(batch.map(async (pub, index) => {
-          try {
-            const issues = await this.getIssuesForPublication(pub.collection);
-            publications[i + index].issueCount = issues.length;
-            if (issues.length > 0) {
-              publications[i + index].lastUpdated = issues[0].title || issues[0].summary;
-            }
-          } catch (e) {
-            console.warn(`无法获取刊物 ${pub.title} 的期数信息:`, e);
+    // 添加重试机制
+    const maxRetries = 3;
+    const retryDelay = 1000; // 1秒
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const response = await fetchWithProxy(collectionUrl);
+        if (!response.ok) {
+          if (response.status === 404 && attempt < maxRetries) {
+            console.warn(`获取刊物列表失败 (尝试 ${attempt}/${maxRetries}): HTTP ${response.status}`);
+            await new Promise(resolve => setTimeout(resolve, retryDelay * attempt));
+            continue;
           }
-        }));
-        
-        // 批次间延迟，避免服务器限流
-        if (i + BATCH_SIZE < publications.length) {
-          await new Promise(resolve => setTimeout(resolve, 100));
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
+        const col = await response.json();
+        
+        // 简化数据处理 - 消除复杂的调试信息
+        const publications = (col.items || []).map((it: IIIFCollectionItem, i: number) => {
+          const collectionId = it.id.match(/([^/]+)\/collection\.json$/)?.[1] || it.id;
+          
+          return {
+            i, 
+            id: collectionId,
+            collection: it.id,
+            title: (it.label?.zh?.[0]) || (it.label?.['zh-CN']?.[0]) || (it.label?.en?.[0]) || '未知刊物',
+            name: (it.label?.zh?.[0]) || (it.label?.['zh-CN']?.[0]) || (it.label?.en?.[0]) || '未知刊物',
+            issueCount: 0,
+            lastUpdated: null
+          };
+        });
+        
+        // 异步获取期数信息 - 使用批处理避免并发请求过多，添加错误容忍
+        const BATCH_SIZE = 3; // 减少批大小以提高稳定性
+        for (let i = 0; i < publications.length; i += BATCH_SIZE) {
+          const batch = publications.slice(i, i + BATCH_SIZE);
+          
+          // 使用Promise.allSettled替代Promise.all，避免单个失败影响整个批次
+          const results = await Promise.allSettled(
+            batch.map(async (pub, index) => {
+              try {
+                const issues = await this.getIssuesForPublication(pub.collection);
+                return { index, issues, success: true };
+              } catch (e) {
+                console.warn(`无法获取刊物 ${pub.title} 的期数信息:`, e);
+                return { index, issues: [], success: false };
+              }
+            })
+          );
+          
+          // 处理结果
+          results.forEach(result => {
+            if (result.status === 'fulfilled' && result.value.success) {
+              const { index, issues } = result.value;
+              publications[i + index].issueCount = issues.length;
+              if (issues.length > 0) {
+                publications[i + index].lastUpdated = issues[0].title || issues[0].summary;
+              }
+            }
+          });
+          
+          // 批次间延迟，避免服务器限流
+          if (i + BATCH_SIZE < publications.length) {
+            await new Promise(resolve => setTimeout(resolve, 200));
+          }
+        }
+        
+        return publications;
+      } catch (e) { 
+        console.error(`加载刊物列表失败 (尝试 ${attempt}/${maxRetries}):`, e);
+        if (attempt === maxRetries) {
+          // 最后一次尝试失败，返回空数组
+          return [];
+        }
+        // 等待后重试
+        await new Promise(resolve => setTimeout(resolve, retryDelay * attempt));
       }
-      
-      return publications;
-    } catch (e) { 
-      console.error('加载刊物列表失败:', e);
-      return []; 
     }
+    
+    return []; // 如果所有重试都失败，返回空数组
   }
   
   static async getIssuesForPublication(collectionUrl: string): Promise<IssueItem[]> {
-    try {
-      const response = await fetchWithProxy(collectionUrl);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+    // 添加重试机制
+    const maxRetries = 2;
+    const retryDelay = 1000;
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const response = await fetchWithProxy(collectionUrl);
+        if (!response.ok) {
+          if (response.status === 404 && attempt < maxRetries) {
+            console.warn(`获取期刊目录失败 (尝试 ${attempt}/${maxRetries}): HTTP ${response.status}`);
+            await new Promise(resolve => setTimeout(resolve, retryDelay * attempt));
+            continue;
+          }
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const col = await response.json();
+        return (col.items || []).map((it: IIIFCollectionItem, i: number) => ({
+          i, 
+          id: it.id,
+          manifest: it.id,
+          title: (it.label?.['zh-CN']?.[0]) || (it.label?.zh?.[0]) || (it.label?.en?.[0]) || '未知期刊',
+          summary: (it.summary?.['zh-CN']?.[0]) || (it.summary?.zh?.[0]) || (it.summary?.en?.[0]) || ''
+        }));
+      } catch (e) { 
+        console.error(`加载目录失败 (尝试 ${attempt}/${maxRetries}):`, e);
+        if (attempt === maxRetries) {
+          return []; // 返回空数组作为降级方案
+        }
+        // 等待后重试
+        await new Promise(resolve => setTimeout(resolve, retryDelay * attempt));
       }
-      
-      const col = await response.json();
-      return (col.items || []).map((it: IIIFCollectionItem, i: number) => ({
-        i, 
-        id: it.id,
-        manifest: it.id,
-        title: (it.label?.['zh-CN']?.[0]) || (it.label?.zh?.[0]) || (it.label?.en?.[0]) || '未知期刊',
-        summary: (it.summary?.['zh-CN']?.[0]) || (it.summary?.zh?.[0]) || (it.summary?.en?.[0]) || ''
-      }));
-    } catch (e) { 
-      console.error('加载目录失败:', e);
-      return []; 
     }
+    
+    return []; // 如果所有重试都失败，返回空数组
   }
 
   static async getManifest(manifestId: string): Promise<IIIFManifest> {
@@ -284,21 +332,28 @@ export class NewspaperService {
   private static buildProxyUrl(url: string): string {
     if (!url) return '';
     
+    // 修复IIIF URL路径问题 - 移除多余的iiif路径段
+    let fixedUrl = url;
+    if (url.includes('iiif/3/iiif/manifests/')) {
+      fixedUrl = url.replace('iiif/3/iiif/manifests/', 'iiif/3/manifests/');
+      logProduction('buildProxyUrl - 修复IIIF URL路径:', url, '->', fixedUrl);
+    }
+    
     if (isProduction) {
       // 生产环境：绝对不使用代理
-      logProduction('buildProxyUrl - 直接访问:', url);
-      return url;
+      logProduction('buildProxyUrl - 直接访问:', fixedUrl);
+      return fixedUrl;
     } else if (isDevelopment) {
       // 开发环境：可以选择使用代理
-      if (url.startsWith('https://')) {
-        const proxyUrl = `/proxy?url=${encodeURIComponent(url)}`;
+      if (fixedUrl.startsWith('https://')) {
+        const proxyUrl = `/proxy?url=${encodeURIComponent(fixedUrl)}`;
         logDevelopment('buildProxyUrl - 使用代理:', proxyUrl);
         return proxyUrl;
       }
     }
     
     // 默认情况：直接访问
-    return url;
+    return fixedUrl;
   }
 
   // 简化的搜索功能

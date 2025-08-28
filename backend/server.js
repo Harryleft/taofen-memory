@@ -189,9 +189,9 @@ app.post('/api/ai/interpret', async (req, res) => {
       path: '/api/paas/v4/chat/completions',
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json; charset=utf-8',
         'Authorization': `Bearer ${AI_API_CONFIG.apiKey}`,
-        'Content-Length': Buffer.byteLength(postData),
+        'Content-Length': Buffer.byteLength(postData, 'utf8'),
         'User-Agent': 'Node.js-App'
       }
     };
@@ -250,8 +250,9 @@ app.post('/api/ai/interpret', async (req, res) => {
 
     const data = await response.json();
     
-    // 提取AI回复内容
-    const interpretation = data.choices?.[0]?.message?.content || '';
+    // 提取AI回复内容 - 优先使用reasoning_content，其次使用content
+    const interpretation = data.choices?.[0]?.message?.reasoning_content || 
+                          data.choices?.[0]?.message?.content || '';
 
     res.json({
       success: true,
