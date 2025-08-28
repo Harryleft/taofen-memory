@@ -1,0 +1,118 @@
+# 本地开发环境Docker Compose配置
+# 使用方法: docker-compose -f docker-compose.dev.yml up -d
+services:
+  # Redis缓存服务
+  redis:
+    image: redis:7-alpine
+    container_name: taofen_redis_dev
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - ./redis.conf:/etc/redis/redis.conf:ro
+    command: redis-server /etc/redis/redis.conf
+    environment:
+      - REDIS_PASSWORD=dev_redis_password_2024
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  # Redis管理界面
+  redis-insight:
+    image: redis/redisinsight:latest
+    container_name: taofen_redis_insight_dev
+    restart: unless-stopped
+    ports:
+      - "5540:5540"
+    depends_on:
+      - redis
+    environment:
+      - REDISINSIGHT_HOST=0.0.0.0
+      - REDISINSIGHT_PORT=5540
+
+  # 缓存服务
+  cache-service:
+    image: node:20-alpine
+    container_name: taofen_cache_service_dev
+    working_dir: /app
+    restart: unless-stopped
+    volumes:
+      - ./cache-service:/app
+      - cache_service_node_modules:/app/node_modules
+    env_file:
+      - ./cache-service/.env
+    environment:
+      - NODE_ENV=development
+      - PORT=3002
+      - REDIS_URL=redis://:dev_redis_password_2024@redis:6379
+    ports:
+      - "3002:3002"
+    command: >
+      sh -c "npm ci --omit=dev && node server.js"
+    depends_on:
+      - redis
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3002/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  # AI后端服务
+  taofen_backend:
+    image: node:20-alpine
+    container_name: taofen_backend_dev
+    working_dir: /app
+    restart: unless-stopped
+    volumes:
+      - ./backend:/app
+      - taofen_node_modules:/app/node_modules
+    env_file:
+      - ./backend/.env
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - REDIS_URL=redis://:dev_redis_password_2024@redis:6379
+    ports:
+      - "3001:3001"
+    command: >
+      sh -c "npm ci --omit=dev && node server.js"
+    depends_on:
+      - redis
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  # Caddy反向代理
+  caddy:
+    image: caddy:2
+    container_name: caddy_dev
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "5173:5173"  # Vite开发服务器
+    depends_on:
+      - taofen_backend
+      - cache-service
+      - redis
+    volumes:
+      - ./Caddyfile.dev:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+      - ./frontend:/srv/www/taofen_web/frontend:ro  # 开发环境挂载源码
+
+volumes:
+  caddy_data: {}
+  caddy_config: {}
+  taofen_node_modules: {}
+  redis_data: {}
+  cache_service_node_modules: {}
+
+networks:
+  default:
+    name: taofen_dev_network

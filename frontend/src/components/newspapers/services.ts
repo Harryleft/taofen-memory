@@ -1,5 +1,20 @@
 import { IIIFManifest } from '@/components/iiif/iiifTypes.ts';
 import { isProduction, isDevelopment, logProduction, logDevelopment } from '../../utils/environment';
+import { cacheService } from '@/services/cache/cache-service';
+
+// IIIF信息接口
+interface IIIFInfo {
+  id?: string;
+  type?: string;
+  label?: { zh?: string[]; ['zh-CN']?: string[]; en?: string[] };
+  metadata?: Array<any>;
+  items?: Array<any>;
+  thumbnail?: Array<any>;
+  rights?: string;
+  provider?: Array<any>;
+  seeAlso?: Array<any>;
+  service?: Array<any>;
+}
 
 // 环境感知的代理函数 - 生产环境彻底禁用代理
 async function fetchWithProxy(url: string): Promise<Response> {
@@ -131,7 +146,24 @@ export class NewspaperService {
 
   static async getManifest(manifestId: string): Promise<IIIFManifest> {
     try {
-      // 直接构建完整的manifest URL
+      // 优先尝试从缓存获取IIIF信息
+      if (await cacheService.healthCheck()) {
+        try {
+          const iiifInfo = await cacheService.getIIIFInfo(manifestId);
+          if (iiifInfo && iiifInfo.data) {
+            logDevelopment(`缓存命中: IIIF信息 ${manifestId}`);
+            
+            // 基于IIIF信息构建manifest
+            const manifest = this.buildManifestFromIIIFInfo(manifestId, iiifInfo.data);
+            return manifest;
+          }
+        } catch (cacheError) {
+          logDevelopment(`缓存获取失败，降级到直接访问: ${cacheError}`);
+        }
+      }
+
+      // 缓存未命中或服务不可用，直接获取manifest
+      logDevelopment(`缓存未命中，直接获取manifest: ${manifestId}`);
       const manifestUrl = this.buildProxyUrl(`https://www.ai4dh.cn/iiif/3/manifests/${manifestId}/manifest.json`);
       
       const response = await fetchWithProxy(manifestUrl);
@@ -139,10 +171,44 @@ export class NewspaperService {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      return await response.json();
+      const manifest = await response.json();
+      
+      // 异步缓存manifest数据（不阻塞返回）
+      this.cacheManifestAsync(manifestId, manifest).catch(error => {
+        console.warn('缓存manifest失败:', error);
+      });
+      
+      return manifest;
     } catch (error) {
       console.error('Failed to fetch manifest:', error);
       throw error;
+    }
+  }
+
+  // 基于IIIF信息构建manifest对象
+  private static buildManifestFromIIIFInfo(manifestId: string, iiifInfo: IIIFInfo): IIIFManifest {
+    return {
+      id: `https://www.ai4dh.cn/iiif/3/manifests/${manifestId}/manifest.json`,
+      type: 'Manifest',
+      label: iiifInfo.label || { zh: [manifestId] },
+      metadata: iiifInfo.metadata || [],
+      items: iiifInfo.items || [],
+      thumbnail: iiifInfo.thumbnail,
+      rights: iiifInfo.rights,
+      provider: iiifInfo.provider,
+      seeAlso: iiifInfo.seeAlso,
+      service: iiifInfo.service
+    };
+  }
+
+  // 异步缓存manifest数据
+  private static async cacheManifestAsync(manifestId: string, manifest: IIIFManifest): Promise<void> {
+    try {
+      const cacheKey = cacheService.generateIIIFKey(manifestId, 'manifest');
+      await cacheService.set(cacheKey, manifest, 86400); // 24小时
+      logDevelopment(`缓存manifest成功: ${manifestId}`);
+    } catch (error) {
+      console.warn('缓存manifest失败:', error);
     }
   }
 
@@ -274,5 +340,75 @@ export class NewspaperService {
   // Linus式简化的代理URL获取 - 消除特殊情况
   static getProxyUrl(url: string): string {
     return this.buildProxyUrl(url);
+  }
+
+  // 缓存相关的辅助方法
+  static async prefetchManifests(manifestIds: string[]): Promise<void> {
+    try {
+      if (await cacheService.healthCheck()) {
+        logDevelopment(`开始预取manifests: ${manifestIds.length}个`);
+        await cacheService.prefetchIIIFInfo(manifestIds);
+        logDevelopment(`预取manifests完成`);
+      }
+    } catch (error) {
+      console.warn('预取manifests失败:', error);
+    }
+  }
+
+  static async clearManifestCache(manifestId?: string): Promise<void> {
+    try {
+      if (manifestId) {
+        // 清除特定manifest的缓存
+        const patterns = [
+          cacheService.generateIIIFKey(manifestId, 'info'),
+          cacheService.generateIIIFKey(manifestId, 'manifest'),
+          `iiif:image:${manifestId}:*`
+        ];
+        
+        for (const pattern of patterns) {
+          await cacheService.clear(pattern);
+        }
+        logDevelopment(`清除manifest缓存成功: ${manifestId}`);
+      } else {
+        // 清除所有相关缓存
+        await cacheService.clear('iiif:*');
+        logDevelopment('清除所有IIIF缓存成功');
+      }
+    } catch (error) {
+      console.warn('清除缓存失败:', error);
+    }
+  }
+
+  static async getCacheStatus(): Promise<{
+    enabled: boolean;
+    healthy: boolean;
+    stats?: unknown;
+  }> {
+    try {
+      const healthy = await cacheService.healthCheck();
+      let stats = null;
+      
+      if (healthy) {
+        try {
+          const statsResponse = await cacheService.getStats();
+          if (statsResponse.success) {
+            stats = statsResponse.data;
+          }
+        } catch (statsError) {
+          console.warn('获取缓存统计失败:', statsError);
+        }
+      }
+      
+      return {
+        enabled: true,
+        healthy,
+        stats
+      };
+    } catch {
+      return {
+        enabled: false,
+        healthy: false
+      };
+    }
   }
 }
