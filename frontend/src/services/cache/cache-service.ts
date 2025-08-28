@@ -348,5 +348,5 @@ export function generateIIIFKey(identifier: string, type: 'info' | 'image', para
   return cacheService.generateKey('iiif', type, identifier);
 }
 
-// 导出单例实例
-export { cacheService };
+// 导出类和单例实例
+export { CacheService, cacheService };
