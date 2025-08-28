@@ -1,8 +1,4 @@
 {
-  "env": {
-    "ANTHROPIC_MODEL": "glm-4.5",
-    "ANTHROPIC_SMALL_FAST_MODEL": "glm-4.5"
-  },
   "permissions": {
     "allow": [
       "Bash(find:*)",
@@ -114,7 +110,9 @@
       "Read(/C:\\Users\\afkxw\\Documents\\WindowsPowerShell/**)",
       "Bash(od:*)",
       "Bash(npm ls:*)",
-      "Bash(npm cache clean:*)"
+      "Bash(npm cache clean:*)",
+      "Bash(expect:*)",
+      "Bash(ssh:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",
