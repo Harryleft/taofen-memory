@@ -112,7 +112,8 @@
       "Bash(npm ls:*)",
       "Bash(npm cache clean:*)",
       "Bash(expect:*)",
-      "Bash(ssh:*)"
+      "Bash(ssh:*)",
+      "Bash(wsl:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",

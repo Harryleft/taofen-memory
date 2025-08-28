@@ -24,6 +24,42 @@ const HandwritingCard = memo(({
   const highlightedTitle = useMemo(() => highlightSearchText(item.title, searchTerm), [item.title, searchTerm]);
   const highlightedDescription = useMemo(() => highlightSearchText(item.description, searchTerm), [item.description, searchTerm]);
   
+  // 新增：智能图片选择
+  const getImageSrc = useMemo(() => {
+    // 优先使用缩略图
+    if (item.thumbnailImage) {
+      return item.thumbnailImage;
+    }
+    // 其次使用WebP版本
+    if (item.optimizedImage) {
+      return item.optimizedImage;
+    }
+    // 最后使用原图（保持兼容）
+    return item.image;
+  }, [item]);
+  
+  // 新增：智能加载策略
+  const loadingStrategy = useMemo(() => {
+    // 首屏前6张图片优先加载
+    return columnIndex < 6 ? 'eager' : 'lazy';
+  }, [columnIndex]);
+  
+  const fetchPriority = useMemo(() => {
+    // 首屏前6张图片高优先级
+    return columnIndex < 6 ? 'high' : 'auto';
+  }, [columnIndex]);
+  
+  // 新增：图片错误处理
+  const handleImageError = useCallback(() => {
+    if (!imageError) {
+      setImageError(true);
+      // 如果优化图片加载失败，尝试使用原图
+      if (getImageSrc !== item.image) {
+        console.warn(`优化图片加载失败，回退到原图: ${item.image}`);
+      }
+    }
+  }, [imageError, getImageSrc, item.image]);
+  
     
   return (
     <div
@@ -67,15 +103,16 @@ const HandwritingCard = memo(({
           
           {/* 实际图片 */}
           <img
-            src={item.image}
+            src={getImageSrc}
             alt={item.title}
             className={`w-full object-cover group-hover:scale-110 transition-transform duration-700 ${
               imageLoaded ? 'opacity-100' : 'opacity-0'
             }`}
             style={{ height: `${item.dimensions.height}px` }}
-            loading="lazy"
+            loading={loadingStrategy}
+            fetchPriority={fetchPriority}
             onLoad={() => setImageLoaded(true)}
-            onError={() => setImageError(true)}
+            onError={handleImageError}
           />
           
           {/* 悬停效果 */}
