@@ -55,7 +55,7 @@ export default defineConfig({
       },
       // 缓存服务代理
       '/api/cache': {
-        target: 'http://localhost:3002',
+        target: 'http://localhost:3001',
         changeOrigin: true,
         configure: (proxy) => {
           proxy.on('proxyReq', (proxyReq, req) => {
