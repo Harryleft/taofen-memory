@@ -18,6 +18,8 @@ export interface ImagePreloadResult {
 export class ImagePreloader {
   private static preloadCache = new Map<string, Promise<ImagePreloadResult>>();
   private static preloadedImages = new Set<string>();
+  private static readonly MAX_CACHE_SIZE = 100; // 最大缓存数量
+  private static readonly MAX_PRELOADED_SIZE = 200; // 最大预加载图片数量
   
   /**
    * 预加载单个图片
@@ -37,6 +39,9 @@ export class ImagePreloader {
       return { success: true, src };
     }
     
+    // 检查缓存大小，如果超过限制，清理一部分
+    this.checkAndCleanupCache();
+    
     // 如果正在预加载中，返回同一个 Promise
     if (this.preloadCache.has(src)) {
       return this.preloadCache.get(src)!;
@@ -47,6 +52,15 @@ export class ImagePreloader {
       let retryAttempts = 0;
       
       const loadHandler = () => {
+        // 检查预加载图片集合大小
+        if (this.preloadedImages.size > this.MAX_PRELOADED_SIZE) {
+          const imagesToDelete = Array.from(this.preloadedImages).slice(0, Math.floor(this.MAX_PRELOADED_SIZE * 0.3));
+          imagesToDelete.forEach(imgSrc => {
+            this.preloadedImages.delete(imgSrc);
+          });
+          console.log(`[ImagePreloader] 清理已预加载图片: 删除${imagesToDelete.length}个图片`);
+        }
+        
         this.preloadedImages.add(src);
         resolve({ success: true, src });
       };
@@ -107,6 +121,29 @@ export class ImagePreloader {
       return result;
     } finally {
       this.preloadCache.delete(src);
+    }
+  }
+  
+  /**
+   * 检查并清理缓存
+   */
+  private static checkAndCleanupCache(): void {
+    // 清理预加载缓存
+    if (this.preloadCache.size > this.MAX_CACHE_SIZE) {
+      const entriesToDelete = Array.from(this.preloadCache.entries()).slice(0, Math.floor(this.MAX_CACHE_SIZE * 0.3));
+      entriesToDelete.forEach(([src]) => {
+        this.preloadCache.delete(src);
+      });
+      console.log(`[ImagePreloader] 清理预加载缓存: 删除${entriesToDelete.length}个缓存项`);
+    }
+    
+    // 清理已预加载图片集合
+    if (this.preloadedImages.size > this.MAX_PRELOADED_SIZE) {
+      const imagesToDelete = Array.from(this.preloadedImages).slice(0, Math.floor(this.MAX_PRELOADED_SIZE * 0.3));
+      imagesToDelete.forEach(src => {
+        this.preloadedImages.delete(src);
+      });
+      console.log(`[ImagePreloader] 清理已预加载图片: 删除${imagesToDelete.length}个图片`);
     }
   }
   
