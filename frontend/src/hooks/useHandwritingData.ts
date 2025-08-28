@@ -90,16 +90,18 @@ const getImagePath = (item: HandwritingItem): string => {
   return '/images/placeholder.png';
 };
 
-// 新增：获取WebP版本路径
+// 获取WebP版本路径（如果不存在则返回原路径）
 const getOptimizedImagePath = (item: HandwritingItem): string => {
   const originalPath = getImagePath(item);
-  return originalPath + '.webp';
+  // 暂时返回原路径，因为WebP文件还不存在
+  return originalPath;
 };
 
-// 新增：获取缩略图路径
+// 获取缩略图路径（如果不存在则返回原路径）
 const getThumbnailImagePath = (item: HandwritingItem): string => {
   const originalPath = getImagePath(item);
-  return originalPath + '.thumb.webp';
+  // 暂时返回原路径，因为缩略图文件还不存在
+  return originalPath;
 };
 
 
