@@ -1,0 +1,54 @@
+www.ai4dh.cn {
+  handle_path /iiif/3/manifests/* {
+    root * /srv/iiif/manifests
+    file_server
+  }
+  handle_path /iiif/manifests/* {
+    root * /srv/iiif/manifests
+   file_server
+  }
+
+  # IIIF 图像端点：只匹配 /iiif/2/* 和 /iiif/3/*
+  @iiif path_regexp iiif ^/iiif/(2|3)/.*
+  handle @iiif {
+    reverse_proxy cantaloupe:8182 {
+      # 直通上游，不做缓冲
+      flush_interval -1
+
+      # 明确用 HTTP/1.1 与上游通讯（更稳）
+      transport http {
+        versions 1.1
+      }
+
+      # 透传常见头，方便上游生成外链等
+      header_up X-Forwarded-Proto {scheme}
+      header_up X-Forwarded-Host  {host}
+      header_up X-Forwarded-For   {remote}
+      header_up Host              {host}
+
+      # 避免出现 0 长度的误报，交给分块传输
+      header_down -Content-Length
+    }
+  }
+
+  
+  # -------- 后端 API：保留 /api 前缀 --------
+  handle /api/* {
+    reverse_proxy taofen_backend:3001
+  }
+
+  # -------- 前端静态（SPA 回退）--------
+  handle {
+    root * /srv/www/taofen_web/frontend/dist
+    try_files {path} /index.html
+    file_server
+  }
+  
+  # ——（可选）静态缓存头（前端更快；IIIF 路径上不生效）——
+  @static path_regexp static ^/(assets|images|data)/.*\.(js|css|png|jpg|jpeg|webp|svg|ico|json)$
+  header @static Cache-Control "public, max-age=31536000, immutable"
+  
+  
+}
+
+

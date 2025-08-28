@@ -1,12 +1,23 @@
 import { IIIFManifest } from '@/components/iiif/iiifTypes.ts';
+import { isProduction, isDevelopment, logProduction, logDevelopment } from '../../utils/environment';
 
-// 简化的代理函数 - 消除特殊情况
+// 环境感知的代理函数 - 生产环境彻底禁用代理
 async function fetchWithProxy(url: string): Promise<Response> {
-  const finalUrl = import.meta.env.DEV && url.startsWith('https://') 
-    ? `/proxy?url=${encodeURIComponent(url)}`
-    : url;
+  if (isProduction) {
+    // 生产环境：直接访问，绝对不使用代理
+    logProduction('直接访问:', url);
+    return fetch(url);
+  } else if (isDevelopment) {
+    // 开发环境：可以选择使用代理
+    if (url.startsWith('https://')) {
+      const proxyUrl = `/proxy?url=${encodeURIComponent(url)}`;
+      logDevelopment('使用代理:', proxyUrl);
+      return fetch(proxyUrl);
+    }
+  }
   
-  return fetch(finalUrl);
+  // 默认情况：直接访问
+  return fetch(url);
 }
 
 export interface PublicationItem {
@@ -203,16 +214,24 @@ export class NewspaperService {
     }
   }
 
-  // Linus式简化的代理URL构建 - 直接使用完整URL
+  // Linus式简化的URL构建 - 生产环境彻底禁用代理
   private static buildProxyUrl(url: string): string {
     if (!url) return '';
     
-    // 开发环境使用代理
-    if (import.meta.env.DEV && url.startsWith('https://')) {
-      return `/proxy?url=${encodeURIComponent(url)}`;
+    if (isProduction) {
+      // 生产环境：绝对不使用代理
+      logProduction('buildProxyUrl - 直接访问:', url);
+      return url;
+    } else if (isDevelopment) {
+      // 开发环境：可以选择使用代理
+      if (url.startsWith('https://')) {
+        const proxyUrl = `/proxy?url=${encodeURIComponent(url)}`;
+        logDevelopment('buildProxyUrl - 使用代理:', proxyUrl);
+        return proxyUrl;
+      }
     }
     
-    // 生产环境直接返回原URL
+    // 默认情况：直接访问
     return url;
   }
 

@@ -1,0 +1,85 @@
+# /srv/iiif/stack/docker-compose.yml
+services:
+  cantaloupe:
+    image: uclalibrary/cantaloupe:5.0.7-0
+    container_name: cantaloupe
+    restart: unless-stopped
+    # 宿主机 127.0.0.1:8282 -> 容器 8282
+    ports:
+      - "127.0.0.1:8282:8182"
+    environment:
+      # 开 IIIF v3 & v2 + 管理面板
+      CANTALOUPE_ENDPOINT_API_ENABLED: "true"
+      CANTALOUPE_ENDPOINT_API_USERNAME: "api"
+      CANTALOUPE_ENDPOINT_API_SECRET: "verysecret"
+      CANTALOUPE_ENDPOINT_IIIF_3_ENABLED: "true"
+      CANTALOUPE_ENDPOINT_IIIF_2_ENABLED: "true"
+      CANTALOUPE_ENDPOINT_ADMIN_ENABLED: "true"
+      CANTALOUPE_ENDPOINT_ADMIN_USERNAME: "admin"
+      CANTALOUPE_ENDPOINT_ADMIN_SECRET: "nsrjd4yt"
+      # 文件系统作为图像源（identifier = 相对 /imageroot 的路径）
+      CANTALOUPE_SOURCE_STATIC: "FilesystemSource"
+      CANTALOUPE_FILESYSTEMSOURCE_LOOKUP_STRATEGY: "BasicLookupStrategy"
+      CANTALOUPE_FILESYSTEMSOURCE_BASICLOOKUPSTRATEGY_PATH_PREFIX: "/imageroot/images/"
+      # 派生缓存 & info 缓存
+      CANTALOUPE_CACHE_SERVER_DERIVATIVE_ENABLED: "false"
+      CANTALOUPE_CACHE_SERVER_DERIVATIVE: "FilesystemCache"
+      CANTALOUPE_FILESYSTEMCACHE_PATHNAME: "/var/cache/cantaloupe"
+      CANTALOUPE_CACHE_SERVER_INFO_ENABLED: "false"
+      # 2GiB 机器：JVM 给 1GiB
+      JAVA_OPTS: "-Xms512m -Xmx1024m"
+    volumes:
+      - /srv/iiif:/imageroot:ro
+      - /srv/iiif/cache:/var/cache/cantaloupe
+      - /srv/iiif/logs:/var/log/cantaloupe
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8182/"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+  taofen_backend:
+    image: node:20-alpine
+    container_name: taofen_backend
+    working_dir: /app
+    restart: unless-stopped
+    # 挂载源码；node_modules 用卷（更干净）
+    volumes:
+      - /srv/www/taofen_web/backend:/app
+      - taofen_node_modules:/app/node_modules
+    env_file:
+      - /srv/www/taofen_web/backend/.env   # 从你的 .env 读 AI_API_KEY/PORT 等
+    environment:
+      NODE_ENV: "production"
+      PORT: "3001"                         # 和 server.js 默认保持一致
+    command: >
+      sh -c "npm ci --omit=dev && node server.js"
+    expose:
+      - "3001"                             # 给同网段容器用，外网不暴露
+    healthcheck:
+      # 你的健康检查路由是 /api/health
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  caddy:
+    image: caddy:2
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - taofen_backend                     # 让 Caddy 在后端之后再起（非硬依赖）
+      - cantaloupe      
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+      - /srv/iiif/manifests:/srv/iiif/manifests:ro
+      - /srv/www/taofen_web/frontend/dist:/srv/www/taofen_web/frontend/dist:ro
+
+volumes:
+  caddy_data: {}
+  caddy_config: {}
+  taofen_node_modules: {}

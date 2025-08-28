@@ -1,0 +1,58 @@
+www.ai4dh.cn {
+  # 暂时关闭压缩，避免对二进制流的干扰
+  # encode zstd gzip
+
+  # -------- 前端代理：处理 /proxy 请求 (必须放在最前面) --------
+  handle /proxy/* {
+    # 从 URL 参数中提取目标 URL
+    # 例如：/proxy?url=https://www.ai4dh.cn/iiif/3/manifests/...
+    reverse_proxy {$query:url} {
+      # 保持原始协议
+      header_up Host {http.reverse_proxy.upstream.host}
+      header_up X-Forwarded-Proto {scheme}
+      header_up X-Forwarded-Host {host}
+      header_up X-Forwarded-For {remote}
+    }
+  }
+
+  handle_path /iiif/3/manifests/* {
+    root * /srv/iiif/manifests
+    file_server
+  }
+  handle_path /iiif/manifests/* {
+    root * /srv/iiif/manifests
+   file_server
+  }
+
+  # IIIF 图像端点：只匹配 /iiif/2/* 和 /iiif/3/*
+  @iiif path_regexp iiif ^/iiif/(2|3)/.*
+  handle @iiif {
+    reverse_proxy cantaloupe:8182 {
+      # 直通上游，不做缓冲
+      flush_interval -1
+
+      # 明确用 HTTP/1.1 与上游通讯（更稳）
+      transport http {
+        versions 1.1
+      }
+
+      # 透传常见头，方便上游生成外链等
+      header_up X-Forwarded-Proto {scheme}
+      header_up X-Forwarded-Host  {host}
+      header_up X-Forwarded-For   {remote}
+      header_up Host              {host}
+
+      # 避免出现 0 长度的误报，交给分块传输
+      header_down -Content-Length
+    }
+  }
+
+  # -------- 静态文件服务 (前端) --------
+  handle /* {
+    root * /var/www/ai4dh.cn/frontend
+    try_files {path} {path}/ /index.html
+    file_server
+  }
+
+  # -------- 后端 API：保留 /api 前缀 --------
+}

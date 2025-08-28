@@ -2,6 +2,8 @@
  * IIIF URL构建工具类
  * 统一处理所有IIIF相关的URL构建逻辑
  */
+import { isProduction, isDevelopment, logProduction, logDevelopment } from '../../utils/environment';
+
 export class IIIFUrlBuilder {
   private static readonly BASE_URL = 'https://www.ai4dh.cn/iiif/3';
   private static readonly PROXY_BASE = '/proxy';
@@ -16,8 +18,6 @@ export class IIIFUrlBuilder {
       const urlObj = new URL(url);
       const pathParts = urlObj.pathname.split('/').filter(Boolean);
       
-      debug.log('iiif', '路径部分:', pathParts);
-      
       // 检查是否是ai4dh.cn的URL
       if (urlObj.hostname === 'www.ai4dh.cn') {
         const iiifIndex = pathParts.indexOf('iiif');
@@ -25,8 +25,6 @@ export class IIIFUrlBuilder {
           const version = pathParts[iiifIndex + 1];
           const type = pathParts[iiifIndex + 2];
           const resourcePath = pathParts.slice(iiifIndex + 3).join('/');
-          
-          debug.log('iiif', '解析结果:', { version, type, resourcePath });
           
           return {
             baseUrl: urlObj.origin,
@@ -67,9 +65,6 @@ export class IIIFUrlBuilder {
   static build(components: IIIFUrlComponents, options: IIIFUrlOptions = {}): string {
     const { proxy = false, format = 'manifest' } = options;
     
-    debug.log('iiif', '构建URL组件:', components);
-    debug.log('iiif', '构建选项:', options);
-    
     let url: string;
     
     if (components.isComplete && components.type !== 'external') {
@@ -86,13 +81,15 @@ export class IIIFUrlBuilder {
     
     console.log('🔍 [IIIF] 构建的基础URL:', url);
     
-    // 添加代理
-    if (proxy && import.meta.env.DEV && url.startsWith('https://')) {
+    // 环境感知的代理处理
+    if (proxy && isDevelopment && url.startsWith('https://')) {
       const proxyUrl = `${this.PROXY_BASE}?url=${encodeURIComponent(url)}`;
-      console.log('🔍 [IIIF] 代理URL:', proxyUrl);
+      logDevelopment('IIIF构建 - 使用代理:', proxyUrl);
       return proxyUrl;
     }
     
+    // 生产环境直接访问，绝对不使用代理
+    logProduction('IIIF构建 - 直接访问:', url);
     return url;
   }
 

@@ -7,6 +7,7 @@ import NewspapersLayout from './NewspapersLayout.tsx';
 import { EmptyState } from './EmptyState';
 import { NewspapersGuideArea } from './NewspapersGuideArea';
 import { useTouchDrawer } from '@/hooks/useTouchDrawer.ts';
+import { isProduction, isDevelopment, logProduction, logDevelopment } from '../../utils/environment';
 
 // ====================
 // 常量配置
@@ -1041,12 +1042,21 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
       // Linus式设计：直接使用issue.manifest，它已经是完整的manifest URL
       const fullManifestUrl = issue.manifest;
       
-      // 使用简化的代理处理
-      const proxyManifestUrl = NewspaperService.getProxyUrl(fullManifestUrl);
-      actions.setManifestUrl(proxyManifestUrl);
+      // 环境感知的URL处理
+      const manifestUrl = isProduction 
+        ? fullManifestUrl  // 生产环境：直接使用原始URL
+        : NewspaperService.getProxyUrl(fullManifestUrl);  // 开发环境：使用代理
+      
+      if (isProduction) {
+        logProduction('loadViewer - 直接访问manifest:', manifestUrl);
+      } else {
+        logDevelopment('loadViewer - 使用代理:', manifestUrl);
+      }
+      
+      actions.setManifestUrl(manifestUrl);
       
       // 验证manifest是否可访问
-      const response = await fetch(proxyManifestUrl);
+      const response = await fetch(manifestUrl);
       
       if (!response.ok) {
         throw new Error(`Manifest加载失败: ${response.status} ${response.statusText}`);
@@ -1147,12 +1157,21 @@ export const NewspapersIntegratedLayout: React.FC<NewspapersIntegratedLayoutProp
         const firstIssue = response.data[0];
         actions.setSelectedIssue(firstIssue);
         
-        // 使用代理URL构建方式，避免CORS问题
-        const proxyManifestUrl = NewspaperService.getProxyUrl(firstIssue.manifest);
-        actions.setManifestUrl(proxyManifestUrl);
+        // 环境感知的URL处理
+        const manifestUrl = isProduction 
+          ? firstIssue.manifest  // 生产环境：直接使用原始URL
+          : NewspaperService.getProxyUrl(firstIssue.manifest);  // 开发环境：使用代理
+        
+        if (isProduction) {
+          logProduction('自动选择第一期 - 直接访问:', manifestUrl);
+        } else {
+          logDevelopment('自动选择第一期 - 使用代理:', manifestUrl);
+        }
+        
+        actions.setManifestUrl(manifestUrl);
         
         if (onIssueSelect) {
-          onIssueSelect(proxyManifestUrl, firstIssue.title);
+          onIssueSelect(manifestUrl, firstIssue.title);
         }
       } else {
         // 如果没有期数，清除选择
