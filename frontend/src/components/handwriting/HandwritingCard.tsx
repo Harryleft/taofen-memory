@@ -1,4 +1,4 @@
-import { useMemo, memo, useState, useCallback } from 'react';
+import { useMemo, memo, useState, useCallback, useEffect } from 'react';
 import { ZoomIn, Image } from 'lucide-react';
 import { highlightSearchText, categoryLabels } from '@/utils/handwritingUtils.ts';
 import type { TransformedHandwritingItem } from '@/hooks/useHandwritingData.ts';
@@ -20,23 +20,36 @@ const HandwritingCard = memo(({
 }: HandwritingCardProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [currentImageSrc, setCurrentImageSrc] = useState<string>('');
   
   const highlightedTitle = useMemo(() => highlightSearchText(item.title, searchTerm), [item.title, searchTerm]);
   const highlightedDescription = useMemo(() => highlightSearchText(item.description, searchTerm), [item.description, searchTerm]);
   
-  // 新增：智能图片选择
-  const getImageSrc = useMemo(() => {
-    // 优先使用缩略图
-    if (item.thumbnailImage) {
-      return item.thumbnailImage;
-    }
-    // 其次使用WebP版本
-    if (item.optimizedImage) {
+  // 智能图片源选择和回退机制
+  const getNextImageSrc = useCallback((currentSrc: string): string => {
+    // 当前是缩略图，尝试优化图片
+    if (currentSrc === item.thumbnailImage && item.optimizedImage) {
       return item.optimizedImage;
     }
-    // 最后使用原图（保持兼容）
-    return item.image;
-  }, [item]);
+    // 当前是优化图片，尝试原图
+    if (currentSrc === item.optimizedImage && item.image) {
+      return item.image;
+    }
+    // 没有更多回退选项
+    return '';
+  }, [item.thumbnailImage, item.optimizedImage, item.image]);
+  
+  // 初始化图片源
+  useEffect(() => {
+    // 优先使用缩略图
+    if (item.thumbnailImage) {
+      setCurrentImageSrc(item.thumbnailImage);
+    } else if (item.optimizedImage) {
+      setCurrentImageSrc(item.optimizedImage);
+    } else if (item.image) {
+      setCurrentImageSrc(item.image);
+    }
+  }, [item.thumbnailImage, item.optimizedImage, item.image]);
   
   // 新增：智能加载策略
   const loadingStrategy = useMemo(() => {
@@ -49,16 +62,20 @@ const HandwritingCard = memo(({
     return columnIndex < 6 ? 'high' : 'auto';
   }, [columnIndex]);
   
-  // 新增：图片错误处理
+  // 修复：图片错误处理和回退机制
   const handleImageError = useCallback(() => {
     if (!imageError) {
-      setImageError(true);
-      // 如果优化图片加载失败，尝试使用原图
-      if (getImageSrc !== item.image) {
-        console.warn(`优化图片加载失败，回退到原图: ${item.image}`);
+      const nextSrc = getNextImageSrc(currentImageSrc);
+      if (nextSrc) {
+        console.warn(`图片加载失败，回退到下一个选项: ${currentImageSrc} -> ${nextSrc}`);
+        setCurrentImageSrc(nextSrc);
+        setImageLoaded(false); // 重置加载状态
+      } else {
+        console.error(`所有图片源都加载失败: ${item.title}`);
+        setImageError(true);
       }
     }
-  }, [imageError, getImageSrc, item.image]);
+  }, [imageError, currentImageSrc, getNextImageSrc, item.title]);
   
     
   return (
@@ -102,18 +119,21 @@ const HandwritingCard = memo(({
           )}
           
           {/* 实际图片 */}
-          <img
-            src={getImageSrc}
-            alt={item.title}
-            className={`w-full object-cover group-hover:scale-110 transition-transform duration-700 ${
-              imageLoaded ? 'opacity-100' : 'opacity-0'
-            }`}
-            style={{ height: `${item.dimensions.height}px` }}
-            loading={loadingStrategy}
-            fetchPriority={fetchPriority}
-            onLoad={() => setImageLoaded(true)}
-            onError={handleImageError}
-          />
+          {currentImageSrc && (
+            <img
+              key={currentImageSrc} // 添加key确保图片源变化时重新加载
+              src={currentImageSrc}
+              alt={item.title}
+              className={`w-full object-cover group-hover:scale-110 transition-transform duration-700 ${
+                imageLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
+              style={{ height: `${item.dimensions.height}px` }}
+              loading={loadingStrategy}
+              fetchPriority={fetchPriority}
+              onLoad={() => setImageLoaded(true)}
+              onError={handleImageError}
+            />
+          )}
           
           {/* 悬停效果 */}
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
