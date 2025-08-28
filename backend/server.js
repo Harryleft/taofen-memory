@@ -251,8 +251,8 @@ app.post('/api/ai/interpret', async (req, res) => {
     const data = await response.json();
     
     // 提取AI回复内容 - 优先使用reasoning_content，其次使用content
-    const interpretation = data.choices?.[0]?.message?.reasoning_content || 
-                          data.choices?.[0]?.message?.content || '';
+    const interpretation = data.choices?.[0]?.message?.content ||
+                          data.choices?.[0]?.message?.reasoning_content || '';
 
     res.json({
       success: true,
