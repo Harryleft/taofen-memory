@@ -76,10 +76,19 @@ app.post('/api/ai/interpret', async (req, res) => {
     const response = await new Promise((resolve, reject) => {
       const req = https.request(requestOptions, (res) => {
         let data = '';
+        
+        // 添加超时机制，防止内存泄漏
+        const timeout = setTimeout(() => {
+          req.destroy();
+          reject(new Error('AI API请求超时'));
+        }, 30000); // 30秒超时
+        
         res.on('data', (chunk) => {
           data += chunk;
         });
+        
         res.on('end', () => {
+          clearTimeout(timeout);
           try {
             resolve({
               ok: res.statusCode >= 200 && res.statusCode < 300,
@@ -90,9 +99,24 @@ app.post('/api/ai/interpret', async (req, res) => {
             reject(parseError);
           }
         });
+        
+        // 处理响应错误
+        res.on('error', (error) => {
+          clearTimeout(timeout);
+          reject(error);
+        });
       });
 
-      req.on('error', reject);
+      req.on('error', (error) => {
+        reject(error);
+      });
+      
+      // 设置请求超时
+      req.setTimeout(30000, () => {
+        req.destroy();
+        reject(new Error('AI API请求超时'));
+      });
+      
       req.write(postData);
       req.end();
     });
