@@ -230,23 +230,27 @@ class CacheService {
     return [prefix, ...parts].join(':');
   }
 
-  /**
-   * IIIF缓存键生成器
-   */
-  generateIIIFKey(identifier: string, type: 'info' | 'image', params?: unknown): string {
-    if (type === 'info') {
-      return this.generateKey('iiif', 'info', identifier);
-    } else if (type === 'image' && params) {
-      const { region, size, rotation, quality } = params;
-      return this.generateKey('iiif', 'image', identifier, region, size, rotation, quality);
-    }
-    return this.generateKey('iiif', type, identifier);
   }
+
+/**
+ * IIIF图片参数接口
+ */
+interface IIIFImageParams {
+  region: string;
+  size: string;
+  rotation: string;
+  quality: string;
 }
 
-// 创建单例实例
-export const cacheService = new CacheService();
-
-// 导出类型
-export type { CacheService };
-export default cacheService;
+/**
+ * IIIF缓存键生成器
+ */
+export function generateIIIFKey(identifier: string, type: 'info' | 'image', params?: IIIFImageParams): string {
+  if (type === 'info') {
+    return cacheService.generateKey('iiif', 'info', identifier);
+  } else if (type === 'image' && params) {
+    const { region, size, rotation, quality } = params;
+    return cacheService.generateKey('iiif', 'image', identifier, region, size, rotation, quality);
+  }
+  return cacheService.generateKey('iiif', type, identifier);
+}
