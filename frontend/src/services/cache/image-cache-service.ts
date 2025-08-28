@@ -233,7 +233,7 @@ export class ImageCacheService extends CacheService {
   /**
    * 获取图片缓存统计
    */
-  async getImageCacheStats(): Promise<any> {
+  async getImageCacheStats(): Promise<ImageCacheStats | null> {
     try {
       const response = await this.get('/cache/image/stats');
       return response.success ? response.data : null;
@@ -267,7 +267,7 @@ export class ImageCacheService extends CacheService {
    * 获取图片ID从URL
    */
   extractImageIdFromUrl(url: string): string {
-    const match = url.match(/\/([^\/]+)\.\w+$/);
+    const match = url.match(/\/([^/]+)\.\w+$/);
     return match ? match[1] : url;
   }
 
@@ -318,7 +318,7 @@ export class ImageCacheService extends CacheService {
     return this.hashObject(arr);
   }
 
-  private hashObject(obj: any): string {
+  private hashObject(obj: Record<string, unknown>): string {
     const str = JSON.stringify(obj);
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
@@ -328,6 +328,19 @@ export class ImageCacheService extends CacheService {
     }
     return Math.abs(hash).toString(16);
   }
+}
+
+/**
+ * 图片缓存统计接口
+ */
+export interface ImageCacheStats {
+  totalKeys: number;
+  memoryUsage: number;
+  hitRate: number;
+  totalRequests: number;
+  averageResponseTime: number;
+  prefix: string;
+  type: string;
 }
 
 // 导出单例实例

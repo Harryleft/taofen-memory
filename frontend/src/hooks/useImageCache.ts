@@ -200,7 +200,7 @@ export const usePreloadQueue = (currentPage: number, itemsPerPage: number) => {
  * 图片缓存统计Hook
  */
 export const useImageCacheStats = () => {
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<ImageCacheStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -244,12 +244,14 @@ export const useSmartImagePreloader = (
     enabled?: boolean;
     priority?: 'high' | 'low';
     concurrency?: number;
+    maxCacheSize?: number;
   } = {}
 ) => {
   const {
     enabled = true,
     priority = 'high',
-    concurrency = 3
+    concurrency = 3,
+    maxCacheSize = 100 // 最大缓存图片数量
   } = options;
 
   const [loading, setLoading] = useState(false);
@@ -258,9 +260,15 @@ export const useSmartImagePreloader = (
 
   const loadingRef = useRef<Set<string>>(new Set());
   const maxConcurrencyRef = useRef(concurrency);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const loadImage = useCallback(async (url: string): Promise<boolean> => {
     if (loadedImages.has(url) || failedImages.has(url) || loadingRef.current.has(url)) {
+      return false;
+    }
+
+    // 检查是否被中止
+    if (abortControllerRef.current?.signal.aborted) {
       return false;
     }
 
@@ -274,18 +282,51 @@ export const useSmartImagePreloader = (
         img.src = url;
       });
 
-      setLoadedImages(prev => new Set(prev).add(url));
+      // LRU清理：如果超过最大缓存大小，删除最早的图片
+      setLoadedImages(prev => {
+        const newSet = new Set(prev).add(url);
+        if (newSet.size > maxCacheSize) {
+          // 转换为数组，删除第一个（最早的）元素
+          const oldestUrl = Array.from(newSet)[0];
+          newSet.delete(oldestUrl);
+        }
+        return newSet;
+      });
+
+      // 同样清理failedImages，防止无限增长
+      setFailedImages(prev => {
+        if (prev.size > maxCacheSize) {
+          const oldestUrl = Array.from(prev)[0];
+          const newSet = new Set(prev);
+          newSet.delete(oldestUrl);
+          return newSet;
+        }
+        return prev;
+      });
+
       return true;
     } catch (error) {
-      setFailedImages(prev => new Set(prev).add(url));
+      setFailedImages(prev => {
+        const newSet = new Set(prev).add(url);
+        // 限制失败图片的缓存大小
+        if (newSet.size > Math.floor(maxCacheSize / 2)) {
+          const oldestUrl = Array.from(newSet)[0];
+          newSet.delete(oldestUrl);
+        }
+        return newSet;
+      });
       return false;
     } finally {
       loadingRef.current.delete(url);
     }
-  }, [loadedImages, failedImages]);
+  }, [loadedImages, failedImages, maxCacheSize]);
 
   const preloadImages = useCallback(async (urls: string[], isPriority: boolean = false) => {
     if (!enabled || urls.length === 0) return;
+
+    // 创建新的AbortController
+    abortControllerRef.current = new AbortController();
+    const { signal } = abortControllerRef.current;
 
     setLoading(true);
 
@@ -298,12 +339,18 @@ export const useSmartImagePreloader = (
       }
 
       for (const chunk of chunks) {
+        // 检查是否被中止
+        if (signal.aborted) break;
         await Promise.all(chunk.map(url => loadImage(url)));
       }
-    } catch (error) {
-      console.error('Failed to preload images:', error);
+    } catch (_err) {
+      // 忽略AbortError，只记录其他错误
+      if (_err instanceof Error && _err.name !== 'AbortError') {
+        console.error('Failed to preload images:', _err);
+      }
     } finally {
       setLoading(false);
+      abortControllerRef.current = null;
     }
   }, [enabled, loadImage]);
 
@@ -342,6 +389,13 @@ export const useSmartImagePreloader = (
       setLoadedImages(new Set());
       setFailedImages(new Set());
       loadingRef.current.clear();
+    },
+    abortPreloading: () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+        abortControllerRef.current = null;
+      }
+      setLoading(false);
     }
   };
 };
@@ -359,7 +413,7 @@ export const useImageCacheHealth = () => {
       // 尝试获取缓存统计来检查服务是否健康
       await imageCacheService.getImageCacheStats();
       setIsHealthy(true);
-    } catch (error) {
+    } catch (_err) {
       setIsHealthy(false);
     } finally {
       setLastCheck(new Date());
