@@ -261,6 +261,7 @@ export const useSmartImagePreloader = (
   const loadingRef = useRef<Set<string>>(new Set());
   const maxConcurrencyRef = useRef(concurrency);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const preloadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const loadImage = useCallback(async (url: string): Promise<boolean> => {
     if (loadedImages.has(url) || failedImages.has(url) || loadingRef.current.has(url)) {
@@ -305,7 +306,7 @@ export const useSmartImagePreloader = (
       });
 
       return true;
-    } catch (error) {
+    } catch (_error) {
       setFailedImages(prev => {
         const newSet = new Set(prev).add(url);
         // 限制失败图片的缓存大小
@@ -324,6 +325,15 @@ export const useSmartImagePreloader = (
   const preloadImages = useCallback(async (urls: string[], isPriority: boolean = false) => {
     if (!enabled || urls.length === 0) return;
 
+    // 过滤掉已经加载过或正在加载的图片
+    const uniqueUrls = urls.filter(url => 
+      !loadedImages.has(url) && 
+      !failedImages.has(url) && 
+      !loadingRef.current.has(url)
+    );
+
+    if (uniqueUrls.length === 0) return;
+
     // 创建新的AbortController
     abortControllerRef.current = new AbortController();
     const { signal } = abortControllerRef.current;
@@ -334,8 +344,8 @@ export const useSmartImagePreloader = (
       const limitedConcurrency = isPriority ? Math.max(1, Math.floor(maxConcurrencyRef.current / 2)) : 1;
       const chunks: string[][] = [];
       
-      for (let i = 0; i < urls.length; i += limitedConcurrency) {
-        chunks.push(urls.slice(i, i + limitedConcurrency));
+      for (let i = 0; i < uniqueUrls.length; i += limitedConcurrency) {
+        chunks.push(uniqueUrls.slice(i, i + limitedConcurrency));
       }
 
       for (const chunk of chunks) {
@@ -343,23 +353,39 @@ export const useSmartImagePreloader = (
         if (signal.aborted) break;
         await Promise.all(chunk.map(url => loadImage(url)));
       }
-    } catch (_err) {
+    } catch (err) {
       // 忽略AbortError，只记录其他错误
-      if (_err instanceof Error && _err.name !== 'AbortError') {
-        console.error('Failed to preload images:', _err);
+      if (err instanceof Error && err.name !== 'AbortError') {
+        console.error('Failed to preload images:', err);
       }
     } finally {
       setLoading(false);
       abortControllerRef.current = null;
     }
-  }, [enabled, loadImage]);
+  }, [enabled, loadImage, loadedImages, failedImages]);
 
   const preloadCurrentImages = useCallback(() => {
-    return preloadImages(currentImages, priority === 'high');
+    // 清除之前的防抖定时器
+    if (preloadTimeoutRef.current) {
+      clearTimeout(preloadTimeoutRef.current);
+    }
+    
+    // 设置新的防抖定时器
+    preloadTimeoutRef.current = setTimeout(() => {
+      preloadImages(currentImages, priority === 'high');
+    }, 300);
   }, [currentImages, priority, preloadImages]);
 
   const preloadNextImages = useCallback(() => {
-    return preloadImages(nextImages, false);
+    // 清除之前的防抖定时器
+    if (preloadTimeoutRef.current) {
+      clearTimeout(preloadTimeoutRef.current);
+    }
+    
+    // 设置新的防抖定时器
+    preloadTimeoutRef.current = setTimeout(() => {
+      preloadImages(nextImages, false);
+    }, 300);
   }, [nextImages, preloadImages]);
 
   useEffect(() => {
@@ -394,6 +420,10 @@ export const useSmartImagePreloader = (
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
         abortControllerRef.current = null;
+      }
+      if (preloadTimeoutRef.current) {
+        clearTimeout(preloadTimeoutRef.current);
+        preloadTimeoutRef.current = null;
       }
       setLoading(false);
     }

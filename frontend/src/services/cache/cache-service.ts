@@ -33,15 +33,78 @@ export interface CacheStats {
 
 class CacheService {
   private baseUrl: string;
+  private isConnected: boolean = false;
+  private healthCheckInterval: NodeJS.Timeout | null = null;
 
   constructor() {
     this.baseUrl = '/api/cache';
+    this.startHealthCheck();
+  }
+
+  /**
+   * 启动健康检查
+   */
+  private startHealthCheck(): void {
+    // 立即检查一次
+    this.checkHealth();
+    
+    // 每30秒检查一次
+    this.healthCheckInterval = setInterval(() => {
+      this.checkHealth();
+    }, 30000);
+  }
+
+  /**
+   * 检查缓存服务健康状态
+   */
+  private async checkHealth(): Promise<void> {
+    try {
+      const response = await fetch(`${this.baseUrl.replace('/cache', '')}/health`);
+      this.isConnected = response.ok;
+    } catch (_error) {
+      this.isConnected = false;
+    }
+  }
+
+  /**
+   * 获取连接状态
+   */
+  public getConnectionStatus(): boolean {
+    return this.isConnected;
+  }
+
+  /**
+   * 健康检查
+   */
+  async healthCheck(): Promise<boolean> {
+    try {
+      const response = await fetch(`${this.baseUrl.replace('/cache', '')}/health`);
+      return response.ok;
+    } catch (error) {
+      console.error('缓存服务健康检查失败:', error);
+      return false;
+    }
+  }
+
+  /**
+   * 清理资源
+   */
+  public destroy(): void {
+    if (this.healthCheckInterval) {
+      clearInterval(this.healthCheckInterval);
+      this.healthCheckInterval = null;
+    }
   }
 
   /**
    * 获取IIIF信息
    */
   async getIIIFInfo(identifier: string): Promise<IIIFInfoResponse> {
+    // 检查连接状态
+    if (!this.isConnected) {
+      throw new Error('缓存服务未连接');
+    }
+
     try {
       const response = await fetch(`${this.baseUrl}/iiif/info/${encodeURIComponent(identifier)}`);
       
@@ -69,6 +132,11 @@ class CacheService {
       quality: string;
     }
   ): Promise<IIIFImageResponse> {
+    // 检查连接状态
+    if (!this.isConnected) {
+      throw new Error('缓存服务未连接');
+    }
+
     try {
       const { region, size, rotation, quality } = params;
       const response = await fetch(
@@ -91,6 +159,11 @@ class CacheService {
    * 设置缓存
    */
   async set(key: string, value: unknown, ttl?: number): Promise<CacheResponse> {
+    // 检查连接状态
+    if (!this.isConnected) {
+      return { success: false, error: '缓存服务未连接' };
+    }
+
     try {
       const response = await fetch(`${this.baseUrl}/set`, {
         method: 'POST',
@@ -112,6 +185,11 @@ class CacheService {
    * 获取缓存
    */
   async get(key: string): Promise<CacheResponse> {
+    // 检查连接状态
+    if (!this.isConnected) {
+      return { success: false, error: '缓存服务未连接' };
+    }
+
     try {
       const response = await fetch(`${this.baseUrl}/get/${encodeURIComponent(key)}`);
       
@@ -127,6 +205,11 @@ class CacheService {
    * 删除缓存
    */
   async delete(key: string): Promise<CacheResponse> {
+    // 检查连接状态
+    if (!this.isConnected) {
+      return { success: false, error: '缓存服务未连接' };
+    }
+
     try {
       const response = await fetch(`${this.baseUrl}/delete/${encodeURIComponent(key)}`, {
         method: 'DELETE',
@@ -144,6 +227,11 @@ class CacheService {
    * 批量获取缓存
    */
   async mget(keys: string[]): Promise<CacheResponse<unknown[]>> {
+    // 检查连接状态
+    if (!this.isConnected) {
+      return { success: false, error: '缓存服务未连接' };
+    }
+
     try {
       const response = await fetch(`${this.baseUrl}/mget`, {
         method: 'POST',
@@ -165,6 +253,11 @@ class CacheService {
    * 清空缓存
    */
   async clear(pattern = '*'): Promise<CacheResponse> {
+    // 检查连接状态
+    if (!this.isConnected) {
+      return { success: false, error: '缓存服务未连接' };
+    }
+
     try {
       const response = await fetch(`${this.baseUrl}/clear`, {
         method: 'POST',
@@ -186,6 +279,11 @@ class CacheService {
    * 获取缓存统计
    */
   async getStats(): Promise<CacheResponse<CacheStats>> {
+    // 检查连接状态
+    if (!this.isConnected) {
+      return { success: false, error: '缓存服务未连接' };
+    }
+
     try {
       const response = await fetch(`${this.baseUrl}/stats`);
       
@@ -198,22 +296,15 @@ class CacheService {
   }
 
   /**
-   * 健康检查
-   */
-  async healthCheck(): Promise<boolean> {
-    try {
-      const response = await fetch(`${this.baseUrl.replace('/cache', '')}/health`);
-      return response.ok;
-    } catch (error) {
-      console.error('缓存服务健康检查失败:', error);
-      return false;
-    }
-  }
-
-  /**
    * 预取IIIF信息
    */
   async prefetchIIIFInfo(identifiers: string[]): Promise<void> {
+    // 检查连接状态
+    if (!this.isConnected) {
+      console.warn('缓存服务未连接，跳过预取IIIF信息');
+      return;
+    }
+
     try {
       await Promise.all(
         identifiers.map(identifier => this.getIIIFInfo(identifier))
@@ -229,8 +320,10 @@ class CacheService {
   generateKey(prefix: string, ...parts: string[]): string {
     return [prefix, ...parts].join(':');
   }
+}
 
-  }
+// 创建单例实例
+const cacheService = new CacheService();
 
 /**
  * IIIF图片参数接口
@@ -254,3 +347,6 @@ export function generateIIIFKey(identifier: string, type: 'info' | 'image', para
   }
   return cacheService.generateKey('iiif', type, identifier);
 }
+
+// 导出单例实例
+export { cacheService };
