@@ -140,11 +140,22 @@
                     if (typeof obj !== 'object' || obj === null) return obj;
                     
                     // 检查是否是图像对象
-                    if (obj.type === 'Image' && obj.id && obj.id.includes('.jpg')) {
+                    if (obj.type === 'Image' && obj.id) {
                       console.log(`🔧 [UV] 发现图像对象 (${path}):`, obj.id);
-                      const newId = convertToIIIFUrl(obj.id);
-                      console.log(`✅ [UV] 图像URL重写完成 (${path}):`, newId);
-                      obj.id = newId;
+                      
+                      // 改进的图像检测逻辑 - 支持多种格式
+                      const imageExtensions = ['.jpg', '.jpeg', '.png', '.tif', '.tiff', '.jp2', '.jpx', '.webp'];
+                      const url = obj.id.toLowerCase();
+                      const isImageFile = imageExtensions.some(ext => url.includes(ext)) ||
+                                        (url.includes('/iiif/') && url.includes('/full/'));
+                      
+                      if (isImageFile) {
+                        const newId = convertToIIIFUrl(obj.id);
+                        console.log(`✅ [UV] 图像URL重写完成 (${path}):`, newId);
+                        obj.id = newId;
+                      } else {
+                        console.log(`⚠️ [UV] 跳过非图像文件 (${path}):`, obj.id);
+                      }
                     }
                     
                     // 递归处理所有属性
@@ -260,11 +271,22 @@
           if (typeof obj !== 'object' || obj === null) return obj;
           
           // 检查是否是图像对象
-          if (obj.type === 'Image' && obj.id && obj.id.includes('.jpg')) {
+          if (obj.type === 'Image' && obj.id) {
             console.log(`🔧 [UV] 发现图像对象 (${path}):`, obj.id);
-            const newId = convertToIIIFUrl(obj.id);
-            console.log(`✅ [UV] 图像URL重写完成 (${path}):`, newId);
-            obj.id = newId;
+            
+            // 改进的图像检测逻辑 - 支持多种格式
+            const imageExtensions = ['.jpg', '.jpeg', '.png', '.tif', '.tiff', '.jp2', '.jpx', '.webp'];
+            const url = obj.id.toLowerCase();
+            const isImageFile = imageExtensions.some(ext => url.includes(ext)) ||
+                              (url.includes('/iiif/') && url.includes('/full/'));
+            
+            if (isImageFile) {
+              const newId = convertToIIIFUrl(obj.id);
+              console.log(`✅ [UV] 图像URL重写完成 (${path}):`, newId);
+              obj.id = newId;
+            } else {
+              console.log(`⚠️ [UV] 跳过非图像文件 (${path}):`, obj.id);
+            }
           }
           
           // 递归处理所有属性
