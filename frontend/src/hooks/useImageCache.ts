@@ -251,7 +251,7 @@ export const useSmartImagePreloader = (
     enabled = true,
     priority = 'high',
     concurrency = 3,
-    maxCacheSize = 50 // 降低最大缓存图片数量，防止内存占用过高
+    maxCacheSize = 100 // 优化缓存大小，平衡内存使用和用户体验
   } = options;
 
   const [loading, setLoading] = useState(false);
@@ -300,8 +300,8 @@ export const useSmartImagePreloader = (
       setLoadedImages(prev => {
         const newSet = new Set(prev).add(url);
         if (newSet.size > maxCacheSize) {
-          // 更激进的清理策略：删除40%的图片，减少清理频率
-          const urlsToDelete = Array.from(newSet).slice(0, Math.ceil(maxCacheSize * 0.4));
+          // 优化清理策略：删除25%的图片，平衡内存使用和缓存命中率
+          const urlsToDelete = Array.from(newSet).slice(0, Math.ceil(maxCacheSize * 0.25));
           urlsToDelete.forEach(urlToDelete => newSet.delete(urlToDelete));
           console.log(`[ImageCache] LRU清理: 删除${urlsToDelete.length}个早期图片，当前缓存大小: ${newSet.size}`);
         }
