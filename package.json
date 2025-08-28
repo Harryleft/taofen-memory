@@ -1,5 +1,9 @@
 {
   "dependencies": {
     "framer-motion": "^12.23.12"
+  },
+  "devDependencies": {
+    "glob": "^11.0.3",
+    "sharp": "^0.34.3"
   }
 }

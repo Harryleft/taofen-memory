@@ -27,6 +27,8 @@ export interface TransformedHandwritingItem {
   description: string;
   image: string;
   highResImage: string;
+  optimizedImage?: string;  // 新增：WebP版本路径
+  thumbnailImage?: string;  // 新增：缩略图路径
   tags: string[];
   dimensions: {
     width: number;
@@ -88,6 +90,18 @@ const getImagePath = (item: HandwritingItem): string => {
   return '/images/placeholder.png';
 };
 
+// 新增：获取WebP版本路径
+const getOptimizedImagePath = (item: HandwritingItem): string => {
+  const originalPath = getImagePath(item);
+  return originalPath + '.webp';
+};
+
+// 新增：获取缩略图路径
+const getThumbnailImagePath = (item: HandwritingItem): string => {
+  const originalPath = getImagePath(item);
+  return originalPath + '.thumb.webp';
+};
+
 // 工具函数：获取图片尺寸（带缓存）
 const getImageDimensions = async (imagePath: string): Promise<ImageDimensions> => {
   const imageId = imageCacheService.extractImageIdFromUrl(imagePath);
@@ -142,6 +156,8 @@ const transformHandwritingData = async (data: HandwritingItem[]): Promise<Transf
       description: item.注释 || item.原文.substring(0, 100) + '...',
       image: imagePath,
       highResImage: imagePath,
+      optimizedImage: getOptimizedImagePath(item),  // 新增
+      thumbnailImage: getThumbnailImagePath(item),  // 新增
       tags,
       dimensions,
       originalData: item

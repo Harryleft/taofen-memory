@@ -35,6 +35,16 @@ const HandwritingLightbox = memo(({
   const highlightedTitle = useMemo(() => highlightSearchText(selectedItem.title, searchTerm), [selectedItem.title, searchTerm]);
   const highlightedContent = useMemo(() => highlightSearchText(selectedItem.originalData.原文, searchTerm), [selectedItem.originalData.原文, searchTerm]);
   const highlightedNotes = useMemo(() => highlightSearchText(selectedItem.originalData.注释, searchTerm), [selectedItem.originalData.注释, searchTerm]);
+  
+  // 新增：智能高清图片选择
+  const getHighResImageSrc = useMemo(() => {
+    // 优先使用WebP版本
+    if (selectedItem.optimizedImage) {
+      return selectedItem.optimizedImage;
+    }
+    // 其次使用原图
+    return selectedItem.highResImage;
+  }, [selectedItem]);
 
   // 当切换到不同的手稿项目时，重置第一次解读状态
   useEffect(() => {
@@ -129,12 +139,13 @@ const HandwritingLightbox = memo(({
                 )}
                 
                 <img
-                  src={selectedItem.highResImage}
+                  src={getHighResImageSrc}
                   alt={selectedItem.title}
                   className={`max-w-full max-h-full object-contain transition-opacity duration-300 ${
                     imageStatus === 'loaded' ? 'opacity-100' : 'opacity-0'
                   }`}
                   loading="lazy"
+                  fetchPriority="high"
                   onLoad={handleImageLoad}
                   onError={handleImageError}
                 />
