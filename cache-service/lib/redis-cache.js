@@ -13,11 +13,20 @@ class RedisCache {
     try {
       const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
       
+      // 清理现有连接
+      if (this.client) {
+        try {
+          await this.client.quit();
+        } catch (e) {
+          logger.warn('清理现有连接失败:', e);
+        }
+      }
+      
       this.client = createClient({
         url: redisUrl,
         socket: {
           reconnectStrategy: (retries) => {
-            if (retries > 10) {
+            if (retries > 5) { // 降低重连次数
               logger.error('Redis重连次数过多，停止重连');
               return new Error('Redis重连次数过多');
             }
@@ -26,21 +35,22 @@ class RedisCache {
         }
       });
 
-      this.client.on('error', (err) => {
+      // 使用once而不是on来避免监听器泄漏
+      this.client.once('error', (err) => {
         logger.error('Redis客户端错误:', err);
       });
 
-      this.client.on('connect', () => {
+      this.client.once('connect', () => {
         logger.info('Redis客户端连接成功');
         this.isConnected = true;
       });
 
-      this.client.on('disconnect', () => {
+      this.client.once('disconnect', () => {
         logger.warn('Redis客户端断开连接');
         this.isConnected = false;
       });
 
-      this.client.on('reconnecting', () => {
+      this.client.once('reconnecting', () => {
         logger.info('Redis客户端正在重连...');
       });
 
@@ -52,15 +62,30 @@ class RedisCache {
       
     } catch (error) {
       logger.error('Redis连接失败:', error);
+      // 清理失败的连接
+      if (this.client) {
+        try {
+          await this.client.quit();
+        } catch (e) {
+          // 忽略清理错误
+        }
+        this.client = null;
+      }
       throw error;
     }
   }
 
   async disconnect() {
     if (this.client) {
-      await this.client.quit();
-      this.isConnected = false;
-      logger.info('Redis连接已关闭');
+      try {
+        await this.client.quit();
+        this.isConnected = false;
+        logger.info('Redis连接已关闭');
+      } catch (error) {
+        logger.error('Redis断开连接失败:', error);
+      } finally {
+        this.client = null;
+      }
     }
   }
 
@@ -143,11 +168,26 @@ class RedisCache {
         throw new Error('Redis未连接');
       }
 
+      // 限制批量删除的数量，避免阻塞
       const keys = await this.client.keys(pattern);
       if (keys.length > 0) {
-        const result = await this.client.del(keys);
-        logger.info(`清空缓存成功，模式: ${pattern}, 删除数量: ${result}`);
-        return result;
+        // 分批删除，每次最多1000个key
+        const batchSize = 1000;
+        let totalDeleted = 0;
+        
+        for (let i = 0; i < keys.length; i += batchSize) {
+          const batch = keys.slice(i, i + batchSize);
+          const result = await this.client.del(batch);
+          totalDeleted += result;
+          
+          // 批次间短暂暂停，避免阻塞
+          if (i + batchSize < keys.length) {
+            await new Promise(resolve => setTimeout(resolve, 50));
+          }
+        }
+        
+        logger.info(`清空缓存成功，模式: ${pattern}, 删除数量: ${totalDeleted}`);
+        return totalDeleted;
       }
       
       logger.info(`清空缓存完成，模式: ${pattern}, 未找到匹配的key`);
