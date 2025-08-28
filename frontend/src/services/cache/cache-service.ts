@@ -61,7 +61,7 @@ class CacheService {
     try {
       const response = await fetch(`${this.baseUrl.replace('/cache', '')}/health`);
       this.isConnected = response.ok;
-    } catch (_error) {
+    } catch {
       this.isConnected = false;
     }
   }

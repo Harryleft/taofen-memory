@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { HandwritingCacheManager, createHandwritingCacheManager } from '@/lib/cache/HandwritingMemoryCache.ts';
-import { imageCacheService, type ImageDimensions } from '@/services/cache/image-cache-service';
+import { imageCacheService } from '@/services/cache/image-cache-service';
 
 // 真实数据接口定义
 export interface HandwritingItem {
@@ -102,30 +102,6 @@ const getThumbnailImagePath = (item: HandwritingItem): string => {
   return originalPath + '.thumb.webp';
 };
 
-// 工具函数：获取图片尺寸（带缓存）
-const getImageDimensions = async (imagePath: string): Promise<ImageDimensions> => {
-  const imageId = imageCacheService.extractImageIdFromUrl(imagePath);
-  
-  // 尝试从缓存获取
-  const cachedDimensions = await imageCacheService.getImageDimensions(imageId);
-  if (cachedDimensions) {
-    return cachedDimensions;
-  }
-  
-  // 如果缓存中没有，返回默认尺寸并缓存
-  const defaultDimensions: ImageDimensions = {
-    width: 320,
-    height: Math.floor(Math.random() * 200) + 300,
-    aspectRatio: 320 / (Math.floor(Math.random() * 200) + 300)
-  };
-  
-  // 异步缓存默认尺寸（不阻塞）
-  imageCacheService.cacheImageDimensions(imageId, defaultDimensions).catch(err => {
-    console.warn('Failed to cache image dimensions:', err);
-  });
-  
-  return defaultDimensions;
-};
 
 // 工具函数：数据转换（带图片尺寸缓存）
 const transformHandwritingData = async (data: HandwritingItem[]): Promise<TransformedHandwritingItem[]> => {

@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { imageCacheService, type ImageDimensions, type LayoutCache, type PreloadQueue } from '@/services/cache/image-cache-service';
+import { imageCacheService, type ImageDimensions, type LayoutCache, type PreloadQueue, type ImageCacheStats } from '@/services/cache/image-cache-service';
 
 /**
  * 图片尺寸缓存Hook
@@ -251,7 +251,7 @@ export const useSmartImagePreloader = (
     enabled = true,
     priority = 'high',
     concurrency = 3,
-    maxCacheSize = 100 // 最大缓存图片数量
+    maxCacheSize = 50 // 降低最大缓存图片数量，防止内存占用过高
   } = options;
 
   const [loading, setLoading] = useState(false);
@@ -266,6 +266,18 @@ export const useSmartImagePreloader = (
   const loadImage = useCallback(async (url: string): Promise<boolean> => {
     if (loadedImages.has(url) || failedImages.has(url) || loadingRef.current.has(url)) {
       return false;
+    }
+
+    // 网络状况检测：如果连接不佳，降低并发数
+    if (navigator.connection) {
+      const connection = navigator.connection;
+      if (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g') {
+        maxConcurrencyRef.current = 1;
+      } else if (connection.effectiveType === '3g') {
+        maxConcurrencyRef.current = 2;
+      } else {
+        maxConcurrencyRef.current = concurrency;
+      }
     }
 
     // 检查是否被中止
@@ -283,13 +295,14 @@ export const useSmartImagePreloader = (
         img.src = url;
       });
 
-      // LRU清理：如果超过最大缓存大小，删除最早的图片
+      // 智能LRU清理：如果超过最大缓存大小，删除最早的图片
       setLoadedImages(prev => {
         const newSet = new Set(prev).add(url);
         if (newSet.size > maxCacheSize) {
-          // 转换为数组，删除第一个（最早的）元素
-          const oldestUrl = Array.from(newSet)[0];
-          newSet.delete(oldestUrl);
+          // 转换为数组，删除最早的25%图片，避免频繁清理
+          const urlsToDelete = Array.from(newSet).slice(0, Math.ceil(maxCacheSize * 0.25));
+          urlsToDelete.forEach(urlToDelete => newSet.delete(urlToDelete));
+          console.log(`[ImageCache] LRU清理: 删除${urlsToDelete.length}个早期图片，当前缓存大小: ${newSet.size}`);
         }
         return newSet;
       });
@@ -306,7 +319,7 @@ export const useSmartImagePreloader = (
       });
 
       return true;
-    } catch (_error) {
+    } catch {
       setFailedImages(prev => {
         const newSet = new Set(prev).add(url);
         // 限制失败图片的缓存大小
@@ -443,7 +456,7 @@ export const useImageCacheHealth = () => {
       // 尝试获取缓存统计来检查服务是否健康
       await imageCacheService.getImageCacheStats();
       setIsHealthy(true);
-    } catch (_err) {
+    } catch {
       setIsHealthy(false);
     } finally {
       setLastCheck(new Date());
