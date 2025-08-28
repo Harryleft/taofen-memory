@@ -36,7 +36,7 @@ function fixedImageDetection(obj) {
            (url.includes('/iiif/') && url.includes('/full/'));
 }
 
-// 模拟convertToIIIFUrl函数
+// 模拟convertToIIIFUrl函数 - 修复版本
 function convertToIIIFUrl(imageUrl) {
     if (imageUrl.includes('/full/') && imageUrl.includes('/default.jpg')) {
         return imageUrl;
@@ -46,13 +46,13 @@ function convertToIIIFUrl(imageUrl) {
         const urlObj = new URL(imageUrl);
         const baseUrl = urlObj.origin;
         const fullPath = urlObj.pathname.replace(/^\/iiif\/3\//, '');
-        const encodedPath = encodeURI(fullPath);
+        const encodedPath = encodeURIComponent(fullPath);
         const iiifUrl = `${baseUrl}/iiif/3/${encodedPath}/full/1024,/0/default.jpg`;
         return iiifUrl;
     } catch (error) {
         const baseUrl = imageUrl.split('/iiif/3/')[0];
         const imagePath = imageUrl.split('/iiif/3/')[1];
-        const encodedPath = encodeURI(imagePath);
+        const encodedPath = encodeURIComponent(imagePath);
         const iiifUrl = `${baseUrl}/iiif/3/${encodedPath}/full/1024,/0/default.jpg`;
         return iiifUrl;
     }
@@ -82,7 +82,7 @@ testImageUrls.forEach((url, index) => {
             
             // 验证转换结果
             const hasCorrectStructure = convertedUrl.includes('/full/1024,/0/default.jpg');
-            const hasCorrectEncoding = !convertedUrl.includes('%2F'); // 不应该有编码的斜杠
+            const hasCorrectEncoding = convertedUrl.includes('%2F'); // 应该有编码的斜杠
             
             if (hasCorrectStructure && hasCorrectEncoding) {
                 console.log(`📝 [验证] ✅ 转换成功`);
