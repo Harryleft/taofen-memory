@@ -33,6 +33,12 @@
         return imageUrl;
       }
       
+      // 处理相对路径 - 如果不是完整的URL，跳过处理
+      if (!imageUrl.startsWith('http')) {
+        console.log('🔧 [UV] 检测到相对路径，跳过处理:', imageUrl);
+        return imageUrl;
+      }
+      
       // 生产环境不再使用代理路径，直接处理
       if (imageUrl.startsWith('/proxy?url=')) {
         console.log('🔧 [UV] 检测到代理路径，解码原始URL:', imageUrl);
@@ -55,8 +61,8 @@
           extractedPath: fullPath
         });
         
-        // 智能编码：只编码特殊字符，保留路径结构
-        const encodedPath = encodeURI(fullPath);
+        // 正确编码：编码所有非字母数字字符，包括斜杠
+        const encodedPath = encodeURIComponent(fullPath);
         console.log('🔧 [UV] 编码结果:', {
           original: fullPath,
           encoded: encodedPath
@@ -75,7 +81,7 @@
         console.log('🔧 [UV] 使用回退解析方法...');
         const baseUrl = imageUrl.split('/iiif/3/')[0];
         const imagePath = imageUrl.split('/iiif/3/')[1];
-        const encodedPath = encodeURI(imagePath);
+        const encodedPath = encodeURIComponent(imagePath);
         const iiifUrl = `${baseUrl}/iiif/3/${encodedPath}/full/1024,/0/default.jpg`;
         
         console.log('🔧 [UV] 回退方法结果:', iiifUrl);
