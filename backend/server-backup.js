@@ -8,9 +8,11 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Redis客户端配置 - 快速失败模式
-let redisClient = null;
-let isRedisConnecting = false;
+// Redis客户端配置
+let redisClient;
+let redisConnectionRetries = 0;
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 5000; // 5秒重试间隔
 
 async function connectRedis() {
   // 如果已经连接成功，直接返回
@@ -18,21 +20,19 @@ async function connectRedis() {
     return;
   }
   
-  // 如果正在连接中，避免重复连接
-  if (isRedisConnecting) {
-    return;
-  }
-  
-  isRedisConnecting = true;
-  
   try {
-    console.log('正在连接Redis...');
+    console.log(`尝试连接Redis (第${redisConnectionRetries + 1}次)...`);
     
     redisClient = createClient({
       url: process.env.REDIS_URL || 'redis://localhost:6379',
       socket: {
-        connectTimeout: 3000, // 3秒连接超时
-        reconnectStrategy: false // 禁用自动重连
+        reconnectStrategy: (retries) => {
+          if (retries > MAX_RETRIES) {
+            console.log('Redis重连次数超过限制，停止重连');
+            return false; // 停止重连
+          }
+          return Math.min(retries * 1000, 30000); // 指数退避，最大30秒
+        }
       }
     });
     
@@ -42,11 +42,25 @@ async function connectRedis() {
     
     redisClient.on('connect', () => {
       console.log('Redis客户端连接成功');
+      redisConnectionRetries = 0; // 重置重试计数
     });
     
-    // 快速连接测试
+    redisClient.on('reconnecting', () => {
+      console.log('Redis客户端正在重连...');
+    });
+    
+    redisClient.on('end', () => {
+      console.log('Redis客户端连接断开，5秒后尝试重连...');
+      setTimeout(() => {
+        connectRedis().catch(() => {
+          console.log('Redis重连失败，继续使用内存缓存');
+        });
+      }, 5000);
+    });
+    
     await redisClient.connect();
     console.log('Redis连接已建立');
+    redisConnectionRetries = 0; // 重置重试计数
     
   } catch (error) {
     console.error('Redis连接失败:', error.message);
@@ -55,7 +69,7 @@ async function connectRedis() {
     if (redisClient) {
       try {
         if (redisClient.isOpen) {
-          await redisClient.quit();
+          redisClient.quit();
         }
       } catch (e) {
         // 忽略清理错误
@@ -63,9 +77,21 @@ async function connectRedis() {
       redisClient = null;
     }
     
-    console.log('Redis不可用，将使用内存缓存');
-  } finally {
-    isRedisConnecting = false;
+    // 重试逻辑
+    if (redisConnectionRetries < MAX_RETRIES) {
+      redisConnectionRetries++;
+      console.log(`将在${RETRY_DELAY/1000}秒后重试连接Redis...`);
+      
+      // 延迟重试
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          connectRedis().then(resolve).catch(resolve);
+        }, RETRY_DELAY);
+      });
+    } else {
+      console.log('Redis连接重试次数达到上限，使用内存缓存');
+      redisClient = null;
+    }
   }
 }
 
@@ -75,7 +101,7 @@ const memoryCache = new Map();
 // 缓存操作函数
 async function getFromCache(key) {
   try {
-    if (redisClient && redisClient.isReady) {
+    if (redisClient) {
       const value = await redisClient.get(key);
       return value ? JSON.parse(value) : null;
     } else {
@@ -90,7 +116,7 @@ async function getFromCache(key) {
 async function setToCache(key, value, ttl = 3600) {
   try {
     const serializedValue = JSON.stringify(value);
-    if (redisClient && redisClient.isReady) {
+    if (redisClient) {
       await redisClient.setEx(key, ttl, serializedValue);
     } else {
       memoryCache.set(key, value);
@@ -106,7 +132,7 @@ async function setToCache(key, value, ttl = 3600) {
 
 async function deleteFromCache(key) {
   try {
-    if (redisClient && redisClient.isReady) {
+    if (redisClient) {
       await redisClient.del(key);
     } else {
       memoryCache.delete(key);
@@ -162,8 +188,8 @@ app.post('/api/ai/interpret', async (req, res) => {
 输出要求：
 
 白话金句：用1-2个短句直击原文核心，像发朋友圈文案般简洁有力。
-背景快闪：用1句话点明时代背景（如"当时正值抗战烽火，百姓苦不堪言"），避免长篇大论。
-鲜活表达：用"就像…比如…"类比复杂概念；把抽象理念转化为具体场景（如"爱国不是口号，是街头卖报时多分给难民半块饼干的行动"）；杜绝"之乎者也""综上所述"等学术腔。
+背景快闪：用1句话点明时代背景（如“当时正值抗战烽火，百姓苦不堪言”），避免长篇大论。
+鲜活表达：用“就像…比如…”类比复杂概念；把抽象理念转化为具体场景（如“爱国不是口号，是街头卖报时多分给难民半块饼干的行动”）；杜绝“之乎者也”“综上所述”等学术腔。
 篇幅控制：解读字数严格≤原文1.5倍，删减冗余，留白引发思考。
 必须使用自然语言段落的形式输出。不需要按照白话金句、背景快闪、鲜活表达的格式输出。`;
 
@@ -268,7 +294,7 @@ app.post('/api/ai/interpret', async (req, res) => {
 // 缓存服务接口
 app.get('/api/cache/health', async (req, res) => {
   try {
-    const isConnected = redisClient && redisClient.isReady;
+    const isConnected = redisClient !== null;
     res.json({ 
       status: 'ok', 
       timestamp: new Date().toISOString(),
@@ -417,7 +443,7 @@ app.post('/api/cache/mget', async (req, res) => {
 
 app.post('/api/cache/clear', async (req, res) => {
   try {
-    if (redisClient && redisClient.isReady) {
+    if (redisClient) {
       await redisClient.flushDb();
     } else {
       memoryCache.clear();
@@ -426,7 +452,7 @@ app.post('/api/cache/clear', async (req, res) => {
     res.json({ 
       success: true, 
       message: '缓存清空成功',
-      cache_type: redisClient && redisClient.isReady ? 'redis' : 'memory'
+      cache_type: redisClient ? 'redis' : 'memory'
     });
   } catch (error) {
     console.error('清空缓存错误:', error);
@@ -441,12 +467,12 @@ app.post('/api/cache/clear', async (req, res) => {
 app.get('/api/cache/stats', async (req, res) => {
   try {
     let stats = {
-      connected: redisClient && redisClient.isReady,
-      cache_type: redisClient && redisClient.isReady ? 'redis' : 'memory',
+      connected: redisClient !== null,
+      cache_type: redisClient ? 'redis' : 'memory',
       memory_cache_size: memoryCache.size
     };
     
-    if (redisClient && redisClient.isReady) {
+    if (redisClient) {
       try {
         const info = await redisClient.info('memory');
         const usedMemory = info.match(/used_memory_human:([^\r\n]+)/);
@@ -491,7 +517,7 @@ function startServer() {
   
   // 后台连接Redis，不阻塞服务器启动
   connectRedis().then(() => {
-    console.log(`缓存服务初始化完成: ${redisClient && redisClient.isReady ? 'Redis' : '内存缓存'}`);
+    console.log(`缓存服务初始化完成: ${redisClient ? 'Redis' : '内存缓存'}`);
   }).catch((error) => {
     console.error('Redis连接失败，使用内存缓存:', error.message);
   });
@@ -501,5 +527,28 @@ function startServer() {
 
 // 启动服务器
 const server = startServer();
+
+// 优雅关闭处理
+process.on('SIGTERM', () => {
+  console.log('收到SIGTERM信号，正在关闭服务器...');
+  server.close(() => {
+    console.log('服务器已关闭');
+    if (redisClient) {
+      redisClient.quit();
+    }
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('收到SIGINT信号，正在关闭服务器...');
+  server.close(() => {
+    console.log('服务器已关闭');
+    if (redisClient) {
+      redisClient.quit();
+    }
+    process.exit(0);
+  });
+});
 
 module.exports = app;
