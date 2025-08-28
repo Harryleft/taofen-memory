@@ -1,12 +1,15 @@
 /**
  * IIIF URL构建工具类
  * 统一处理所有IIIF相关的URL构建逻辑
+ * 增加缓存支持
  */
 import { isProduction, isDevelopment, logProduction, logDevelopment } from '../../utils/environment';
+import { cacheService } from '../../services/cache/cache-service';
 
 export class IIIFUrlBuilder {
   private static readonly BASE_URL = 'https://www.ai4dh.cn/iiif/3';
   private static readonly PROXY_BASE = '/proxy';
+  private static readonly CACHE_ENABLED = true; // 开发环境启用缓存
 
   /**
    * 解析IIIF URL组件
@@ -109,6 +112,115 @@ export class IIIFUrlBuilder {
     };
     
     return this.build(components, options);
+  }
+
+  /**
+   * 获取IIIF信息（支持缓存）
+   */
+  static async getIIIFInfo(identifier: string): Promise<any> {
+    console.log('🔍 [IIIF] 获取IIIF信息:', identifier);
+    
+    if (this.CACHE_ENABLED && isDevelopment) {
+      try {
+        // 先尝试从缓存获取
+        const cacheResponse = await cacheService.getIIIFInfo(identifier);
+        
+        if (cacheResponse.source === 'cache') {
+          console.log('🎯 [IIIF] 缓存命中:', identifier);
+          return cacheResponse.data;
+        } else if (cacheResponse.source === 'remote') {
+          console.log('🌐 [IIIF] 远程获取:', identifier);
+          return cacheResponse.data;
+        } else if (cacheResponse.source === 'stale') {
+          console.log('⚠️ [IIIF] 使用过期缓存:', identifier);
+          return cacheResponse.data;
+        }
+      } catch (error) {
+        console.warn('⚠️ [IIIF] 缓存获取失败，使用原始方法:', error);
+      }
+    }
+    
+    // 回退到原始方法
+    const url = this.buildManifest(identifier);
+    console.log('🔍 [IIIF] 使用原始URL:', url);
+    return url;
+  }
+
+  /**
+   * 获取IIIF图像（支持缓存）
+   */
+  static async getIIIFImage(
+    identifier: string,
+    params: {
+      region: string;
+      size: string;
+      rotation: string;
+      quality: string;
+    }
+  ): Promise<string> {
+    console.log('🔍 [IIIF] 获取IIIF图像:', identifier, params);
+    
+    if (this.CACHE_ENABLED && isDevelopment) {
+      try {
+        // 先尝试从缓存获取
+        const cacheResponse = await cacheService.getIIIFImage(identifier, params);
+        
+        if (cacheResponse.source === 'cache') {
+          console.log('🎯 [IIIF] 图像缓存命中:', identifier);
+          // 创建Blob URL
+          const blob = new Blob([cacheResponse.data.buffer], { 
+            type: cacheResponse.data.contentType 
+          });
+          return URL.createObjectURL(blob);
+        } else if (cacheResponse.source === 'remote') {
+          console.log('🌐 [IIIF] 图像远程获取:', identifier);
+          // 创建Blob URL
+          const blob = new Blob([cacheResponse.data.buffer], { 
+            type: cacheResponse.data.contentType 
+          });
+          return URL.createObjectURL(blob);
+        }
+      } catch (error) {
+        console.warn('⚠️ [IIIF] 图像缓存获取失败，使用原始方法:', error);
+      }
+    }
+    
+    // 回退到原始方法
+    const url = `${this.BASE_URL}/${identifier}/${params.region}/${params.size}/${params.rotation}/${params.quality}.jpg`;
+    console.log('🔍 [IIIF] 使用原始图像URL:', url);
+    return url;
+  }
+
+  /**
+   * 预取IIIF信息
+   */
+  static async prefetchIIIFInfo(identifiers: string[]): Promise<void> {
+    console.log('🔍 [IIIF] 预取IIIF信息:', identifiers);
+    
+    if (this.CACHE_ENABLED && isDevelopment) {
+      try {
+        await cacheService.prefetchIIIFInfo(identifiers);
+        console.log('✅ [IIIF] 预取完成');
+      } catch (error) {
+        console.error('❌ [IIIF] 预取失败:', error);
+      }
+    }
+  }
+
+  /**
+   * 清空IIIF缓存
+   */
+  static async clearIIIFCache(identifier?: string): Promise<void> {
+    console.log('🔍 [IIIF] 清空缓存:', identifier);
+    
+    if (this.CACHE_ENABLED && isDevelopment) {
+      try {
+        await cacheService.clear(identifier ? `iiif:*${identifier}*` : 'iiif:*');
+        console.log('✅ [IIIF] 缓存清空完成');
+      } catch (error) {
+        console.error('❌ [IIIF] 缓存清空失败:', error);
+      }
+    }
   }
 
   /**

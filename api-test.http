@@ -1,0 +1,64 @@
+### 缓存服务API测试
+
+#### 健康检查
+GET http://localhost:3002/api/health
+
+#### 获取IIIF信息
+GET http://localhost:3002/api/cache/iiif/info/book_23416
+
+#### 获取IIIF图像
+GET http://localhost:3002/api/cache/iiif/region/book_23416/full/400,600/0/default
+
+#### 设置缓存
+POST http://localhost:3002/api/cache/set
+Content-Type: application/json
+
+{
+  "key": "test:key",
+  "value": {
+    "message": "Hello World",
+    "timestamp": "2024-01-01T00:00:00Z"
+  },
+  "ttl": 3600
+}
+
+#### 获取缓存
+GET http://localhost:3002/api/cache/get/test:key
+
+#### 删除缓存
+DELETE http://localhost:3002/api/cache/delete/test:key
+
+#### 批量获取缓存
+POST http://localhost:3002/api/cache/mget
+Content-Type: application/json
+
+{
+  "keys": ["test:key1", "test:key2", "test:key3"]
+}
+
+#### 清空缓存
+POST http://localhost:3002/api/cache/clear
+Content-Type: application/json
+
+{
+  "pattern": "test:*"
+}
+
+#### 获取缓存统计
+GET http://localhost:3002/api/cache/stats
+
+### AI后端服务API测试
+
+#### 健康检查
+GET http://localhost:3001/api/health
+
+#### AI解读
+POST http://localhost:3001/api/ai/interpret
+Content-Type: application/json
+
+{
+  "title": "测试标题",
+  "content": "这是测试内容，用于AI解读功能。",
+  "notes": "测试注释",
+  "time": "2024-01-01"
+}

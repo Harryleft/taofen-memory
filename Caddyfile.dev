@@ -1,0 +1,92 @@
+# 本地开发环境Caddy配置
+{
+  admin :2019
+}
+
+# 全局配置
+{
+  # 日志配置
+  log {
+    output file /var/log/caddy/access.log
+    format json
+  }
+  
+  # 安全头
+  header {
+    # HSTS
+    Strict-Transport-Security "max-age=31536000; includeSubdomains; preload"
+    # 内容安全策略
+    Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' ws: wss: https:;"
+    # 其他安全头
+    X-Content-Type-Options "nosniff"
+    X-Frame-Options "DENY"
+    X-XSS-Protection "1; mode=block"
+    Referrer-Policy "strict-origin-when-cross-origin"
+    Permissions-Policy "camera=(), microphone=(), geolocation=()"
+  }
+}
+
+# 本地开发服务器
+http://localhost:5173 {
+  # 反向代理到Vite开发服务器
+  reverse_proxy localhost:5173 {
+    # 启用WebSocket支持
+    header_up Host {host}
+    header_up X-Real-IP {remote_host}
+    header_up X-Forwarded-For {remote_host}
+    header_up X-Forwarded-Proto {scheme}
+    
+    # 支持热重载
+    header_up Upgrade {>Upgrade}
+    header_up Connection {>Connection}
+  }
+  
+  # 静态资源缓存
+  handle /assets/* {
+    header_cache_control "public, max-age=31536000, immutable"
+  }
+  
+  handle /* {
+    header_cache_control "no-cache, no-store, must-revalidate"
+  }
+}
+
+# 缓存服务代理
+http://localhost:3002 {
+  reverse_proxy localhost:3002 {
+    header_up Host {host}
+    header_up X-Real-IP {remote_host}
+    header_up X-Forwarded-For {remote_host}
+    header_up X-Forwarded-Proto {scheme}
+  }
+}
+
+# AI后端服务代理
+http://localhost:3001 {
+  reverse_proxy localhost:3001 {
+    header_up Host {host}
+    header_up X-Real-IP {remote_host}
+    header_up X-Forwarded-For {remote_host}
+    header_up X-Forwarded-Proto {scheme}
+  }
+}
+
+# IIIF代理服务
+http://localhost:8282 {
+  reverse_proxy localhost:8282 {
+    header_up Host {host}
+    header_up X-Real-IP {remote_host}
+    header_up X-Forwarded-For {remote_host}
+    header_up X-Forwarded-Proto {scheme}
+  }
+}
+
+# Redis Insight管理界面
+http://localhost:5540 {
+  reverse_proxy localhost:5540 {
+    header_up Host {host}
+    header_up X-Real-IP {remote_host}
+    header_up X-Forwarded-For {remote_host}
+    header_up X-Forwarded-Proto {scheme}
+  }
+}
