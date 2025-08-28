@@ -16,7 +16,7 @@ export default defineConfig({
       '/iiif': {
         target: 'https://www.ai4dh.cn',
         changeOrigin: true,
-        secure: true,
+        secure: false,
         configure: (proxy) => {
           proxy.on('proxyReq', (proxyReq, req) => {
             console.log(`[代理] /iiif 请求: ${req.method} ${req.url}`);
@@ -33,7 +33,7 @@ export default defineConfig({
       '/proxy': {
         target: 'https://www.ai4dh.cn',
         changeOrigin: true,
-        secure: true,
+        secure: false,
         rewrite: (path) => {
           // 从 /proxy?url=https://www.ai4dh.cn/iiif/... 中提取实际URL
           const urlParams = new URLSearchParams(path.split('?')[1]);
@@ -50,6 +50,38 @@ export default defineConfig({
           });
           proxy.on('error', (err) => {
             console.error(`[代理] /proxy 错误:`, err);
+          });
+        }
+      },
+      // 缓存服务代理
+      '/api/cache': {
+        target: 'http://localhost:3002',
+        changeOrigin: true,
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq, req) => {
+            console.log(`[缓存] 请求: ${req.method} ${req.url}`);
+          });
+          proxy.on('proxyRes', (proxyRes, req) => {
+            console.log(`[缓存] 响应: ${req.url} - ${proxyRes.statusCode}`);
+          });
+          proxy.on('error', (err) => {
+            console.error(`[缓存] 错误:`, err);
+          });
+        }
+      },
+      // AI后端服务代理
+      '/api/ai': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq, req) => {
+            console.log(`[AI] 请求: ${req.method} ${req.url}`);
+          });
+          proxy.on('proxyRes', (proxyRes, req) => {
+            console.log(`[AI] 响应: ${req.url} - ${proxyRes.statusCode}`);
+          });
+          proxy.on('error', (err) => {
+            console.error(`[AI] 错误:`, err);
           });
         }
       }
