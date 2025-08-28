@@ -1,4 +1,4 @@
-import { useMemo, memo, useState } from 'react';
+import { useMemo, memo, useState, useCallback } from 'react';
 import { ZoomIn, Image } from 'lucide-react';
 import { highlightSearchText, categoryLabels } from '@/utils/handwritingUtils.ts';
 import type { TransformedHandwritingItem } from '@/hooks/useHandwritingData.ts';
