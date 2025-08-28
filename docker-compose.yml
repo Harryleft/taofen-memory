@@ -83,9 +83,9 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
+      - ./redis.conf:/etc/redis/redis.conf:ro
       - redis_data:/data
-    command: redis-server /usr/local/etc/redis/redis.conf
+    command: redis-server /etc/redis/redis.conf
     # 2G服务器内存限制
     deploy:
       resources:
@@ -94,7 +94,7 @@ services:
         reservations:
           memory: 128M
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "sh", "-c", "redis-cli ping || redis-cli -a dev_redis_password_2024 ping"]
       interval: 30s
       timeout: 5s
       retries: 5
