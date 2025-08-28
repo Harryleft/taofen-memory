@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { HandwritingCacheManager, createHandwritingCacheManager } from '@/lib/cache/HandwritingMemoryCache.ts';
+import { imageCacheService, type ImageDimensions } from '@/services/cache/image-cache-service';
 
 // 真实数据接口定义
 export interface HandwritingItem {
@@ -87,13 +88,50 @@ const getImagePath = (item: HandwritingItem): string => {
   return '/images/placeholder.png';
 };
 
-// 工具函数：数据转换
-const transformHandwritingData = (data: HandwritingItem[]): TransformedHandwritingItem[] => {
+// 工具函数：获取图片尺寸（带缓存）
+const getImageDimensions = async (imagePath: string): Promise<ImageDimensions> => {
+  const imageId = imageCacheService.extractImageIdFromUrl(imagePath);
+  
+  // 尝试从缓存获取
+  const cachedDimensions = await imageCacheService.getImageDimensions(imageId);
+  if (cachedDimensions) {
+    return cachedDimensions;
+  }
+  
+  // 如果缓存中没有，返回默认尺寸并缓存
+  const defaultDimensions: ImageDimensions = {
+    width: 320,
+    height: Math.floor(Math.random() * 200) + 300,
+    aspectRatio: 320 / (Math.floor(Math.random() * 200) + 300)
+  };
+  
+  // 异步缓存默认尺寸（不阻塞）
+  imageCacheService.cacheImageDimensions(imageId, defaultDimensions).catch(err => {
+    console.warn('Failed to cache image dimensions:', err);
+  });
+  
+  return defaultDimensions;
+};
+
+// 工具函数：数据转换（带图片尺寸缓存）
+const transformHandwritingData = async (data: HandwritingItem[]): Promise<TransformedHandwritingItem[]> => {
+  const imagePaths = data.map(item => getImagePath(item));
+  
+  // 批量预获取图片尺寸
+  const cachedDimensions = await imageCacheService.prefetchImageDimensions(imagePaths);
+  
   return data.map(item => {
     const year = extractYearFromDateString(item.时间);
     const category = getMainCategory(item);
     const tags = generateTags(item, year);
     const imagePath = getImagePath(item);
+    const imageId = imageCacheService.extractImageIdFromUrl(imagePath);
+    
+    // 使用缓存的尺寸或默认尺寸
+    const dimensions = cachedDimensions[imageId] || {
+      width: 320,
+      height: Math.floor(Math.random() * 200) + 300
+    };
     
     return {
       id: item.id,
@@ -105,10 +143,7 @@ const transformHandwritingData = (data: HandwritingItem[]): TransformedHandwriti
       image: imagePath,
       highResImage: imagePath,
       tags,
-      dimensions: {
-        width: 320,
-        height: Math.floor(Math.random() * 200) + 300
-      },
+      dimensions,
       originalData: item
     };
   });
@@ -143,7 +178,7 @@ export const useHandwritingData = () => {
       setLoading(true);
       setError(null);
       const rawData = await fetchHandwritingData();
-      const transformedData = transformHandwritingData(rawData);
+      const transformedData = await transformHandwritingData(rawData);
       setHandwritingItems(transformedData);
     } catch (err) {
       setError('加载手迹数据失败，请刷新页面重试');
@@ -179,7 +214,7 @@ export const useHandwritingData = () => {
       await cacheManager.setRawData(rawData);
       
       // 转换数据
-      const transformedData = transformHandwritingData(rawData);
+      const transformedData = await transformHandwritingData(rawData);
       
       // 缓存转换后的数据
       await cacheManager.setTransformedData(transformedData);
@@ -216,13 +251,42 @@ export const useHandwritingData = () => {
     loadData();
   }, [loadData]);
 
+  // 图片缓存相关功能
+  const prefetchImageDimensions = useCallback(async (imageUrls: string[]) => {
+    try {
+      return await imageCacheService.prefetchImageDimensions(imageUrls);
+    } catch (err) {
+      console.error('Failed to prefetch image dimensions:', err);
+      return {};
+    }
+  }, []);
+
+  const clearImageCache = useCallback(async () => {
+    try {
+      // 清除所有图片相关的缓存
+      const imageIds = handwritingItems.map(item => 
+        imageCacheService.extractImageIdFromUrl(item.image)
+      );
+      
+      await Promise.all(
+        imageIds.map(id => imageCacheService.clearImageCache(id))
+      );
+      
+      console.log('Cleared image cache for', imageIds.length, 'images');
+    } catch (err) {
+      console.error('Failed to clear image cache:', err);
+    }
+  }, [handwritingItems]);
+
   return {
     handwritingItems,
     loading,
     error,
     refetch,
-    forceRefresh, // 新增：强制刷新方法
-    cacheStats: cacheManager?.getStats() // 新增：缓存统计信息
+    forceRefresh, // 强制刷新方法
+    cacheStats: cacheManager?.getStats(), // 缓存统计信息
+    prefetchImageDimensions, // 图片尺寸预获取
+    clearImageCache // 清除图片缓存
   };
 };
 

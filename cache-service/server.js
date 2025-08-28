@@ -7,6 +7,7 @@ require('dotenv').config();
 
 const RedisCache = require('./lib/redis-cache');
 const IIIFCache = require('./lib/iiif-cache');
+const ImageCache = require('./lib/image-cache');
 const logger = require('./lib/logger');
 const errorHandler = require('./middleware/error-handler');
 
@@ -32,6 +33,7 @@ app.use('/api/', limiter);
 // 初始化缓存
 let redisCache;
 let iiifCache;
+let imageCache;
 
 async function initializeCache() {
   try {
@@ -39,6 +41,7 @@ async function initializeCache() {
     await redisCache.connect();
     
     iiifCache = new IIIFCache(redisCache);
+    imageCache = new ImageCache();
     
     logger.info('缓存服务初始化成功');
   } catch (error) {
@@ -144,6 +147,176 @@ app.post('/api/cache/clear', async (req, res) => {
   } catch (error) {
     logger.error('清空缓存失败:', error);
     res.status(500).json({ error: '清空缓存失败' });
+  }
+});
+
+// 图片缓存相关路由
+
+// 缓存图片元数据
+app.post('/api/cache/image/metadata', async (req, res) => {
+  try {
+    const { imageId, metadata, ttl } = req.body;
+    
+    if (!imageId || !metadata) {
+      return res.status(400).json({ error: '缺少必要参数: imageId, metadata' });
+    }
+    
+    const result = await imageCache.cacheImageMetadata(imageId, metadata, ttl);
+    res.json({ success: true, result });
+  } catch (error) {
+    logger.error('缓存图片元数据失败:', error);
+    res.status(500).json({ error: '缓存图片元数据失败' });
+  }
+});
+
+// 获取图片元数据
+app.get('/api/cache/image/metadata/:imageId', async (req, res) => {
+  try {
+    const { imageId } = req.params;
+    const metadata = await imageCache.getImageMetadata(imageId);
+    res.json({ success: true, data: metadata });
+  } catch (error) {
+    logger.error('获取图片元数据失败:', error);
+    res.status(500).json({ error: '获取图片元数据失败' });
+  }
+});
+
+// 缓存图片尺寸
+app.post('/api/cache/image/dimensions', async (req, res) => {
+  try {
+    const { imageId, dimensions, ttl } = req.body;
+    
+    if (!imageId || !dimensions) {
+      return res.status(400).json({ error: '缺少必要参数: imageId, dimensions' });
+    }
+    
+    const result = await imageCache.cacheImageDimensions(imageId, dimensions, ttl);
+    res.json({ success: true, result });
+  } catch (error) {
+    logger.error('缓存图片尺寸失败:', error);
+    res.status(500).json({ error: '缓存图片尺寸失败' });
+  }
+});
+
+// 获取图片尺寸
+app.get('/api/cache/image/dimensions/:imageId', async (req, res) => {
+  try {
+    const { imageId } = req.params;
+    const dimensions = await imageCache.getImageDimensions(imageId);
+    res.json({ success: true, data: dimensions });
+  } catch (error) {
+    logger.error('获取图片尺寸失败:', error);
+    res.status(500).json({ error: '获取图片尺寸失败' });
+  }
+});
+
+// 批量获取图片尺寸
+app.post('/api/cache/image/dimensions/batch', async (req, res) => {
+  try {
+    const { imageIds } = req.body;
+    
+    if (!Array.isArray(imageIds) || imageIds.length === 0) {
+      return res.status(400).json({ error: 'imageIds必须是非空数组' });
+    }
+    
+    const dimensions = await imageCache.batchGetImageDimensions(imageIds);
+    res.json({ success: true, data: dimensions });
+  } catch (error) {
+    logger.error('批量获取图片尺寸失败:', error);
+    res.status(500).json({ error: '批量获取图片尺寸失败' });
+  }
+});
+
+// 缓存瀑布流布局
+app.post('/api/cache/image/layout', async (req, res) => {
+  try {
+    const { layoutKey, layout, ttl } = req.body;
+    
+    if (!layoutKey || !layout) {
+      return res.status(400).json({ error: '缺少必要参数: layoutKey, layout' });
+    }
+    
+    const result = await imageCache.cacheLayout(layoutKey, layout, ttl);
+    res.json({ success: true, result });
+  } catch (error) {
+    logger.error('缓存瀑布流布局失败:', error);
+    res.status(500).json({ error: '缓存瀑布流布局失败' });
+  }
+});
+
+// 获取瀑布流布局
+app.get('/api/cache/image/layout/:layoutKey', async (req, res) => {
+  try {
+    const { layoutKey } = req.params;
+    const layout = await imageCache.getLayout(layoutKey);
+    res.json({ success: true, data: layout });
+  } catch (error) {
+    logger.error('获取瀑布流布局失败:', error);
+    res.status(500).json({ error: '获取瀑布流布局失败' });
+  }
+});
+
+// 缓存预加载队列
+app.post('/api/cache/image/preload', async (req, res) => {
+  try {
+    const { queueId, queue, ttl } = req.body;
+    
+    if (!queueId || !queue) {
+      return res.status(400).json({ error: '缺少必要参数: queueId, queue' });
+    }
+    
+    const result = await imageCache.cachePreloadQueue(queueId, queue, ttl);
+    res.json({ success: true, result });
+  } catch (error) {
+    logger.error('缓存预加载队列失败:', error);
+    res.status(500).json({ error: '缓存预加载队列失败' });
+  }
+});
+
+// 获取预加载队列
+app.get('/api/cache/image/preload/:queueId', async (req, res) => {
+  try {
+    const { queueId } = req.params;
+    const queue = await imageCache.getPreloadQueue(queueId);
+    res.json({ success: true, data: queue });
+  } catch (error) {
+    logger.error('获取预加载队列失败:', error);
+    res.status(500).json({ error: '获取预加载队列失败' });
+  }
+});
+
+// 清除图片缓存
+app.delete('/api/cache/image/:imageId', async (req, res) => {
+  try {
+    const { imageId } = req.params;
+    const result = await imageCache.clearImageCache(imageId);
+    res.json({ success: true, result });
+  } catch (error) {
+    logger.error('清除图片缓存失败:', error);
+    res.status(500).json({ error: '清除图片缓存失败' });
+  }
+});
+
+// 清除布局缓存
+app.delete('/api/cache/image/layout/:layoutKey', async (req, res) => {
+  try {
+    const { layoutKey } = req.params;
+    const result = await imageCache.clearLayoutCache(layoutKey);
+    res.json({ success: true, result });
+  } catch (error) {
+    logger.error('清除布局缓存失败:', error);
+    res.status(500).json({ error: '清除布局缓存失败' });
+  }
+});
+
+// 图片缓存统计
+app.get('/api/cache/image/stats', async (req, res) => {
+  try {
+    const stats = await imageCache.getCacheStats();
+    res.json({ success: true, data: stats });
+  } catch (error) {
+    logger.error('获取图片缓存统计失败:', error);
+    res.status(500).json({ error: '获取图片缓存统计失败' });
   }
 });
 
