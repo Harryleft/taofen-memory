@@ -33,8 +33,8 @@ services:
       CANTALOUPE_CACHE_SERVER_DERIVATIVE: "FilesystemCache"
       CANTALOUPE_FILESYSTEMCACHE_PATHNAME: "/var/cache/cantaloupe"
       CANTALOUPE_CACHE_SERVER_INFO_ENABLED: "false"
-      # 2GiB 机器：JVM 给 512m（降低内存占用）
-      JAVA_OPTS: "-Xms256m -Xmx512m"
+      # 2GiB 机器：JVM 给 384m（进一步降低内存占用）
+      JAVA_OPTS: "-Xms192m -Xmx384m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=35"
     volumes:
       - /srv/iiif:/imageroot:ro
       - /srv/iiif/cache:/var/cache/cantaloupe
@@ -110,6 +110,13 @@ services:
       - taofen_backend                     # 让 Caddy 在后端之后再起（非硬依赖）
       - cantaloupe
       - redis
+    # 2G服务器内存限制
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data

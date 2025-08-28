@@ -129,10 +129,15 @@ class PerformanceMonitor {
   private renderMetrics: Map<string, RenderMetric> = new Map();
   private customMarks: Map<string, { startTime: number; endTime?: number }> = new Map();
   private observers: PerformanceObserver[] = [];
+  private static readonly MAX_IMAGE_METRICS = 500; // 最大图片监控数量
+  private static readonly MAX_RENDER_METRICS = 200; // 最大渲染监控数量
+  private static readonly MAX_CUSTOM_MARKS = 100; // 最大自定义标记数量
+  private static readonly MAX_IMAGE_LOAD_TIMES = 1000; // 最大图片加载时间记录数量
 
   private constructor() {
     this.initializeMetrics();
     this.setupPerformanceObservers();
+    this.startPeriodicCleanup();
   }
 
   static getInstance(): PerformanceMonitor {
@@ -354,6 +359,17 @@ class PerformanceMonitor {
 
   static trackImageStart(id: number, url: string): void {
     const instance = PerformanceMonitor.getInstance();
+    
+    // 检查图片监控数据数量
+    if (instance.imageLoadMetrics.size >= PerformanceMonitor.MAX_IMAGE_METRICS) {
+      // 清理最旧的30%记录
+      const entriesToDelete = Array.from(instance.imageLoadMetrics.entries()).slice(0, Math.floor(PerformanceMonitor.MAX_IMAGE_METRICS * 0.3));
+      entriesToDelete.forEach(([id]) => {
+        instance.imageLoadMetrics.delete(id);
+      });
+      console.log(`[PerformanceMonitor] 清理图片监控数据: 删除${entriesToDelete.length}个记录`);
+    }
+    
     instance.imageLoadMetrics.set(id, {
       id,
       url,
@@ -387,6 +403,14 @@ class PerformanceMonitor {
         }
       } else {
         images.failedImages++;
+      }
+      
+      // 检查图片加载时间记录数量
+      if (images.imageLoadTimes.length >= PerformanceMonitor.MAX_IMAGE_LOAD_TIMES) {
+        // 清理最旧的30%记录
+        const timesToDelete = Math.floor(PerformanceMonitor.MAX_IMAGE_LOAD_TIMES * 0.3);
+        images.imageLoadTimes = images.imageLoadTimes.slice(timesToDelete);
+        console.log(`[PerformanceMonitor] 清理图片加载时间记录: 删除${timesToDelete}个记录`);
       }
       
       // 计算平均加载时间
@@ -568,6 +592,52 @@ class PerformanceMonitor {
     
     // 重新初始化
     instance.initializeMetrics();
+  }
+
+  // =============== 内部清理方法 ===============
+
+  private startPeriodicCleanup(): void {
+    // 每10分钟执行一次清理，防止长时间运行时的内存累积
+    setInterval(() => {
+      this.performCleanup();
+    }, 600000); // 10分钟
+  }
+
+  private performCleanup(): void {
+    // 清理图片监控数据
+    if (this.imageLoadMetrics.size > PerformanceMonitor.MAX_IMAGE_METRICS) {
+      const entriesToDelete = Array.from(this.imageLoadMetrics.entries()).slice(0, Math.floor(PerformanceMonitor.MAX_IMAGE_METRICS * 0.3));
+      entriesToDelete.forEach(([id]) => {
+        this.imageLoadMetrics.delete(id);
+      });
+      console.log(`[PerformanceMonitor] 清理图片监控数据: 删除${entriesToDelete.length}个记录`);
+    }
+
+    // 清理渲染监控数据
+    if (this.renderMetrics.size > PerformanceMonitor.MAX_RENDER_METRICS) {
+      const entriesToDelete = Array.from(this.renderMetrics.entries()).slice(0, Math.floor(PerformanceMonitor.MAX_RENDER_METRICS * 0.3));
+      entriesToDelete.forEach(([id]) => {
+        this.renderMetrics.delete(id);
+      });
+      console.log(`[PerformanceMonitor] 清理渲染监控数据: 删除${entriesToDelete.length}个记录`);
+    }
+
+    // 清理自定义标记
+    if (this.customMarks.size > PerformanceMonitor.MAX_CUSTOM_MARKS) {
+      const entriesToDelete = Array.from(this.customMarks.entries()).slice(0, Math.floor(PerformanceMonitor.MAX_CUSTOM_MARKS * 0.3));
+      entriesToDelete.forEach(([name]) => {
+        this.customMarks.delete(name);
+      });
+      console.log(`[PerformanceMonitor] 清理自定义标记: 删除${entriesToDelete.length}个标记`);
+    }
+
+    // 清理图片加载时间记录
+    const imageLoadTimes = this.metrics.images?.imageLoadTimes || [];
+    if (imageLoadTimes.length > PerformanceMonitor.MAX_IMAGE_LOAD_TIMES) {
+      const timesToDelete = imageLoadTimes.length - PerformanceMonitor.MAX_IMAGE_LOAD_TIMES;
+      this.metrics.images!.imageLoadTimes = imageLoadTimes.slice(timesToDelete);
+      console.log(`[PerformanceMonitor] 清理图片加载时间记录: 删除${timesToDelete}个记录`);
+    }
   }
 }
 

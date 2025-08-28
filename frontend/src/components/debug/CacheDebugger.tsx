@@ -10,7 +10,7 @@ import { cacheService } from '../services/cache/cache-service';
 export const CacheDebugger: React.FC = () => {
   const { stats, loading: statsLoading, error: statsError, refetch: refetchStats } = useCacheStats();
   const { healthy, loading: healthLoading, lastCheck, check: checkHealth } = useCacheHealth();
-  const { prefetch, prefetchIIIF, loading: prefetchLoading } = useCachePrefetch();
+  const { prefetchIIIF, loading: prefetchLoading } = useCachePrefetch();
   
   const [customKey, setCustomKey] = useState('');
   const [customValue, setCustomValue] = useState('');

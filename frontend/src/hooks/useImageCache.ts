@@ -262,6 +262,7 @@ export const useSmartImagePreloader = (
   const maxConcurrencyRef = useRef(concurrency);
   const abortControllerRef = useRef<AbortController | null>(null);
   const preloadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const cleanupIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const loadImage = useCallback(async (url: string): Promise<boolean> => {
     if (loadedImages.has(url) || failedImages.has(url) || loadingRef.current.has(url)) {
@@ -299,8 +300,8 @@ export const useSmartImagePreloader = (
       setLoadedImages(prev => {
         const newSet = new Set(prev).add(url);
         if (newSet.size > maxCacheSize) {
-          // 转换为数组，删除最早的25%图片，避免频繁清理
-          const urlsToDelete = Array.from(newSet).slice(0, Math.ceil(maxCacheSize * 0.25));
+          // 更激进的清理策略：删除40%的图片，减少清理频率
+          const urlsToDelete = Array.from(newSet).slice(0, Math.ceil(maxCacheSize * 0.4));
           urlsToDelete.forEach(urlToDelete => newSet.delete(urlToDelete));
           console.log(`[ImageCache] LRU清理: 删除${urlsToDelete.length}个早期图片，当前缓存大小: ${newSet.size}`);
         }
@@ -309,23 +310,29 @@ export const useSmartImagePreloader = (
 
       // 同样清理failedImages，防止无限增长
       setFailedImages(prev => {
-        if (prev.size > maxCacheSize) {
-          const oldestUrl = Array.from(prev)[0];
-          const newSet = new Set(prev);
-          newSet.delete(oldestUrl);
-          return newSet;
+        const newSet = new Set(prev).add(url);
+        // 失败图片缓存大小限制为最大缓存的一半
+        const failedCacheLimit = Math.floor(maxCacheSize / 2);
+        if (newSet.size > failedCacheLimit) {
+          // 清理50%的失败图片
+          const urlsToDelete = Array.from(newSet).slice(0, Math.ceil(failedCacheLimit * 0.5));
+          urlsToDelete.forEach(urlToDelete => newSet.delete(urlToDelete));
+          console.log(`[ImageCache] 失败图片清理: 删除${urlsToDelete.length}个失败图片，当前缓存大小: ${newSet.size}`);
         }
-        return prev;
+        return newSet;
       });
 
       return true;
     } catch {
       setFailedImages(prev => {
         const newSet = new Set(prev).add(url);
-        // 限制失败图片的缓存大小
-        if (newSet.size > Math.floor(maxCacheSize / 2)) {
-          const oldestUrl = Array.from(newSet)[0];
-          newSet.delete(oldestUrl);
+        // 失败图片缓存大小限制为最大缓存的一半
+        const failedCacheLimit = Math.floor(maxCacheSize / 2);
+        if (newSet.size > failedCacheLimit) {
+          // 清理50%的失败图片
+          const urlsToDelete = Array.from(newSet).slice(0, Math.ceil(failedCacheLimit * 0.5));
+          urlsToDelete.forEach(urlToDelete => newSet.delete(urlToDelete));
+          console.log(`[ImageCache] 失败图片清理: 删除${urlsToDelete.length}个失败图片，当前缓存大小: ${newSet.size}`);
         }
         return newSet;
       });
@@ -417,6 +424,74 @@ export const useSmartImagePreloader = (
       return () => clearTimeout(timer);
     }
   }, [enabled, nextImages, currentImages, preloadNextImages]);
+
+  // 定期清理机制
+  useEffect(() => {
+    if (!enabled) return;
+
+    // 每5分钟执行一次清理，防止长时间运行时的内存累积
+    cleanupIntervalRef.current = setInterval(() => {
+      setLoadedImages(prev => {
+        if (prev.size > maxCacheSize * 0.8) {
+          // 如果缓存使用超过80%，执行清理
+          const urlsToDelete = Array.from(prev).slice(0, Math.ceil(maxCacheSize * 0.3));
+          const newSet = new Set(prev);
+          urlsToDelete.forEach(urlToDelete => newSet.delete(urlToDelete));
+          console.log(`[ImageCache] 定期清理: 删除${urlsToDelete.length}个早期图片，当前缓存大小: ${newSet.size}`);
+          return newSet;
+        }
+        return prev;
+      });
+
+      setFailedImages(prev => {
+        const failedCacheLimit = Math.floor(maxCacheSize / 2);
+        if (prev.size > failedCacheLimit * 0.8) {
+          // 如果失败图片缓存使用超过80%，执行清理
+          const urlsToDelete = Array.from(prev).slice(0, Math.ceil(failedCacheLimit * 0.4));
+          const newSet = new Set(prev);
+          urlsToDelete.forEach(urlToDelete => newSet.delete(urlToDelete));
+          console.log(`[ImageCache] 定期清理失败图片: 删除${urlsToDelete.length}个失败图片，当前缓存大小: ${newSet.size}`);
+          return newSet;
+        }
+        return prev;
+      });
+    }, 300000); // 5分钟
+
+    return () => {
+      if (cleanupIntervalRef.current) {
+        clearInterval(cleanupIntervalRef.current);
+        cleanupIntervalRef.current = null;
+      }
+    };
+  }, [enabled, maxCacheSize]);
+
+  // 组件卸载时清理所有资源
+  useEffect(() => {
+    return () => {
+      // 清理定时器
+      if (preloadTimeoutRef.current) {
+        clearTimeout(preloadTimeoutRef.current);
+        preloadTimeoutRef.current = null;
+      }
+      
+      if (cleanupIntervalRef.current) {
+        clearInterval(cleanupIntervalRef.current);
+        cleanupIntervalRef.current = null;
+      }
+      
+      // 中止所有进行中的加载
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+        abortControllerRef.current = null;
+      }
+      
+      // 清理加载中的图片引用
+      loadingRef.current.clear();
+      
+      // 停止加载状态
+      setLoading(false);
+    };
+  }, []);
 
   return {
     loading,
