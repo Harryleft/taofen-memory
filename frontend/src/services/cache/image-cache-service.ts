@@ -61,12 +61,14 @@ export class ImageCacheService extends CacheService {
     metadata: ImageMetadata,
     ttl: number = 86400
   ): Promise<boolean> {
+    // 检查连接状态
+    if (!this.getConnectionStatus()) {
+      console.warn('缓存服务未连接，跳过缓存图片元数据');
+      return false;
+    }
+
     try {
-      const response = await this.post('/cache/image/metadata', {
-        imageId,
-        metadata,
-        ttl
-      });
+      const response = await this.set(`image:metadata:${imageId}`, metadata, ttl);
       return response.success;
     } catch (error) {
       console.error('Failed to cache image metadata:', error);
@@ -78,9 +80,15 @@ export class ImageCacheService extends CacheService {
    * 获取图片元数据
    */
   async getImageMetadata(imageId: string): Promise<ImageMetadata | null> {
+    // 检查连接状态
+    if (!this.getConnectionStatus()) {
+      console.warn('缓存服务未连接，跳过获取图片元数据');
+      return null;
+    }
+
     try {
-      const response = await this.get(`/cache/image/metadata/${imageId}`);
-      return response.success ? response.data : null;
+      const response = await this.get(`image:metadata:${imageId}`);
+      return response.success ? response.data as ImageMetadata : null;
     } catch (error) {
       console.error('Failed to get image metadata:', error);
       return null;
@@ -95,12 +103,14 @@ export class ImageCacheService extends CacheService {
     dimensions: ImageDimensions,
     ttl: number = 2592000
   ): Promise<boolean> {
+    // 检查连接状态
+    if (!this.getConnectionStatus()) {
+      console.warn('缓存服务未连接，跳过缓存图片尺寸');
+      return false;
+    }
+
     try {
-      const response = await this.post('/cache/image/dimensions', {
-        imageId,
-        dimensions,
-        ttl
-      });
+      const response = await this.set(`image:dimensions:${imageId}`, dimensions, ttl);
       return response.success;
     } catch (error) {
       console.error('Failed to cache image dimensions:', error);
@@ -112,9 +122,15 @@ export class ImageCacheService extends CacheService {
    * 获取图片尺寸
    */
   async getImageDimensions(imageId: string): Promise<ImageDimensions | null> {
+    // 检查连接状态
+    if (!this.getConnectionStatus()) {
+      console.warn('缓存服务未连接，跳过获取图片尺寸');
+      return null;
+    }
+
     try {
-      const response = await this.get(`/cache/image/dimensions/${imageId}`);
-      return response.success ? response.data : null;
+      const response = await this.get(`image:dimensions:${imageId}`);
+      return response.success ? response.data as ImageDimensions : null;
     } catch (error) {
       console.error('Failed to get image dimensions:', error);
       return null;
@@ -125,11 +141,25 @@ export class ImageCacheService extends CacheService {
    * 批量获取图片尺寸
    */
   async batchGetImageDimensions(imageIds: string[]): Promise<Record<string, ImageDimensions>> {
+    // 检查连接状态
+    if (!this.getConnectionStatus()) {
+      console.warn('缓存服务未连接，跳过批量获取图片尺寸');
+      return {};
+    }
+
     try {
-      const response = await this.post('/cache/image/dimensions/batch', {
-        imageIds
-      });
-      return response.success ? response.data : {};
+      const keys = imageIds.map(id => `image:dimensions:${id}`);
+      const response = await this.mget(keys);
+      if (response.success && response.data) {
+        const result: Record<string, ImageDimensions> = {};
+        imageIds.forEach((id, index) => {
+          if (response.data[index]) {
+            result[id] = response.data[index] as ImageDimensions;
+          }
+        });
+        return result;
+      }
+      return {};
     } catch (error) {
       console.error('Failed to batch get image dimensions:', error);
       return {};
@@ -144,12 +174,14 @@ export class ImageCacheService extends CacheService {
     layout: LayoutCache,
     ttl: number = 300
   ): Promise<boolean> {
+    // 检查连接状态
+    if (!this.getConnectionStatus()) {
+      console.warn('缓存服务未连接，跳过缓存瀑布流布局');
+      return false;
+    }
+
     try {
-      const response = await this.post('/cache/image/layout', {
-        layoutKey,
-        layout,
-        ttl
-      });
+      const response = await this.set(`image:layout:${layoutKey}`, layout, ttl);
       return response.success;
     } catch (error) {
       console.error('Failed to cache layout:', error);
@@ -161,9 +193,15 @@ export class ImageCacheService extends CacheService {
    * 获取瀑布流布局
    */
   async getLayout(layoutKey: string): Promise<LayoutCache | null> {
+    // 检查连接状态
+    if (!this.getConnectionStatus()) {
+      console.warn('缓存服务未连接，跳过获取瀑布流布局');
+      return null;
+    }
+
     try {
-      const response = await this.get(`/cache/image/layout/${layoutKey}`);
-      return response.success ? response.data : null;
+      const response = await this.get(`image:layout:${layoutKey}`);
+      return response.success ? response.data as LayoutCache : null;
     } catch (error) {
       console.error('Failed to get layout:', error);
       return null;
@@ -178,12 +216,14 @@ export class ImageCacheService extends CacheService {
     queue: PreloadQueue,
     ttl: number = 60
   ): Promise<boolean> {
+    // 检查连接状态
+    if (!this.getConnectionStatus()) {
+      console.warn('缓存服务未连接，跳过缓存预加载队列');
+      return false;
+    }
+
     try {
-      const response = await this.post('/cache/image/preload', {
-        queueId,
-        queue,
-        ttl
-      });
+      const response = await this.set(`image:preload:${queueId}`, queue, ttl);
       return response.success;
     } catch (error) {
       console.error('Failed to cache preload queue:', error);
@@ -195,9 +235,15 @@ export class ImageCacheService extends CacheService {
    * 获取预加载队列
    */
   async getPreloadQueue(queueId: string): Promise<PreloadQueue | null> {
+    // 检查连接状态
+    if (!this.getConnectionStatus()) {
+      console.warn('缓存服务未连接，跳过获取预加载队列');
+      return null;
+    }
+
     try {
-      const response = await this.get(`/cache/image/preload/${queueId}`);
-      return response.success ? response.data : null;
+      const response = await this.get(`image:preload:${queueId}`);
+      return response.success ? response.data as PreloadQueue : null;
     } catch (error) {
       console.error('Failed to get preload queue:', error);
       return null;
@@ -208,9 +254,16 @@ export class ImageCacheService extends CacheService {
    * 清除图片缓存
    */
   async clearImageCache(imageId: string): Promise<boolean> {
+    // 检查连接状态
+    if (!this.getConnectionStatus()) {
+      console.warn('缓存服务未连接，跳过清除图片缓存');
+      return false;
+    }
+
     try {
-      const response = await this.delete(`/cache/image/${imageId}`);
-      return response.success;
+      const response = await this.delete(`image:metadata:${imageId}`);
+      const response2 = await this.delete(`image:dimensions:${imageId}`);
+      return response.success && response2.success;
     } catch (error) {
       console.error('Failed to clear image cache:', error);
       return false;
@@ -221,8 +274,14 @@ export class ImageCacheService extends CacheService {
    * 清除布局缓存
    */
   async clearLayoutCache(layoutKey: string): Promise<boolean> {
+    // 检查连接状态
+    if (!this.getConnectionStatus()) {
+      console.warn('缓存服务未连接，跳过清除布局缓存');
+      return false;
+    }
+
     try {
-      const response = await this.delete(`/cache/image/layout/${layoutKey}`);
+      const response = await this.delete(`image:layout:${layoutKey}`);
       return response.success;
     } catch (error) {
       console.error('Failed to clear layout cache:', error);
@@ -234,9 +293,15 @@ export class ImageCacheService extends CacheService {
    * 获取图片缓存统计
    */
   async getImageCacheStats(): Promise<ImageCacheStats | null> {
+    // 检查连接状态
+    if (!this.getConnectionStatus()) {
+      console.warn('缓存服务未连接，跳过获取图片缓存统计');
+      return null;
+    }
+
     try {
-      const response = await this.get('/cache/image/stats');
-      return response.success ? response.data : null;
+      const response = await this.get('image:stats');
+      return response.success ? response.data as ImageCacheStats : null;
     } catch (error) {
       console.error('Failed to get image cache stats:', error);
       return null;
