@@ -122,6 +122,9 @@ async function deleteFromCache(key) {
 app.use(cors());
 app.use(express.json());
 
+// 静态文件服务 - 为图片文件提供服务
+app.use('/images', express.static(path.join(__dirname, '../images')));
+
 // 静态文件服务 - 为前端构建文件提供服务
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
