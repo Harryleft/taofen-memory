@@ -113,7 +113,13 @@
       "Bash(npm cache clean:*)",
       "Bash(expect:*)",
       "Bash(ssh:*)",
-      "Bash(wsl:*)"
+      "Bash(wsl:*)",
+      "Bash(npm root:*)",
+      "Read(/C:\\Program Files\\nodejs\\node_modules\\@browser-echo/**)",
+      "Read(/C:\\Program Files\\nodejs\\node_modules\\@browser-echo\\mcp/**)",
+      "Read(/C:\\Program Files\\nodejs\\node_modules\\@browser-echo\\mcp/**)",
+      "Bash(claude mcp:*)",
+      "Read(/C:\\Users\\afkxw/**)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",
