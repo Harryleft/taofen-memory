@@ -1,0 +1,8 @@
+[
+  { "id": 1, "filename": "hero_placeholder_1.jpg", "title": "邹韬奋历史照片1", "year": "1925" },
+  { "id": 2, "filename": "hero_placeholder_2.jpg", "title": "生活周刊创刊号", "year": "1926" },
+  { "id": 3, "filename": "hero_placeholder_3.jpg", "title": "邹韬奋肖像", "year": "1930" },
+  { "id": 4, "filename": "hero_placeholder_4.jpg", "title": "生活日报", "year": "1932" },
+  { "id": 5, "filename": "hero_placeholder_5.jpg", "title": "历史文献", "year": "1935" },
+  { "id": 6, "filename": "hero_placeholder_6.jpg", "title": "文化活动照片", "year": "1940" }
+]

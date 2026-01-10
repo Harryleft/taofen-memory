@@ -103,7 +103,11 @@ dump.rdb
 # Docker
 .dockerignore
 
+# 敏感数据 - 不提交到版本控制
 data/
 .claude/
 .specstory/
-.gitignore
+
+# 保留示例数据
+!data-example/
+!public/images-example/

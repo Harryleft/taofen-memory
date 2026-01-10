@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "year": 1926,
+    "bookname": "示例书籍1 - 职业心理学",
+    "writer": "示例作者",
+    "publisher": "示例出版社",
+    "image": "/images/books/book_placeholder_1.jpg"
+  },
+  {
+    "id": 2,
+    "year": 1930,
+    "bookname": "示例书籍2 - 生活周刊选集",
+    "writer": "邹韬奋",
+    "publisher": "生活周刊社",
+    "image": "/images/books/book_placeholder_2.jpg"
+  },
+  {
+    "id": 3,
+    "year": 1935,
+    "bookname": "示例书籍3 - 大众生活",
+    "writer": "示例作者",
+    "publisher": "生活书店",
+    "image": "/images/books/book_placeholder_3.jpg"
+  }
+]
