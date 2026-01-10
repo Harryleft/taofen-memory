@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "title": "示例手迹1 - 信札",
+    "date": "1930年代",
+    "description": "这是示例手迹描述，实际使用时请替换为真实的手迹信息。",
+    "image": "/images/manuscripts/handwriting_placeholder_1.jpg",
+    "content": "这是示例手迹的OCR识别内容，实际使用时需要使用AI模型进行真实手迹的识别。",
+    "ai_interpretation": "这是AI对示例手迹的解读结果。实际使用时，AI会分析手迹的历史背景、文化价值、书法风格等信息。"
+  },
+  {
+    "id": 2,
+    "title": "示例手迹2 - 题词",
+    "date": "1935年",
+    "description": "这是示例手迹描述，实际使用时请替换为真实的手迹信息。",
+    "image": "/images/manuscripts/handwriting_placeholder_2.jpg",
+    "content": "示例内容",
+    "ai_interpretation": "示例解读"
+  },
+  {
+    "id": 3,
+    "title": "示例手迹3 - 手稿",
+    "date": "1940年代",
+    "description": "这是示例手迹描述，实际使用时请替换为真实的手迹信息。",
+    "image": "/images/manuscripts/handwriting_placeholder_3.jpg",
+    "content": "示例内容",
+    "ai_interpretation": "示例解读"
+  }
+]

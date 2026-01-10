@@ -1,0 +1,33 @@
+[
+  {
+    "id": 1,
+    "name": "邹韬奋",
+    "birth_year": "1895",
+    "death_year": "1944",
+    "description": "中国现代著名新闻记者、政论家、出版家，生活书店创始人。",
+    "image": "/images/manuscripts/person_placeholder_1.jpg",
+    "relationships": []
+  },
+  {
+    "id": 2,
+    "name": "示例人物1",
+    "birth_year": "1900",
+    "death_year": "1980",
+    "description": "这是示例人物描述，实际使用时请替换为真实数据。",
+    "image": "/images/manuscripts/person_placeholder_2.jpg",
+    "relationships": [
+      { "target_id": 1, "relationship": "同事" }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "示例人物2",
+    "birth_year": "1910",
+    "death_year": "1990",
+    "description": "这是示例人物描述，实际使用时请替换为真实数据。",
+    "image": "/images/manuscripts/person_placeholder_3.jpg",
+    "relationships": [
+      { "target_id": 1, "relationship": "学生" }
+    ]
+  }
+]

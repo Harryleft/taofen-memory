@@ -1,0 +1,42 @@
+{
+  "nodes": [
+    {
+      "id": 1,
+      "label": "邹韬奋",
+      "group": "核心人物",
+      "birth_year": "1895",
+      "death_year": "1944",
+      "description": "中国现代著名新闻记者、政论家、出版家"
+    },
+    {
+      "id": 2,
+      "label": "示例同事",
+      "group": "同事",
+      "birth_year": "1900",
+      "death_year": "1980",
+      "description": "示例人物描述"
+    },
+    {
+      "id": 3,
+      "label": "示例学生",
+      "group": "学生",
+      "birth_year": "1910",
+      "death_year": "1990",
+      "description": "示例人物描述"
+    }
+  ],
+  "links": [
+    {
+      "source": 2,
+      "target": 1,
+      "relationship": "同事",
+      "description": "工作关系"
+    },
+    {
+      "source": 3,
+      "target": 1,
+      "relationship": "学生",
+      "description": "师生关系"
+    }
+  ]
+}

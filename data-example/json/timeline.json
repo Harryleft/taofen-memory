@@ -1,0 +1,59 @@
+[
+  {
+    "core_event": "1. 幼年生活",
+    "timeline": [
+      {
+        "time": "1895年",
+        "experience": "11月5日，邹韬奋出生于福建省永安市。",
+        "image": "/images/timeline_images/childhood_placeholder.jpg",
+        "location": "福建, 永安"
+      },
+      {
+        "time": "1900年",
+        "experience": "父亲去福州任候补，全家迁往。由父亲亲自发蒙，教读《三字经》等。",
+        "image": "/images/timeline_images/education_placeholder.jpg",
+        "location": "福建, 福州"
+      },
+      {
+        "time": "1908年",
+        "experience": "随父亲前往江西余江奔丧，扶母亲灵柩归乡，并在老家居住四个月。",
+        "image": "/images/timeline_images/family_placeholder.jpg",
+        "location": "江西, 余江"
+      }
+    ]
+  },
+  {
+    "core_event": "2. 求学时期",
+    "timeline": [
+      {
+        "time": "1912年",
+        "experience": "考入上海南洋公学（交通大学前身）小学部。",
+        "image": "/images/timeline_images/school_placeholder.jpg",
+        "location": "上海"
+      },
+      {
+        "time": "1919年",
+        "experience": "从南洋公学上院（大学部）毕业，获学士学位。",
+        "image": "/images/timeline_images/graduation_placeholder.jpg",
+        "location": "上海"
+      }
+    ]
+  },
+  {
+    "core_event": "3. 职业生涯",
+    "timeline": [
+      {
+        "time": "1922年",
+        "experience": "担任中华职业教育社编辑部主任，负责编辑《职业与教育》月刊。",
+        "image": "/images/timeline_images/career_placeholder.jpg",
+        "location": "上海"
+      },
+      {
+        "time": "1926年",
+        "experience": "接任《生活》周刊主编，开始其新闻出版事业。",
+        "image": "/images/timeline_images/editor_placeholder.jpg",
+        "location": "上海"
+      }
+    ]
+  }
+]

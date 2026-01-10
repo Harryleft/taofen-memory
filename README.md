@@ -18,6 +18,7 @@
 - [项目概述](#项目概述)
 - [核心功能](#核心功能)
 - [技术架构](#技术架构)
+- [数据配置](#数据配置)
 - [快速开始](#快速开始)
 - [开发指南](#开发指南)
 - [部署文档](#部署文档)
@@ -164,6 +165,119 @@ graph TB
 - **Masonry**: 瀑布流布局算法
 - **Cantaloupe**: IIIF图像服务器
 - **Caddy**: 现代Web服务器
+
+---
+
+## 数据配置
+
+### 🔒 数据安全说明
+
+本项目采用**敏感数据保护策略**,确保真实数据不会意外提交到公开仓库:
+
+- ✅ **真实数据**: `data/` 目录已添加到 `.gitignore`,不会被提交
+- ✅ **示例数据**: `data-example/` 目录包含脱敏的示例数据,可以安全提交
+- ✅ **环境变量**: 使用 `.env.example` 模板,真实配置在 `.env` 中不提交
+- ✅ **占位图片**: SVG占位图替代真实历史照片
+
+### 📊 使用示例数据 (推荐新手)
+
+项目包含完整的示例数据,无需准备真实资源即可运行:
+
+#### 1. 配置环境变量
+
+```bash
+# 后端配置
+cd backend
+cp .env.example .env
+# 编辑 .env,设置: USE_SAMPLE_DATA=true
+
+# 前端配置
+cd ../frontend
+cp .env.example .env.local
+# 编辑 .env.local,设置: VITE_USE_SAMPLE_DATA=true
+```
+
+#### 2. 启动项目
+
+```bash
+# 后端
+cd backend
+npm run dev
+
+# 前端 (新终端)
+cd frontend
+npm run dev
+```
+
+#### 3. 访问应用
+
+打开浏览器访问: **http://localhost:5173**
+
+### 🗂️ 使用真实数据 (生产环境)
+
+如需使用真实的历史数据和图片资源,请参考:
+
+**📘 详细指南**: [docs/DATA_SETUP_GUIDE.md](docs/DATA_SETUP_GUIDE.md)
+
+#### 快速步骤
+
+1. **准备数据目录**
+   ```bash
+   mkdir -p data/json
+   mkdir -p data/images/{books,manuscripts,timeline_images}
+   ```
+
+2. **配置环境变量**
+   ```bash
+   # backend/.env
+   USE_SAMPLE_DATA=false
+   DATA_PATH=/path/to/real/data
+   ```
+
+3. **准备数据文件**
+
+   支持的数据格式:
+   - JSON文件 (书籍、人物、时间轴等)
+   - 图片资源 (本地/IIIF/CDN)
+   - AI解读结果
+
+4. **数据格式示例**
+
+   ```json
+   // books.json
+   [
+     {
+       "id": 1,
+       "year": 1926,
+       "bookname": "书名",
+       "writer": "作者",
+       "publisher": "出版社",
+       "image": "/images/books/cover.jpg"
+     }
+   ]
+   ```
+
+### 🎨 生成占位图片
+
+如果需要更多占位图片用于开发:
+
+```bash
+node scripts/generate-placeholder-images.js
+```
+
+这将在 `data-example/images/` 目录生成SVG占位图片。
+
+### 📋 数据文件清单
+
+| 文件 | 说明 | 示例数据 |
+|------|------|---------|
+| `books.json` | 书籍信息 | ✅ 3条示例 |
+| `hero_images.json` | 首页瀑布流图片 | ✅ 6张占位图 |
+| `timeline.json` | 人生时间轴事件 | ✅ 3个时期 |
+| `persons.json` | 人物信息 | ✅ 3个示例人物 |
+| `relationships.json` | 人际关系网络 | ✅ 示例网络 |
+| `newspapers_info.json` | 报刊文章 | ✅ 3篇示例 |
+| `taofen_handwriting_details.json` | 手迹详情 | ✅ 3个示例 |
 
 ---
 
@@ -600,6 +714,7 @@ docker-compose up -d
 
 ## 文档资源
 
+- [数据配置指南](docs/DATA_SETUP_GUIDE.md) - 如何配置真实数据和示例数据
 - [本地开发环境指南](docs/本地开发环境指南.md)
 - [阿里云ECS部署完整教程](docs/阿里云ECS部署完整教程.md)
 - [AI环境配置指南](docs/AI_ENV_SETUP.md)
