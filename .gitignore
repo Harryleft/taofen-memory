@@ -111,3 +111,14 @@ data/
 # 保留示例数据
 !data-example/
 !public/images-example/
+
+# 压缩包和临时文件
+*.tar.gz
+*.zip
+*.rar
+*.7z
+
+# 临时目录
+taofen_web_source/
+tmp/
+temp/
