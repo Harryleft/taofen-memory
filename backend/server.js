@@ -5,6 +5,72 @@ const path = require('path');
 const { createClient } = require('redis');
 require('dotenv').config();
 
+// 输入验证中间件
+const validateAIInput = (req, res, next) => {
+  const { content, title, notes } = req.body;
+
+  // 验证必要参数
+  if (!content) {
+    return res.status(400).json({ error: '缺少必要参数：content' });
+  }
+
+  // 验证类型
+  if (typeof content !== 'string') {
+    return res.status(400).json({ error: 'content必须是字符串' });
+  }
+
+  // 验证长度
+  if (content.length > 5000) {
+    return res.status(400).json({ error: 'content长度不能超过5000字符' });
+  }
+
+  // 检测潜在的prompt injection
+  const dangerousPatterns = [
+    /<script/i,
+    /javascript:/i,
+    /data:text/i,
+    /onload=/i,
+    /ignore.*previous.*instructions/i,
+    /disregard.*above/i
+  ];
+
+  const combinedInput = `${content} ${title || ''} ${notes || ''}`;
+  for (const pattern of dangerousPatterns) {
+    if (pattern.test(combinedInput)) {
+      return res.status(400).json({ error: '输入内容包含不合法字符' });
+    }
+  }
+
+  next();
+};
+
+// AI API速率限制（内存实现）
+const aiRateLimiter = (() => {
+  const requests = new Map();
+  const WINDOW_MS = 60000; // 1分钟
+  const MAX_REQUESTS = 10;  // 每分钟最多10次
+
+  return (req, res, next) => {
+    const ip = req.ip || req.connection.remoteAddress;
+    const now = Date.now();
+    const userRequests = requests.get(ip) || [];
+
+    // 清理过期请求
+    const validRequests = userRequests.filter(time => now - time < WINDOW_MS);
+
+    if (validRequests.length >= MAX_REQUESTS) {
+      return res.status(429).json({
+        error: 'AI调用过于频繁，请稍后重试',
+        retryAfter: Math.ceil(WINDOW_MS / 1000)
+      });
+    }
+
+    validRequests.push(now);
+    requests.set(ip, validRequests);
+    next();
+  };
+})();
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -69,8 +135,9 @@ async function connectRedis() {
   }
 }
 
-// 内存缓存后备方案
+// 内存缓存后备方案 - 修复泄漏
 const memoryCache = new Map();
+const cacheTimers = new Map(); // 存储定时器引用
 
 // 缓存操作函数
 async function getFromCache(key) {
@@ -92,10 +159,19 @@ async function setToCache(key, value, ttl = 3600) {
     const serializedValue = JSON.stringify(value);
     if (redisClient && redisClient.isReady) {
       await redisClient.setEx(key, ttl, serializedValue);
+      // 清除旧的定时器
+      if (cacheTimers.has(key)) {
+        clearTimeout(cacheTimers.get(key));
+        cacheTimers.delete(key);
+      }
     } else {
       memoryCache.set(key, value);
-      // 内存缓存设置过期时间
-      setTimeout(() => memoryCache.delete(key), ttl * 1000);
+      // 存储定时器引用，允许取消
+      const timer = setTimeout(() => {
+        memoryCache.delete(key);
+        cacheTimers.delete(key);
+      }, ttl * 1000);
+      cacheTimers.set(key, timer);
     }
     return true;
   } catch (error) {
@@ -133,23 +209,23 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
 });
 
-// AI API配置
+// AI API配置 - 强制要求环境变量
 const AI_API_CONFIG = {
   url: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
-  apiKey: process.env.AI_API_KEY || '2cdde2240d0a446b9bd7962a8c5a25fe.suOORlOs7kv84ZEF',
+  get apiKey() {
+    const key = process.env.AI_API_KEY;
+    if (!key) {
+      throw new Error('AI_API_KEY environment variable is required');
+    }
+    return key;
+  },
   model: 'glm-4.5-air'
 };
 
-// AI解读接口
-app.post('/api/ai/interpret', async (req, res) => {
+// AI解读接口 - 添加速率限制和输入验证
+app.post('/api/ai/interpret', aiRateLimiter, validateAIInput, async (req, res) => {
   try {
     const { title, content, notes, time } = req.body;
-
-    if (!content) {
-      return res.status(400).json({ 
-        error: '缺少必要参数：content' 
-      });
-    }
 
     // 构建提示词
     const prompt = `角色：你是一名深谙邹韬奋思想的金牌讲解员，擅长用生活化比喻和当代语境还原历史手稿的灵魂。
@@ -375,35 +451,42 @@ app.delete('/api/cache/delete/:key', async (req, res) => {
 app.post('/api/cache/mget', async (req, res) => {
   try {
     const { keys } = req.body;
-    
+
     if (!keys || !Array.isArray(keys)) {
-      return res.status(400).json({ 
-        success: false, 
-        message: '缺少必要参数：keys（数组）' 
+      return res.status(400).json({
+        success: false,
+        message: '缺少必要参数：keys（数组）'
       });
     }
-    
-    // 批量获取缓存数据
-    const results = await Promise.all(
-      keys.map(async (key) => {
-        try {
-          const value = await getFromCache(key);
-          return { key, value, found: value !== null };
-        } catch (error) {
-          console.error(`获取缓存 ${key} 失败:`, error);
-          return { key, value: null, found: false, error: error.message };
-        }
-      })
-    );
-    
+
+    if (keys.length === 0) {
+      return res.json({ success: true, data: [], results: [], count: 0, found: 0 });
+    }
+
+    let results;
+
+    if (redisClient && redisClient.isReady) {
+      // 使用 Redis MGET 一次性查询所有键
+      const values = await redisClient.mGet(keys);
+      results = keys.map((key, index) => ({
+        key,
+        value: values[index] ? JSON.parse(values[index]) : null,
+        found: values[index] !== null
+      }));
+    } else {
+      // 内存缓存逐个查询
+      results = keys.map(key => ({
+        key,
+        value: memoryCache.get(key) || null,
+        found: memoryCache.has(key)
+      }));
+    }
+
     // 按照原始keys顺序返回数据
-    const data = keys.map(key => {
-      const result = results.find(r => r.key === key);
-      return result ? result.value : null;
-    });
-    
-    res.json({ 
-      success: true, 
+    const data = results.map(r => r.value);
+
+    res.json({
+      success: true,
       data: data,
       results: results,
       count: keys.length,
@@ -411,10 +494,10 @@ app.post('/api/cache/mget', async (req, res) => {
     });
   } catch (error) {
     console.error('批量获取缓存错误:', error);
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       message: '批量获取缓存失败',
-      error: error.message 
+      error: error.message
     });
   }
 });

@@ -36,21 +36,21 @@ class RedisCache {
       });
 
       // 使用once而不是on来避免监听器泄漏
-      this.client.once('error', (err) => {
+      this.client.on('error', (err) => {
         logger.error('Redis客户端错误:', err);
       });
 
-      this.client.once('connect', () => {
+      this.client.on('connect', () => {
         logger.info('Redis客户端连接成功');
         this.isConnected = true;
       });
 
-      this.client.once('disconnect', () => {
+      this.client.on('disconnect', () => {
         logger.warn('Redis客户端断开连接');
         this.isConnected = false;
       });
 
-      this.client.once('reconnecting', () => {
+      this.client.on('reconnecting', () => {
         logger.info('Redis客户端正在重连...');
       });
 
@@ -168,30 +168,27 @@ class RedisCache {
         throw new Error('Redis未连接');
       }
 
-      // 限制批量删除的数量，避免阻塞
-      const keys = await this.client.keys(pattern);
-      if (keys.length > 0) {
-        // 分批删除，每次最多1000个key
-        const batchSize = 1000;
-        let totalDeleted = 0;
-        
-        for (let i = 0; i < keys.length; i += batchSize) {
-          const batch = keys.slice(i, i + batchSize);
-          const result = await this.client.del(batch);
+      // 使用 SCAN 命令代替 KEYS，避免阻塞
+      let cursor = 0;
+      const batchSize = 1000;
+      let totalDeleted = 0;
+
+      do {
+        const [nextCursor, keys] = await this.client.scan(cursor, {
+          MATCH: pattern,
+          COUNT: batchSize
+        });
+
+        if (keys.length > 0) {
+          const result = await this.client.del(keys);
           totalDeleted += result;
-          
-          // 批次间短暂暂停，避免阻塞
-          if (i + batchSize < keys.length) {
-            await new Promise(resolve => setTimeout(resolve, 50));
-          }
         }
-        
-        logger.info(`清空缓存成功，模式: ${pattern}, 删除数量: ${totalDeleted}`);
-        return totalDeleted;
-      }
-      
-      logger.info(`清空缓存完成，模式: ${pattern}, 未找到匹配的key`);
-      return 0;
+
+        cursor = parseInt(nextCursor);
+      } while (cursor !== 0);
+
+      logger.info(`清空缓存成功，模式: ${pattern}, 删除数量: ${totalDeleted}`);
+      return totalDeleted;
     } catch (error) {
       logger.error('清空缓存失败:', error);
       throw error;

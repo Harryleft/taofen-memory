@@ -218,65 +218,7 @@ export const useHandwritingFilters = (
   };
 };
 
-// 工具函数：计算过滤结果（导出供测试使用）
-// 注意：这个函数与内部的computeFilteredItems函数重复，为了保持向后兼容性而保留
-export const computeFilteredItems = (
-  items: TransformedHandwritingItem[],
-  filters: Record<string, unknown>,
-  searchTerm: string
-): TransformedHandwritingItem[] => {
-  // 搜索过滤
-  let filteredItems = items;
-  if (searchTerm) {
-    const searchLower = searchTerm.toLowerCase();
-    filteredItems = items.filter(item => (
-      item.title.toLowerCase().includes(searchLower) ||
-      item.description.toLowerCase().includes(searchLower) ||
-      item.tags.some(tag => tag.toLowerCase().includes(searchLower)) ||
-      item.originalData.原文.toLowerCase().includes(searchLower) ||
-      item.originalData.注释.toLowerCase().includes(searchLower)
-    ));
-  }
-
-  // 分类过滤
-  if (filters.selectedCategory !== 'all') {
-    filteredItems = filteredItems.filter(item => item.category === filters.selectedCategory);
-  }
-
-  // 年份过滤
-  if (filters.selectedYear !== 'all') {
-    filteredItems = filteredItems.filter(item => item.year.toString() === filters.selectedYear);
-  }
-
-  // 来源过滤
-  if (filters.selectedSource !== 'all') {
-    filteredItems = filteredItems.filter(item => item.originalData.数据来源 === filters.selectedSource);
-  }
-
-  // 标签过滤
-  if (filters.selectedTag !== 'all') {
-    filteredItems = filteredItems.filter(item => item.tags.includes(filters.selectedTag));
-  }
-
-  // 排序
-  return filteredItems.sort((a, b) => {
-    switch (filters.sortOrder) {
-      case 'year_asc':
-        return a.year - b.year;
-      case 'year_desc':
-        return b.year - a.year;
-      case 'name_asc':
-        return a.title.localeCompare(b.title);
-      case 'name_desc':
-        return b.title.localeCompare(a.title);
-      case 'id_asc':
-        return a.id.localeCompare(b.id);
-      case 'id_desc':
-        return b.id.localeCompare(a.id);
-      default:
-        return 0;
-    }
-  });
-};
+// 导出内部函数供测试使用，避免代码重复
+export { computeFilteredItems };
 
 export default useHandwritingFilters;

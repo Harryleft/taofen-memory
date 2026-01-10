@@ -3,12 +3,11 @@
  * 专门用于缓存瀑布流布局中的图片数据和元信息
  */
 
-const RedisCache = require('./redis-cache');
 const logger = require('./logger');
 
 class ImageCache {
-    constructor() {
-        this.redis = new RedisCache();
+    constructor(redisCache) {
+        this.redis = redisCache;
         this.cachePrefix = 'image';
     }
 

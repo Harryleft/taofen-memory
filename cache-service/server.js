@@ -39,10 +39,11 @@ async function initializeCache() {
   try {
     redisCache = new RedisCache();
     await redisCache.connect();
-    
+
+    // 使用依赖注入，传递已连接的 redisCache
     iiifCache = new IIIFCache(redisCache);
-    imageCache = new ImageCache();
-    
+    imageCache = new ImageCache(redisCache);
+
     logger.info('缓存服务初始化成功');
   } catch (error) {
     logger.error('缓存服务初始化失败:', error);

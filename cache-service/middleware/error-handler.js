@@ -24,21 +24,9 @@ const errorHandler = (err, req, res, next) => {
     stack: err.stack
   });
 
-  // Mongoose错误处理
-  if (err.name === 'CastError') {
-    const message = '资源未找到';
-    error = new AppError(message, 404);
-  }
-
-  // Mongoose重复字段错误
-  if (err.code === 11000) {
-    const message = '重复字段值';
-    error = new AppError(message, 400);
-  }
-
-  // Mongoose验证错误
+  // 验证错误处理
   if (err.name === 'ValidationError') {
-    const message = Object.values(err.errors).map(val => val.message);
+    const message = err.message || '数据验证失败';
     error = new AppError(message, 400);
   }
 
