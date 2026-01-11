@@ -2,18 +2,41 @@ import { IIIFManifest } from '@/components/iiif/iiifTypes.ts';
 import { isProduction, isDevelopment, logProduction, logDevelopment } from '../../utils/environment';
 import { cacheService } from '@/services/cache/cache-service';
 
+// IIIF元数据项接口
+interface IIIFMetadataItem {
+  label: Record<string, string>;
+  value: Record<string, string | string[]>;
+}
+
+// IIIF服务接口
+interface IIIFService {
+  id?: string;
+  type?: string;
+  [key: string]: unknown;
+}
+
+// IIIF缩略图接口
+interface IIIFThumbnail {
+  id?: string;
+  type?: string;
+  format?: string;
+  width?: number;
+  height?: number;
+  [key: string]: unknown;
+}
+
 // IIIF信息接口
 interface IIIFInfo {
   id?: string;
   type?: string;
   label?: { zh?: string[]; ['zh-CN']?: string[]; en?: string[] };
-  metadata?: Array<any>;
-  items?: Array<any>;
-  thumbnail?: Array<any>;
+  metadata?: IIIFMetadataItem[];
+  items?: IIIFInfo[];
+  thumbnail?: IIIFThumbnail[];
   rights?: string;
-  provider?: Array<any>;
-  seeAlso?: Array<any>;
-  service?: Array<any>;
+  provider?: Record<string, unknown>[];
+  seeAlso?: Record<string, unknown>[];
+  service?: IIIFService[];
 }
 
 // 环境感知的代理函数 - 生产环境彻底禁用代理
