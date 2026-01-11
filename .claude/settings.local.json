@@ -154,7 +154,12 @@
       "Bash(command:*)",
       "Bash(Get-ChildItem \"C:\\\\Users\\\\afkxw\\\\.local\\\\bin\")",
       "Bash(lsof:*)",
-      "Bash(ps:*)"
+      "Bash(ps:*)",
+      "mcp__chrome-devtools__list_pages",
+      "Bash(for:*)",
+      "Bash(do:*)",
+      "Bash(done)",
+      "Bash(npx playwright:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",

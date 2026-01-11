@@ -73,7 +73,7 @@ const ImageItem = React.memo(({
         }`}
         loading={isVisible ? "eager" : "lazy"}
         decoding="async"
-        fetchPriority={isVisible ? "high" : "low"}
+        fetchpriority={isVisible ? "high" : "low"}
         onLoad={handleLoad}
         onError={handleError}
       />
