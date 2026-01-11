@@ -467,9 +467,6 @@ export const useSmartImagePreloader = (
 
   // 组件卸载时清理所有资源
   useEffect(() => {
-    // 在effect开始时捕获ref值，避免cleanup函数中的ref值变化问题
-    const currentLoadingRef = loadingRef;
-
     return () => {
       // 清理定时器
       if (preloadTimeoutRef.current) {
@@ -488,7 +485,7 @@ export const useSmartImagePreloader = (
         abortControllerRef.current = null;
       }
 
-      // 清理加载中的图片引用（使用捕获的ref引用）
+      // 清理加载中的图片引用
       loadingRef.current.clear();
 
       // 停止加载状态

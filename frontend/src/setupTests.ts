@@ -1,7 +1,6 @@
 import '@testing-library/jest-dom';
 
 // Mock framer-motion to avoid React JSX runtime issues in Jest
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 jest.mock('framer-motion', () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const React = require('react');

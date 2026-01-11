@@ -52,7 +52,7 @@
       "Bash(curl:*)",
       "mcp__playwright__browser_evaluate",
       "mcp__playwright__browser_wait_for",
-      "Bash(\"bash\" \"S:\\vibe_coding\\taofen_web\\scripts\\test-masonry-fix.sh\")",
+      "Bash(bash /mnt/s/vibe_coding/taofen_web/scripts/test-masonry-fix.sh)",
       "Bash(bash:*)",
       "Bash(node:*)",
       "mcp__playwright__browser_resize",
@@ -151,18 +151,15 @@
       "Bash(source:*)",
       "Bash(export PATH=\"$HOME/.ralph:$PATH\":*)",
       "Bash(~/.ralph/ralph:*)",
-      "Bash(command:*)"
+      "Bash(command:*)",
+      "Bash(Get-ChildItem \"C:\\\\Users\\\\afkxw\\\\.local\\\\bin\")",
+      "Bash(lsof:*)",
+      "Bash(ps:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",
     "additionalDirectories": [
-      "S:\\S\\vibe_coding\\taofen_web",
-      "S:\\mnt\\s\\vibe_coding\\taofen_web",
-      "S:\\S:\\vibe_coding\\taofen_web",
-      "S:\\vibe_coding",
-      "S:\\s\\vibe_coding\\taofen_web\\frontend\\src\\pages",
-      "S:\\s\\vibe_coding\\taofen_web\\frontend",
-      "S:\\s\\vibe_coding\\taofen_web"
+      "/mnt/s/vibe_coding/taofen_web"
     ]
   },
   "enableAllProjectMcpServers": true,
