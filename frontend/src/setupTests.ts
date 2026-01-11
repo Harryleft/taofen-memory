@@ -1,20 +1,15 @@
 import '@testing-library/jest-dom';
 
 // Mock framer-motion to avoid React JSX runtime issues in Jest
-jest.mock('framer-motion', () => ({
-  motion: {
-    div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
-      <div {...props}>{children}</div>
-    ),
-    span: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
-      <span {...props}>{children}</span>
-    ),
-    button: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
-      <button {...props}>{children}</button>
-    ),
-    a: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
-      <a {...props}>{children}</a>
-    ),
-  },
-  AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-}));
+jest.mock('framer-motion', () => {
+  const React = require('react');
+  return {
+    motion: {
+      div: (props: Record<string, unknown>) => React.createElement('div', props),
+      span: (props: Record<string, unknown>) => React.createElement('span', props),
+      button: (props: Record<string, unknown>) => React.createElement('button', props),
+      a: (props: Record<string, unknown>) => React.createElement('a', props),
+    },
+    AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
+  };
+});
