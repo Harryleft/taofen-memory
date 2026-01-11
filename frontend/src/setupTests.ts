@@ -1,8 +1,8 @@
 import '@testing-library/jest-dom';
+import * as React from 'react';
 
 // Mock framer-motion to avoid React JSX runtime issues in Jest
 jest.mock('framer-motion', () => {
-  const React = require('react');
 
   // Framer-motion specific props that should be filtered out
   const motionProps = new Set([
