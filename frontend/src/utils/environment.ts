@@ -33,21 +33,21 @@ export const getEnvironment = (): string => {
 };
 
 // 生产环境日志
-export const logProduction = (message: string, ...args: any[]) => {
+export const logProduction = (message: string, ...args: unknown[]) => {
   if (isProduction()) {
     console.log(`🚀 [生产环境] ${message}`, ...args);
   }
 };
 
 // 开发环境日志
-export const logDevelopment = (message: string, ...args: any[]) => {
+export const logDevelopment = (message: string, ...args: unknown[]) => {
   if (isDevelopment()) {
     console.log(`🛠️ [开发环境] ${message}`, ...args);
   }
 };
 
 // 环境通用日志
-export const logEnvironment = (message: string, ...args: any[]) => {
+export const logEnvironment = (message: string, ...args: unknown[]) => {
   const env = getEnvironment();
   console.log(`🌍 [${env}] ${message}`, ...args);
 };
