@@ -489,7 +489,7 @@ export const useSmartImagePreloader = (
       }
 
       // 清理加载中的图片引用（使用捕获的ref引用）
-      currentLoadingRef.current.clear();
+      loadingRef.current.clear();
 
       // 停止加载状态
       setLoading(false);
