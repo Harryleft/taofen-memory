@@ -7,7 +7,7 @@ import NewspapersLayout from './NewspapersLayout.tsx';
 import { EmptyState } from './EmptyState';
 import { NewspapersGuideArea } from './NewspapersGuideArea';
 import { useTouchDrawer } from '@/hooks/useTouchDrawer.ts';
-import { isProduction, isDevelopment, logProduction, logDevelopment } from '../../utils/environment';
+import { isProduction, logProduction, logDevelopment } from '../../utils/environment';
 
 // ====================
 // 常量配置
