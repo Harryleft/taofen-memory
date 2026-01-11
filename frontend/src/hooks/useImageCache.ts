@@ -340,7 +340,7 @@ export const useSmartImagePreloader = (
     } finally {
       loadingRef.current.delete(url);
     }
-  }, [loadedImages, failedImages, maxCacheSize]);
+  }, [loadedImages, failedImages, maxCacheSize, concurrency]);
 
   const preloadImages = useCallback(async (urls: string[], isPriority: boolean = false) => {
     if (!enabled || urls.length === 0) return;
@@ -478,16 +478,17 @@ export const useSmartImagePreloader = (
         clearInterval(cleanupIntervalRef.current);
         cleanupIntervalRef.current = null;
       }
-      
+
       // 中止所有进行中的加载
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
         abortControllerRef.current = null;
       }
-      
-      // 清理加载中的图片引用
-      loadingRef.current.clear();
-      
+
+      // 清理加载中的图片引用（复制到局部变量以避免ref问题）
+      const loadingRefCopy = loadingRef.current;
+      loadingRefCopy.clear();
+
       // 停止加载状态
       setLoading(false);
     };
