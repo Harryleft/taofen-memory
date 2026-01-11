@@ -39,6 +39,14 @@ interface IIIFInfo {
   service?: IIIFService[];
 }
 
+// IIIF集合项接口
+interface IIIFCollectionItem {
+  id: string;
+  type?: string;
+  label?: { zh?: string[]; ['zh-CN']?: string[]; en?: string[] };
+  summary?: { zh?: string[]; ['zh-CN']?: string[]; en?: string[] };
+}
+
 // 环境感知的代理函数 - 生产环境彻底禁用代理
 async function fetchWithProxy(url: string): Promise<Response> {
   if (isProduction) {
