@@ -301,7 +301,10 @@ const AI_API_CONFIG = {
     }
     return key;
   },
-  model: 'glm-4.5-air'
+  get model() {
+    // 从环境变量读取模型，默认使用 glm-4.7
+    return process.env.AI_MODEL || 'glm-4.7';
+  }
 };
 
 // AI解读接口 - 添加速率限制和输入验证
