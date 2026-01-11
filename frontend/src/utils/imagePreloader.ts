@@ -107,10 +107,10 @@ export class ImagePreloader {
       
       // 开始加载
       img.src = src;
-      
-      // 如果是优先加载，设置 fetchPriority
+
+      // 如果是优先加载，设置 fetchpriority (HTML标准属性使用小写)
       if (priority) {
-        img.fetchPriority = 'high';
+        img.fetchpriority = 'high';
       }
     });
     

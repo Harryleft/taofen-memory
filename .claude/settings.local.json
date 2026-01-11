@@ -159,7 +159,8 @@
       "Bash(for:*)",
       "Bash(do:*)",
       "Bash(done)",
-      "Bash(npx playwright:*)"
+      "Bash(npx playwright:*)",
+      "Bash(kill:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",
