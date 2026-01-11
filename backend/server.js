@@ -5,7 +5,25 @@ const path = require('path');
 const { createClient } = require('redis');
 require('dotenv').config();
 
-// 输入验证中间件
+// 启动时验证环境变量
+function validateEnv() {
+  const requiredVars = [];
+  if (!process.env.AI_API_KEY) {
+    requiredVars.push('AI_API_KEY');
+  }
+  if (!process.env.REDIS_URL) {
+    // Redis URL是可选的,有内存后备方案
+    console.warn('⚠️  未设置REDIS_URL,将使用内存缓存');
+  }
+
+  if (requiredVars.length > 0) {
+    throw new Error(`缺少必要的环境变量: ${requiredVars.join(', ')}`);
+  }
+
+  console.log('✅ 环境变量验证通过');
+}
+
+// 输入验证和清理中间件
 const validateAIInput = (req, res, next) => {
   const { content, title, notes } = req.body;
 
@@ -24,31 +42,76 @@ const validateAIInput = (req, res, next) => {
     return res.status(400).json({ error: 'content长度不能超过5000字符' });
   }
 
-  // 检测潜在的prompt injection
+  // HTML实体编码函数
+  const escapeHtml = (text) => {
+    const map = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#x27;',
+      '/': '&#x2F;'
+    };
+    return text.replace(/[&<>"'/]/g, m => map[m]);
+  };
+
+  // 清理和验证输入
+  const cleanContent = escapeHtml(content.trim());
+  const cleanTitle = title ? escapeHtml(title.trim()) : '';
+  const cleanNotes = notes ? escapeHtml(notes.trim()) : '';
+
+  // 检测潜在的prompt injection (清理后)
   const dangerousPatterns = [
     /<script/i,
     /javascript:/i,
     /data:text/i,
     /onload=/i,
-    /ignore.*previous.*instructions/i,
-    /disregard.*above/i
+    /onerror=/i,
+    /ignore.*all.*instructions/i,
+    /disregard.*everything/i,
+    /system.*prompt/i,
+    /角色.*扮演/i
   ];
 
-  const combinedInput = `${content} ${title || ''} ${notes || ''}`;
+  const combinedInput = `${cleanContent} ${cleanTitle} ${cleanNotes}`;
   for (const pattern of dangerousPatterns) {
     if (pattern.test(combinedInput)) {
       return res.status(400).json({ error: '输入内容包含不合法字符' });
     }
   }
 
+  // 将清理后的数据挂载到req对象上
+  req.sanitizedInput = {
+    title: cleanTitle,
+    content: cleanContent,
+    notes: cleanNotes
+  };
+
   next();
 };
 
-// AI API速率限制（内存实现）
+// AI API速率限制（内存实现，修复内存泄漏）
 const aiRateLimiter = (() => {
   const requests = new Map();
   const WINDOW_MS = 60000; // 1分钟
   const MAX_REQUESTS = 10;  // 每分钟最多10次
+  const CLEANUP_INTERVAL = 300000; // 5分钟清理一次
+
+  // 定期清理过期IP条目，防止内存泄漏
+  setInterval(() => {
+    const now = Date.now();
+    for (const [ip, userRequests] of requests.entries()) {
+      // 清理过期的请求时间戳
+      const validRequests = userRequests.filter(time => now - time < WINDOW_MS);
+      if (validRequests.length === 0) {
+        // 删除没有活跃请求的IP
+        requests.delete(ip);
+      } else {
+        // 更新有效请求
+        requests.set(ip, validRequests);
+      }
+    }
+  }, CLEANUP_INTERVAL);
 
   return (req, res, next) => {
     const ip = req.ip || req.connection.remoteAddress;
@@ -59,9 +122,12 @@ const aiRateLimiter = (() => {
     const validRequests = userRequests.filter(time => now - time < WINDOW_MS);
 
     if (validRequests.length >= MAX_REQUESTS) {
+      // 计算实际需要等待的时间
+      const oldestRequest = validRequests[0];
+      const waitTime = oldestRequest + WINDOW_MS - now;
       return res.status(429).json({
         error: 'AI调用过于频繁，请稍后重试',
-        retryAfter: Math.ceil(WINDOW_MS / 1000)
+        retryAfter: Math.ceil(Math.max(0, waitTime) / 1000)
       });
     }
 
@@ -73,6 +139,15 @@ const aiRateLimiter = (() => {
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// 立即验证环境变量
+try {
+  validateEnv();
+} catch (error) {
+  console.error('❌ 启动失败:', error.message);
+  console.error('请检查.env文件配置');
+  process.exit(1);
+}
 
 // Redis客户端配置 - 快速失败模式
 let redisClient = null;
@@ -98,7 +173,14 @@ async function connectRedis() {
       url: process.env.REDIS_URL || 'redis://localhost:6379',
       socket: {
         connectTimeout: 3000, // 3秒连接超时
-        reconnectStrategy: false // 禁用自动重连
+        reconnectStrategy: (retries) => {
+          if (retries > 10) {
+            console.error('Redis重连次数过多，停止重连');
+            return new Error('Redis重连次数过多');
+          }
+          // 指数退避: 100ms, 200ms, 400ms, ..., 最大5秒
+          return Math.min(retries * 100, 5000);
+        }
       }
     });
     
@@ -225,7 +307,9 @@ const AI_API_CONFIG = {
 // AI解读接口 - 添加速率限制和输入验证
 app.post('/api/ai/interpret', aiRateLimiter, validateAIInput, async (req, res) => {
   try {
-    const { title, content, notes, time } = req.body;
+    // 使用清理后的输入
+    const { title, content, notes } = req.sanitizedInput;
+    const { time } = req.body;
 
     // 构建提示词
     const prompt = `角色：你是一名深谙邹韬奋思想的金牌讲解员，擅长用生活化比喻和当代语境还原历史手稿的灵魂。
