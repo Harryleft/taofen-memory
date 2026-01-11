@@ -3,7 +3,7 @@
  * 展示如何使用缓存功能优化IIIF图像加载
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useIIIFInfo, useCachePrefetch } from '../hooks/useCache';
 import { IIIFUrlBuilder } from '../components/iiif/iiifUrlBuilder';
 
@@ -41,7 +41,7 @@ export const IIIFCacheExample: React.FC = () => {
   const { prefetchIIIF, loading: prefetchLoading } = useCachePrefetch();
 
   // 加载图像
-  const loadImage = async () => {
+  const loadImage = useCallback(async () => {
     setLoading(true);
     try {
       const url = await IIIFUrlBuilder.getIIIFImage(selectedImage.identifier, {
@@ -56,7 +56,7 @@ export const IIIFCacheExample: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedImage.identifier]);
 
   // 预取所有示例图像
   const prefetchAll = async () => {
@@ -83,7 +83,7 @@ export const IIIFCacheExample: React.FC = () => {
   // 选择图像时自动加载
   useEffect(() => {
     loadImage();
-  }, [selectedImage]);
+  }, [loadImage]);
 
   // 监听缓存命中/未命中
   useEffect(() => {
