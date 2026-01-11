@@ -290,18 +290,19 @@ class PerformanceMonitor {
     const instance = PerformanceMonitor.getInstance();
     // 统一使用 hero- 前缀，避免重复前缀
     const markName = name.startsWith('hero-') ? name : `hero-${name}`;
-    
+
     // 安全检查：确保 performance API 可用
     if (typeof performance === 'undefined' || typeof performance.mark !== 'function') {
-      console.warn('Performance API not available, skipping mark:', markName);
       return;
     }
-    
+
     try {
+      // 清理可能存在的同名标记，避免重新渲染时冲突
+      performance.clearMarks(markName);
       performance.mark(markName);
       instance.customMarks.set(name, { startTime: performance.now() });
     } catch (error) {
-      console.warn('Failed to create performance mark:', markName, error);
+      // 静默失败，避免控制台警告
     }
   }
 
@@ -311,27 +312,26 @@ class PerformanceMonitor {
     const startMark = name.startsWith('hero-') ? name : `hero-${name}`;
     const endMark = `${startMark}-end`;
     const measureName = name.startsWith('hero-') ? name : `hero-${name}`;
-    
+
     // 安全检查：确保 performance API 可用
     if (typeof performance === 'undefined' || typeof performance.mark !== 'function') {
-      console.warn('Performance API not available, skipping mark:', endMark);
       return 0;
     }
-    
+
     try {
       // 检查开始标记是否存在
       const startMarks = performance.getEntriesByName(startMark, 'mark');
       if (startMarks.length === 0) {
-        console.warn(`Start mark '${startMark}' does not exist, skipping measurement`);
+        // 标记已被清理或不存在，静默返回
         return 0;
       }
-      
+
       performance.mark(endMark);
       performance.measure(measureName, startMark, endMark);
-      
+
       const measures = performance.getEntriesByName(measureName);
       const duration = measures.length > 0 ? measures[measures.length - 1].duration : 0;
-      
+
       const markData = instance.customMarks.get(name);
       if (markData) {
         markData.endTime = performance.now();
@@ -342,7 +342,7 @@ class PerformanceMonitor {
           duration,
         });
       }
-      
+
       // 清理标记
       performance.clearMarks(startMark);
       performance.clearMarks(endMark);

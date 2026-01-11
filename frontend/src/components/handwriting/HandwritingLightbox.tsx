@@ -145,7 +145,7 @@ const HandwritingLightbox = memo(({
                     imageStatus === 'loaded' ? 'opacity-100' : 'opacity-0'
                   }`}
                   loading="lazy"
-                  fetchPriority="high"
+                  fetchpriority="high"
                   onLoad={handleImageLoad}
                   onError={handleImageError}
                 />

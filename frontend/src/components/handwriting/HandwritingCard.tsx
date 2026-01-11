@@ -129,7 +129,7 @@ const HandwritingCard = memo(({
               }`}
               style={{ height: `${item.dimensions.height}px` }}
               loading={loadingStrategy}
-              fetchPriority={fetchPriority}
+              fetchpriority={fetchPriority}
               onLoad={() => setImageLoaded(true)}
               onError={handleImageError}
             />
