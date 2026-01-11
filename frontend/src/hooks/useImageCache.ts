@@ -467,13 +467,16 @@ export const useSmartImagePreloader = (
 
   // 组件卸载时清理所有资源
   useEffect(() => {
+    // 在effect开始时捕获ref值，避免cleanup函数中的ref值变化问题
+    const currentLoadingRef = loadingRef;
+
     return () => {
       // 清理定时器
       if (preloadTimeoutRef.current) {
         clearTimeout(preloadTimeoutRef.current);
         preloadTimeoutRef.current = null;
       }
-      
+
       if (cleanupIntervalRef.current) {
         clearInterval(cleanupIntervalRef.current);
         cleanupIntervalRef.current = null;
@@ -485,9 +488,8 @@ export const useSmartImagePreloader = (
         abortControllerRef.current = null;
       }
 
-      // 清理加载中的图片引用（复制到局部变量以避免ref问题）
-      const loadingRefCopy = loadingRef.current;
-      loadingRefCopy.clear();
+      // 清理加载中的图片引用（使用捕获的ref引用）
+      currentLoadingRef.current.clear();
 
       // 停止加载状态
       setLoading(false);

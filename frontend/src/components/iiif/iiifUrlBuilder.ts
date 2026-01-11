@@ -3,7 +3,7 @@
  * 统一处理所有IIIF相关的URL构建逻辑
  * 增加缓存支持
  */
-import { isDevelopment, logProduction, logDevelopment } from '../../utils/environment';
+import { isDevelopment } from '../../utils/environment';
 import { cacheService } from '../../services/cache/cache-service';
 
 export class IIIFUrlBuilder {
@@ -87,12 +87,12 @@ export class IIIFUrlBuilder {
     // 环境感知的代理处理
     if (proxy && isDevelopment && url.startsWith('https://')) {
       const proxyUrl = `${this.PROXY_BASE}?url=${encodeURIComponent(url)}`;
-      logDevelopment('IIIF构建 - 使用代理:', proxyUrl);
+      console.log('IIIF构建 - 使用代理:', proxyUrl);
       return proxyUrl;
     }
-    
+
     // 生产环境直接访问，绝对不使用代理
-    logProduction('IIIF构建 - 直接访问:', url);
+    console.log('IIIF构建 - 直接访问:', url);
     return url;
   }
 
