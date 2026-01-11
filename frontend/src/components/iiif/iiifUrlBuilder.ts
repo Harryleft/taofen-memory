@@ -3,7 +3,7 @@
  * 统一处理所有IIIF相关的URL构建逻辑
  * 增加缓存支持
  */
-import { isProduction, isDevelopment, logProduction, logDevelopment } from '../../utils/environment';
+import { isDevelopment, logProduction, logDevelopment } from '../../utils/environment';
 import { cacheService } from '../../services/cache/cache-service';
 
 export class IIIFUrlBuilder {
@@ -117,7 +117,7 @@ export class IIIFUrlBuilder {
   /**
    * 获取IIIF信息（支持缓存）
    */
-  static async getIIIFInfo(identifier: string): Promise<any> {
+  static async getIIIFInfo(identifier: string): Promise<IIIFInfoResponse> {
     console.log('🔍 [IIIF] 获取IIIF信息:', identifier);
     
     if (this.CACHE_ENABLED && isDevelopment) {
@@ -314,4 +314,15 @@ export interface IIIFUrlComponents {
 export interface IIIFUrlOptions {
   proxy?: boolean;
   format?: 'manifest' | 'collection' | 'json';
+}
+
+/**
+ * IIIF信息响应接口
+ */
+export interface IIIFInfoResponse {
+  id: string;
+  type: string;
+  label: Record<string, string[]>;
+  metadata?: Array<{ label: Record<string, string>; value: Record<string, string> }>;
+  [key: string]: unknown;
 }
