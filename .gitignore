@@ -108,6 +108,10 @@ data/
 .claude/
 .specstory/
 
+# 图片资源 - 体积过大，不提交到版本控制
+images/
+frontend/public/images/
+
 # 保留示例数据
 !data-example/
 !public/images-example/
