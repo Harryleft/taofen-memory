@@ -2,7 +2,6 @@ const express = require('express');
 const cors = require('cors');
 const https = require('https');
 const path = require('path');
-const { createClient } = require('redis');
 require('dotenv').config();
 
 // 启动时验证环境变量
@@ -10,10 +9,6 @@ function validateEnv() {
   const requiredVars = [];
   if (!process.env.AI_API_KEY) {
     requiredVars.push('AI_API_KEY');
-  }
-  if (!process.env.REDIS_URL) {
-    // Redis URL是可选的,有内存后备方案
-    console.warn('⚠️  未设置REDIS_URL,将使用内存缓存');
   }
 
   if (requiredVars.length > 0) {
@@ -149,131 +144,36 @@ try {
   process.exit(1);
 }
 
-// Redis客户端配置 - 快速失败模式
-let redisClient = null;
-let isRedisConnecting = false;
-
-async function connectRedis() {
-  // 如果已经连接成功，直接返回
-  if (redisClient && redisClient.isReady) {
-    return;
-  }
-  
-  // 如果正在连接中，避免重复连接
-  if (isRedisConnecting) {
-    return;
-  }
-  
-  isRedisConnecting = true;
-  
-  try {
-    console.log('正在连接Redis...');
-    
-    redisClient = createClient({
-      url: process.env.REDIS_URL || 'redis://localhost:6379',
-      socket: {
-        connectTimeout: 3000, // 3秒连接超时
-        reconnectStrategy: (retries) => {
-          if (retries > 10) {
-            console.error('Redis重连次数过多，停止重连');
-            return new Error('Redis重连次数过多');
-          }
-          // 指数退避: 100ms, 200ms, 400ms, ..., 最大5秒
-          return Math.min(retries * 100, 5000);
-        }
-      }
-    });
-    
-    redisClient.on('error', (err) => {
-      console.error('Redis客户端错误:', err.message);
-    });
-    
-    redisClient.on('connect', () => {
-      console.log('Redis客户端连接成功');
-    });
-    
-    // 快速连接测试
-    await redisClient.connect();
-    console.log('Redis连接已建立');
-    
-  } catch (error) {
-    console.error('Redis连接失败:', error.message);
-    
-    // 清理失败的客户端
-    if (redisClient) {
-      try {
-        if (redisClient.isOpen) {
-          await redisClient.quit();
-        }
-      } catch (e) {
-        // 忽略清理错误
-      }
-      redisClient = null;
-    }
-    
-    console.log('Redis不可用，将使用内存缓存');
-  } finally {
-    isRedisConnecting = false;
-  }
-}
-
-// 内存缓存后备方案 - 修复泄漏
+// 内存缓存
 const memoryCache = new Map();
-const cacheTimers = new Map(); // 存储定时器引用
+const cacheTimers = new Map();
 
 // 缓存操作函数
 async function getFromCache(key) {
-  try {
-    if (redisClient && redisClient.isReady) {
-      const value = await redisClient.get(key);
-      return value ? JSON.parse(value) : null;
-    } else {
-      return memoryCache.get(key);
-    }
-  } catch (error) {
-    console.error('获取缓存失败:', error);
-    return null;
-  }
+  return memoryCache.get(key) || null;
 }
 
 async function setToCache(key, value, ttl = 3600) {
-  try {
-    const serializedValue = JSON.stringify(value);
-    if (redisClient && redisClient.isReady) {
-      await redisClient.setEx(key, ttl, serializedValue);
-      // 清除旧的定时器
-      if (cacheTimers.has(key)) {
-        clearTimeout(cacheTimers.get(key));
-        cacheTimers.delete(key);
-      }
-    } else {
-      memoryCache.set(key, value);
-      // 存储定时器引用，允许取消
-      const timer = setTimeout(() => {
-        memoryCache.delete(key);
-        cacheTimers.delete(key);
-      }, ttl * 1000);
-      cacheTimers.set(key, timer);
-    }
-    return true;
-  } catch (error) {
-    console.error('设置缓存失败:', error);
-    return false;
+  memoryCache.set(key, value);
+  if (cacheTimers.has(key)) {
+    clearTimeout(cacheTimers.get(key));
+    cacheTimers.delete(key);
   }
+  const timer = setTimeout(() => {
+    memoryCache.delete(key);
+    cacheTimers.delete(key);
+  }, ttl * 1000);
+  cacheTimers.set(key, timer);
+  return true;
 }
 
 async function deleteFromCache(key) {
-  try {
-    if (redisClient && redisClient.isReady) {
-      await redisClient.del(key);
-    } else {
-      memoryCache.delete(key);
-    }
-    return true;
-  } catch (error) {
-    console.error('删除缓存失败:', error);
-    return false;
+  memoryCache.delete(key);
+  if (cacheTimers.has(key)) {
+    clearTimeout(cacheTimers.get(key));
+    cacheTimers.delete(key);
   }
+  return true;
 }
 
 // 中间件
@@ -434,21 +334,12 @@ app.post('/api/ai/interpret', aiRateLimiter, validateAIInput, async (req, res) =
 
 // 缓存服务接口
 app.get('/api/cache/health', async (req, res) => {
-  try {
-    const isConnected = redisClient && redisClient.isReady;
-    res.json({ 
-      status: 'ok', 
-      timestamp: new Date().toISOString(),
-      redis_connected: isConnected,
-      cache_type: isConnected ? 'redis' : 'memory'
-    });
-  } catch (error) {
-    res.status(500).json({ 
-      status: 'error', 
-      message: '缓存健康检查失败',
-      error: error.message 
-    });
-  }
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    cache_type: 'memory',
+    cache_size: memoryCache.size
+  });
 });
 
 app.post('/api/cache/set', async (req, res) => {
@@ -546,36 +437,16 @@ app.post('/api/cache/mget', async (req, res) => {
       });
     }
 
-    if (keys.length === 0) {
-      return res.json({ success: true, data: [], results: [], count: 0, found: 0 });
-    }
-
-    let results;
-
-    if (redisClient && redisClient.isReady) {
-      // 使用 Redis MGET 一次性查询所有键
-      const values = await redisClient.mGet(keys);
-      results = keys.map((key, index) => ({
-        key,
-        value: values[index] ? JSON.parse(values[index]) : null,
-        found: values[index] !== null
-      }));
-    } else {
-      // 内存缓存逐个查询
-      results = keys.map(key => ({
-        key,
-        value: memoryCache.get(key) || null,
-        found: memoryCache.has(key)
-      }));
-    }
-
-    // 按照原始keys顺序返回数据
-    const data = results.map(r => r.value);
+    const results = keys.map(key => ({
+      key,
+      value: memoryCache.get(key) || null,
+      found: memoryCache.has(key)
+    }));
 
     res.json({
       success: true,
-      data: data,
-      results: results,
+      data: results.map(r => r.value),
+      results,
       count: keys.length,
       found: results.filter(r => r.found).length
     });
@@ -590,58 +461,27 @@ app.post('/api/cache/mget', async (req, res) => {
 });
 
 app.post('/api/cache/clear', async (req, res) => {
-  try {
-    if (redisClient && redisClient.isReady) {
-      await redisClient.flushDb();
-    } else {
-      memoryCache.clear();
-    }
-    
-    res.json({ 
-      success: true, 
-      message: '缓存清空成功',
-      cache_type: redisClient && redisClient.isReady ? 'redis' : 'memory'
-    });
-  } catch (error) {
-    console.error('清空缓存错误:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: '清空缓存失败',
-      error: error.message 
-    });
+  for (const [key, timer] of cacheTimers.entries()) {
+    clearTimeout(timer);
   }
+  cacheTimers.clear();
+  memoryCache.clear();
+
+  res.json({
+    success: true,
+    message: '缓存清空成功',
+    cache_type: 'memory'
+  });
 });
 
 app.get('/api/cache/stats', async (req, res) => {
-  try {
-    let stats = {
-      connected: redisClient && redisClient.isReady,
-      cache_type: redisClient && redisClient.isReady ? 'redis' : 'memory',
-      memory_cache_size: memoryCache.size
-    };
-    
-    if (redisClient && redisClient.isReady) {
-      try {
-        const info = await redisClient.info('memory');
-        const usedMemory = info.match(/used_memory_human:([^\r\n]+)/);
-        const keyCount = await redisClient.dbSize();
-        
-        stats.redis_used_memory = usedMemory ? usedMemory[1] : 'unknown';
-        stats.redis_key_count = keyCount;
-      } catch (error) {
-        console.error('获取Redis统计信息失败:', error);
-      }
+  res.json({
+    success: true,
+    data: {
+      cache_type: 'memory',
+      cache_size: memoryCache.size
     }
-    
-    res.json({ success: true, data: stats });
-  } catch (error) {
-    console.error('获取缓存统计错误:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: '获取缓存统计失败',
-      error: error.message 
-    });
-  }
+  });
 });
 
 // 健康检查接口
@@ -657,19 +497,10 @@ app.use((err, req, res, next) => {
 
 // 启动服务器
 function startServer() {
-  // 立即启动服务器，不等待Redis连接
   const server = app.listen(PORT, () => {
     console.log(`AI代理服务器运行在端口 ${PORT}`);
-    console.log('服务器启动成功，正在连接Redis...');
   });
-  
-  // 后台连接Redis，不阻塞服务器启动
-  connectRedis().then(() => {
-    console.log(`缓存服务初始化完成: ${redisClient && redisClient.isReady ? 'Redis' : '内存缓存'}`);
-  }).catch((error) => {
-    console.error('Redis连接失败，使用内存缓存:', error.message);
-  });
-  
+
   return server;
 }
 
