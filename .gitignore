@@ -144,3 +144,9 @@ status.json
 @fix_plan.md
 PROMPT.md
 uv_simple.html
+
+# 本地工具配置
+.browser-echo-mcp.json
+.cursorindexingignore
+.mcp.json
+CLAUDE.local.md
