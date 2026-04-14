@@ -151,6 +151,7 @@ uv_simple.html
 .cursorindexingignore
 .mcp.json
 CLAUDE.local.md
+CLAUDE.md
 
 # 构建产物
 assets/
