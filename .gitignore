@@ -126,3 +126,21 @@ frontend/public/images/
 taofen_web_source/
 tmp/
 temp/
+
+# 运行时状态文件
+.circuit_breaker_history
+.circuit_breaker_state
+.claude_session_id
+.exit_signals
+.last_reset
+.ralph_session
+.ralph_session_history
+.response_analysis
+progress.json
+status.json
+
+# 临时文档
+@AGENT.md
+@fix_plan.md
+PROMPT.md
+uv_simple.html
