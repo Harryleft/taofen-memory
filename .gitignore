@@ -150,3 +150,19 @@ uv_simple.html
 .cursorindexingignore
 .mcp.json
 CLAUDE.local.md
+
+# 构建产物
+assets/
+index.html
+
+# 开发截图参考
+dev_image/
+
+# IDE/工具自动生成
+.playwright-mcp/
+.specstory/
+agents/
+specs/
+
+# Python 依赖（项目为 Node.js 栈）
+requirements.txt
