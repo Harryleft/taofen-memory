@@ -7,6 +7,7 @@
 """
 
 import json
+import os
 import requests
 import time
 import re
@@ -38,7 +39,7 @@ class WikipediaEnricher:
         self.api_url = 'https://zh.wikipedia.org/w/api.php'
         # 上海图书馆API配置
         self.sh_library_api = 'https://data1.library.sh.cn/persons/data'
-        self.sh_library_key = ''
+        self.sh_library_key = os.getenv('SH_LIBRARY_API_KEY', '').strip()
         
     def clean_name(self, name: str) -> str:
         """清理姓名，去除空字符串和多余空白"""
@@ -214,7 +215,9 @@ class WikipediaEnricher:
             return None
     
     def search_sh_library(self, name: str) -> Optional[Dict]:
-        """搜索上海图书馆人物数据"""
+        """搜索上海图书馆人物数据；未配置 SH_LIBRARY_API_KEY 时跳过。"""
+        if not self.sh_library_key:
+            return None
         try:
             # 上海图书馆API调用前延迟，避免请求过于频繁
             time.sleep(2.0)
@@ -245,13 +248,14 @@ class WikipediaEnricher:
             return None
             
         except requests.exceptions.HTTPError as e:
-            if e.response.status_code == 403:
+            status = e.response.status_code if e.response is not None else None
+            if status == 403:
                 print(f"搜索上海图书馆 {name} 时遇到403错误，可能需要更长的请求间隔")
             else:
-                print(f"搜索上海图书馆 {name} 时HTTP错误: {e}")
+                print(f"搜索上海图书馆 {name} 时HTTP错误，状态码: {status}")
             return None
         except Exception as e:
-            print(f"搜索上海图书馆 {name} 时出错: {e}")
+            print(f"搜索上海图书馆 {name} 时出错: {type(e).__name__}")
             return None
     
     def extract_sh_library_data(self, sh_data: Dict) -> Dict:
